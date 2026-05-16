@@ -55,7 +55,7 @@ class RingsPage extends StatelessWidget {
                         childAspectRatio: 0.66,
                       ),
                       itemBuilder: (context, index) {
-                        return ProductCard(product: catalogController.products[index % 4], compact: true);
+                        //return ProductCard(product: catalogController.products[index % 4], compact: true);
                       },
                     ),
                   ),

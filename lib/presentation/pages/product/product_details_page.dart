@@ -1,65 +1,644 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../app/routes/app_routes.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductDetailsPage extends StatelessWidget {
-  const ProductDetailsPage({super.key});
+  const ProductDetailsPage({
+    super.key,
+    required this.product,
+  });
+
+  final ProductModel product;
 
   @override
   Widget build(BuildContext context) {
+    final rawData = product.rawData ?? {};
+
     return Scaffold(
+      backgroundColor: AppColors.pageBg,
+
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(4),
+            context.getScreenHeight(1.2),
+            context.getScreenWidth(4),
+            context.getScreenHeight(1.2),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: context.getScreenHeight(6.2),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor:
+                          const Color(0xFFE5DED5),
+                      foregroundColor:
+                          AppColors.primaryGold,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          16,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      'Add to Cart',
+                      style: TextStyle(
+                        fontSize:
+                            context.getScreenWidth(
+                          4.5,
+                        ),
+                        fontWeight:
+                            FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                width: context.getScreenWidth(3),
+              ),
+
+              Expanded(
+                child: SizedBox(
+                  height: context.getScreenHeight(6.2),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor:
+                          AppColors.primaryGold,
+                      foregroundColor:
+                          Colors.white,
+                      shape:
+                          RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                          16,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.cart);
+                    },
+                    child: Text(
+                      'Buy Now',
+                      style: TextStyle(
+                        fontSize:
+                            context.getScreenWidth(
+                          4.5,
+                        ),
+                        fontWeight:
+                            FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      // =========================================================
+      // BODY
+      // =========================================================
+
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              height: 350,
-              width: double.infinity,
-              color: const Color(0xFFE6E1D9),
-              alignment: Alignment.center,
-              child: const Text('[ Product Image ]', style: TextStyle(fontSize: 30, color: Color(0xFF8C7E68))),
-            ),
-            const SizedBox(height: 8),
-            const Text('•  •  •', style: TextStyle(fontSize: 20, color: Color(0xFFC5B9A7))),
-            const SizedBox(height: 8),
+            // =====================================================
+            // IMAGE SECTION
+            // =====================================================
+
             Expanded(
+              flex: 5,
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    color: const Color(0xFFE6E1D9),
+                    child:
+                        product.imageUrl != null &&
+                                product.imageUrl!
+                                    .trim()
+                                    .isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl:
+                                    product.imageUrl!,
+                                fit: BoxFit.contain,
+
+                                placeholder:
+                                    (
+                                      context,
+                                      url,
+                                    ) {
+                                      return Shimmer.fromColors(
+                                        baseColor:
+                                            const Color(
+                                              0xFFE7E2DB,
+                                            ),
+                                        highlightColor:
+                                            const Color(
+                                              0xFFF5F1EB,
+                                            ),
+                                        child:
+                                            Container(
+                                              color:
+                                                  Colors
+                                                      .white,
+                                            ),
+                                      );
+                                    },
+
+                                errorWidget:
+                                    (
+                                      context,
+                                      url,
+                                      error,
+                                    ) {
+                                      return Center(
+                                        child: Icon(
+                                          Icons
+                                              .image_not_supported_outlined,
+                                          size:
+                                              context
+                                                  .getScreenWidth(
+                                                    12,
+                                                  ),
+                                          color:
+                                              Colors
+                                                  .grey,
+                                        ),
+                                      );
+                                    },
+                              )
+                            : Center(
+                                child: Text(
+                                  '[ Product Image ]',
+                                  style: TextStyle(
+                                    fontSize:
+                                        context
+                                            .getScreenWidth(
+                                              5,
+                                            ),
+                                    color:
+                                        const Color(
+                                          0xFF8C7E68,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                  ),
+
+                  // =================================================
+                  // BACK BUTTON
+                  // =================================================
+
+                  Positioned(
+                    top: context.getScreenHeight(2),
+                    left: context.getScreenWidth(4),
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(
+                          context.getScreenWidth(
+                            2.5,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black
+                                      .withOpacity(
+                                        0.08,
+                                      ),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_ios_new,
+                          size:
+                              context
+                                  .getScreenWidth(
+                                    4,
+                                  ),
+                          color:
+                              AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // =================================================
+                  // IMAGE INDICATORS
+                  // =================================================
+
+                  Positioned(
+                    bottom:
+                        context.getScreenHeight(
+                          1.5,
+                        ),
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center,
+                      children: List.generate(
+                        4,
+                        (index) {
+                          return Container(
+                            margin:
+                                EdgeInsets.symmetric(
+                              horizontal:
+                                  context
+                                      .getScreenWidth(
+                                        1,
+                                      ),
+                            ),
+                            width:
+                                index == 1 ? 18 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color:
+                                  index == 1
+                                      ? AppColors
+                                          .primaryGold
+                                      : Colors
+                                          .brown
+                                          .shade200,
+                              borderRadius:
+                                  BorderRadius.circular(
+                                    100,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // =====================================================
+            // DETAILS SECTION
+            // =====================================================
+
+            Expanded(
+              flex: 6,
               child: Container(
                 width: double.infinity,
-                color: AppColors.pageBg,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                decoration: const BoxDecoration(
+                  color: AppColors.pageBg,
+                ),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    context.getScreenWidth(5),
+                    context.getScreenHeight(2),
+                    context.getScreenWidth(5),
+                    context.getScreenHeight(2),
+                  ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      const Text('22K Yellow Gold Floral Ring', style: TextStyle(fontSize: 38, fontWeight: FontWeight.w700, color: AppColors.textDark)),
-                      const SizedBox(height: 6),
-                      const Text('⭐ 4.8  (124 reviews)', style: TextStyle(fontSize: 21, color: AppColors.textMuted)),
-                      const SizedBox(height: 2),
-                      const Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      // =============================================
+                      // PRODUCT NAME
+                      // =============================================
+
+                      Text(
+                        product.name,
+                        style: TextStyle(
+                          fontSize:
+                              context
+                                  .getScreenWidth(
+                                    7,
+                                  ),
+                          fontWeight:
+                              FontWeight.w700,
+                          color:
+                              AppColors.textDark,
+                          height: 1.2,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  0.8,
+                                ),
+                      ),
+
+                      // =============================================
+                      // REVIEWS
+                      // =============================================
+
+                      Row(
                         children: [
-                          Text('₹ 12,450', style: TextStyle(fontSize: 50, fontWeight: FontWeight.w700, color: AppColors.primaryGold)),
-                          SizedBox(width: 6),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 8),
-                            child: Text('(incl. making charges)', style: TextStyle(fontSize: 18, color: AppColors.textMuted)),
+                          Icon(
+                            Icons.star,
+                            color:
+                                const Color(
+                                  0xFFF4B400,
+                                ),
+                            size:
+                                context
+                                    .getScreenWidth(
+                                      4.5,
+                                    ),
+                          ),
+
+                          SizedBox(
+                            width:
+                                context
+                                    .getScreenWidth(
+                                      1,
+                                    ),
+                          ),
+
+                          Text(
+                            "4.8",
+                            style: TextStyle(
+                              fontSize:
+                                  context
+                                      .getScreenWidth(
+                                        4,
+                                      ),
+                              color:
+                                  AppColors
+                                      .textDark,
+                            ),
+                          ),
+
+                          SizedBox(
+                            width:
+                                context
+                                    .getScreenWidth(
+                                      1.5,
+                                    ),
+                          ),
+
+                          Text(
+                            "(124 reviews)",
+                            style: TextStyle(
+                              fontSize:
+                                  context
+                                      .getScreenWidth(
+                                        3.8,
+                                      ),
+                              color:
+                                  AppColors
+                                      .textMuted,
+                            ),
                           ),
                         ],
                       ),
-                      const Divider(height: 18),
-                      const Text('Product Details', style: TextStyle(fontSize: 31, fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 8),
-                      _detailRow('Purity', '22K (916 Hallmark)'),
-                      _detailRow('Weight', '1.2 grams'),
-                      _detailRow('Making Charges', '₹850'),
-                      _detailRow('Stone', 'None'),
-                      const SizedBox(height: 12),
-                      const Text('Reviews', style: TextStyle(fontSize: 31, fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 4),
-                      const Text('⭐⭐⭐⭐⭐ 4.8 out of 5', style: TextStyle(fontSize: 29, color: AppColors.textDark)),
-                      const Text('Based on 124 reviews', style: TextStyle(fontSize: 18, color: AppColors.textMuted)),
-                      const Spacer(),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  1,
+                                ),
+                      ),
+
+                      // =============================================
+                      // PRICE
+                      // =============================================
+
+                      Row(
+                        crossAxisAlignment:
+                            CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "₹ ${rawData["NetAmt"] ?? "12,450"}",
+                            style: TextStyle(
+                              fontSize:
+                                  context
+                                      .getScreenWidth(
+                                        8,
+                                      ),
+                              fontWeight:
+                                  FontWeight.w700,
+                              color:
+                                  AppColors
+                                      .primaryGold,
+                            ),
+                          ),
+
+                          SizedBox(
+                            width:
+                                context
+                                    .getScreenWidth(
+                                      2,
+                                    ),
+                          ),
+
+                          Padding(
+                            padding:
+                                EdgeInsets.only(
+                              bottom:
+                                  context
+                                      .getScreenHeight(
+                                        0.6,
+                                      ),
+                            ),
+                            child: Text(
+                              "(incl. making charges)",
+                              style: TextStyle(
+                                fontSize:
+                                    context
+                                        .getScreenWidth(
+                                          3.4,
+                                        ),
+                                color:
+                                    AppColors
+                                        .textMuted,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  1.2,
+                                ),
+                      ),
+
+                      Divider(
+                        color: Colors.grey.shade300,
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  1,
+                                ),
+                      ),
+
+                      // =============================================
+                      // PRODUCT DETAILS TITLE
+                      // =============================================
+
+                      Text(
+                        "Product Details",
+                        style: TextStyle(
+                          fontSize:
+                              context
+                                  .getScreenWidth(
+                                    5.5,
+                                  ),
+                          fontWeight:
+                              FontWeight.w700,
+                          color:
+                              AppColors.textDark,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  1.2,
+                                ),
+                      ),
+
+                      // =============================================
+                      // DETAILS
+                      // =============================================
+
+                      _detailRow(
+                        context,
+                        "Purity",
+                        product.karat ??
+                            "${rawData["SalesTouch"] ?? ""}K",
+                      ),
+
+                      _detailRow(
+                        context,
+                        "Weight",
+                        "${rawData["FineWt"] ?? "-"} grams",
+                      ),
+
+                      _detailRow(
+                        context,
+                        "Making Charges",
+                        "₹${rawData["LabourAmt"] ?? 0}",
+                      ),
+
+                      _detailRow(
+                        context,
+                        "Design",
+                        rawData["DesignName"] ??
+                            "-",
+                      ),
+
+                      _detailRow(
+                        context,
+                        "Category",
+                        product.category?.name ??
+                            "-",
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  2,
+                                ),
+                      ),
+
+                      // =============================================
+                      // REVIEWS
+                      // =============================================
+
+                      Text(
+                        "Reviews",
+                        style: TextStyle(
+                          fontSize:
+                              context
+                                  .getScreenWidth(
+                                    5.5,
+                                  ),
+                          fontWeight:
+                              FontWeight.w700,
+                          color:
+                              AppColors.textDark,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  1,
+                                ),
+                      ),
+
+                      Text(
+                        "⭐⭐⭐⭐⭐ 4.8 out of 5",
+                        style: TextStyle(
+                          fontSize:
+                              context
+                                  .getScreenWidth(
+                                    4.5,
+                                  ),
+                          color:
+                              AppColors.textDark,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  0.4,
+                                ),
+                      ),
+
+                      Text(
+                        "Based on 124 reviews",
+                        style: TextStyle(
+                          fontSize:
+                              context
+                                  .getScreenWidth(
+                                    3.6,
+                                  ),
+                          color:
+                              AppColors.textMuted,
+                        ),
+                      ),
+
+                      SizedBox(
+                        height:
+                            context
+                                .getScreenHeight(
+                                  2,
+                                ),
+                      ),
                     ],
                   ),
                 ),
@@ -68,56 +647,61 @@ class ProductDetailsPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE2DCD4),
-                      foregroundColor: AppColors.primaryGold,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () {},
-                    child: const Text('Add to Cart', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryGold,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    onPressed: () => Get.toNamed(AppRoutes.cart),
-                    child: const Text('Buy Now', style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w700)),
-                  ),
-                ),
-              ),
-            ],
-          ),
+    );
+  }
+
+  Widget _detailRow(
+    BuildContext context,
+    String left,
+    String right,
+  ) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: context.getScreenHeight(
+          0.7,
         ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              left,
+              style: TextStyle(
+                fontSize:
+                    context.getScreenWidth(
+                      4,
+                    ),
+                color:
+                    AppColors.textMuted,
+              ),
+            ),
+          ),
+
+          SizedBox(
+            width:
+                context.getScreenWidth(
+                  4,
+                ),
+          ),
+
+          Expanded(
+            child: Text(
+              right,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize:
+                    context.getScreenWidth(
+                      4,
+                    ),
+                color:
+                    AppColors.textDark,
+                fontWeight:
+                    FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-Widget _detailRow(String left, String right) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 3),
-    child: Row(
-      children: [
-        Expanded(child: Text(left, style: const TextStyle(fontSize: 24, color: AppColors.textMuted))),
-        Text(right, style: const TextStyle(fontSize: 24, color: AppColors.textDark)),
-      ],
-    ),
-  );
 }

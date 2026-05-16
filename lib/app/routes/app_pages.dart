@@ -20,7 +20,7 @@ abstract class AppPages {
     GetPage(name: AppRoutes.home, page: HomePage.new),
     GetPage(name: AppRoutes.search, page: SearchPage.new),
     GetPage(name: AppRoutes.rings, page: RingsPage.new),
-    GetPage(name: AppRoutes.details, page: ProductDetailsPage.new),
+    GetPage(name: AppRoutes.details, page: () => ProductDetailsPage(product: Get.arguments)),
     GetPage(name: AppRoutes.wishlist, page: WishlistPage.new),
     GetPage(name: AppRoutes.cart, page: CartPage.new),
     GetPage(name: AppRoutes.checkout, page: CheckoutPage.new),

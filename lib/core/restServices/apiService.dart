@@ -26,7 +26,6 @@ class BaseHttpService {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          debugPrint("➡️ Request: ${options.method} ${options.uri}");
 
           final requiresAuth = options.extra["requiresAuth"] ?? true;
 
@@ -42,7 +41,6 @@ class BaseHttpService {
         },
 
         onResponse: (response, handler) {
-          debugPrint("✅ Response [${response.statusCode}]: ${response.data}");
           return handler.next(response);
         },
 
