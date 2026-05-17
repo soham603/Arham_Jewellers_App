@@ -1,38 +1,99 @@
 import 'package:get/get.dart';
-
-import '../../domain/entities/cart_item.dart';
-import '../../domain/entities/product.dart';
+import 'package:ratnesh_gold_app/domain/entities/cart_item.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 
 class CartController extends GetxController {
-  final items = <CartItem>[].obs;
+  static CartController get instance => Get.find();
 
-  @override
-  void onInit() {
-    items.assignAll(
-      [
-        CartItem(product: const Product(id: 'c1', name: '22K Gold Ring', price: 12450, rating: 4.8, tag: '[ Product Image ]')),
-        CartItem(product: const Product(id: 'c2', name: 'Diamond Earrings', price: 8900, rating: 4.8, tag: '[ Product Image ]')),
-        CartItem(product: const Product(id: 'c3', name: 'Gold Bangle', price: 22100, rating: 4.8, tag: '[ Product Image ]')),
-      ],
+  final RxList<CartItem> _items = <CartItem>[].obs;
+
+  List<CartItem> get items => _items;
+
+  int get totalItems {
+    return _items.fold(
+      0,
+      (sum, item) => sum + item.quantity,
     );
-    super.onInit();
   }
 
-  int get subtotal => items.fold(0, (sum, item) => sum + (item.product.price * item.quantity));
-
-  void increment(int index) {
-    items[index].quantity += 1;
-    items.refresh();
+  double get subtotal {
+    return _items.fold(
+      0,
+      (sum, item) =>
+          sum +
+          ((item.product.rawData?["TagSalesAmount"] ?? 0)
+                  .toDouble() *
+              item.quantity),
+    );
   }
 
-  void decrement(int index) {
-    if (items[index].quantity > 1) {
-      items[index].quantity -= 1;
-      items.refresh();
+  bool isInCart(String productId) {
+    return _items.any(
+      (e) => e.product.id == productId,
+    );
+  }
+
+  int getProductQuantity(String productId) {
+    final index = _items.indexWhere(
+      (e) => e.product.id == productId,
+    );
+
+    if (index == -1) return 0;
+
+    return _items[index].quantity;
+  }
+
+  void addToCart(ProductModel product) {
+    final index = _items.indexWhere(
+      (e) => e.product.id == product.id,
+    );
+
+    if (index != -1) {
+      _items[index].quantity += 1;
+      _items.refresh();
+      return;
     }
+    _items.add(
+      CartItem(
+        product: product,
+        quantity: 1,
+      ),
+    );
   }
 
-  void remove(int index) {
-    items.removeAt(index);
+  void removeFromCart(String productId) {
+    _items.removeWhere(
+      (e) => e.product.id == productId,
+    );
+  }
+  void incrementQuantity(String productId) {
+    final index = _items.indexWhere(
+      (e) => e.product.id == productId,
+    );
+
+    if (index == -1) return;
+
+    _items[index].quantity += 1;
+    _items.refresh();
+  }
+
+  void decrementQuantity(String productId) {
+    final index = _items.indexWhere(
+      (e) => e.product.id == productId,
+    );
+
+    if (index == -1) return;
+
+    if (_items[index].quantity > 1) {
+      _items[index].quantity -= 1;
+    } else {
+      _items.removeAt(index);
+    }
+
+    _items.refresh();
+  }
+
+  void clearCart() {
+    _items.clear();
   }
 }

@@ -8,4 +8,5 @@ abstract class AppRoutes {
   static const wishlist = '/wishlist';
   static const cart = '/cart';
   static const checkout = '/checkout';
+  static const profile = '/profile';
 }

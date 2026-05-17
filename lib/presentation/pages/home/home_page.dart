@@ -64,7 +64,11 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: Row(
                             children: const [
-                              Icon(Icons.search, color: Color(0xFF8D847A), size: 20),
+                              Icon(
+                                Icons.search,
+                                color: Color(0xFF8D847A),
+                                size: 20,
+                              ),
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -85,11 +89,13 @@ class _HomePageState extends State<HomePage> {
 
                       // ── Carousel ──────────────────────────────────────────
                       Obx(() {
-                        if (carouselController.getCarouselState == CurrentAppState.LOADING) {
+                        if (carouselController.getCarouselState ==
+                            CurrentAppState.LOADING) {
                           return const CarouselShimmer();
                         }
 
-                        if (carouselController.getCarouselState == CurrentAppState.ERROR) {
+                        if (carouselController.getCarouselState ==
+                            CurrentAppState.ERROR) {
                           return Container(
                             width: double.infinity,
                             height: context.getScreenHeight(22),
@@ -100,7 +106,11 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.error, color: Colors.red, size: 32),
+                                const Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                  size: 32,
+                                ),
                                 const SizedBox(height: 8),
                                 Text(
                                   "Failed to load banners",
@@ -138,20 +148,25 @@ class _HomePageState extends State<HomePage> {
                                     child: Stack(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(14),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                           child: CachedNetworkImage(
                                             imageUrl: item.imageUrl,
                                             width: double.infinity,
                                             height: double.infinity,
                                             fit: BoxFit.cover,
-                                            placeholder: (_, __) => const CarouselShimmer(),
+                                            placeholder: (_, __) =>
+                                                const CarouselShimmer(),
                                             errorWidget: (_, __, ___) =>
                                                 Container(color: Colors.grey),
                                           ),
                                         ),
                                         Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(14),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
                                             gradient: LinearGradient(
                                               colors: [
                                                 Colors.black.withOpacity(0.6),
@@ -167,13 +182,15 @@ class _HomePageState extends State<HomePage> {
                                           right: 16,
                                           bottom: 16,
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 item.title,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: context.getScreenWidth(5),
+                                                  fontSize: context
+                                                      .getScreenWidth(5),
                                                   fontWeight: FontWeight.w700,
                                                 ),
                                               ),
@@ -182,7 +199,8 @@ class _HomePageState extends State<HomePage> {
                                                 item.description,
                                                 style: TextStyle(
                                                   color: Colors.white70,
-                                                  fontSize: context.getScreenWidth(3.5),
+                                                  fontSize: context
+                                                      .getScreenWidth(3.5),
                                                 ),
                                               ),
                                               const SizedBox(height: 6),
@@ -190,7 +208,8 @@ class _HomePageState extends State<HomePage> {
                                                 "→ Shop Now",
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: context.getScreenWidth(3.8),
+                                                  fontSize: context
+                                                      .getScreenWidth(3.8),
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
@@ -210,7 +229,9 @@ class _HomePageState extends State<HomePage> {
                                 final isActive = index == currentIndex;
                                 return AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
-                                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3,
+                                  ),
                                   width: isActive ? 10 : 6,
                                   height: isActive ? 10 : 6,
                                   decoration: BoxDecoration(
@@ -228,7 +249,7 @@ class _HomePageState extends State<HomePage> {
 
                       const SizedBox(height: 20),
 
-                     Text(
+                      Text(
                         'Arham Gold Categories',
                         style: TextStyle(
                           fontSize: context.getScreenWidth(5),
@@ -281,11 +302,11 @@ class _HomePageState extends State<HomePage> {
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: 0.66,
-                        ),
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                              childAspectRatio: 0.66,
+                            ),
                         itemBuilder: (context, index) {
                           //final item = catalogController.products[index];
                           return GestureDetector(
@@ -307,8 +328,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// ── Karat Section Widget ──────────────────────────────────────────────────────
-
 class _KaratSection extends StatelessWidget {
   final Karat karat;
   final CategoryController controller;
@@ -317,17 +336,23 @@ class _KaratSection extends StatelessWidget {
 
   CurrentAppState _stateFor() {
     switch (karat) {
-      case Karat.k18: return controller.k18State;
-      case Karat.k20: return controller.k20State;
-      case Karat.k22: return controller.k22State;
+      case Karat.k18:
+        return controller.k18State;
+      case Karat.k20:
+        return controller.k20State;
+      case Karat.k22:
+        return controller.k22State;
     }
   }
 
   List<CategoryModel> _listFor() {
     switch (karat) {
-      case Karat.k18: return controller.k18Categories;
-      case Karat.k20: return controller.k20Categories;
-      case Karat.k22: return controller.k22Categories;
+      case Karat.k18:
+        return controller.k18Categories;
+      case Karat.k20:
+        return controller.k20Categories;
+      case Karat.k22:
+        return controller.k22Categories;
     }
   }
 
@@ -433,7 +458,9 @@ class _KaratSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: context.colorPalette.backgroundColor,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: context.colorPalette.boxColor),
+                        border: Border.all(
+                          color: context.colorPalette.boxColor,
+                        ),
                       ),
                       child: Column(
                         children: [

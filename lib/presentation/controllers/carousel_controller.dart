@@ -33,7 +33,7 @@ class CarouselsController extends GetxController {
 
       final response = await httpClient.get(
         "/api/v1/carousel/get-All",
-        options: Options(extra: {"requiresAuth": true}),
+        //options: Options(extra: {"requiresAuth": true}),
       );
 
       if (response.statusCode == 200) {

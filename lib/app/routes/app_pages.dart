@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/presentation/pages/profile/profileScreen.dart';
 
 import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/cart/cart_page.dart';
@@ -24,5 +25,6 @@ abstract class AppPages {
     GetPage(name: AppRoutes.wishlist, page: WishlistPage.new),
     GetPage(name: AppRoutes.cart, page: CartPage.new),
     GetPage(name: AppRoutes.checkout, page: CheckoutPage.new),
+    GetPage(name: AppRoutes.profile, page: ProfileScreen.new),
   ];
 }

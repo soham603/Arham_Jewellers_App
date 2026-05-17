@@ -135,10 +135,6 @@ class ProductCard extends StatelessWidget {
               ),
             ),
 
-            // =====================================================
-            // CONTENT
-            // =====================================================
-
             Expanded(
               flex: compact ? 4 : 5,
               child: Padding(
@@ -154,10 +150,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment:
                       CrossAxisAlignment.start,
                   children: [
-                    // ==========================
-                    // PRODUCT NAME
-                    // ==========================
-
+                    
                     Text(
                       product.name,
                       maxLines: 1,

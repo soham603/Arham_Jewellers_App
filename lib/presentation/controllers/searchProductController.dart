@@ -72,7 +72,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/get-allProducts",
+        "/api/v1/products/get-all",
         queryParameters: {
           "page": _initialPage,
           "limit": _pageLimit,
@@ -144,7 +144,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/get-allProducts",
+        "/api/v1/products/search",
         queryParameters: {
           "search": query,
           "page": _searchPage,
