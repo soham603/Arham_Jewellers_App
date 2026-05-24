@@ -253,6 +253,32 @@ class _LoginPageState extends State<LoginPage> {
 
                     const Spacer(), // ✅ NOW SAFE
 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account? ",
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(4),
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Get.toNamed(AppRoutes.register),
+                          child: Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(4),
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(3)),
+
                     Center(
                       child: Text(
                         'By continuing you agree to our Terms & Privacy Policy',

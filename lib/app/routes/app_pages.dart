@@ -2,9 +2,12 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/pages/profile/profileScreen.dart';
 
 import '../../presentation/pages/auth/login_page.dart';
+import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/cart/cart_page.dart';
 import '../../presentation/pages/checkout/checkout_page.dart';
 import '../../presentation/pages/home/home_page.dart';
+import '../../presentation/pages/orders/my_orders_page.dart';
+import '../../presentation/pages/orders/order_success_page.dart';
 import '../../presentation/pages/product/product_details_page.dart';
 import '../../presentation/pages/rings/rings_page.dart';
 import '../../presentation/pages/search/search_page.dart';
@@ -26,5 +29,8 @@ abstract class AppPages {
     GetPage(name: AppRoutes.cart, page: CartPage.new),
     GetPage(name: AppRoutes.checkout, page: CheckoutPage.new),
     GetPage(name: AppRoutes.profile, page: ProfileScreen.new),
+    GetPage(name: AppRoutes.orderSuccess, page: OrderSuccessPage.new),
+    GetPage(name: AppRoutes.myOrders, page: MyOrdersPage.new),
+    GetPage(name: AppRoutes.register, page: RegisterPage.new),
   ];
 }
