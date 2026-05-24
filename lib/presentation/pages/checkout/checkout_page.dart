@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
@@ -547,7 +548,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 );
 
                 if (shouldPlaceOrder == true) {
-                  await userOrderController.createOrder();
+                  final success = await userOrderController.createOrder();
+                  if (success) {
+                    Get.offAllNamed(AppRoutes.orderSuccess);
+                  }
                 }
               },
 

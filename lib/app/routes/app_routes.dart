@@ -9,4 +9,7 @@ abstract class AppRoutes {
   static const cart = '/cart';
   static const checkout = '/checkout';
   static const profile = '/profile';
+  static const orderSuccess = '/order-success';
+  static const myOrders = '/my-orders';
+  static const register = '/register';
 }
