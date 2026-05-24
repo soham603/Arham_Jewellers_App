@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class AdminDrawer extends StatefulWidget {
@@ -139,6 +140,19 @@ class _AdminDrawerState extends State<AdminDrawer> {
 
                 onTap: () {
                   Get.to(() => CategoryManagerScreen());
+                },
+              ),
+
+              SizedBox(height: context.getScreenHeight(1.5)),
+
+              _drawerItem(
+                context,
+                icon: Icons.production_quantity_limits_rounded,
+                title: "Product Manager",
+                subtitle: "Manage product in stock",
+
+                onTap: () {
+                  Get.to(() => AdminProductScreen());
                 },
               ),
 
