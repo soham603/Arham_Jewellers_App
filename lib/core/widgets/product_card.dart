@@ -45,9 +45,6 @@ class ProductCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // =====================================================
-            // IMAGE
-            // =====================================================
 
             Expanded(
               flex: 6,

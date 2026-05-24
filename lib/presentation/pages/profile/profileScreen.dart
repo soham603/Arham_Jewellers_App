@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminDrawer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +19,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late final UserOrderController orderController;
+  late final AuthController authController;
+
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -28,6 +33,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       orderController = Get.put(UserOrderController());
     }
 
+    if (Get.isRegistered<AuthController>()) {
+      authController = Get.find<AuthController>();
+    } else {
+      authController = Get.put(AuthController());
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       orderController.fetchUserOrders();
     });
@@ -37,9 +48,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
-
+      key: scaffoldKey,
       bottomNavigationBar: const AppBottomNav(currentIndex: 4),
-
+      endDrawer: const AdminDrawer(),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
@@ -51,6 +62,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontSize: context.getScreenWidth(5.5),
           ),
         ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+
+            child: GestureDetector(
+              onTap: () {
+                scaffoldKey.currentState?.openEndDrawer();
+              },
+
+              child: Container(
+                padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+
+                child: Icon(
+                  Icons.menu_rounded,
+                  color: AppColors.textDark,
+                  size: context.getScreenWidth(6),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
 
       body: Obx(() {
@@ -139,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                             children: [
                               Text(
-                                "Ratnesh Gold User",
+                                authController.user?.name ?? "User" ,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(

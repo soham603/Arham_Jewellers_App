@@ -69,7 +69,7 @@ class SessionManager {
 
   Future<String?> getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
-    Logger.info("SessionManager", "Fetching access Token :${prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN)}");
+    //Logger.info("SessionManager", "Fetching access Token :${prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN)}");
     return prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN);
   }
 

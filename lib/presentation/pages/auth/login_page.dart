@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                   print(deviceID);
 
-                                  await authController.loginUserWithPhone(
+                                  await authController.loginAdminWithPhone(
                                     phoneNumber: phoneController.text.trim(),
                                     password: passwordController.text.trim(),
                                     deviceId: deviceID,

@@ -17,7 +17,7 @@ class AppBottomNav extends StatelessWidget {
     const labels = [
       'Home',
       'Search',
-      'Wishlist',
+      //'Wishlist',
       'Cart',
       'Profile',
     ];
@@ -25,7 +25,7 @@ class AppBottomNav extends StatelessWidget {
     const icons = [
       Icons.home_rounded,
       Icons.search_rounded,
-      Icons.favorite_rounded,
+      //Icons.favorite_rounded,
       Icons.shopping_cart_rounded,
       Icons.person_rounded,
     ];
@@ -137,15 +137,15 @@ class AppBottomNav extends StatelessWidget {
         Get.offAllNamed("/search");
         break;
 
-      case 2:
-        Get.offAllNamed("/wishlist");
-        break;
+      // case 2:
+      //   Get.offAllNamed("/wishlist");
+      //   break;
 
-      case 3:
+      case 2:
         Get.offAllNamed("/cart");
         break;
 
-      case 4:
+      case 3:
         Get.offAllNamed(AppRoutes.profile);
         break;
     }

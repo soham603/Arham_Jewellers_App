@@ -9,7 +9,7 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class UserOrderController extends GetxController {
   static UserOrderController get instance => Get.find();
 
-  final CartController cartController = Get.find<CartController>();
+  final CartController cartController = Get.isRegistered<CartController>() ? Get.find<CartController>() : Get.put(CartController());
 
   final _createOrderState = CurrentAppState.INITIAL.obs;
 

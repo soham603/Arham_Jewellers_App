@@ -109,7 +109,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200 && response.data['success'] == true) {
         final data = response.data['data'];
 
-        final user = UserModel.fromJson(data['user']);
+        final user = UserModel.fromJson(data['admin']);
         _user.value = user;
         await SessionManager().saveUserData(user);
 
