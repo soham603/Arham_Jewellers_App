@@ -16,7 +16,6 @@ class ProductCard extends StatelessWidget {
 
   final ProductModel product;
   final bool compact;
-
   final VoidCallback? onTap;
   final VoidCallback? onAddToCart;
 
@@ -29,12 +28,8 @@ class ProductCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(
-            cardRadius,
-          ),
-          border: Border.all(
-            color: const Color(0xFFE7E2DB),
-          ),
+          borderRadius: BorderRadius.circular(cardRadius),
+          border: Border.all(color: const Color(0xFFE7E2DB)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.03),
@@ -45,7 +40,6 @@ class ProductCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-
             Expanded(
               flex: 6,
               child: ClipRRect(
@@ -55,79 +49,40 @@ class ProductCard extends StatelessWidget {
                 child: Container(
                   width: double.infinity,
                   color: const Color(0xFFF8F5F0),
-                  padding: EdgeInsets.all(
-                    context.getScreenWidth(2),
-                  ),
+                  padding: EdgeInsets.all(context.getScreenWidth(2)),
                   child:
                       product.imageUrl != null &&
-                              product.imageUrl!
-                                  .trim()
-                                  .isNotEmpty
-                          ? CachedNetworkImage(
-                              imageUrl:
-                                  product.imageUrl!,
-                              fit: BoxFit.contain,
-                              width: double.infinity,
+                          product.imageUrl!.trim().isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: product.imageUrl!,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
 
-                              placeholder:
-                                  (
-                                    context,
-                                    url,
-                                  ) {
-                                    return Shimmer.fromColors(
-                                      baseColor:
-                                          const Color(
-                                            0xFFE7E2DB,
-                                          ),
-                                      highlightColor:
-                                          const Color(
-                                            0xFFF5F1EB,
-                                          ),
-                                      child:
-                                          Container(
-                                            color:
-                                                Colors
-                                                    .white,
-                                          ),
-                                    );
-                                  },
+                          placeholder: (context, url) {
+                            return Shimmer.fromColors(
+                              baseColor: const Color(0xFFE7E2DB),
+                              highlightColor: const Color(0xFFF5F1EB),
+                              child: Container(color: Colors.white),
+                            );
+                          },
 
-                              errorWidget:
-                                  (
-                                    context,
-                                    url,
-                                    error,
-                                  ) {
-                                    return Center(
-                                      child: Icon(
-                                        Icons
-                                            .image_not_supported_outlined,
-                                        color:
-                                            Colors
-                                                .grey
-                                                .shade500,
-                                        size:
-                                            context
-                                                .getScreenWidth(
-                                                  8,
-                                                ),
-                                      ),
-                                    );
-                                  },
-                            )
-                          : Center(
+                          errorWidget: (context, url, error) {
+                            return Center(
                               child: Icon(
-                                Icons.image_outlined,
-                                color: const Color(
-                                  0xFF887A67,
-                                ),
-                                size:
-                                    context
-                                        .getScreenWidth(
-                                          8,
-                                        ),
+                                Icons.image_not_supported_outlined,
+                                color: Colors.grey.shade500,
+                                size: context.getScreenWidth(8),
                               ),
-                            ),
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.image_outlined,
+                            color: const Color(0xFF887A67),
+                            size: context.getScreenWidth(8),
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -136,185 +91,95 @@ class ProductCard extends StatelessWidget {
               flex: compact ? 4 : 5,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal:
-                      context.getScreenWidth(2.8),
-                  vertical:
-                      context.getScreenHeight(
-                        0.6,
-                      ),
+                  horizontal: context.getScreenWidth(2.8),
+                  vertical: context.getScreenHeight(0.6),
                 ),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     Text(
                       product.name,
                       maxLines: 1,
-                      overflow:
-                          TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize:
-                            context
-                                .getScreenWidth(
-                                  3.2,
-                                ),
-                        fontWeight:
-                            FontWeight.w700,
-                        color:
-                            AppColors.textDark,
+                        fontSize: context.getScreenWidth(3.2),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
                       ),
                     ),
 
-                    SizedBox(
-                      height:
-                          context.getScreenHeight(
-                            0.4,
-                          ),
-                    ),
+                    SizedBox(height: context.getScreenHeight(0.4)),
 
                     // ==========================
                     // CATEGORY
                     // ==========================
-
                     if (product.category != null)
                       Container(
-                        constraints:
-                            BoxConstraints(
-                              maxWidth:
-                                  double.infinity,
-                            ),
-                        padding:
-                            EdgeInsets.symmetric(
-                              horizontal:
-                                  context
-                                      .getScreenWidth(
-                                        2,
-                                      ),
-                              vertical:
-                                  context
-                                      .getScreenHeight(
-                                        0.2,
-                                      ),
-                            ),
+                        constraints: BoxConstraints(maxWidth: double.infinity),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getScreenWidth(2),
+                          vertical: context.getScreenHeight(0.2),
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFFFF6DD,
-                          ),
-                          borderRadius:
-                              BorderRadius.circular(
-                                100,
-                              ),
+                          color: const Color(0xFFFFF6DD),
+                          borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
-                          product
-                              .category!
-                              .name,
+                          product.category!.name,
                           maxLines: 1,
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize:
-                                context
-                                    .getScreenWidth(
-                                      2.5,
-                                    ),
-                            color:
-                                AppColors
-                                    .primaryGold,
-                            fontWeight:
-                                FontWeight
-                                    .w600,
+                            fontSize: context.getScreenWidth(2.5),
+                            color: AppColors.primaryGold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
 
-                    SizedBox(
-                      height:
-                          context.getScreenHeight(
-                            0.3,
-                          ),
-                    ),
+                    SizedBox(height: context.getScreenHeight(0.3)),
 
                     // ==========================
                     // TAG
                     // ==========================
-
                     if (product.tagNo != null)
                       Text(
                         product.tagNo!,
                         maxLines: 1,
-                        overflow:
-                            TextOverflow.ellipsis,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize:
-                              context
-                                  .getScreenWidth(
-                                    2.5,
-                                  ),
-                          color:
-                              AppColors.textMuted,
-                          fontWeight:
-                              FontWeight.w500,
+                          fontSize: context.getScreenWidth(2.5),
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
 
                     const Spacer(),
 
-                    // ==========================
-                    // BOTTOM INFO
-                    // ==========================
-
                     Row(
                       children: [
-                        if (product.fineWeight !=
-                            null)
-                          Expanded(
-                            child: Text(
-                              "Wt ${product.fineWeight}",
-                              maxLines: 1,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis,
-                              style: TextStyle(
-                                fontSize:
-                                    context
-                                        .getScreenWidth(
-                                          2.5,
-                                        ),
-                                color:
-                                    AppColors
-                                        .textDark,
-                                fontWeight:
-                                    FontWeight
-                                        .w600,
-                              ),
+                        if (product.fineWeight != null)
+                          Text(
+                            "Wt ${product.fineWeight}",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.5),
+                              color: AppColors.textDark,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
 
                         if (product.touch != null)
                           Expanded(
                             child: Text(
-                              "T ${product.touch}",
-                              textAlign:
-                                  TextAlign.end,
+                              "Touch : ${product.touch}",
+                              textAlign: TextAlign.end,
                               maxLines: 1,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize:
-                                    context
-                                        .getScreenWidth(
-                                          2.5,
-                                        ),
-                                color:
-                                    AppColors
-                                        .textDark,
-                                fontWeight:
-                                    FontWeight
-                                        .w600,
+                                fontSize: context.getScreenWidth(2.5),
+                                color: AppColors.textDark,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -322,57 +187,33 @@ class ProductCard extends StatelessWidget {
                     ),
 
                     if (!compact) ...[
-                      SizedBox(
-                        height:
-                            context
-                                .getScreenHeight(
-                                  0.7,
-                                ),
-                      ),
+                      SizedBox(height: context.getScreenHeight(0.7)),
 
                       SizedBox(
                         width: double.infinity,
-                        height:
-                            context
-                                .getScreenHeight(
-                                  4.2,
-                                ),
+                        height: context.getScreenHeight(4.2),
                         child: ElevatedButton(
                           onPressed: onAddToCart,
-                          style:
-                              ElevatedButton.styleFrom(
-                                elevation: 0,
-                                backgroundColor: AppColors.primaryGold,
-                                foregroundColor: AppColors.primaryGold,
-                                shadowColor: Colors.transparent,
-                                surfaceTintColor: Colors.transparent,
-                                disabledBackgroundColor:  AppColors.primaryGold,
-                                padding: EdgeInsets.zero,
-                                shape:
-                                    RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                            12,
-                                          ),
-                                    ),
-                              ),
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            backgroundColor: AppColors.primaryGold,
+                            foregroundColor: AppColors.primaryGold,
+                            shadowColor: Colors.transparent,
+                            surfaceTintColor: Colors.transparent,
+                            disabledBackgroundColor: AppColors.primaryGold,
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           child: Text(
                             "View Product",
                             maxLines: 1,
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color:
-                                  Colors.white,
-                              fontWeight:
-                                  FontWeight
-                                      .w700,
-                              fontSize:
-                                  context
-                                      .getScreenWidth(
-                                        3.25,
-                                      ),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: context.getScreenWidth(3.25),
                             ),
                           ),
                         ),
