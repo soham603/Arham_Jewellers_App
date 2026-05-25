@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
@@ -287,7 +286,6 @@ class _HomePageState extends State<HomePage> {
 
                       const SizedBox(height: 20),
 
-                      // ── Trending Now ──────────────────────────────────────
                       const Text(
                         'Trending Now',
                         style: TextStyle(
@@ -297,25 +295,25 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      GridView.builder(
-                        itemCount: 4,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 8,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 0.66,
-                            ),
-                        itemBuilder: (context, index) {
-                          //final item = catalogController.products[index];
-                          return GestureDetector(
-                            onTap: () => Get.toNamed(AppRoutes.details),
-                            //child: ProductCard(product: item),
-                          );
-                        },
-                      ),
+                      // GridView.builder(
+                      //   itemCount: 4,
+                      //   shrinkWrap: true,
+                      //   physics: const NeverScrollableScrollPhysics(),
+                      //   gridDelegate:
+                      //       const SliverGridDelegateWithFixedCrossAxisCount(
+                      //         crossAxisCount: 2,
+                      //         mainAxisSpacing: 8,
+                      //         crossAxisSpacing: 8,
+                      //         childAspectRatio: 0.66,
+                      //       ),
+                      //   itemBuilder: (context, index) {
+                      //     //final item = catalogController.products[index];
+                      //     return GestureDetector(
+                      //       onTap: () => Get.toNamed(AppRoutes.details),
+                      //       //child: ProductCard(product: item),
+                      //     );
+                      //   },
+                      // ),
                     ],
                   ),
                 ),

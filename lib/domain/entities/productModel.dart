@@ -144,22 +144,20 @@ class ProductModel {
     );
   }
 
-  // =========================================================
-  // HELPERS
-  // =========================================================
-
-  /// Example:
-  /// product.touch
-  double? get touch {
-    final value = rawData?['Touch'];
+  String? get touch {
+    final value = rawData?['SalesTouch'];
 
     if (value == null) return null;
 
-    return double.tryParse(value.toString());
+    final karat = value.toString() == "92"
+        ? "22 K"
+        : value.toString() == "84"
+        ? "20 K"
+        : "18 K";
+
+    return "$value ($karat)";
   }
 
-  /// Example:
-  /// product.salesTouch
   double? get salesTouch {
     final value = rawData?['SalesTouch'];
 
@@ -168,8 +166,6 @@ class ProductModel {
     return double.tryParse(value.toString());
   }
 
-  /// Example:
-  /// product.grossWeight
   double? get grossWeight {
     final value = rawData?['GrossWt'];
 

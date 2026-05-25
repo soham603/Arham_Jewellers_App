@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -20,7 +21,7 @@ class _AdminDrawerState extends State<AdminDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.75,
+      width: context.getScreenWidth(75),
 
       backgroundColor: const Color(0xFF1F1F1F),
 
@@ -39,19 +40,17 @@ class _AdminDrawerState extends State<AdminDrawer> {
           ),
 
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
-              // =========================================
+              // ===================================================
               // HEADER
-              // =========================================
+              // ===================================================
               Row(
                 children: [
                   Container(
                     width: context.getScreenWidth(14),
                     height: context.getScreenWidth(14),
 
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primaryGold,
                       shape: BoxShape.circle,
                     ),
@@ -72,19 +71,21 @@ class _AdminDrawerState extends State<AdminDrawer> {
                       children: [
                         Text(
                           "Admin Panel",
+
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
+
                             fontSize: context.getScreenWidth(5),
                           ),
                         ),
 
-                        SizedBox(height: context.getScreenHeight(0.3)),
-
                         Text(
                           "Manage app operations",
+
                           style: TextStyle(
                             color: Colors.white70,
+
                             fontSize: context.getScreenWidth(3.4),
                           ),
                         ),
@@ -94,94 +95,153 @@ class _AdminDrawerState extends State<AdminDrawer> {
                 ],
               ),
 
-              SizedBox(height: context.getScreenHeight(4)),
-              _drawerItem(
-                context,
-                icon: Icons.verified_user_rounded,
-                title: "Approve Users",
-                subtitle: "Manage user approvals",
+              SizedBox(height: context.getScreenHeight(3)),
 
-                onTap: () {
-                  Get.to(() => const ApproveUsersScreen());
-                },
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+
+                  child: Column(
+                    children: [
+                      _drawerItem(
+                        context,
+                        icon: Icons.verified_user_rounded,
+
+                        title: "Approve Users",
+
+                        subtitle: "Manage user approvals",
+
+                        onTap: () {
+                          Get.back();
+
+                          Get.to(() => const ApproveUsersScreen());
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+                        icon: Icons.inventory_2_rounded,
+
+                        title: "Approve Orders",
+
+                        subtitle: "Verify jewellery orders",
+
+                        onTap: () {
+                          Get.back();
+
+                          Get.to(() => const ApproveOrdersScreen());
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+
+                        icon: Icons.people_alt_rounded,
+
+                        title: "Customers",
+
+                        subtitle: "View all customers",
+
+                        onTap: () {},
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+
+                        icon: Icons.settings_rounded,
+
+                        title: "Category Manager",
+
+                        subtitle: "Manage categories",
+
+                        onTap: () {
+                          Get.back();
+
+                          Get.to(() => CategoryManagerScreen());
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+
+                        icon: Icons.production_quantity_limits_rounded,
+
+                        title: "Product Manager",
+
+                        subtitle: "Manage products",
+
+                        onTap: () {
+                          Get.back();
+
+                          Get.to(() => AdminProductScreen());
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+
+                        icon: Icons.view_carousel_rounded,
+
+                        title: "Carousel Manager",
+
+                        subtitle: "Manage homepage banners",
+
+                        onTap: () {
+                          Get.back();
+                          Get.to(() => CarouselManagerScreen());
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
 
-              SizedBox(height: context.getScreenHeight(2)),
+              Column(
+                children: [
+                  const Divider(color: Colors.white24),
 
-              _drawerItem(
-                context,
-                icon: Icons.inventory_2_rounded,
-                title: "Approve Orders",
-                subtitle: "Verify jewellery orders",
+                  SizedBox(height: context.getScreenHeight(1)),
 
-                onTap: () {
-                  Get.to(() => const ApproveOrdersScreen());
-                },
-              ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
 
-              SizedBox(height: context.getScreenHeight(2)),
+                    child: _drawerItem(
+                      context,
 
-              _drawerItem(
-                context,
-                icon: Icons.people_alt_rounded,
-                title: "Customers",
-                subtitle: "View all customers",
+                      icon: Icons.logout_rounded,
 
-                onTap: () {},
-              ),
+                      title: "Logout",
 
-              SizedBox(height: context.getScreenHeight(2)),
+                      subtitle: "Sign out from app",
 
-              _drawerItem(
-                context,
-                icon: Icons.settings_rounded,
-                title: "Category Manager",
-                subtitle: "Manage product categories",
+                      iconColor: Colors.redAccent,
 
-                onTap: () {
-                  Get.to(() => CategoryManagerScreen());
-                },
-              ),
+                      onTap: () {
+                        final auth = Get.isRegistered<AuthController>()
+                            ? Get.find<AuthController>()
+                            : Get.put(AuthController());
 
-              SizedBox(height: context.getScreenHeight(1.5)),
+                        Get.back();
 
-              _drawerItem(
-                context,
-                icon: Icons.production_quantity_limits_rounded,
-                title: "Product Manager",
-                subtitle: "Manage product in stock",
+                        auth.user?.role == 'ADMIN'
+                            ? auth.logoutAdmin(context)
+                            : auth.logoutUser(context);
 
-                onTap: () {
-                  Get.to(() => AdminProductScreen());
-                },
-              ),
-
-              const Spacer(),
-
-              Divider(color: Colors.white24),
-
-              SizedBox(height: context.getScreenHeight(1.5)),
-
-              _drawerItem(
-                context,
-                icon: Icons.logout_rounded,
-                title: "Logout",
-                subtitle: "Sign out from app",
-
-                iconColor: Colors.redAccent,
-
-                onTap: () {
-                  final AuthController authController =
-                      Get.isRegistered<AuthController>()
-                      ? Get.find<AuthController>()
-                      : Get.put(AuthController());
-
-                  authController.user?.role == 'ADMIN'
-                      ? authController.logoutAdmin(context)
-                      : authController.logoutUser(context);
-
-                  Get.offAllNamed(AppRoutes.login);
-                },
+                        Get.offAllNamed(AppRoutes.login);
+                      },
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
