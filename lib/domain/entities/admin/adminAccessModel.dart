@@ -1,53 +1,77 @@
-class AccessUser {
+class AccessRequestUser {
   final String id;
   final String? name;
   final String? email;
-  final String phoneNumber;
-  final String? role;
+  final String? phoneNumber;
+  final String role;
 
-  AccessUser({
+  AccessRequestUser({
     required this.id,
     this.name,
     this.email,
-    required this.phoneNumber,
-    this.role,
+    this.phoneNumber,
+    required this.role,
   });
 
-  factory AccessUser.fromJson(Map<String, dynamic> json) {
-    return AccessUser(
-      id: json['id'] ?? "",
+  factory AccessRequestUser.fromJson(Map<String, dynamic> json) {
+    return AccessRequestUser(
+      id: json['id'] ?? '',
       name: json['name'],
       email: json['email'],
-      phoneNumber: json['phoneNumber'] ?? "",
-      role: json['role'],
+      phoneNumber: json['phoneNumber'],
+      role: json['role'] ?? 'USER',
     );
   }
 }
 
 class AccessRequestModel {
   final String id;
-  final String status;
   final String userId;
-  final DateTime? createdAt;
-  final AccessUser user;
+  final String status; // PENDING | APPROVED | REJECTED
+  final DateTime requestedAt;
+  final DateTime? approvedTill;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final AccessRequestUser? user;
 
   AccessRequestModel({
     required this.id,
-    required this.status,
     required this.userId,
-    required this.user,
-    this.createdAt,
+    required this.status,
+    required this.requestedAt,
+    this.approvedTill,
+    required this.createdAt,
+    required this.updatedAt,
+    this.user,
   });
 
   factory AccessRequestModel.fromJson(Map<String, dynamic> json) {
     return AccessRequestModel(
-      id: json['id'] ?? "",
-      status: json['status'] ?? "",
-      userId: json['userId'] ?? "",
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'])
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      status: json['status'] ?? 'PENDING',
+      requestedAt: DateTime.tryParse(json['requestedAt'] ?? '') ?? DateTime.now(),
+      approvedTill: json['approvedTill'] != null
+          ? DateTime.tryParse(json['approvedTill'])
           : null,
-      user: AccessUser.fromJson(json['user'] ?? {}),
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      user: json['user'] != null
+          ? AccessRequestUser.fromJson(json['user'])
+          : null,
+    );
+  }
+
+  AccessRequestModel copyWith({String? status, DateTime? approvedTill}) {
+    return AccessRequestModel(
+      id: id,
+      userId: userId,
+      status: status ?? this.status,
+      requestedAt: requestedAt,
+      approvedTill: approvedTill ?? this.approvedTill,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      user: user,
     );
   }
 }
