@@ -110,9 +110,6 @@ class ProductCard extends StatelessWidget {
 
                     SizedBox(height: context.getScreenHeight(0.4)),
 
-                    // ==========================
-                    // CATEGORY
-                    // ==========================
                     if (product.category != null)
                       Container(
                         constraints: BoxConstraints(maxWidth: double.infinity),
@@ -138,9 +135,6 @@ class ProductCard extends StatelessWidget {
 
                     SizedBox(height: context.getScreenHeight(0.3)),
 
-                    // ==========================
-                    // TAG
-                    // ==========================
                     if (product.tagNo != null)
                       Text(
                         product.tagNo!,
