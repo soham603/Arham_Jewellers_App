@@ -12,4 +12,6 @@ Future<String> getDeviceId() async {
     final iosInfo = await deviceInfo.iosInfo;
     return iosInfo.identifierForVendor ?? "unknown";
   }
+
+  // NAMAN - add fnc for get Device Name
 }
