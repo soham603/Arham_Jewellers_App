@@ -195,4 +195,9 @@ class AuthController extends GetxController {
       ToastUtils.showError(context, "Logout failed. Please try again.");
     }
   }
+
+
+  // NAMAN - add fnc for register
 }
+
+

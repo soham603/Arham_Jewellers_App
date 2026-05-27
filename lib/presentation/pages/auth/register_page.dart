@@ -7,6 +7,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../../../utils/ToastUtil.dart';
 
+// NAMAN - fields as per docs
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
