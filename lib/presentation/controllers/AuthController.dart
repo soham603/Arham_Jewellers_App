@@ -14,11 +14,19 @@ class AuthController extends GetxController {
   final _adminLoginState = CurrentAppState.INITIAL.obs;
   CurrentAppState get adminLoginState => _adminLoginState.value;
 
+  // New states for Registration flow
+  final _userRegisterState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get userRegisterState => _userRegisterState.value;
+
   final RxString _userLoginErrorMsg = "".obs;
   String get userLoginErrorMsg => _userLoginErrorMsg.value;
 
   final RxString _adminLoginErrorMsg = "".obs;
   String get adminLoginErrorMsg => _adminLoginErrorMsg.value;
+
+  // New error message state for Registration flow
+  final RxString _userRegisterErrorMsg = "".obs;
+  String get userRegisterErrorMsg => _userRegisterErrorMsg.value;
 
   final Rxn<UserModel> _user = Rxn<UserModel>();
   UserModel? get user => _user.value;
@@ -42,7 +50,7 @@ class AuthController extends GetxController {
         data: {
           "phoneNumber": phoneNumber,
           "password": password,
-          "deviceId": "AP3A.240905.015.A2",
+          "deviceId": deviceId, 
         },
       );
 
@@ -196,8 +204,83 @@ class AuthController extends GetxController {
     }
   }
 
+  // NAMAN - Register Function Implementation
+  Future<bool> registerUser({
+    required String email,
+    required String password,
+    required String name,
+    required String phoneNumber,
+    required String deviceId,
+    required String gstNumber,
+    required String city,
+    required String area,
+    required String pincode,
+    required String companyName,
+    required String deviceName,
+    required String fcmToken,
+    required BuildContext context,
+    VoidCallback? onSuccess,
+  }) async {
+    if (_userRegisterState.value == CurrentAppState.LOADING) return false;
 
-  // NAMAN - add fnc for register
+    try {
+      _userRegisterState.value = CurrentAppState.LOADING;
+      _userRegisterErrorMsg.value = "";
+
+      final response = await httpClient.post(
+        "/api/v1/auth/register",
+        options: Options(extra: {"requiresAuth": false}),
+        data: {
+          "email": email,
+          "password": password,
+          "name": name,
+          "phoneNumber": phoneNumber,
+          "deviceId": deviceId,
+          "gstNumber": gstNumber,
+          "city": city,
+          "area": area,
+          "pincode": pincode,
+          "companyName": companyName,
+          "deviceName": deviceName,
+          "fcmToken": fcmToken,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data['success'] == true || response.data['success'] == null) {
+          _userRegisterState.value = CurrentAppState.SUCCESS;
+          ToastUtils.showSuccess(
+            context,
+            response.data['message'] ?? "Registration successful!",
+          );
+          onSuccess?.call();
+          return true;
+        } else {
+          _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
+          _userRegisterState.value = CurrentAppState.ERROR;
+          ToastUtils.showError(context, _userRegisterErrorMsg.value);
+        }
+      } else {
+        _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
+        _userRegisterState.value = CurrentAppState.ERROR;
+        ToastUtils.showError(context, _userRegisterErrorMsg.value);
+      }
+    } on DioException catch (e) {
+      String errorMsg = "An unexpected error occurred";
+      if (e.response?.data != null) {
+        errorMsg = e.response!.data['error']?['message'] ??
+            e.response!.data['detail'] ??
+            e.response!.data['message'] ??
+            errorMsg;
+      }
+      _userRegisterErrorMsg.value = errorMsg;
+      _userRegisterState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(Get.context ?? context, _userRegisterErrorMsg.value);
+    } catch (e) {
+      _userRegisterErrorMsg.value = "An unexpected error occurred";
+      _userRegisterState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(context, _userRegisterErrorMsg.value);
+    }
+    return false;
+  }
 }
-
-
