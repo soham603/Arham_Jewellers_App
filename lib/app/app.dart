@@ -17,6 +17,7 @@ class RatneshGoldApp extends StatelessWidget {
       initialRoute: AppPages.initial,
       getPages: AppPages.routes,
       builder: (context, child) {
+        // 🔥 The global SafeArea is removed here so the screen draws edge-to-edge
         return MobileFrame(child: child ?? const SizedBox.shrink());
       },
     );
