@@ -16,6 +16,9 @@ import 'package:shimmer/shimmer.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
 
+// Imported the Customise Order Page
+import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -83,12 +86,9 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 6),
 
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(horizontal: 16),
-                    //   child: _SearchBar(),
-                    // ),
                     const SizedBox(height: 14),
 
+                    // 🔥 Original API-driven Carousel Section (Restored exactly as before)
                     _CarouselSection(
                       controller: carouselController,
                       pageController: pageController,
@@ -105,11 +105,13 @@ class _HomePageState extends State<HomePage> {
 
                     JewelleryDivider(),
 
-                    SizedBox(height: context.getScreenHeight(1)),
+                    // 🔥 Customise Order Banner placed exactly below the original carousel
+                    const CustomiseOrderBanner(),
 
-                    // const _QuickStatsStrip(),
+                    JewelleryDivider(),
 
-                    // const SizedBox(height: 24),
+                    SizedBox(height: context.getScreenHeight(2)),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
 
@@ -158,7 +160,6 @@ class _HomePageState extends State<HomePage> {
                       onLevel3Selected: scrollToProductSection,
                     ),
 
-                   
                     SizedBox(height: context.getScreenHeight(2)),
 
                     Obx(() {
@@ -168,10 +169,9 @@ class _HomePageState extends State<HomePage> {
 
                       return Column(
                         children: [
+                          JewelleryDivider(),
 
-                    JewelleryDivider(),
-
-                    SizedBox(height: context.getScreenHeight(1)),
+                          SizedBox(height: context.getScreenHeight(1)),
                           _ProductSection(
                             key: productSectionKey,
                             category: categoryController.selectedLevel3!,
@@ -180,19 +180,6 @@ class _HomePageState extends State<HomePage> {
                         ],
                       );
                     }),
-
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(horizontal: 16),
-
-                    //   child: _SectionTitle(
-                    //     label: 'Trending Now',
-                    //     subtitle: 'Most loved this week',
-                    //   ),
-                    // ),
-
-                    // const SizedBox(height: 12),
-
-                    // const _TrendingPlaceholder(),
 
                     JewelleryDivider(),
 
@@ -1462,6 +1449,7 @@ class _QuickStatsStrip extends StatelessWidget {
   }
 }
 
+// 🔥 RESTORED EXACTLY TO YOUR ORIGINAL CODE! No default fallback banners.
 class _CarouselSection extends StatelessWidget {
   final CarouselsController controller;
   final PageController pageController;
@@ -1742,6 +1730,256 @@ class _SectionTitle extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// =====================================================
+// 🔥 CUSTOMISE ORDER BANNER COMPONENT
+// =====================================================
+class CustomiseOrderBanner extends StatelessWidget {
+  const CustomiseOrderBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => const CustomiseOrderPage());
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(1),
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFEAD8C1), // Rich beige/gold
+              Color(0xFFD6C1A1), // Deeper warm gold/brown
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: context.colorPalette.goldDeep.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(
+            color: context.colorPalette.goldDeep.withOpacity(0.15),
+            width: 1.5,
+          ),
+        ),
+        child: Stack(
+          children: [
+            // ==========================================
+            // "Bespoke Service" Ribbon (Top Right)
+            // ==========================================
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(3),
+                  vertical: context.getScreenHeight(0.6),
+                ),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.goldDeep,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  "Bespoke Service",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.getScreenWidth(2.6),
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+
+            // ==========================================
+            // Main Content Layout
+            // ==========================================
+            Padding(
+              padding: EdgeInsets.all(context.getScreenWidth(5)),
+              child: Row(
+                children: [
+                  // Left Side: Text Content
+                  Expanded(
+                    flex: 6,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Overline Text
+                        Text(
+                          "BRING IDEAS TO LIFE",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: context.getScreenWidth(2.8),
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        SizedBox(height: context.getScreenHeight(1)),
+
+                        // Main Headlines
+                        Text(
+                          "Craft Your",
+                          style: TextStyle(
+                            color: const Color(
+                              0xFF3E2723,
+                            ), // Deep Espresso Brown
+                            fontSize: context.getScreenWidth(5.5),
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                          ),
+                        ),
+                        Text(
+                          "Dream Jewelry",
+                          style: TextStyle(
+                            color: const Color(0xFF3E2723).withOpacity(0.8),
+                            fontSize: context.getScreenWidth(4),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+
+                        SizedBox(height: context.getScreenHeight(1.5)),
+
+                        // Feature Bullet Points
+                        Row(
+                          children: [
+                            _buildBulletDot(context),
+                            _buildFeatureText(context, "Imagine"),
+                            _buildBulletDot(context),
+                            _buildFeatureText(context, "Upload"),
+                            _buildBulletDot(context),
+                            _buildFeatureText(context, "Craft"),
+                          ],
+                        ),
+
+                        SizedBox(height: context.getScreenHeight(1.5)),
+
+                        // Tagline
+                        Text(
+                          "Turn your unique inspirations into\nstunning gold masterpieces.",
+                          style: TextStyle(
+                            color: const Color(0xFF5D4037),
+                            fontSize: context.getScreenWidth(2.8),
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                          ),
+                        ),
+
+                        SizedBox(height: context.getScreenHeight(2)),
+
+                        // CTA Button
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getScreenWidth(3.5),
+                            vertical: context.getScreenHeight(0.8),
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: context.colorPalette.gold.withOpacity(0.5),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: context.colorPalette.gold.withOpacity(
+                                  0.1,
+                                ),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Start Designing",
+                                style: TextStyle(
+                                  color: context.colorPalette.goldDeep,
+                                  fontSize: context.getScreenWidth(3),
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(width: context.getScreenWidth(1.5)),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: context.colorPalette.goldDeep,
+                                size: context.getScreenWidth(3.5),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Right Side: Graphic/Illustration placeholder
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      height: context.getScreenWidth(32),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(
+                              Icons.diamond_outlined,
+                              color: context.colorPalette.gold.withOpacity(0.3),
+                              size: context.getScreenWidth(20),
+                            ),
+                            Icon(
+                              Icons.draw_outlined,
+                              color: context.colorPalette.goldDeep,
+                              size: context.getScreenWidth(10),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- Helper Widgets for the UI ---
+  Widget _buildBulletDot(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Icon(Icons.circle, size: 4, color: const Color(0xFF3E2723)),
+    );
+  }
+
+  Widget _buildFeatureText(BuildContext context, String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: const Color(0xFF3E2723),
+        fontSize: context.getScreenWidth(2.6),
+        fontWeight: FontWeight.w800,
+      ),
     );
   }
 }

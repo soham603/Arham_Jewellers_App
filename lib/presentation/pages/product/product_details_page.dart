@@ -8,6 +8,9 @@ import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
 
+// Import your new Customise Order Page here
+import 'customise_order_page.dart';
+
 class ProductDetailsPage extends StatefulWidget {
   const ProductDetailsPage({super.key, required this.product});
 
@@ -120,7 +123,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     // Dynamic Stock Logic
     final bool inStock = widget.product.isActive;
     final String stockText = inStock ? "IN STOCK" : "OUT OF STOCK";
-    // 🔥 Uses App Theme for In Stock, distinct red for Out of Stock
     final Color stockColor = inStock
         ? AppColors.primaryGold
         : Colors.red.shade600;
@@ -139,7 +141,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              // 🔥 Added a soft, premium upward shadow to the bottom bar
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -225,17 +226,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           )
                         : ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              elevation: 2, // Soft lift
+                              elevation: 2,
                               shadowColor: AppColors.primaryGold.withOpacity(
                                 0.2,
                               ),
-                              backgroundColor: const Color(
-                                0xFFF9F6F0,
-                              ), // Ultra-soft beige
+                              backgroundColor: const Color(0xFFF9F6F0),
                               foregroundColor: AppColors.primaryGold,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
-                                // Beautiful gold-tinted border
                                 side: BorderSide(
                                   color: AppColors.primaryGold.withOpacity(0.4),
                                   width: 1.2,
@@ -262,7 +260,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     height: context.getScreenHeight(6.2),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        elevation: 6, // Stronger premium shadow
+                        elevation: 6,
                         shadowColor: AppColors.primaryGold.withOpacity(0.5),
                         backgroundColor: AppColors.primaryGold,
                         foregroundColor: Colors.white,
@@ -391,7 +389,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               topRight: Radius.circular(20),
                               bottomRight: Radius.circular(20),
                             ),
-                            // Subtle shadow for the ribbons
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
@@ -418,8 +415,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             context.getScreenHeight(0.6),
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors
-                                .primaryGold, // 🔥 Changed to App Theme
+                            color: AppColors.primaryGold,
                             borderRadius: const BorderRadius.only(
                               topRight: Radius.circular(20),
                               bottomRight: Radius.circular(20),
@@ -538,9 +534,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           ElevatedButton.icon(
                             onPressed: () {
-                              Get.snackbar(
-                                "Customize",
-                                "Customization options coming soon!",
+                              // 🔥 Route to Customise Order Page
+                              Get.to(
+                                () =>
+                                    CustomiseOrderPage(product: widget.product),
                               );
                             },
                             icon: Icon(
@@ -557,8 +554,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors
-                                  .primaryGold, // 🔥 Changed to App Theme
+                              backgroundColor: AppColors.primaryGold,
                               elevation: 3,
                               shadowColor: AppColors.primaryGold.withOpacity(
                                 0.4,
@@ -667,9 +663,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           vertical: context.getScreenHeight(2),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(
-                            0xFFF9F6F0,
-                          ), // Softer warm tone for background
+                          color: const Color(0xFFF9F6F0),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: AppColors.primaryGold.withOpacity(0.1),
@@ -707,7 +701,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  // --- 🔥 Enhanced Helper Widget for Grid and Full-Width Spec Boxes ---
+  // --- Enhanced Helper Widget for Grid and Full-Width Spec Boxes ---
   Widget _buildSpecBox(
     BuildContext context,
     IconData icon,
@@ -722,7 +716,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        // Delicate gold border and modern drop shadow
         border: Border.all(
           color: AppColors.primaryGold.withOpacity(0.15),
           width: 1,
@@ -737,7 +730,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       ),
       child: Row(
         children: [
-          // Tinted the icon with the theme color to look elegant
           Icon(
             icon,
             color: AppColors.primaryGold.withOpacity(0.8),
