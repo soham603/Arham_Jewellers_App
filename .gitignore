@@ -53,3 +53,8 @@ AGENT.md
 # Environment variables
 .env
 
+# Android signing
+*.jks
+*.keystore
+key.properties
+
