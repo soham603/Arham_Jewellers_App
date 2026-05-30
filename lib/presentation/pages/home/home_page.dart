@@ -16,6 +16,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
+import '../../../core/widgets/custom_divider.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
@@ -115,56 +116,42 @@ class _HomePageState extends State<HomePage> {
 
                     _CategoryQuickAccess(controller: categoryController),
 
-                    SizedBox(height: context.getScreenHeight(1)),
+                    const JewelleryDivider(),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-
-                      child: _SectionTitle(
-                        label: 'Arham Gold',
-                        subtitle: '18K & 20K Collection',
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _navigateToKaratListing('18K'),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  'assets/images/arham-collection.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _navigateToKaratListing('22K'),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  'assets/images/ratnesh-collection.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                    const SizedBox(height: 12),
-
-                    _KaratSection(
-                      karat: Karat.k18,
-                      controller: categoryController,
-                      onLevel3Selected: scrollToProductSection,
-                      onSeeAll: () => _navigateToKaratListing('18K'),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(4)),
-
-                    _KaratSection(
-                      karat: Karat.k20,
-                      controller: categoryController,
-                      onLevel3Selected: scrollToProductSection,
-                      onSeeAll: () => _navigateToKaratListing('20K'),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(1)),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-
-                      child: _SectionTitle(
-                        label: 'Ratnesh Gold',
-                        subtitle: '22K Premium Collection',
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    _KaratSection(
-                      karat: Karat.k22,
-                      controller: categoryController,
-                      onLevel3Selected: scrollToProductSection,
-                      onSeeAll: () => _navigateToKaratListing('22K'),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(2)),
+                    const JewelleryDivider(),
 
                     Obx(() {
                       if (!categoryController.showProductSection) {
@@ -1235,52 +1222,38 @@ class _TopBar extends StatelessWidget {
 
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
+              Image.asset(
+                'assets/images/ratnesh-logo.png',
+                height: 50,
+                fit: BoxFit.contain,
+                color: context.colorPalette.gold,
+                colorBlendMode: BlendMode.srcIn,
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-
-                    decoration: BoxDecoration(
-                      color: context.colorPalette.gold,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-
-                    child: const Icon(
-                      Icons.diamond,
-                      color: Colors.white,
-                      size: 17,
-                    ),
-                  ),
-
-                  const SizedBox(width: 10),
-
                   Text(
                     'Ratnesh Gold',
-
                     style: TextStyle(
                       fontSize: 21,
                       fontWeight: FontWeight.w800,
                       color: context.colorPalette.goldDeep,
                     ),
                   ),
+                  Text(
+                    'Purity • Quality • Trust',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.colorPalette.goldDark,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
                 ],
-              ),
-
-              const SizedBox(height: 2),
-
-              Text(
-                'Pure gold. Pure trust.',
-
-                style: TextStyle(
-                  fontSize: 11,
-                  color: context.colorPalette.goldDark,
-                  letterSpacing: 0.3,
-                ),
               ),
             ],
           ),
@@ -1702,12 +1675,12 @@ class _CategoryQuickAccess extends StatelessWidget {
       if (unique.isEmpty) return const SizedBox();
 
       return SizedBox(
-        height: context.getScreenHeight(11),
+        height: context.getScreenHeight(13),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
           itemCount: unique.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 14),
+          separatorBuilder: (_, __) => const SizedBox(width: 15),
           itemBuilder: (_, index) {
             final cat = unique[index];
             return GestureDetector(
@@ -1717,35 +1690,35 @@ class _CategoryQuickAccess extends StatelessWidget {
               child: Column(
                 children: [
                   CircleAvatar(
-                    radius: context.getScreenWidth(7),
+                    radius: context.getScreenWidth(8.5),
                     backgroundColor: context.colorPalette.goldLight,
                     child: ClipOval(
                       child: cat.imageUrl.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: cat.imageUrl,
-                              width: context.getScreenWidth(14),
-                              height: context.getScreenWidth(14),
+                              width: context.getScreenWidth(17),
+                              height: context.getScreenWidth(17),
                               fit: BoxFit.cover,
                               errorWidget: (_, __, ___) => Icon(
                                 Icons.diamond_outlined,
-                                size: context.getScreenWidth(6),
+                                size: context.getScreenWidth(7),
                                 color: context.colorPalette.goldDark,
                               ),
                             )
                           : Icon(
                               Icons.diamond_outlined,
-                              size: context.getScreenWidth(6),
+                              size: context.getScreenWidth(7),
                               color: context.colorPalette.goldDark,
                             ),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 7),
                   SizedBox(
-                    width: context.getScreenWidth(22),
+                    width: context.getScreenWidth(24),
                     child: Text(
                       cat.name,
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(2.8),
+                        fontSize: context.getScreenWidth(3.0),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDeep,
                       ),
