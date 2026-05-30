@@ -1,8 +1,5 @@
-class ApiUrlConstants {
-  static String BASE_URL = "";
-  static String UAT_BASE_URL = "https://arham-jewellers-backend.onrender.com";
-  //static String UAT_BASE_URL = "https://3be3-103-58-152-137.ngrok-free.app";
-  static String WEBSITE_URL = "";
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-  //static String UAT_BASE_URL = "http://localhost:5000";
+class ApiUrlConstants {
+  static String get BASE_URL => dotenv.env['BASE_URL'] ?? '';
 }

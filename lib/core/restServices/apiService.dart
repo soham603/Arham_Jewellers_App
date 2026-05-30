@@ -13,7 +13,7 @@ class BaseHttpService {
   BaseHttpService() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: ApiUrlConstants.UAT_BASE_URL,
+        baseUrl: ApiUrlConstants.BASE_URL,
         connectTimeout: const Duration(minutes: 2),
         sendTimeout: const Duration(minutes: 2),
         receiveTimeout: const Duration(minutes: 2),
