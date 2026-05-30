@@ -1,3 +1,6 @@
+class _Undefined {}
+const _undefined = _Undefined();
+
 class CarouselModel {
   final String id;
   final String title;
@@ -42,10 +45,7 @@ class CarouselModel {
     String? id,
     String? title,
     String? description,
-    String? descHtml,
     String? imageUrl,
-    String? mobileImageUrl,
-    String? linkUrl,
     int? position,
     bool? isActive,
     DateTime? createdAt,
@@ -54,16 +54,16 @@ class CarouselModel {
     String? updatedBy,
     DateTime? deletedAt,
     String? deletedBy,
-    String? imagePublicId,
+    Object? descHtml = _undefined,
+    Object? mobileImageUrl = _undefined,
+    Object? linkUrl = _undefined,
+    Object? imagePublicId = _undefined,
   }) {
     return CarouselModel(
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
-      descHtml: descHtml ?? this.descHtml,
       imageUrl: imageUrl ?? this.imageUrl,
-      mobileImageUrl: mobileImageUrl ?? this.mobileImageUrl,
-      linkUrl: linkUrl ?? this.linkUrl,
       position: position ?? this.position,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
@@ -72,7 +72,15 @@ class CarouselModel {
       updatedBy: updatedBy ?? this.updatedBy,
       deletedAt: deletedAt ?? this.deletedAt,
       deletedBy: deletedBy ?? this.deletedBy,
-      imagePublicId: imagePublicId ?? this.imagePublicId,
+      descHtml: descHtml == _undefined ? this.descHtml : descHtml as String?,
+      mobileImageUrl: mobileImageUrl == _undefined
+          ? this.mobileImageUrl
+          : mobileImageUrl as String?,
+      linkUrl:
+          linkUrl == _undefined ? this.linkUrl : linkUrl as String?,
+      imagePublicId: imagePublicId == _undefined
+          ? this.imagePublicId
+          : imagePublicId as String?,
     );
   }
 
