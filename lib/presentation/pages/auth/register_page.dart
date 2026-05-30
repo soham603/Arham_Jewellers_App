@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
+import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
@@ -349,7 +350,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             '$selectedCountryCode${phoneController.text.trim()}';
 
                                         final fcmToken =
-                                            "placeholder_fcm_token"; // Replace with Firebase token later
+                                            NotificationService().fcmToken;
 
                                         await authController.registerUser(
                                           email: emailController.text.trim(),

@@ -6,6 +6,7 @@ import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/cart/cart_page.dart';
 import '../../presentation/pages/checkout/checkout_page.dart';
 import '../../presentation/pages/home/home_page.dart';
+import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/orders/my_orders_page.dart';
 import '../../presentation/pages/orders/order_success_page.dart';
 import '../../presentation/pages/product/product_details_page.dart';
@@ -32,5 +33,6 @@ abstract class AppPages {
     GetPage(name: AppRoutes.orderSuccess, page: OrderSuccessPage.new),
     GetPage(name: AppRoutes.myOrders, page: MyOrdersPage.new),
     GetPage(name: AppRoutes.register, page: RegisterPage.new),
+    GetPage(name: AppRoutes.notifications, page: NotificationsPage.new),
   ];
 }

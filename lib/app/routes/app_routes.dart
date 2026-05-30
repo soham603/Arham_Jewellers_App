@@ -12,4 +12,5 @@ abstract class AppRoutes {
   static const orderSuccess = '/order-success';
   static const myOrders = '/my-orders';
   static const register = '/register';
+  static const notifications = '/notifications';
 }
