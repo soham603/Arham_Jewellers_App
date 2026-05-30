@@ -38,6 +38,44 @@ class CarouselModel {
     this.imagePublicId,
   });
 
+  CarouselModel copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? descHtml,
+    String? imageUrl,
+    String? mobileImageUrl,
+    String? linkUrl,
+    int? position,
+    bool? isActive,
+    DateTime? createdAt,
+    String? createdBy,
+    DateTime? updatedAt,
+    String? updatedBy,
+    DateTime? deletedAt,
+    String? deletedBy,
+    String? imagePublicId,
+  }) {
+    return CarouselModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      descHtml: descHtml ?? this.descHtml,
+      imageUrl: imageUrl ?? this.imageUrl,
+      mobileImageUrl: mobileImageUrl ?? this.mobileImageUrl,
+      linkUrl: linkUrl ?? this.linkUrl,
+      position: position ?? this.position,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      createdBy: createdBy ?? this.createdBy,
+      updatedAt: updatedAt ?? this.updatedAt,
+      updatedBy: updatedBy ?? this.updatedBy,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deletedBy: deletedBy ?? this.deletedBy,
+      imagePublicId: imagePublicId ?? this.imagePublicId,
+    );
+  }
+
   factory CarouselModel.fromJson(Map<String, dynamic> json) {
     return CarouselModel(
       id: json['id'] ?? "",
