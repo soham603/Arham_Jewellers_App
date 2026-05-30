@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -66,6 +67,15 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _navigateToKaratListing(String karat) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductListingPage(karat: karat),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,18 +111,11 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
 
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.getScreenHeight(3)),
 
                     _CategoryQuickAccess(controller: categoryController),
 
-                    SizedBox(height: context.getScreenHeight(3)),
-
-                    // 🔥 Customise Order Banner placed exactly below the original carousel
-                    const CustomiseOrderBanner(),
-
-
-
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.getScreenHeight(1)),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -129,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                       karat: Karat.k18,
                       controller: categoryController,
                       onLevel3Selected: scrollToProductSection,
+                      onSeeAll: () => _navigateToKaratListing('18K'),
                     ),
 
                     SizedBox(height: context.getScreenHeight(4)),
@@ -137,11 +141,8 @@ class _HomePageState extends State<HomePage> {
                       karat: Karat.k20,
                       controller: categoryController,
                       onLevel3Selected: scrollToProductSection,
+                      onSeeAll: () => _navigateToKaratListing('20K'),
                     ),
-
-                    SizedBox(height: context.getScreenHeight(1)),
-
-
 
                     SizedBox(height: context.getScreenHeight(1)),
 
@@ -160,6 +161,7 @@ class _HomePageState extends State<HomePage> {
                       karat: Karat.k22,
                       controller: categoryController,
                       onLevel3Selected: scrollToProductSection,
+                      onSeeAll: () => _navigateToKaratListing('22K'),
                     ),
 
                     SizedBox(height: context.getScreenHeight(2)),
@@ -397,6 +399,8 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 30),
 
+                    const CustomiseOrderBanner(),
+
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -415,11 +419,13 @@ class _KaratSection extends StatelessWidget {
   final Karat karat;
   final CategoryController controller;
   final VoidCallback onLevel3Selected;
+  final VoidCallback onSeeAll;
 
   const _KaratSection({
     required this.karat,
     required this.controller,
     required this.onLevel3Selected,
+    required this.onSeeAll,
   });
 
   CurrentAppState _state() {
@@ -510,13 +516,16 @@ class _KaratSection extends StatelessWidget {
 
                 const Spacer(),
 
-                Text(
-                  'See all →',
+                GestureDetector(
+                  onTap: onSeeAll,
+                  child: Text(
+                    'See all →',
 
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: context.colorPalette.goldDark,
-                    fontWeight: FontWeight.w600,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: context.colorPalette.goldDark,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
