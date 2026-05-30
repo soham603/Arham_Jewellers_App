@@ -53,6 +53,15 @@ class CarouselsController extends GetxController {
   final RxList<ProductModel> _latestProducts = <ProductModel>[].obs;
   List<ProductModel> get latestProducts => _latestProducts;
 
+  final _editLoadingId = RxString('');
+  String get editLoadingId => _editLoadingId.value;
+
+  final _deleteLoadingId = RxString('');
+  String get deleteLoadingId => _deleteLoadingId.value;
+
+  final _restoreLoadingId = RxString('');
+  String get restoreLoadingId => _restoreLoadingId.value;
+
   final _error = ''.obs;
   String get error => _error.value;
 
@@ -246,6 +255,7 @@ class CarouselsController extends GetxController {
     File? imageFile,
   }) async {
     try {
+      _editLoadingId.value = id;
       _editState.value = CurrentAppState.LOADING;
       _error.value = '';
 
@@ -294,15 +304,18 @@ class CarouselsController extends GetxController {
           _adminList.refresh();
         }
 
+        _editLoadingId.value = '';
         _editState.value = CurrentAppState.SUCCESS;
 
         return true;
       }
 
+      _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
       _error.value =
           response.data['message'] ?? 'Edit failed';
     } catch (e) {
+      _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 
@@ -317,6 +330,7 @@ class CarouselsController extends GetxController {
 
   Future<bool> deleteCarousel(String id) async {
     try {
+      _deleteLoadingId.value = id;
       _deleteState.value = CurrentAppState.LOADING;
       _error.value = '';
 
@@ -341,15 +355,18 @@ class CarouselsController extends GetxController {
           _deletedList.insert(0, removed);
         }
 
+        _deleteLoadingId.value = '';
         _deleteState.value = CurrentAppState.SUCCESS;
 
         return true;
       }
 
+      _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;
       _error.value =
           response.data['message'] ?? 'Delete failed';
     } catch (e) {
+      _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 
@@ -364,6 +381,7 @@ class CarouselsController extends GetxController {
 
   Future<bool> restoreCarousel(String id) async {
     try {
+      _restoreLoadingId.value = id;
       _restoreState.value = CurrentAppState.LOADING;
       _error.value = '';
 
@@ -386,15 +404,18 @@ class CarouselsController extends GetxController {
 
         _adminList.insert(0, restored);
 
+        _restoreLoadingId.value = '';
         _restoreState.value = CurrentAppState.SUCCESS;
 
         return true;
       }
 
+      _restoreLoadingId.value = '';
       _restoreState.value = CurrentAppState.ERROR;
       _error.value =
           response.data['message'] ?? 'Restore failed';
     } catch (e) {
+      _restoreLoadingId.value = '';
       _restoreState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 

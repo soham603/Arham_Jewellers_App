@@ -353,7 +353,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         label: item.isActive ? 'Deactivate' : 'Activate',
                         color: item.isActive ? Colors.orange : Colors.green,
                         isLoading:
-                            controller.editState == CurrentAppState.LOADING,
+                            controller.editLoadingId == item.id,
                         onTap: () => controller.editCarousel(
                           id: item.id,
                           isActive: !item.isActive,
@@ -380,7 +380,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         label: 'Delete',
                         color: Colors.red,
                         isLoading:
-                            controller.deleteState == CurrentAppState.LOADING,
+                            controller.deleteLoadingId == item.id,
                         onTap: () => _confirmDelete(context, item),
                       ),
                     ),
@@ -493,8 +493,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child:
-                                  controller.restoreState ==
-                                      CurrentAppState.LOADING
+                                  controller.restoreLoadingId == item.id
                                   ? Center(
                                       child: SizedBox(
                                         width: context.getScreenWidth(4),
@@ -744,26 +743,40 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed:
-                        controller.restoreState == CurrentAppState.LOADING
-                        ? null
-                        : () async {
-                            bool ok = false;
-                            if (newImage != null) {
-                              ok = await controller.editCarousel(
-                                id: item.id,
-                                imageFile: newImage,
-                              );
-                            }
-                            ok = await controller.restoreCarousel(item.id);
-                            if (ok && context.mounted) {
-                              Get.back();
-                              _showSnack(
-                                context,
-                                'Carousel restored',
-                                isError: false,
-                              );
-                            }
-                          },
+                        controller.restoreState == CurrentAppState.LOADING ||
+                                controller.editState ==
+                                    CurrentAppState.LOADING
+                            ? null
+                            : () async {
+                                bool ok = true;
+                                if (newImage != null) {
+                                  ok = await controller.editCarousel(
+                                    id: item.id,
+                                    imageFile: newImage,
+                                  );
+                                }
+                                if (ok) {
+                                  ok = await controller.restoreCarousel(
+                                    item.id,
+                                  );
+                                }
+                                if (ok && context.mounted) {
+                                  Get.back();
+                                  _showSnack(
+                                    context,
+                                    'Carousel restored',
+                                    isError: false,
+                                  );
+                                } else if (context.mounted) {
+                                  _showSnack(
+                                    context,
+                                    controller.error.isNotEmpty
+                                        ? controller.error
+                                        : 'Failed to restore carousel',
+                                    isError: true,
+                                  );
+                                }
+                              },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(
@@ -832,7 +845,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           ),
           Obx(
             () => TextButton(
-              onPressed: controller.deleteState == CurrentAppState.LOADING
+              onPressed: controller.deleteLoadingId == item.id
                   ? null
                   : () async {
                       final ok = await controller.deleteCarousel(item.id);
@@ -841,7 +854,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         _showSnack(context, 'Carousel deleted', isError: false);
                       }
                     },
-              child: controller.deleteState == CurrentAppState.LOADING
+              child: controller.deleteLoadingId == item.id
                   ? SizedBox(
                       width: context.getScreenWidth(4),
                       height: context.getScreenWidth(4),
