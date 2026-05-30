@@ -1,4 +1,6 @@
-class _Undefined {}
+class _Undefined {
+  const _Undefined();
+}
 const _undefined = _Undefined();
 
 class CarouselModel {
