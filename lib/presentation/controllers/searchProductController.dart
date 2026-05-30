@@ -179,6 +179,74 @@ class SearchProductController extends GetxController {
     }
   }
 
+  // ── Karat-filtered products (for "See all" on home page) ───────────────
+  final _karatProducts = <ProductModel>[].obs;
+  List<ProductModel> get karatProducts => _karatProducts;
+
+  final _karatState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get karatState => _karatState.value;
+
+  String _currentKarat = '';
+  int _karatPage = 1;
+  bool _karatHasMore = true;
+  bool get karatHasMore => _karatHasMore;
+
+  Future<void> loadProductsByKarat(String karat,
+      {bool isPagination = false}) async {
+    if (!_karatHasMore && isPagination) return;
+    if (_karatState.value == CurrentAppState.LOADING) return;
+
+    if (!isPagination) {
+      _currentKarat = karat;
+      _karatState.value = CurrentAppState.LOADING;
+      _karatPage = 1;
+      _karatHasMore = true;
+      _karatProducts.clear();
+    }
+
+    try {
+      final response = await httpClient.get(
+        "/api/v1/products/search",
+        queryParameters: {
+          "karat": karat,
+          "page": _karatPage,
+          "limit": _pageLimit,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final List raw = data['data'] is List ? data['data'] : [];
+        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+
+        if (isPagination) {
+          _karatProducts.addAll(fetched);
+        } else {
+          _karatProducts.value = fetched;
+        }
+
+        if (fetched.length < _pageLimit) {
+          _karatHasMore = false;
+        } else {
+          _karatPage++;
+        }
+
+        _karatState.value = CurrentAppState.SUCCESS;
+      } else {
+        _karatState.value = CurrentAppState.ERROR;
+      }
+    } catch (e, st) {
+      _karatState.value = CurrentAppState.ERROR;
+      Logger.error(
+          "SearchProductController", "loadProductsByKarat error: $e\n$st");
+    }
+  }
+
+  void loadMoreKaratProducts() {
+    if (!_karatHasMore || _karatState.value == CurrentAppState.LOADING) return;
+    loadProductsByKarat(_currentKarat, isPagination: true);
+  }
+
   void clearSearch() {
     _debounce?.cancel();
     _searchQuery.value = '';
