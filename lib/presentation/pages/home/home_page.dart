@@ -1525,12 +1525,12 @@ class _CarouselSection extends StatelessWidget {
 
       if (list.isEmpty) return const SizedBox();
 
-      return Column(
-        children: [
-          SizedBox(
-            height: context.getScreenHeight(22),
+      return SizedBox(
+        height: context.getScreenHeight(22),
 
-            child: PageView.builder(
+        child: Stack(
+          children: [
+            PageView.builder(
               controller: pageController,
 
               itemCount: list.length,
@@ -1570,35 +1570,38 @@ class _CarouselSection extends StatelessWidget {
                 );
               },
             ),
-          ),
 
-          const SizedBox(height: 10),
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(list.length, (i) {
+                  final active = i == currentIndex;
 
-            children: List.generate(list.length, (i) {
-              final active = i == currentIndex;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
 
-                margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: active ? 22 : 6,
+                    height: 6,
 
-                width: active ? 22 : 6,
-                height: 6,
+                    decoration: BoxDecoration(
+                      color: active
+                          ? context.colorPalette.gold
+                          : context.colorPalette.border,
 
-                decoration: BoxDecoration(
-                  color: active
-                      ? context.colorPalette.gold
-                      : context.colorPalette.border,
-
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              );
-            }),
-          ),
-        ],
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
       );
     });
   }
