@@ -42,14 +42,21 @@ class BaseHttpService {
     _dio.interceptors.add(
       dio.InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final requiresAuth = options.extra["requiresAuth"] ?? true;
+          try {
+            final requiresAuth = options.extra["requiresAuth"] ?? true;
 
-          if (requiresAuth) {
-            final token = await sessionManager.getAccessToken();
+            if (requiresAuth) {
+              final token = await sessionManager.getAccessToken();
 
-            if (token != null) {
-              options.headers["Authorization"] = "Bearer $token";
+              if (token != null) {
+                options.headers["Authorization"] = "Bearer $token";
+              }
             }
+          } catch (e) {
+            Logger.error(
+              "BaseHttpService",
+              "onRequest interceptor error: $e",
+            );
           }
 
           return handler.next(options);
