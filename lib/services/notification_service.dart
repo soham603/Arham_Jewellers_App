@@ -23,7 +23,7 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  late final FirebaseMessaging _messaging;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   static const String _counterKey = 'notification_id_counter';
   int _notificationIdCounter = 0;
@@ -44,6 +44,7 @@ class NotificationService {
   Future<void> init() async {
     try {
       await Firebase.initializeApp();
+      _messaging = FirebaseMessaging.instance;
 
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
