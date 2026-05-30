@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
 class BaseHttpService {
@@ -45,8 +46,9 @@ class BaseHttpService {
         },
 
         onError: (DioException error, handler) async {
-          debugPrint(
-            "❌ Error [${error.response?.statusCode}]: ${error.message}",
+          Logger.error(
+            "BaseHttpService",
+            "Error [${error.response?.statusCode}]: ${error.message}",
           );
 
           if (error.response?.statusCode == 401) {
@@ -81,7 +83,7 @@ class BaseHttpService {
   }
 
   Future<void> _handleTokenExpiration() async {
-    debugPrint("⚠️ Token expired. Redirecting to SignIn.");
+    Logger.warning("BaseHttpService", "Token expired. Redirecting to SignIn.");
     await sessionManager.clearTokens();
 
     final context = navigatorKey.currentContext;
