@@ -185,7 +185,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         child: ListView.separated(
           padding: EdgeInsets.all(context.getScreenWidth(4)),
           itemCount: list.length,
-          separatorBuilder: (_, _) =>
+          separatorBuilder: (_, __) =>
               SizedBox(height: context.getScreenHeight(1.5)),
           itemBuilder: (context, index) =>
               _deletedCarouselCard(context, list[index]),
@@ -360,7 +360,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                             isActive: !item.isActive,
                           );
                           if (ok) {
-                            controller.fetchAdminCarousels();
+                            await controller.fetchAdminCarousels();
                             if (context.mounted) {
                               _showSnack(
                                 context,

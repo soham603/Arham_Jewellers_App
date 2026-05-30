@@ -295,13 +295,21 @@ class CarouselsController extends GetxController {
           response.data['data'],
         );
 
-        final index = _adminList.indexWhere(
+        var index = _adminList.indexWhere(
           (e) => e.id == id,
         );
 
         if (index != -1) {
           _adminList[index] = updated;
           _adminList.refresh();
+        } else {
+          index = _deletedList.indexWhere(
+            (e) => e.id == id,
+          );
+          if (index != -1) {
+            _deletedList[index] = updated;
+            _deletedList.refresh();
+          }
         }
 
         _editLoadingId.value = '';
@@ -311,7 +319,7 @@ class CarouselsController extends GetxController {
       }
 
       if (response.statusCode == 204) {
-        final index = _adminList.indexWhere(
+        var index = _adminList.indexWhere(
           (e) => e.id == id,
         );
 
@@ -320,6 +328,16 @@ class CarouselsController extends GetxController {
             isActive: isActive,
           );
           _adminList.refresh();
+        } else {
+          index = _deletedList.indexWhere(
+            (e) => e.id == id,
+          );
+          if (index != -1) {
+            _deletedList[index] = _deletedList[index].copyWith(
+              isActive: isActive,
+            );
+            _deletedList.refresh();
+          }
         }
 
         _editLoadingId.value = '';
@@ -461,6 +479,7 @@ class CarouselsController extends GetxController {
 
     if (oldIndex == -1) return;
 
+    final snapshot = List<CarouselModel>.from(_adminList);
     final item = _adminList.removeAt(oldIndex);
 
     _adminList.insert(
@@ -470,10 +489,16 @@ class CarouselsController extends GetxController {
 
     _adminList.refresh();
 
-    await editCarousel(
+    final ok = await editCarousel(
       id: id,
       position: newPosition,
     );
+
+    if (!ok) {
+      _adminList.value = snapshot;
+      _adminList.refresh();
+      _error.value = 'Reordering failed. Changes reverted.';
+    }
   }
 
   Future<void> loadLatestProducts({
@@ -530,11 +555,13 @@ class CarouselsController extends GetxController {
         }
 
         _productState.value = CurrentAppState.SUCCESS;
-      } else {
+      } else if (!isPagination) {
         _productState.value = CurrentAppState.ERROR;
       }
     } catch (e, st) {
-      _productState.value = CurrentAppState.ERROR;
+      if (!isPagination) {
+        _productState.value = CurrentAppState.ERROR;
+      }
 
       Logger.error(
         "CarouselsController",
