@@ -1558,120 +1558,13 @@ class _CarouselSection extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(18),
 
-                    child: Stack(
-                      fit: StackFit.expand,
-
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: item.imageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (_, _) => CarouselShimmer(),
-                          errorWidget: (_, __, ___) => Container(
-                            color: context.colorPalette.shimmerBaseColor,
-                          ),
-                        ),
-
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withOpacity(0.62),
-                                Colors.transparent,
-                              ],
-
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                          ),
-                        ),
-
-                        Positioned(
-                          top: 12,
-                          right: 14,
-
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-
-                            decoration: BoxDecoration(
-                              color: context.colorPalette.gold.withOpacity(0.9),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-
-                            child: const Text(
-                              'SALE',
-
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        Positioned(
-                          left: 16,
-                          right: 60,
-                          bottom: 18,
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              Text(
-                                item.title,
-
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-
-                              const SizedBox(height: 4),
-
-                              Text(
-                                item.description,
-
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12.5,
-                                ),
-                              ),
-
-                              const SizedBox(height: 8),
-
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 5,
-                                ),
-
-                                decoration: BoxDecoration(
-                                  color: context.colorPalette.gold,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-
-                                child: const Text(
-                                  'Shop Now →',
-
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    child: CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => CarouselShimmer(),
+                      errorWidget: (_, __, ___) => Container(
+                        color: context.colorPalette.shimmerBaseColor,
+                      ),
                     ),
                   ),
                 );
