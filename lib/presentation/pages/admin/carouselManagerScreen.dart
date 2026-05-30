@@ -1052,8 +1052,6 @@ class _CarouselFormSheet extends StatefulWidget {
 
 class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   final CarouselsController controller = Get.find();
-  final _titleController = TextEditingController();
-  final _descController = TextEditingController();
   final _linkController = TextEditingController();
   File? _pickedImage;
   bool _isActive = true;
@@ -1063,8 +1061,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   void initState() {
     super.initState();
     if (widget.existing != null) {
-      _titleController.text = widget.existing!.title;
-      _descController.text = widget.existing!.description;
       _linkController.text = widget.existing!.linkUrl ?? '';
       _isActive = widget.existing!.isActive;
     }
@@ -1072,8 +1068,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descController.dispose();
     _linkController.dispose();
     super.dispose();
   }
@@ -1227,19 +1221,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(2)),
 
-              // ── Title ───────────────────────────────────────────────────
-              _buildField(context, 'Title (optional)', _titleController),
-              SizedBox(height: context.getScreenHeight(1.5)),
-
-              // ── Description ─────────────────────────────────────────────
-              _buildField(
-                context,
-                'Description (optional)',
-                _descController,
-                maxLines: 3,
-              ),
-              SizedBox(height: context.getScreenHeight(1.5)),
-
               // ── Link URL ─────────────────────────────────────────────────
               _buildField(
                 context,
@@ -1281,12 +1262,8 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                       : () async {
                           setState(() => _isSubmitting = true);
                           await widget.onSubmit(
-                            title: _titleController.text.trim().isEmpty
-                                ? null
-                                : _titleController.text.trim(),
-                            description: _descController.text.trim().isEmpty
-                                ? null
-                                : _descController.text.trim(),
+                            title: null,
+                            description: null,
                             linkUrl: _linkController.text.trim().isEmpty
                                 ? null
                                 : _linkController.text.trim(),
