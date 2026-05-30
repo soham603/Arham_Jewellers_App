@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
@@ -70,22 +69,20 @@ class AuthController extends GetxController {
         _user.value = user;
         await SessionManager().saveUserData(user);
 
-        final bool tokensSaved = await SessionManager().saveTokens(
+        await SessionManager().saveTokens(
           accessToken: data['accessToken'],
           refreshToken: data['refreshToken'],
           accessTokenExpiry: data['accessTokenValidTill'],
           refreshTokenExpiry: data['enableAccessTill'],
         );
 
-        if (tokensSaved) {
-          _userLoginState.value = CurrentAppState.SUCCESS;
-          ToastUtils.showSuccess(
-            context,
-            response.data['message'] ?? "Login successful!",
-          );
-          onSuccess?.call();
-          return true;
-        }
+        _userLoginState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showSuccess(
+          context,
+          response.data['message'] ?? "Login successful!",
+        );
+        onSuccess?.call();
+        return true;
       } else {
         _userLoginErrorMsg.value = response.data['message'] ?? "Login failed";
         _userLoginState.value = CurrentAppState.ERROR;
@@ -118,6 +115,7 @@ class AuthController extends GetxController {
 
       final response = await httpClient.post(
         "/api/v1/auth/admin-login",
+        options: Options(extra: {"requiresAuth": false}),
         data: {
           "phoneNumber": phoneNumber,
           "password": password,
@@ -133,22 +131,20 @@ class AuthController extends GetxController {
         _user.value = user;
         await SessionManager().saveUserData(user);
 
-        final bool tokensSaved = await SessionManager().saveTokens(
+        await SessionManager().saveTokens(
           accessToken: data['accessToken'],
           refreshToken: data['refreshToken'],
           accessTokenExpiry: data['accessTokenValidTill'],
           refreshTokenExpiry: data['refreshTokenValidTill'],
         );
 
-        if (tokensSaved) {
-          _adminLoginState.value = CurrentAppState.SUCCESS;
-          ToastUtils.showSuccess(
-            context,
-            response.data['message'] ?? "Admin login successful!",
-          );
-          onSuccess?.call();
-          return true;
-        }
+        _adminLoginState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showSuccess(
+          context,
+          response.data['message'] ?? "Admin login successful!",
+        );
+        onSuccess?.call();
+        return true;
       } else {
         _adminLoginErrorMsg.value =
             response.data['message'] ?? "Admin login failed";
@@ -168,11 +164,19 @@ class AuthController extends GetxController {
   void _handleLoginError(DioException e, {required bool isUserLogin}) {
     String errorMsg = "An unexpected error occurred";
 
-    if (e.response?.data != null) {
-      errorMsg =
-          e.response!.data['error']['message'] ??
-          e.response!.data['detail'] ??
-          errorMsg;
+    try {
+      if (e.response?.data != null) {
+        final data = e.response!.data as Map;
+        if (data['error'] is Map) {
+          errorMsg = (data['error']['message'] as String?) ?? errorMsg;
+        } else {
+          errorMsg = (data['message'] as String?) ??
+              (data['detail'] as String?) ??
+              errorMsg;
+        }
+      }
+    } catch (_) {
+      // ignore extraction errors, fall back to default message
     }
 
     if (isUserLogin) {
