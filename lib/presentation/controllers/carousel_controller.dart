@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:get/get.dart' hide MultipartFile, FormData;
+import 'package:get/get.dart' hide MultipartFile, FormData, Response;
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
@@ -267,7 +267,7 @@ class CarouselsController extends GetxController {
         if (mobileImageUrl != null)
           "mobileImageUrl": mobileImageUrl,
         if (position != null) "position": position,
-        if (isActive != null) "isActive": isActive,
+        if (isActive != null) "isActive": isActive.toString(),
       };
 
       if (imageFile != null) {
@@ -310,10 +310,30 @@ class CarouselsController extends GetxController {
         return true;
       }
 
+      if (response.statusCode == 204) {
+        final index = _adminList.indexWhere(
+          (e) => e.id == id,
+        );
+
+        if (index != -1) {
+          _adminList[index] = _adminList[index].copyWith(
+            isActive: isActive,
+          );
+          _adminList.refresh();
+        }
+
+        _editLoadingId.value = '';
+        _editState.value = CurrentAppState.SUCCESS;
+
+        return true;
+      }
+
       _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
-      _error.value =
-          response.data['message'] ?? 'Edit failed';
+      _error.value = (response.data != null
+              ? response.data['message']
+              : null) ??
+          'Edit failed';
     } catch (e) {
       _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
@@ -344,7 +364,8 @@ class CarouselsController extends GetxController {
       );
 
       if (response.statusCode == 200 ||
-          response.statusCode == 201) {
+          response.statusCode == 201 ||
+          response.statusCode == 204) {
         final removed = _adminList.firstWhereOrNull(
           (e) => e.id == id,
         );
@@ -363,8 +384,10 @@ class CarouselsController extends GetxController {
 
       _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;
-      _error.value =
-          response.data['message'] ?? 'Delete failed';
+      _error.value = (response.data != null
+              ? response.data['message']
+              : null) ??
+          'Delete failed';
     } catch (e) {
       _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;

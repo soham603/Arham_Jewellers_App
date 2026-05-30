@@ -354,10 +354,30 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         color: item.isActive ? Colors.orange : Colors.green,
                         isLoading:
                             controller.editLoadingId == item.id,
-                        onTap: () => controller.editCarousel(
-                          id: item.id,
-                          isActive: !item.isActive,
-                        ),
+                        onTap: () async {
+                          final ok = await controller.editCarousel(
+                            id: item.id,
+                            isActive: !item.isActive,
+                          );
+                          if (ok) {
+                            controller.fetchAdminCarousels();
+                            if (context.mounted) {
+                              _showSnack(
+                                context,
+                                'Status updated',
+                                isError: false,
+                              );
+                            }
+                          } else if (context.mounted) {
+                            _showSnack(
+                              context,
+                              controller.error.isNotEmpty
+                                  ? controller.error
+                                  : 'Failed to update status',
+                              isError: true,
+                            );
+                          }
+                        },
                       ),
                     ),
                     SizedBox(width: context.getScreenWidth(2)),
@@ -844,16 +864,24 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ),
           ),
           Obx(
-            () => TextButton(
-              onPressed: controller.deleteLoadingId == item.id
-                  ? null
-                  : () async {
-                      final ok = await controller.deleteCarousel(item.id);
-                      if (ok && context.mounted) {
-                        Get.back();
-                        _showSnack(context, 'Carousel deleted', isError: false);
-                      }
-                    },
+              () => TextButton(
+                onPressed: controller.deleteLoadingId == item.id
+                    ? null
+                    : () async {
+                        final ok = await controller.deleteCarousel(item.id);
+                        if (ok && context.mounted) {
+                          Get.back();
+                          _showSnack(context, 'Carousel deleted', isError: false);
+                        } else if (!ok && context.mounted) {
+                          _showSnack(
+                            context,
+                            controller.error.isNotEmpty
+                                ? controller.error
+                                : 'Delete failed',
+                            isError: true,
+                          );
+                        }
+                      },
               child: controller.deleteLoadingId == item.id
                   ? SizedBox(
                       width: context.getScreenWidth(4),
