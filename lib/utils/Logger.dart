@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 
 class LogColors {
   static const String reset = '\x1B[0m';
@@ -48,6 +49,7 @@ class Logger {
   }
 
   static void _log(String message) {
+    if (kReleaseMode) return;
     print(message);
     developer.log(message);
   }
