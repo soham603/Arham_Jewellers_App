@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
@@ -104,12 +103,14 @@ class _HomePageState extends State<HomePage> {
 
                     SizedBox(height: context.getScreenHeight(1)),
 
-                    JewelleryDivider(),
+                    _CategoryQuickAccess(controller: categoryController),
+
+                    SizedBox(height: context.getScreenHeight(3)),
 
                     // 🔥 Customise Order Banner placed exactly below the original carousel
                     const CustomiseOrderBanner(),
 
-                    JewelleryDivider(),
+
 
                     SizedBox(height: context.getScreenHeight(2)),
 
@@ -140,7 +141,7 @@ class _HomePageState extends State<HomePage> {
 
                     SizedBox(height: context.getScreenHeight(1)),
 
-                    JewelleryDivider(),
+
 
                     SizedBox(height: context.getScreenHeight(1)),
 
@@ -170,7 +171,7 @@ class _HomePageState extends State<HomePage> {
 
                       return Column(
                         children: [
-                          JewelleryDivider(),
+      
 
                           SizedBox(height: context.getScreenHeight(1)),
                           _ProductSection(
@@ -182,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                       );
                     }),
 
-                    JewelleryDivider(),
+
 
                     SizedBox(height: context.getScreenHeight(1)),
 
@@ -1667,6 +1668,93 @@ class _SectionTitle extends StatelessWidget {
 // =====================================================
 // 🔥 CUSTOMISE ORDER BANNER COMPONENT
 // =====================================================
+class _CategoryQuickAccess extends StatelessWidget {
+  final CategoryController controller;
+
+  const _CategoryQuickAccess({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final allCategories = [
+        ...controller.k18Categories,
+        ...controller.k20Categories,
+        ...controller.k22Categories,
+      ];
+
+      final seen = <String>{};
+      final unique = <CategoryModel>[];
+      for (final cat in allCategories) {
+        if (seen.add(cat.name.toLowerCase())) {
+          unique.add(cat);
+        }
+      }
+
+      if (unique.isEmpty) return const SizedBox();
+
+      return SizedBox(
+        height: context.getScreenHeight(11),
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          scrollDirection: Axis.horizontal,
+          itemCount: unique.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 14),
+          itemBuilder: (_, index) {
+            final cat = unique[index];
+            return GestureDetector(
+              onTap: () {
+                controller.toggleExpand(cat);
+              },
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: context.getScreenWidth(7),
+                    backgroundColor: context.colorPalette.goldLight,
+                    child: ClipOval(
+                      child: cat.imageUrl.isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: cat.imageUrl,
+                              width: context.getScreenWidth(14),
+                              height: context.getScreenWidth(14),
+                              fit: BoxFit.cover,
+                              errorWidget: (_, __, ___) => Icon(
+                                Icons.diamond_outlined,
+                                size: context.getScreenWidth(6),
+                                color: context.colorPalette.goldDark,
+                              ),
+                            )
+                          : Icon(
+                              Icons.diamond_outlined,
+                              size: context.getScreenWidth(6),
+                              color: context.colorPalette.goldDark,
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    width: context.getScreenWidth(22),
+                    child: Text(
+                      cat.name,
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(2.8),
+                        fontWeight: FontWeight.w600,
+                        color: context.colorPalette.goldDeep,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    });
+  }
+}
+
 class CustomiseOrderBanner extends StatelessWidget {
   const CustomiseOrderBanner({super.key});
 
