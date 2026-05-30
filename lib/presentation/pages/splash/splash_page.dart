@@ -37,7 +37,8 @@ class _SplashPageState extends State<SplashPage>
     final stopwatch = Stopwatch()..start();
 
     final token = await sessionManager.getAccessToken();
-    final isExpired = await sessionManager.isAccessTokenExpired();
+    final isAccessExpired = await sessionManager.isAccessTokenExpired();
+    final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
 
     final elapsed = stopwatch.elapsedMilliseconds;
     final remaining = 3500 - elapsed;
@@ -46,7 +47,7 @@ class _SplashPageState extends State<SplashPage>
       await Future.delayed(Duration(milliseconds: remaining));
     }
 
-    if (token != null && !isExpired) {
+    if (token != null && (!isAccessExpired || !isRefreshExpired)) {
       Get.offNamed(AppRoutes.home);
     } else {
       Get.offNamed(AppRoutes.login);
