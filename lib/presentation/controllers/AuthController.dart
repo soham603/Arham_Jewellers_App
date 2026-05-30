@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
+import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
@@ -44,13 +47,19 @@ class AuthController extends GetxController {
       _userLoginState.value = CurrentAppState.LOADING;
       _userLoginErrorMsg.value = "";
 
+      final fcmToken = NotificationService().fcmToken;
+      if (fcmToken == null || fcmToken.isEmpty) {
+        Logger.warning("AuthController", "FCM token not available during login");
+      }
+
       final response = await httpClient.post(
         "/api/v1/auth/user-login",
         options: Options(extra: {"requiresAuth": false}),
         data: {
           "phoneNumber": phoneNumber,
           "password": password,
-          "deviceId": deviceId, 
+          "deviceId": deviceId,
+          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
         },
       );
 
@@ -105,12 +114,15 @@ class AuthController extends GetxController {
       _adminLoginState.value = CurrentAppState.LOADING;
       _adminLoginErrorMsg.value = "";
 
+      final fcmToken = NotificationService().fcmToken;
+
       final response = await httpClient.post(
         "/api/v1/auth/admin-login",
         data: {
           "phoneNumber": phoneNumber,
           "password": password,
           "deviceId": deviceId,
+          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
         },
       );
 
@@ -217,7 +229,7 @@ class AuthController extends GetxController {
     required String pincode,
     required String companyName,
     required String deviceName,
-    required String fcmToken,
+    String? fcmToken,
     required BuildContext context,
     VoidCallback? onSuccess,
   }) async {
@@ -242,7 +254,7 @@ class AuthController extends GetxController {
           "pincode": pincode,
           "companyName": companyName,
           "deviceName": deviceName,
-          "fcmToken": fcmToken,
+          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
         },
       );
 

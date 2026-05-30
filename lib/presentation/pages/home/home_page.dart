@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
@@ -1276,7 +1277,11 @@ class _TopBar extends StatelessWidget {
 
           const Spacer(),
 
-          _IconBtn(icon: Icons.notifications_none_rounded, onTap: () {}),
+          Obx(() => _IconBtn(
+            icon: Icons.notifications_none_rounded,
+            onTap: () => Get.toNamed(AppRoutes.notifications),
+            badgeCount: Get.find<NotificationController>().unreadCount.value,
+          )),
 
           const SizedBox(width: 8),
 
@@ -1293,25 +1298,54 @@ class _TopBar extends StatelessWidget {
 class _IconBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
+  final int badgeCount;
 
-  const _IconBtn({required this.icon, required this.onTap});
+  const _IconBtn({required this.icon, required this.onTap, this.badgeCount = 0});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-
-      child: Container(
-        width: 40,
-        height: 40,
-
-        decoration: BoxDecoration(
-          color: context.colorPalette.goldLight,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: context.colorPalette.border),
-        ),
-
-        child: Icon(icon, size: 20, color: context.colorPalette.goldDark),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: context.colorPalette.goldLight,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: context.colorPalette.border),
+            ),
+            child: Icon(icon, size: 20, color: context.colorPalette.goldDark),
+          ),
+          if (badgeCount > 0)
+            Positioned(
+              right: -4,
+              top: -4,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                constraints: const BoxConstraints(
+                  minWidth: 18,
+                  minHeight: 18,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(
+                  badgeCount > 99 ? '99+' : '$badgeCount',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
