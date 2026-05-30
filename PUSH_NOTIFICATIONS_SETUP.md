@@ -11,6 +11,7 @@ The Flutter client now has full push notification support. Firebase is initializ
 Place these files in the project:
 
 - `android/app/google-services.json` — from Firebase Console > Project Settings > Android app
+- After placing the file, uncomment `id("com.google.gms.google-services")` in `android/app/build.gradle.kts` (currently commented out)
 - `ios/Runner/GoogleService-Info.plist` — from Firebase Console > Project Settings > iOS app
 
 ### 2. Backend Endpoint Required
