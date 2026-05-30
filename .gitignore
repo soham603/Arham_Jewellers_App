@@ -50,3 +50,6 @@ AGENT.md
 *.fig
 *.py
 
+# Environment variables
+.env
+
