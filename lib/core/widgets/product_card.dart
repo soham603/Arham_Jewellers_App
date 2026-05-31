@@ -126,75 +126,67 @@ class ProductCard extends StatelessWidget {
                             horizontal: hPad,
                             vertical: vPad,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              // Product name — always visible
-                              Text(
-                                displayName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: titleSize,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.2,
-                                  color: AppColors.textDark,
-                                ),
-                              ),
-
-                              // Category chip
-                              if (categoryName != null) ...[
-                                SizedBox(height: gap4),
-                                _CategoryChip(
-                                  label: categoryName,
-                                  maxWidth: width * 0.75,
-                                  fontSize: chipSize,
-                                  hPad: gap6,
-                                  vPad: gap2,
-                                ),
-                              ],
-
-                              // Tag number — hidden in compact to save space
-                              if (showTagNo) ...[
-                                SizedBox(height: gap4),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 Text(
-                                  tagNo!,
+                                  displayName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontSize: bodySize,
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.2,
+                                    color: AppColors.textDark,
                                   ),
                                 ),
+
+                                if (categoryName != null) ...[
+                                  SizedBox(height: gap4),
+                                  _CategoryChip(
+                                    label: categoryName,
+                                    maxWidth: width * 0.75,
+                                    fontSize: chipSize,
+                                    hPad: gap6,
+                                    vPad: gap2,
+                                  ),
+                                ],
+
+                                if (showTagNo) ...[
+                                  SizedBox(height: gap4),
+                                  Text(
+                                    tagNo!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: bodySize,
+                                      color: AppColors.textMuted,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+
+                                if (showWeight) ...[
+                                  SizedBox(height: gap4),
+                                  _WeightRow(
+                                    fineWeight: fineWeight,
+                                    touch: touch,
+                                    fontSize: bodySize,
+                                  ),
+                                ],
+
+                                if (!compact) ...[
+                                  SizedBox(height: gap8),
+                                  _ViewButton(
+                                    onPressed: primaryAction,
+                                    height: buttonHeight,
+                                    fontSize: buttonTextSize,
+                                  ),
+                                ],
                               ],
-
-                              // ── Push weight/button to bottom ─────────
-                              // Use Spacer only when there's enough room.
-                              // In compact mode use a minimal gap instead.
-                              compact
-                                  ? const Spacer()
-                                  : const Spacer(),
-
-                              // Weight + Touch row
-                              if (showWeight)
-                                _WeightRow(
-                                  fineWeight: fineWeight,
-                                  touch: touch,
-                                  fontSize: bodySize,
-                                ),
-
-                              // CTA button — non-compact only
-                              if (!compact) ...[
-                                SizedBox(height: gap8),
-                                _ViewButton(
-                                  onPressed: primaryAction,
-                                  height: buttonHeight,
-                                  fontSize: buttonTextSize,
-                                ),
-                              ],
-                            ],
+                            ),
                           ),
                         ),
                       ),
