@@ -54,7 +54,7 @@ class ColorPalette {
 
   Color get gold => const Color(0xFFD4AF37);
 
-  Color get goldLight => const Color(0xFFF4EED8);
+  Color get goldLight => const Color(0xFFFEFAF6);
 
   Color get goldDark => const Color(0xFF8B6914);
 
