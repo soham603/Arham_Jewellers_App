@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -184,13 +185,13 @@ class CategoryController extends GetxController {
   void selectLevel3Category(CategoryModel category) {
     _selectedLevel3.value = category;
     _showProductSection.value = true;
-    // TODO: trigger product fetch here using category.id
-    // e.g. productController.fetchProductsByCategory(category.id);
+    SearchProductController.instance.loadProductsByCategory(category.id);
   }
 
   void clearSelectedLevel3() {
     _selectedLevel3.value = null;
     _showProductSection.value = false;
+    SearchProductController.instance.clearCategoryProducts();
   }
 
   // ── Fetch level-3 under a level-2 ────────────────────────────────────────

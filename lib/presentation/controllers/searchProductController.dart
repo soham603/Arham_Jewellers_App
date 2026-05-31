@@ -250,6 +250,48 @@ class SearchProductController extends GetxController {
     }
   }
 
+  // ── Category-filtered products (for level-3 selection on home page) ────
+  final _categoryProducts = <ProductModel>[].obs;
+  List<ProductModel> get categoryProducts => _categoryProducts;
+
+  final _categoryState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get categoryState => _categoryState.value;
+
+  Future<void> loadProductsByCategory(String categoryId) async {
+    _categoryState.value = CurrentAppState.LOADING;
+    _categoryProducts.clear();
+
+    try {
+      final response = await httpClient.get(
+        "/api/v1/products/search",
+        queryParameters: {
+          "categoryId": categoryId,
+          "page": 1,
+          "limit": _pageLimit,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final List raw = data['data'] is List ? data['data'] : [];
+        _categoryProducts.value =
+            raw.map((e) => ProductModel.fromJson(e)).toList();
+        _categoryState.value = CurrentAppState.SUCCESS;
+      } else {
+        _categoryState.value = CurrentAppState.ERROR;
+      }
+    } catch (e, st) {
+      _categoryState.value = CurrentAppState.ERROR;
+      Logger.error(
+          "SearchProductController", "loadProductsByCategory error: $e\n$st");
+    }
+  }
+
+  void clearCategoryProducts() {
+    _categoryProducts.clear();
+    _categoryState.value = CurrentAppState.INITIAL;
+  }
+
   void clearSearch() {
     _debounce?.cancel();
     _searchQuery.value = '';
