@@ -8,9 +8,11 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class ProductListingPage extends StatefulWidget {
-  final String karat;
+  final String? karat;
+  final List<String>? karats;
+  final String? title;
 
-  const ProductListingPage({super.key, required this.karat});
+  const ProductListingPage({super.key, this.karat, this.karats, this.title});
 
   @override
   State<ProductListingPage> createState() => _ProductListingPageState();
@@ -23,8 +25,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
   @override
   void initState() {
     super.initState();
-    _controller = Get.put(SearchProductController(), tag: 'listing_${widget.karat}');
-    _controller.loadProductsByKarat(widget.karat);
+    _controller = Get.put(SearchProductController(), tag: 'listing_${widget.karat ?? widget.karats?.join("_")}');
+
+    final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+    _controller.loadProductsByKarats(karatsToLoad);
+
     _scrollController.addListener(_onScroll);
   }
 
@@ -32,7 +37,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    Get.delete<SearchProductController>(tag: 'listing_${widget.karat}');
+    Get.delete<SearchProductController>(tag: 'listing_${widget.karat ?? widget.karats?.join("_")}');
     super.dispose();
   }
 
@@ -49,7 +54,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       backgroundColor: context.colorPalette.cream,
       appBar: AppBar(
         title: Text(
-          '${widget.karat} Collection',
+          widget.title ?? '${widget.karat} Collection',
           style: TextStyle(
             fontWeight: FontWeight.w700,
             color: context.colorPalette.goldDeep,
@@ -85,7 +90,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => _controller.loadProductsByKarat(widget.karat),
+                  onPressed: () {
+                    final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+                    _controller.loadProductsByKarats(karatsToLoad);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.colorPalette.gold,
                     foregroundColor: Colors.white,
