@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,16 +39,40 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey productSectionKey = GlobalKey();
 
   int currentCarouselIndex = 0;
+  Timer? _carouselTimer;
 
   @override
   void initState() {
     super.initState();
     carouselController.getAllCarousels();
     categoryController.fetchAllKaratCategories();
+    _startCarouselAutoSlide();
+  }
+
+  void _startCarouselAutoSlide() {
+    _carouselTimer?.cancel();
+    _carouselTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      final list = carouselController.list;
+      if (list.isEmpty) return;
+      final nextIndex = (currentCarouselIndex + 1) % list.length;
+      pageController.animateToPage(
+        nextIndex,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _onCarouselPageChanged(int index) {
+    setState(() {
+      currentCarouselIndex = index;
+    });
+    _startCarouselAutoSlide();
   }
 
   @override
   void dispose() {
+    _carouselTimer?.cancel();
     scrollController.dispose();
     pageController.dispose();
     super.dispose();
@@ -105,93 +130,90 @@ class _HomePageState extends State<HomePage> {
                       pageController: pageController,
                       currentIndex: currentCarouselIndex,
 
-                      onPageChanged: (i) {
-                        setState(() {
-                          currentCarouselIndex = i;
-                        });
-                      },
+                      onPageChanged: _onCarouselPageChanged,
                     ),
 
                     SizedBox(height: context.getScreenHeight(3)),
 
                     _CategoryQuickAccess(controller: categoryController),
 
-                    const JewelleryDivider(vertical: 16),
+                    const SizedBox(height: 32),
 
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Collections',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: context.colorPalette.goldDeep,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
+                    Container(
+                      width: double.infinity,
+                      color: const Color(0xFF3E2723),
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => _navigateToKaratListing('18K'),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
+                          const JewelleryDivider(vertical: 4, label: 'Collections'),
+
+                          const SizedBox(height: 24),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _navigateToKaratListing('18K'),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.08),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          'assets/images/arham-collection.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.asset(
-                                    'assets/images/arham-collection.png',
-                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => _navigateToKaratListing('22K'),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _navigateToKaratListing('22K'),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.08),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          'assets/images/ratnesh-collection.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.asset(
-                                    'assets/images/ratnesh-collection.png',
-                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
+
+                          const SizedBox(height: 16),
+
+                          const JewelleryDivider(),
                         ],
                       ),
                     ),
 
-                    const JewelleryDivider(),
+                    const SizedBox(height: 32),
 
                     Obx(() {
                       if (!categoryController.showProductSection) {
@@ -1557,7 +1579,7 @@ class _CarouselSection extends StatelessWidget {
       if (list.isEmpty) return const SizedBox();
 
       return SizedBox(
-        height: context.getScreenHeight(22),
+        height: context.getScreenHeight(28),
 
         child: Stack(
           children: [
