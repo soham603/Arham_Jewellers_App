@@ -43,10 +43,10 @@ class JewelleryDivider extends StatelessWidget {
               child: Text(
                 label!.toUpperCase(),
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 16,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 2.5, // Wide letter spacing looks premium
-                  color: context.colorPalette.goldDeep,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -62,7 +62,7 @@ class JewelleryDivider extends StatelessWidget {
                   Icon(
                     Icons.diamond_outlined,
                     size: 18,
-                    color: context.colorPalette.goldDeep,
+                  color: context.colorPalette.goldDeep,
                   ),
                   const SizedBox(width: 8),
                   _buildTinyDiamond(context),
