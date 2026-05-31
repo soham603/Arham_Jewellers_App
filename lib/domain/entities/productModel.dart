@@ -145,25 +145,45 @@ class ProductModel {
   }
 
   String? get touch {
-    final value = rawData?['SalesTouch'];
+    // 1. Try rawData (SalesTouch / Touch)
+    final raw = rawData?['SalesTouch']?.toString().trim() ??
+                rawData?['Touch']?.toString().trim();
+    if (raw != null && raw.isNotEmpty) {
+      final result = _resolvePurity(raw);
+      if (result != null) return result;
+    }
 
+    // 2. Fallback: extract purity from tagNo prefix (e.g. "76GR-303" → "76")
+    if (tagNo != null && tagNo!.length >= 2) {
+      final result = _resolvePurity(tagNo!.substring(0, 2));
+      if (result != null) return result;
+    }
+
+    return null;
+  }
+
+  static String? _resolvePurity(String raw) {
+    final match = RegExp(r'^(\d+(?:\.\d+)?)').firstMatch(raw.trim());
+    final numStr = match?.group(1);
+    if (numStr == null) return null;
+    final value = double.tryParse(numStr);
     if (value == null) return null;
 
-    final karat = value.toString() == "92"
-        ? "22 K"
-        : value.toString() == "84"
-        ? "20 K"
-        : "18 K";
+    if (value >= 915 && value <= 917) return "$numStr (22 K)";
+    if (value >= 830 && value <= 835) return "$numStr (20 K)";
+    if (value >= 748 && value <= 752) return "$numStr (18 K)";
+    if (value >= 91 && value <= 92) return "$numStr (22 K)";
+    if (value >= 83 && value <= 84) return "$numStr (20 K)";
+    if (value >= 75 && value <= 76) return "$numStr (18 K)";
 
-    return "$value ($karat)";
+    return null;
   }
 
   double? get salesTouch {
-    final value = rawData?['SalesTouch'];
-
-    if (value == null) return null;
-
-    return double.tryParse(value.toString());
+    final raw = rawData?['SalesTouch']?.toString().trim() ??
+                rawData?['Touch']?.toString().trim();
+    if (raw == null || raw.isEmpty) return null;
+    return double.tryParse(raw);
   }
 
   double? get grossWeight {
