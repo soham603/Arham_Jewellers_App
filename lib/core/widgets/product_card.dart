@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -122,9 +123,13 @@ class _ProductCardState extends State<ProductCard>
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            SizedBox(
-                              width: double.infinity,
-                              child: _ProductImage(
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: width * 1.5,
+                              ),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: _ProductImage(
                                 imageUrl: imageUrl,
                                 productName: displayName,
                                 iconSize: iconSize,
@@ -132,6 +137,7 @@ class _ProductCardState extends State<ProductCard>
                                 isHovered: _isHovered,
                               ),
                             ),
+                          ),
                             Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: hPad,
@@ -266,6 +272,7 @@ class _ProductImage extends StatelessWidget {
                     label: '$productName image',
                       child: CachedNetworkImage(
                       imageUrl: imageUrl!,
+                      fit: BoxFit.contain,
                       width: double.infinity,
                       fadeInDuration: const Duration(milliseconds: 200),
                       placeholder: (context, url) => Shimmer.fromColors(
@@ -311,6 +318,22 @@ class _ProductImage extends StatelessWidget {
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
                 ),
+              ),
+            ),
+          ),
+        if (imageUrl != null)
+          Positioned(
+            bottom: 6,
+            right: 6,
+            child: GestureDetector(
+              onTap: () => showImageZoomDialog(context, imageUrl!),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.open_in_full, color: Colors.white, size: 16),
               ),
             ),
           ),
