@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                           final products =
                               carouselController.latestProducts;
                           final cardWidth = context.getScreenWidth(50);
-                          final cardHeight = cardWidth * 1.28 + 110;
+                          final cardHeight = cardWidth * 1.5 + 100;
 
                           if (state == CurrentAppState.LOADING &&
                               products.isEmpty) {

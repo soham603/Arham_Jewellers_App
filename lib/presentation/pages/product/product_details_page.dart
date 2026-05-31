@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -33,101 +34,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
   }
 
-  // --- Zoom Dialog Function ---
-  void _showZoomDialog(BuildContext context, String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(10),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            InteractiveViewer(
-              panEnabled: true,
-              boundaryMargin: const EdgeInsets.all(20),
-              minScale: 1,
-              maxScale: 4,
-              child: Container(
-                width: context.getScreenWidth(80),
-                height: context.getScreenHeight(45),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.contain,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryGold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: -15,
-              right: -15,
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Colors.black87,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 20),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --- Helper to convert raw Touch/Purity to standard Karat ---
-  String _getConvertedPurity(Map<String, dynamic> rawData, String? modelKarat, {String? tagNo}) {
-    if (modelKarat != null && modelKarat.isNotEmpty) return modelKarat;
-
-    // 1. Try rawData
-    final raw = rawData["SalesTouch"]?.toString() ?? rawData["Touch"]?.toString();
-    if (raw != null) {
-      final result = _resolvePurity(raw);
-      if (result != null) return result;
+  String _getConvertedPurity(Map<String, dynamic> rawData, String? karat, {String? tagNo}) {
+    final touchRaw = rawData['SalesTouch']?.toString().trim() ??
+        rawData['Touch']?.toString().trim();
+    if (touchRaw != null && touchRaw.isNotEmpty) {
+      final resolved = _resolvePurityValue(touchRaw);
+      if (resolved != null) return resolved;
     }
 
-    // 2. Fallback to tagNo prefix
     if (tagNo != null && tagNo.length >= 2) {
-      final result = _resolvePurity(tagNo.substring(0, 2));
-      if (result != null) return result;
+      final resolved = _resolvePurityValue(tagNo.substring(0, 2));
+      if (resolved != null) return resolved;
     }
 
-    return "22K";
+    if (karat != null && karat.isNotEmpty) {
+      return '$karat K Gold';
+    }
+
+    return '\u2014';
   }
 
-  String _resolvePurity(String raw) {
+  String? _resolvePurityValue(String raw) {
     final match = RegExp(r'^(\d+(?:\.\d+)?)').firstMatch(raw.trim());
     final numStr = match?.group(1);
-    if (numStr == null) return "22K";
+    if (numStr == null) return null;
     final value = double.tryParse(numStr);
-    if (value == null) return "22K";
+    if (value == null) return null;
 
-    if (value >= 915 && value <= 917) return "22K";
-    if (value >= 830 && value <= 835) return "20K";
-    if (value >= 748 && value <= 752) return "18K";
-    if (value >= 91 && value <= 92) return "22K";
-    if (value >= 83 && value <= 84) return "20K";
-    if (value >= 75 && value <= 76) return "18K";
+    if (value >= 915 && value <= 917) return "$numStr (22 K)";
+    if (value >= 830 && value <= 835) return "$numStr (20 K)";
+    if (value >= 748 && value <= 752) return "$numStr (18 K)";
+    if (value >= 91 && value <= 92) return "$numStr (22 K)";
+    if (value >= 83 && value <= 84) return "$numStr (20 K)";
+    if (value >= 75 && value <= 76) return "$numStr (18 K)";
 
-    return "22K";
+    return null;
   }
 
   @override
@@ -467,7 +408,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       right: context.getScreenWidth(4),
                       child: GestureDetector(
                         onTap: () =>
-                            _showZoomDialog(context, widget.product.imageUrl!),
+                            showImageZoomDialog(context, widget.product.imageUrl!),
                         child: Container(
                           padding: EdgeInsets.all(context.getScreenWidth(2.5)),
                           decoration: BoxDecoration(
