@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:shimmer/shimmer.dart';
@@ -81,6 +82,14 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> _onRefresh() async {
+    await Future.wait([
+      carouselController.getAllCarousels(),
+      categoryController.fetchAllKaratCategories(),
+      carouselController.loadLatestProducts(),
+    ]);
+  }
+
   void scrollToProductSection() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ctx = productSectionKey.currentContext;
@@ -135,352 +144,357 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                controller: scrollController,
+              child: RefreshIndicator(
+                color: AppColors.primaryGold,
+                backgroundColor: Colors.white,
+                onRefresh: _onRefresh,
+                child: SingleChildScrollView(
+                  controller: scrollController,
 
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children: [
-                    const _TopBar(),
+                    children: [
+                      const _TopBar(),
 
-                    const SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: HomeSearchBar(),
-                    ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 14),
+                        child: HomeSearchBar(),
+                      ),
 
-                    const SizedBox(height: 14),
+                      const SizedBox(height: 18),
 
-                    // 🔥 Original API-driven Carousel Section (Restored exactly as before)
-                    _CarouselSection(
-                      controller: carouselController,
-                      pageController: pageController,
-                      currentIndex: currentCarouselIndex,
+                      // 🔥 Original API-driven Carousel Section (Restored exactly as before)
+                      _CarouselSection(
+                        controller: carouselController,
+                        pageController: pageController,
+                        currentIndex: currentCarouselIndex,
 
-                      onPageChanged: _onCarouselPageChanged,
-                    ),
+                        onPageChanged: _onCarouselPageChanged,
+                      ),
 
-                    const CategoryDivider(),
+                      const CategoryDivider(),
 
-                    _CategoryQuickAccess(controller: categoryController),
+                      _CategoryQuickAccess(controller: categoryController),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    Container(
-                      width: double.infinity,
-                      color: const Color(0xFF3E2723),
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Column(
-                        children: [
-                          const CollectionsDivider(vertical: 4, label: 'Collections'),
+                      Container(
+                        width: double.infinity,
+                        color: const Color(0xFF3E2723),
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Column(
+                          children: [
+                            const CollectionsDivider(vertical: 4, label: 'Collections'),
 
-                          const SizedBox(height: 24),
+                            const SizedBox(height: 24),
 
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => _navigateToKaratListing('18K'),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.08),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _navigateToKaratListing('18K'),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.08),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Image.asset(
+                                            'assets/images/arham-collection.png',
+                                            fit: BoxFit.cover,
                                           ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          'assets/images/arham-collection.png',
-                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => _navigateToKaratListing('22K'),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.08),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _navigateToKaratListing('22K'),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.08),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Image.asset(
+                                            'assets/images/ratnesh-collection.png',
+                                            fit: BoxFit.cover,
                                           ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          'assets/images/ratnesh-collection.png',
-                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 24),
+                            const SizedBox(height: 24),
 
-                          const CollectionsDivider(vertical: 4),
-                        ],
+                            const CollectionsDivider(vertical: 4),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                    Obx(() {
-                      if (!categoryController.showProductSection) {
-                        return const SizedBox();
-                      }
+                      Obx(() {
+                        if (!categoryController.showProductSection) {
+                          return const SizedBox();
+                        }
 
-                      return Column(
-                        children: [
-      
+                        return Column(
+                          children: [
+        
 
-                          SizedBox(height: context.getScreenHeight(1)),
-                          _ProductSection(
-                            key: productSectionKey,
-                            category: categoryController.selectedLevel3!,
-                            onClose: categoryController.clearSelectedLevel3,
-                          ),
-                        ],
-                      );
-                    }),
-
+                            SizedBox(height: context.getScreenHeight(1)),
+                            _ProductSection(
+                              key: productSectionKey,
+                              category: categoryController.selectedLevel3!,
+                              onClose: categoryController.clearSelectedLevel3,
+                            ),
+                          ],
+                        );
+                      }),
 
 
-                    SizedBox(height: context.getScreenHeight(1)),
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _SectionTitle(
-                        label: 'Latest Additions',
-                        subtitle: 'Newest jewellery collections',
+                      SizedBox(height: context.getScreenHeight(1)),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _SectionTitle(
+                          label: 'Latest Additions',
+                          subtitle: 'Newest jewellery collections',
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    Obx(() {
-                      final state = carouselController.productState;
-                      final products = carouselController.latestProducts;
+                      Obx(() {
+                        final state = carouselController.productState;
+                        final products = carouselController.latestProducts;
 
-                      if (state == CurrentAppState.LOADING &&
-                          products.isEmpty) {
-                        return SizedBox(
-                          height: context.getScreenHeight(44),
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 5,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(width: 12),
-                            itemBuilder: (_, __) {
-                              return Shimmer.fromColors(
-                                baseColor:
-                                    context.colorPalette.shimmerBaseColor,
-                                highlightColor:
-                                    context.colorPalette.shimmerHighLightColor,
-                                child: Container(
-                                  width: context.getScreenWidth(50),
-                                  decoration: BoxDecoration(
-                                    color: context.colorPalette.cardBg,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                      color: context.colorPalette.border,
+                        if (state == CurrentAppState.LOADING &&
+                            products.isEmpty) {
+                          return SizedBox(
+                            height: context.getScreenHeight(44),
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 5,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (_, __) {
+                                return Shimmer.fromColors(
+                                  baseColor:
+                                      context.colorPalette.shimmerBaseColor,
+                                  highlightColor:
+                                      context.colorPalette.shimmerHighLightColor,
+                                  child: Container(
+                                    width: context.getScreenWidth(50),
+                                    decoration: BoxDecoration(
+                                      color: context.colorPalette.cardBg,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: context.colorPalette.border,
+                                      ),
                                     ),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                        flex: 7,
-                                        child: Container(
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(15),
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                          flex: 7,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.vertical(
+                                                top: Radius.circular(15),
+                                              ),
                                             ),
-                                          ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.diamond_outlined,
-                                              size: 36,
-                                              color:
-                                                  context.colorPalette.goldDark,
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.diamond_outlined,
+                                                size: 36,
+                                                color:
+                                                    context.colorPalette.goldDark,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
 
-                                      Expanded(
-                                        flex: 4,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                height: 12,
-                                                width: double.infinity,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                              ),
-
-                                              const SizedBox(height: 8),
-
-                                              Container(
-                                                height: 10,
-                                                width: 70,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                              ),
-
-                                              const Spacer(),
-
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Container(
-                                                    height: 10,
-                                                    width: 50,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            4,
-                                                          ),
-                                                    ),
+                                        Expanded(
+                                          flex: 4,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  height: 12,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(4),
                                                   ),
+                                                ),
 
-                                                  Container(
-                                                    width: 30,
-                                                    height: 30,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            8,
-                                                          ),
-                                                    ),
+                                                const SizedBox(height: 8),
+
+                                                Container(
+                                                  height: 10,
+                                                  width: 70,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(4),
                                                   ),
-                                                ],
-                                              ),
-                                            ],
+                                                ),
+
+                                                const Spacer(),
+
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Container(
+                                                      height: 10,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              4,
+                                                            ),
+                                                      ),
+                                                    ),
+
+                                                    Container(
+                                                      width: 30,
+                                                      height: 30,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
-
-                      if (state == CurrentAppState.ERROR && products.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: _ErrorRow(
-                            onRetry: () {
-                              carouselController.loadLatestProducts();
-                            },
-                          ),
-                        );
-                      }
-
-                      if (products.isEmpty) {
-                        return const SizedBox();
-                      }
-
-                      return SizedBox(
-                        height: context.getScreenHeight(44),
-                        child: NotificationListener<ScrollNotification>(
-                          onNotification: (scrollInfo) {
-                            if (scrollInfo.metrics.pixels >=
-                                scrollInfo.metrics.maxScrollExtent - 200) {
-                              carouselController.loadLatestProducts(
-                                isPagination: true,
-                              );
-                            }
-
-                            return false;
-                          },
-                          child: ListView.separated(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            scrollDirection: Axis.horizontal,
-                            itemCount:
-                                products.length +
-                                (carouselController.productLoadingMore ? 1 : 0),
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(width: 12),
-                            itemBuilder: (_, index) {
-                              if (index >= products.length) {
-                                return SizedBox(
-                                  width: context.getScreenWidth(50),
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      color: context.colorPalette.gold,
+                                      ],
                                     ),
                                   ),
                                 );
+                              },
+                            ),
+                          );
+                        }
+
+                        if (state == CurrentAppState.ERROR && products.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _ErrorRow(
+                              onRetry: () {
+                                carouselController.loadLatestProducts();
+                              },
+                            ),
+                          );
+                        }
+
+                        if (products.isEmpty) {
+                          return const SizedBox();
+                        }
+
+                        return SizedBox(
+                          height: context.getScreenHeight(44),
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (scrollInfo) {
+                              if (scrollInfo.metrics.pixels >=
+                                  scrollInfo.metrics.maxScrollExtent - 200) {
+                                carouselController.loadLatestProducts(
+                                  isPagination: true,
+                                );
                               }
 
-                              final product = products[index];
-
-                              return SizedBox(
-                                width: context.getScreenWidth(50),
-                                child: ProductCard(
-                                  product: product,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProductDetailsPage(
-                                              product: product,
-                                            ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
+                              return false;
                             },
+                            child: ListView.separated(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  products.length +
+                                  (carouselController.productLoadingMore ? 1 : 0),
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(width: 12),
+                              itemBuilder: (_, index) {
+                                if (index >= products.length) {
+                                  return SizedBox(
+                                    width: context.getScreenWidth(50),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: context.colorPalette.gold,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                final product = products[index];
+
+                                return SizedBox(
+                                  width: context.getScreenWidth(50),
+                                  child: ProductCard(
+                                    product: product,
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductDetailsPage(
+                                                product: product,
+                                              ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
 
-                    const SizedBox(height: 30),
+                      const SizedBox(height: 30),
 
-                    const CustomiseOrderBanner(),
+                      const CustomiseOrderBanner(),
 
-                    const SizedBox(height: 30),
-                  ],
+                      const SizedBox(height: 30),
+                    ],
+                  ),
                 ),
               ),
             ),
