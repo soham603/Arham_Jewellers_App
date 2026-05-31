@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                       onPageChanged: _onCarouselPageChanged,
                     ),
 
-                    SizedBox(height: context.getScreenHeight(3)),
+                    const CategoryDivider(),
 
                     _CategoryQuickAccess(controller: categoryController),
 
@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Column(
                         children: [
-                          const JewelleryDivider(vertical: 4, label: 'Collections'),
+                          const CollectionsDivider(vertical: 4, label: 'Collections'),
 
                           const SizedBox(height: 24),
 
@@ -229,9 +229,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 24),
 
-                          const JewelleryDivider(),
+                          const CollectionsDivider(vertical: 4),
                         ],
                       ),
                     ),
