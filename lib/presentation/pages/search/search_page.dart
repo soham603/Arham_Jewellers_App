@@ -82,8 +82,9 @@ class _SearchPageState extends State<SearchPage> {
                           isSearching ? 'Results' : 'Products',
                           style: TextStyle(
                             fontSize: context.getScreenWidth(6),
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                             color: AppColors.textDark,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
@@ -112,7 +113,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
+  // ── PREMIUM Search Bar ───────────────────────────────────────────────────
   Widget _buildSearchBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -121,46 +122,71 @@ class _SearchPageState extends State<SearchPage> {
         context.getScreenWidth(4),
         context.getScreenHeight(1),
       ),
-      decoration: BoxDecoration(
-        color: context.colorPalette.backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color: context.colorPalette.backgroundColor,
       child: Row(
         children: [
+          // Elegant Back Button
           GestureDetector(
             onTap: () => Get.back(),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: context.getScreenWidth(5),
-              color: context.colorPalette.textColor,
+            child: Container(
+              padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primaryGold.withOpacity(0.15),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryGold.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: context.getScreenWidth(4.5),
+                color: AppColors.textDark,
+              ),
             ),
           ),
           SizedBox(width: context.getScreenWidth(3)),
+
+          // Modern Floating Search Input
           Expanded(
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(3.5),
-                vertical: context.getScreenHeight(1.2),
+                horizontal: context.getScreenWidth(4),
+                vertical: context.getScreenHeight(
+                  0.6,
+                ), // Tightened for sleekness
               ),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFCFC7BC)),
-                color: const Color(0xFFF4F1EC),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24), // Smoother pill shape
+                border: Border.all(
+                  color: AppColors.primaryGold.withOpacity(0.2),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryGold.withOpacity(
+                      0.08,
+                    ), // Soft gold shadow
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Icon(
-                    Icons.search,
-                    color: const Color(0xFF8D847A),
-                    size: context.getScreenWidth(5),
+                    Icons.search_rounded,
+                    color: AppColors.primaryGold, // Theme color
+                    size: context.getScreenWidth(6),
                   ),
-                  SizedBox(width: context.getScreenWidth(2)),
+                  SizedBox(width: context.getScreenWidth(2.5)),
                   Expanded(
                     child: TextField(
                       controller: _textController,
@@ -168,19 +194,21 @@ class _SearchPageState extends State<SearchPage> {
                       autofocus: true,
                       style: TextStyle(
                         fontSize: context.getScreenWidth(4),
-                        color: context.colorPalette.textColor,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textDark,
                       ),
                       decoration: InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
-                        hintText: 'Search gold, diamonds, rings...',
+                        hintText: 'Search collections, rings...',
                         hintStyle: TextStyle(
-                          fontSize: context.getScreenWidth(3.8),
-                          color: const Color(0xFFA29A90),
+                          fontSize: context.getScreenWidth(3.6),
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade400,
                         ),
                       ),
                       onChanged: (v) {
-                        setState(() {}); // rebuild clear icon
+                        setState(() {});
                         controller.onSearchChanged(v);
                       },
                       onSubmitted: (v) {
@@ -196,10 +224,17 @@ class _SearchPageState extends State<SearchPage> {
                         controller.clearSearch();
                         setState(() {});
                       },
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: context.getScreenWidth(4.5),
-                        color: const Color(0xFF8D847A),
+                      child: Container(
+                        padding: EdgeInsets.all(context.getScreenWidth(1)),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGold.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.close_rounded,
+                          size: context.getScreenWidth(4.5),
+                          color: AppColors.primaryGold,
+                        ),
                       ),
                     ),
                 ],
@@ -238,8 +273,8 @@ class _SearchPageState extends State<SearchPage> {
                   'Recent Searches',
                   style: TextStyle(
                     fontSize: context.getScreenWidth(4.5),
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF675F55),
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textDark,
                   ),
                 ),
                 GestureDetector(
@@ -248,7 +283,8 @@ class _SearchPageState extends State<SearchPage> {
                     'Clear all',
                     style: TextStyle(
                       fontSize: context.getScreenWidth(3.2),
-                      color: context.colorPalette.primaryColor,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGold,
                     ),
                   ),
                 ),
@@ -266,9 +302,9 @@ class _SearchPageState extends State<SearchPage> {
                     child: Text(
                       'Show more',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3),
-                        color: context.colorPalette.primaryColor,
-                        fontWeight: FontWeight.w500,
+                        fontSize: context.getScreenWidth(3.2),
+                        color: AppColors.primaryGold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -284,16 +320,19 @@ class _SearchPageState extends State<SearchPage> {
                     child: Text(
                       'Show less',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3),
-                        color: context.colorPalette.primaryColor,
-                        fontWeight: FontWeight.w500,
+                        fontSize: context.getScreenWidth(3.2),
+                        color: AppColors.primaryGold,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ),
               ),
             SizedBox(height: context.getScreenHeight(1)),
-            Divider(color: context.colorPalette.boxColor),
+            Divider(
+              color: AppColors.primaryGold.withOpacity(0.1),
+              thickness: 1,
+            ),
           ],
         ),
       ),
@@ -310,13 +349,13 @@ class _SearchPageState extends State<SearchPage> {
       },
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
+        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1)),
         child: Row(
           children: [
             Icon(
               Icons.history_rounded,
-              size: context.getScreenWidth(4.5),
-              color: const Color(0xFF8D847A),
+              size: context.getScreenWidth(5),
+              color: Colors.grey.shade400,
             ),
             SizedBox(width: context.getScreenWidth(3)),
             Expanded(
@@ -324,7 +363,8 @@ class _SearchPageState extends State<SearchPage> {
                 term,
                 style: TextStyle(
                   fontSize: context.getScreenWidth(4),
-                  color: context.colorPalette.textColor,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textDark,
                 ),
               ),
             ),
@@ -332,8 +372,8 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () => controller.removeRecentSearch(term),
               child: Icon(
                 Icons.close_rounded,
-                size: context.getScreenWidth(4),
-                color: const Color(0xFF8D847A),
+                size: context.getScreenWidth(4.5),
+                color: Colors.grey.shade400,
               ),
             ),
           ],
