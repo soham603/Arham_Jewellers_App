@@ -19,6 +19,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/app_bottom_nav.dart';
 import '../../../core/widgets/custom_divider.dart';
+import '../../../core/widgets/home_search_bar.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
@@ -143,7 +144,12 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     const _TopBar(),
 
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
+
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: HomeSearchBar(),
+                    ),
 
                     const SizedBox(height: 14),
 
@@ -1312,7 +1318,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
 
       child: Row(
         children: [
@@ -1321,7 +1327,7 @@ class _TopBar extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/images/ratnesh-logo.png',
-                height: 50,
+                height: 44,
                 fit: BoxFit.contain,
                 color: context.colorPalette.gold,
                 colorBlendMode: BlendMode.srcIn,
@@ -1334,7 +1340,7 @@ class _TopBar extends StatelessWidget {
                   Text(
                     'Ratnesh Gold',
                     style: TextStyle(
-                      fontSize: 21,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: context.colorPalette.goldDeep,
                     ),
@@ -1423,76 +1429,6 @@ class _IconBtn extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _SearchBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Get.toNamed(AppRoutes.search),
-
-      borderRadius: BorderRadius.circular(14),
-
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-
-          border: Border.all(color: context.colorPalette.border, width: 1.5),
-
-          color: context.colorPalette.cardBg,
-
-          boxShadow: [
-            BoxShadow(
-              color: context.colorPalette.gold.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-
-        child: Row(
-          children: [
-            Icon(
-              Icons.search_rounded,
-              color: context.colorPalette.goldDark,
-              size: 20,
-            ),
-
-            const SizedBox(width: 10),
-
-            Expanded(
-              child: Text(
-                'Search rings, necklaces, bangles...',
-
-                style: TextStyle(fontSize: 14.5, color: Colors.grey.shade500),
-              ),
-            ),
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-
-              decoration: BoxDecoration(
-                color: context.colorPalette.goldLight,
-                borderRadius: BorderRadius.circular(6),
-              ),
-
-              child: Text(
-                'Search',
-
-                style: TextStyle(
-                  fontSize: 11,
-                  color: context.colorPalette.goldDark,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
