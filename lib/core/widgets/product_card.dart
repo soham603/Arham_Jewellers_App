@@ -4,7 +4,7 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:shimmer/shimmer.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   const ProductCard({
     super.key,
     required this.product,
@@ -18,179 +18,166 @@ class ProductCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onAddToCart;
 
+  @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard>
+    with SingleTickerProviderStateMixin {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
   static const _cardBorderColor = Color(0xFFE7E2DB);
-  static const _imageBackgroundColor = Color(0xFFF8F5F0);
-  static const _categoryChipColor = Color(0xFFFFF6DD);
 
   @override
   Widget build(BuildContext context) {
-    final primaryAction = onAddToCart ?? onTap;
+    final primaryAction = widget.onAddToCart ?? widget.onTap;
+    final product = widget.product;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // ── Sizing tokens derived from card width ──────────────────────
         final width =
             constraints.maxWidth.isFinite && constraints.maxWidth > 0
                 ? constraints.maxWidth
                 : MediaQuery.sizeOf(context).width * 0.45;
 
         final radius = (width * 0.075).clamp(10.0, 18.0);
-        final imagePadding = (width * 0.05).clamp(6.0, 14.0);
-        final hPad = (width * 0.065).clamp(8.0, 14.0);
-        final vPad = (width * 0.045).clamp(6.0, 12.0);
+        final hPad = (width * 0.055).clamp(7.0, 11.0);
+        final vPad = (width * 0.03).clamp(4.0, 8.0);
 
-        final titleSize = (width * 0.082).clamp(11.5, 15.0);
-        final bodySize = (width * 0.062).clamp(9.0, 11.5);
-        final chipSize = (width * 0.058).clamp(8.5, 11.0);
-        final buttonTextSize = (width * 0.070).clamp(11.0, 13.5);
-        final buttonHeight = (width * 0.20).clamp(34.0, 42.0);
+        final bodySize = (width * 0.05).clamp(8.0, 10.0);
+        final metaSize = (width * 0.05).clamp(8.0, 10.0);
+        final buttonTextSize = (width * 0.06).clamp(10.0, 12.0);
+        final buttonHeight = (width * 0.145).clamp(28.0, 34.0);
         final iconSize = (width * 0.18).clamp(22.0, 32.0);
 
-        // Scale gaps down proportionally — key fix for overflow
-        final gap2 = (width * 0.015).clamp(2.0, 4.0);
-        final gap4 = (width * 0.025).clamp(3.0, 6.0);
-        final gap6 = (width * 0.032).clamp(4.0, 7.0);
-        final gap8 = (width * 0.038).clamp(5.0, 8.0);
+        final gap2 = (width * 0.01).clamp(1.5, 3.0);
+        final gap3 = (width * 0.015).clamp(2.0, 4.0);
 
-        final displayName = _cleanText(product.name) ?? 'Untitled Product';
+        final displayName =
+            _cleanText(product.name) ?? 'Untitled Product';
         final imageUrl = _cleanText(product.imageUrl);
         final categoryName = _cleanText(product.category?.name);
         final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.fineWeight);
-        final touch = _formatValue(product.touch);
+        final touchData = _parseTouch(product.touch);
 
-        // In compact mode, hide tag number to prevent overflow
-        final showTagNo = !compact && tagNo != null;
-        final showWeight = fineWeight != null || touch != null;
+        final showTagNo = !widget.compact && tagNo != null;
+        final showWeight = fineWeight != null || touchData != null;
 
-        return Tooltip(
-          message: displayName,
-          preferBelow: true,
-          child: Semantics(
-            container: true,
-            label: '$displayName product card',
-            hint: onTap != null ? 'Tap to open product details' : null,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(radius),
-                border: Border.all(color: _cardBorderColor),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+        return MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          child: GestureDetector(
+            onTapDown: (_) => setState(() => _isPressed = true),
+            onTapUp: (_) => setState(() => _isPressed = false),
+            onTapCancel: () => setState(() => _isPressed = false),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              transform: Matrix4.translationValues(
+                0,
+                _isPressed ? 1.0 : (_isHovered ? -2.0 : 0),
+                0,
               ),
-              child: Material(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(radius),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: onTap,
-                  borderRadius: BorderRadius.circular(radius),
-                  mouseCursor: onTap != null
-                      ? SystemMouseCursors.click
-                      : MouseCursor.defer,
-                  overlayColor: WidgetStateProperty.resolveWith(
-                    (states) {
-                      if (states.contains(WidgetState.pressed)) {
-                        return AppColors.primaryGold.withOpacity(0.08);
-                      }
-                      if (states.contains(WidgetState.hovered) ||
-                          states.contains(WidgetState.focused)) {
-                        return AppColors.primaryGold.withOpacity(0.04);
-                      }
-                      return null;
-                    },
-                  ),
-                  child: Column(
-                    children: [
-                      // ── Image section ────────────────────────────────
-                      Expanded(
-                        flex: 6,
-                        child: _ProductImage(
-                          imageUrl: imageUrl,
-                          productName: displayName,
-                          padding: imagePadding,
-                          iconSize: iconSize,
-                        ),
+              child: Tooltip(
+                message: displayName,
+                preferBelow: true,
+                child: Semantics(
+                  container: true,
+                  label: '$displayName product card',
+                  hint: widget.onTap != null
+                      ? 'Tap to open product details'
+                      : null,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(radius),
+                      border: Border.all(
+                        color: _isHovered
+                            ? AppColors.primaryGold.withOpacity(0.3)
+                            : _cardBorderColor,
                       ),
-
-                      // ── Info section ─────────────────────────────────
-                      Expanded(
-                        flex: compact ? 4 : 5,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: hPad,
-                            vertical: vPad,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  displayName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: titleSize,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.2,
-                                    color: AppColors.textDark,
-                                  ),
-                                ),
-
-                                if (categoryName != null) ...[
-                                  SizedBox(height: gap4),
-                                  _CategoryChip(
-                                    label: categoryName,
-                                    maxWidth: width * 0.75,
-                                    fontSize: chipSize,
-                                    hPad: gap6,
-                                    vPad: gap2,
-                                  ),
-                                ],
-
-                                if (showTagNo) ...[
-                                  SizedBox(height: gap4),
-                                  Text(
-                                    tagNo!,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: bodySize,
-                                      color: AppColors.textMuted,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-
-                                if (showWeight) ...[
-                                  SizedBox(height: gap4),
-                                  _WeightRow(
-                                    fineWeight: fineWeight,
-                                    touch: touch,
-                                    fontSize: bodySize,
-                                  ),
-                                ],
-
-                                if (!compact) ...[
-                                  SizedBox(height: gap8),
-                                  _ViewButton(
-                                    onPressed: primaryAction,
-                                    height: buttonHeight,
-                                    fontSize: buttonTextSize,
-                                  ),
-                                ],
-                              ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: _isHovered
+                              ? AppColors.primaryGold.withOpacity(0.12)
+                              : Colors.black.withOpacity(0.06),
+                          blurRadius: _isHovered ? 16 : 10,
+                          offset: Offset(0, _isHovered ? 6 : 3),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(radius),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: widget.onTap,
+                        borderRadius: BorderRadius.circular(radius),
+                        mouseCursor: widget.onTap != null
+                            ? SystemMouseCursors.click
+                            : MouseCursor.defer,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: _ProductImage(
+                                imageUrl: imageUrl,
+                                productName: displayName,
+                                iconSize: iconSize,
+                                isNew: _isRecent(product),
+                                isHovered: _isHovered,
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: hPad,
+                                vertical: vPad,
+                              ),
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (categoryName != null)
+                                    _CategoryChip(
+                                      label: categoryName,
+                                      maxWidth: width * 0.7,
+                                      fontSize: bodySize,
+                                      hPad: gap3,
+                                      vPad: 1,
+                                    ),
+                                  if (showWeight) ...[
+                                    SizedBox(height: gap3),
+                                    _WeightInfo(
+                                      fineWeight: fineWeight,
+                                      touchData: touchData,
+                                      fontSize: metaSize,
+                                    ),
+                                  ],
+
+                                ],
+                              ),
+                            ),
+                            if (!widget.compact)
+                              const Spacer(),
+                            if (!widget.compact)
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    hPad, 0, hPad, vPad),
+                                child: _ViewButton(
+                                  onPressed: primaryAction,
+                                  height: buttonHeight,
+                                  fontSize: buttonTextSize,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -200,8 +187,6 @@ class ProductCard extends StatelessWidget {
       },
     );
   }
-
-  // ── Helpers ──────────────────────────────────────────────────────────
 
   static String? _cleanText(String? value) {
     final cleaned = value?.trim();
@@ -221,64 +206,115 @@ class ProductCard extends StatelessWidget {
     final parsed = num.tryParse(raw);
     if (parsed == null) return raw;
     if (parsed == parsed.roundToDouble()) return parsed.toInt().toString();
-    return parsed.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+    return parsed
+        .toStringAsFixed(2)
+        .replaceFirst(RegExp(r'\.?0+$'), '');
+  }
+
+  static _TouchData? _parseTouch(String? touch) {
+    if (touch == null || touch.isEmpty) return null;
+    final match = RegExp(r'([\d.]+)\s*\((\d+)\s*K\)').firstMatch(touch);
+    if (match != null) {
+      return _TouchData(
+        karat: match.group(2),
+        touchValue: match.group(1),
+      );
+    }
+    return _TouchData(karat: null, touchValue: touch);
+  }
+
+  static bool _isRecent(ProductModel product) {
+    if (product.createdAt == null) return false;
+    return DateTime.now().difference(product.createdAt!).inDays < 7;
   }
 }
 
-// ── Sub-widgets ──────────────────────────────────────────────────────────────
+class _TouchData {
+  final String? karat;
+  final String? touchValue;
+  const _TouchData({this.karat, this.touchValue});
+}
 
 class _ProductImage extends StatelessWidget {
   const _ProductImage({
     required this.imageUrl,
     required this.productName,
-    required this.padding,
     required this.iconSize,
+    required this.isNew,
+    required this.isHovered,
   });
 
   final String? imageUrl;
   final String productName;
-  final double padding;
   final double iconSize;
+  final bool isNew;
+  final bool isHovered;
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: const Color(0xFFF8F5F0),
-      child: Padding(
-        padding: EdgeInsets.all(padding),
-        child: imageUrl != null
-            ? Semantics(
-                image: true,
-                label: '$productName image',
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl!,
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                  fadeInDuration: const Duration(milliseconds: 200),
-                  placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: const Color(0xFFE8E3DB),
-                    highlightColor: const Color(0xFFF7F3ED),
-                    child: const DecoratedBox(
-                      decoration: BoxDecoration(color: Colors.white),
+    return Stack(
+      children: [
+        ColoredBox(
+          color: const Color(0xFFF8F5F0),
+          child: AnimatedScale(
+            scale: isHovered ? 1.05 : 1.0,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
+            child: imageUrl != null
+                ? Semantics(
+                    image: true,
+                    label: '$productName image',
+                      child: CachedNetworkImage(
+                      imageUrl: imageUrl!,
+                      width: double.infinity,
+                      fadeInDuration: const Duration(milliseconds: 200),
+                      placeholder: (context, url) => Shimmer.fromColors(
+                        baseColor: const Color(0xFFE8E3DB),
+                        highlightColor: const Color(0xFFF7F3ED),
+                        child: const DecoratedBox(
+                          decoration: BoxDecoration(color: Colors.white),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: Colors.grey.shade400,
+                          size: iconSize,
+                        ),
+                      ),
                     ),
-                  ),
-                  errorWidget: (context, url, error) => Center(
+                  )
+                : Center(
                     child: Icon(
-                      Icons.image_not_supported_outlined,
-                      color: Colors.grey.shade400,
+                      Icons.image_outlined,
+                      color: const Color(0xFF887A67),
                       size: iconSize,
                     ),
                   ),
-                ),
-              )
-            : Center(
-                child: Icon(
-                  Icons.image_outlined,
-                  color: const Color(0xFF887A67),
-                  size: iconSize,
+          ),
+        ),
+        if (isNew)
+          Positioned(
+            top: 6,
+            left: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGold,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'NEW',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
                 ),
               ),
-      ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -315,7 +351,7 @@ class _CategoryChip extends StatelessWidget {
           style: TextStyle(
             fontSize: fontSize,
             color: AppColors.primaryGold,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
@@ -323,49 +359,78 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-class _WeightRow extends StatelessWidget {
-  const _WeightRow({
+class _WeightInfo extends StatelessWidget {
+  const _WeightInfo({
     required this.fineWeight,
-    required this.touch,
+    required this.touchData,
     required this.fontSize,
   });
 
   final String? fineWeight;
-  final String? touch;
+  final _TouchData? touchData;
   final double fontSize;
 
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: fontSize,
-      color: AppColors.textDark,
-      fontWeight: FontWeight.w600,
+      color: AppColors.textDark.withOpacity(0.7),
+      fontWeight: FontWeight.w500,
+      height: 1.3,
+    );
+    final dimSep = style.copyWith(
+      color: AppColors.textMuted.withOpacity(0.4),
     );
 
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (fineWeight != null)
-          Expanded(
-            child: Text(
-              'Wt $fineWeight',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: style,
-            ),
-          ),
-        if (touch != null)
-          Expanded(
-            child: Text(
-              'Touch: $touch',
-              textAlign: fineWeight != null
-                  ? TextAlign.end
-                  : TextAlign.start,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: style,
-            ),
-          ),
+          Text('Wt: ${fineWeight}g', style: style, maxLines: 1),
+        if (touchData != null) ...[
+          if (fineWeight != null) const SizedBox(height: 2),
+          _PurityRow(data: touchData!, style: style, dimSep: dimSep),
+        ],
       ],
+    );
+  }
+}
+
+class _PurityRow extends StatelessWidget {
+  const _PurityRow({
+    required this.data,
+    required this.style,
+    required this.dimSep,
+  });
+
+  final _TouchData data;
+  final TextStyle style;
+  final TextStyle dimSep;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasKarat = data.karat != null;
+    final hasTouch = data.touchValue != null;
+
+    final spans = <TextSpan>[];
+
+    if (hasKarat) {
+      spans.add(TextSpan(text: '${data.karat}K Gold', style: style));
+    }
+
+    if (hasKarat && hasTouch) {
+      spans.add(TextSpan(text: '  •  ', style: dimSep));
+    }
+
+    if (hasTouch) {
+      spans.add(TextSpan(text: '${data.touchValue} Touch', style: style));
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -398,7 +463,7 @@ class _ViewButton extends StatelessWidget {
           shadowColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
         child: Text(
@@ -407,7 +472,7 @@ class _ViewButton extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: fontSize,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),

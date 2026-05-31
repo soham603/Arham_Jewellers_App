@@ -148,194 +148,214 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: Scaffold(
-      backgroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.primaryGold,
+                  backgroundColor: Colors.white,
+                  onRefresh: _onRefresh,
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _TopBar(),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: RefreshIndicator(
-                color: AppColors.primaryGold,
-                backgroundColor: Colors.white,
-                onRefresh: _onRefresh,
-                child: SingleChildScrollView(
-                  controller: scrollController,
+                        const SizedBox(height: 8),
 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 14),
+                          child: HomeSearchBar(),
+                        ),
 
-                    children: [
-                      const _TopBar(),
+                        const SizedBox(height: 18),
 
-                      const SizedBox(height: 8),
+                        _CarouselSection(
+                          controller: carouselController,
+                          pageController: pageController,
+                          currentIndex: currentCarouselIndex,
+                          onPageChanged: _onCarouselPageChanged,
+                        ),
 
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 14),
-                        child: HomeSearchBar(),
-                      ),
+                        const CategoryDivider(),
 
-                      const SizedBox(height: 18),
+                        _CategoryQuickAccess(controller: categoryController),
 
-                      // 🔥 Original API-driven Carousel Section (Restored exactly as before)
-                      _CarouselSection(
-                        controller: carouselController,
-                        pageController: pageController,
-                        currentIndex: currentCarouselIndex,
+                        const SizedBox(height: 16),
 
-                        onPageChanged: _onCarouselPageChanged,
-                      ),
+                        Container(
+                          width: double.infinity,
+                          color: const Color(0xFF3E2723),
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Column(
+                            children: [
+                              const CollectionsDivider(
+                                  vertical: 4, label: 'Collections'),
 
-                      const CategoryDivider(),
+                              const SizedBox(height: 24),
 
-                      _CategoryQuickAccess(controller: categoryController),
-
-                      const SizedBox(height: 16),
-
-                      Container(
-                        width: double.infinity,
-                        color: const Color(0xFF3E2723),
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Column(
-                          children: [
-                            const CollectionsDivider(vertical: 4, label: 'Collections'),
-
-                            const SizedBox(height: 24),
-
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                  child: GestureDetector(
-                                    onTap: () => _navigateToMultiKaratListing(['18K', '20K'], '18K & 20K Collection'),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.08),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          'assets/images/arham-collection.png',
-                                          fit: BoxFit.cover,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            _navigateToMultiKaratListing(
+                                          ['18K', '20K'],
+                                          '18K & 20K Collection',
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () => _navigateToKaratListing('22K'),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.08),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 3),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.08),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Image.asset(
+                                              'assets/images/arham-collection.png',
+                                              fit: BoxFit.cover,
                                             ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.asset(
-                                            'assets/images/ratnesh-collection.png',
-                                            fit: BoxFit.cover,
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            const CollectionsDivider(vertical: 4),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Obx(() {
-                        if (!categoryController.showProductSection) {
-                          return const SizedBox();
-                        }
-
-                        return Column(
-                          children: [
-        
-
-                            SizedBox(height: context.getScreenHeight(1)),
-                            _ProductSection(
-                              key: productSectionKey,
-                              category: categoryController.selectedLevel3!,
-                              onClose: categoryController.clearSelectedLevel3,
-                            ),
-                          ],
-                        );
-                      }),
-
-
-
-                      SizedBox(height: context.getScreenHeight(1)),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _SectionTitle(
-                          label: 'Latest Additions',
-                          subtitle: 'Newest jewellery collections',
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      Obx(() {
-                        final state = carouselController.productState;
-                        final products = carouselController.latestProducts;
-
-                        if (state == CurrentAppState.LOADING &&
-                            products.isEmpty) {
-                          return SizedBox(
-                            height: context.getScreenHeight(44),
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 5,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 12),
-                              itemBuilder: (_, __) {
-                                return Shimmer.fromColors(
-                                  baseColor:
-                                      context.colorPalette.shimmerBaseColor,
-                                  highlightColor:
-                                      context.colorPalette.shimmerHighLightColor,
-                                  child: Container(
-                                    width: context.getScreenWidth(50),
-                                    decoration: BoxDecoration(
-                                      color: context.colorPalette.cardBg,
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: context.colorPalette.border,
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () =>
+                                            _navigateToKaratListing('22K'),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.08),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Image.asset(
+                                              'assets/images/ratnesh-collection.png',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          flex: 7,
-                                          child: Container(
-                                            decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.vertical(
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 24),
+
+                              const CollectionsDivider(vertical: 4),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Obx(() {
+                          if (!categoryController.showProductSection) {
+                            return const SizedBox();
+                          }
+
+                          return Column(
+                            children: [
+                              SizedBox(
+                                  height: context.getScreenHeight(1)),
+                              _ProductSection(
+                                key: productSectionKey,
+                                category:
+                                    categoryController.selectedLevel3!,
+                                onClose:
+                                    categoryController.clearSelectedLevel3,
+                              ),
+                            ],
+                          );
+                        }),
+
+                        SizedBox(height: context.getScreenHeight(1)),
+
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                          child: _SectionTitle(
+                            label: 'Latest Additions',
+                            subtitle: 'Newest jewellery collections',
+                            badge: 'LATEST',
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Obx(() {
+                          final state = carouselController.productState;
+                          final products =
+                              carouselController.latestProducts;
+                          final cardWidth = context.getScreenWidth(50);
+                          final cardHeight = cardWidth * 1.28 + 110;
+
+                          if (state == CurrentAppState.LOADING &&
+                              products.isEmpty) {
+                            return SizedBox(
+                              height: 260,
+                              child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 5,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 12),
+                                itemBuilder: (_, __) {
+                                  final cardWidth =
+                                      context.getScreenWidth(50);
+                                  return Shimmer.fromColors(
+                                    baseColor: context
+                                        .colorPalette.shimmerBaseColor,
+                                    highlightColor: context.colorPalette
+                                        .shimmerHighLightColor,
+                                    child: Container(
+                                      width: cardWidth,
+                                      height: cardWidth * 0.8 + 110,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            context.colorPalette.cardBg,
+                                        borderRadius:
+                                            BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color:
+                                              context.colorPalette.border,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: cardWidth * 0.8,
+                                            decoration:
+                                                const BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
                                                 top: Radius.circular(15),
                                               ),
                                             ),
@@ -343,17 +363,15 @@ class _HomePageState extends State<HomePage> {
                                               child: Icon(
                                                 Icons.diamond_outlined,
                                                 size: 36,
-                                                color:
-                                                    context.colorPalette.goldDark,
+                                                color: context
+                                                    .colorPalette.goldDark,
                                               ),
                                             ),
                                           ),
-                                        ),
-
-                                        Expanded(
-                                          flex: 4,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10),
+                                          Container(
+                                            height: 110,
+                                            padding:
+                                                const EdgeInsets.all(10),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -364,156 +382,128 @@ class _HomePageState extends State<HomePage> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius.circular(4),
+                                                        BorderRadius
+                                                            .circular(4),
                                                   ),
                                                 ),
-
                                                 const SizedBox(height: 8),
-
                                                 Container(
                                                   height: 10,
                                                   width: 70,
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius.circular(4),
+                                                        BorderRadius
+                                                            .circular(4),
                                                   ),
-                                                ),
-
-                                                const Spacer(),
-
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      height: 10,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              4,
-                                                            ),
-                                                      ),
-                                                    ),
-
-                                                    Container(
-                                                      width: 30,
-                                                      height: 30,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        }
+                                  );
+                                },
+                              ),
+                            );
+                          }
 
-                        if (state == CurrentAppState.ERROR && products.isEmpty) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: _ErrorRow(
-                              onRetry: () {
-                                carouselController.loadLatestProducts();
-                              },
-                            ),
-                          );
-                        }
+                          if (state == CurrentAppState.ERROR &&
+                              products.isEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16),
+                              child: _ErrorRow(
+                                onRetry: () {
+                                  carouselController.loadLatestProducts();
+                                },
+                              ),
+                            );
+                          }
 
-                        if (products.isEmpty) {
-                          return const SizedBox();
-                        }
+                          if (products.isEmpty) {
+                            return const SizedBox();
+                          }
 
-                        return SizedBox(
-                          height: context.getScreenHeight(44),
-                          child: NotificationListener<ScrollNotification>(
+                          return NotificationListener<ScrollNotification>(
                             onNotification: (scrollInfo) {
                               if (scrollInfo.metrics.pixels >=
-                                  scrollInfo.metrics.maxScrollExtent - 200) {
+                                  scrollInfo.metrics.maxScrollExtent -
+                                      200) {
                                 carouselController.loadLatestProducts(
                                   isPagination: true,
                                 );
                               }
-
                               return false;
                             },
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              scrollDirection: Axis.horizontal,
-                              itemCount:
-                                  products.length +
-                                  (carouselController.productLoadingMore ? 1 : 0),
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 12),
-                              itemBuilder: (_, index) {
-                                if (index >= products.length) {
+                            child: SizedBox(
+                              height: cardHeight,
+                              child: ListView.separated(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: products.length +
+                                    (carouselController.productLoadingMore
+                                        ? 1
+                                        : 0),
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 12),
+                                itemBuilder: (_, index) {
+                                  if (index >= products.length) {
+                                    return SizedBox(
+                                      width: context.getScreenWidth(50),
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          color:
+                                              context.colorPalette.gold,
+                                        ),
+                                      ),
+                                    );
+                                  }
+
+                                  final product = products[index];
+
                                   return SizedBox(
                                     width: context.getScreenWidth(50),
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: context.colorPalette.gold,
-                                      ),
+                                    child: ProductCard(
+                                      product: product,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailsPage(
+                                              product: product,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   );
-                                }
-
-                                final product = products[index];
-
-                                return SizedBox(
-                                  width: context.getScreenWidth(50),
-                                  child: ProductCard(
-                                    product: product,
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductDetailsPage(
-                                                product: product,
-                                              ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
+                                },
+                              ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
 
-                      const SizedBox(height: 30),
+                        const SizedBox(height: 30),
 
-                      const CustomiseOrderBanner(),
+                        const CustomiseOrderBanner(),
 
-                      const SizedBox(height: 30),
-                    ],
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            AppBottomNav(currentIndex: 0),
-          ],
+              AppBottomNav(currentIndex: 0),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
@@ -1534,23 +1524,18 @@ class _CarouselSection extends StatelessWidget {
               right: 0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: List.generate(list.length, (i) {
                   final active = i == currentIndex;
 
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
-
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-
                     width: active ? 22 : 6,
                     height: 6,
-
                     decoration: BoxDecoration(
                       color: active
                           ? context.colorPalette.gold
                           : context.colorPalette.border,
-
                       borderRadius: BorderRadius.circular(3),
                     ),
                   );
@@ -1567,8 +1552,13 @@ class _CarouselSection extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String label;
   final String subtitle;
+  final String? badge;
 
-  const _SectionTitle({required this.label, required this.subtitle});
+  const _SectionTitle({
+    required this.label,
+    required this.subtitle,
+    this.badge,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1578,42 +1568,46 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Row(
           children: [
-            Container(
-              width: 4,
-              height: 22,
-
-              decoration: BoxDecoration(
-                color: context.colorPalette.gold,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            const SizedBox(width: 8),
-
             Text(
               label,
-
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: context.colorPalette.goldDeep,
               ),
             ),
+            if (badge != null) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.gold,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  badge!,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
 
-        const SizedBox(height: 3),
+        const SizedBox(height: 2),
 
-        Padding(
-          padding: const EdgeInsets.only(left: 12),
-
-          child: Text(
-            subtitle,
-
-            style: TextStyle(
-              fontSize: 12.5,
-              color: context.colorPalette.goldDark,
-            ),
+        Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 12,
+            color: context.colorPalette.goldDark,
           ),
         ),
       ],

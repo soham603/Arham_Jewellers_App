@@ -94,20 +94,39 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   // --- Helper to convert raw Touch/Purity to standard Karat ---
-  String _getConvertedPurity(Map<String, dynamic> rawData, String? modelKarat) {
+  String _getConvertedPurity(Map<String, dynamic> rawData, String? modelKarat, {String? tagNo}) {
     if (modelKarat != null && modelKarat.isNotEmpty) return modelKarat;
 
-    final touch =
-        rawData["SalesTouch"]?.toString() ?? rawData["Touch"]?.toString();
-    if (touch == "92" || touch == "91.6" || touch == "91.75") {
-      return "22K";
-    } else if (touch == "84" || touch == "83.3") {
-      return "20K";
-    } else if (touch == "75") {
-      return "18K";
-    } else if (touch != null) {
-      return "${touch}K";
+    // 1. Try rawData
+    final raw = rawData["SalesTouch"]?.toString() ?? rawData["Touch"]?.toString();
+    if (raw != null) {
+      final result = _resolvePurity(raw);
+      if (result != null) return result;
     }
+
+    // 2. Fallback to tagNo prefix
+    if (tagNo != null && tagNo.length >= 2) {
+      final result = _resolvePurity(tagNo.substring(0, 2));
+      if (result != null) return result;
+    }
+
+    return "22K";
+  }
+
+  String _resolvePurity(String raw) {
+    final match = RegExp(r'^(\d+(?:\.\d+)?)').firstMatch(raw.trim());
+    final numStr = match?.group(1);
+    if (numStr == null) return "22K";
+    final value = double.tryParse(numStr);
+    if (value == null) return "22K";
+
+    if (value >= 915 && value <= 917) return "22K";
+    if (value >= 830 && value <= 835) return "20K";
+    if (value >= 748 && value <= 752) return "18K";
+    if (value >= 91 && value <= 92) return "22K";
+    if (value >= 83 && value <= 84) return "20K";
+    if (value >= 75 && value <= 76) return "18K";
+
     return "22K";
   }
 
@@ -116,7 +135,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final rawData = widget.product.rawData ?? {};
     final netWeight = rawData["FineWt"]?.toString() ?? "0.000";
     final grossWeight = rawData["GrossWt"]?.toString() ?? "0.000";
-    final purity = _getConvertedPurity(rawData, widget.product.karat);
+    final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo);
     final pieces = rawData["Pieces"]?.toString() ?? "1";
     final designName = rawData["DesignName"]?.toString() ?? "Standard";
 
