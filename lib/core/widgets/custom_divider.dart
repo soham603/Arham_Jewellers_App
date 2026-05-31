@@ -4,15 +4,16 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class JewelleryDivider extends StatelessWidget {
   final String? label;
+  final double vertical;
 
-  const JewelleryDivider({super.key, this.label});
+  const JewelleryDivider({super.key, this.label, this.vertical = 20});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24, // Added a bit more breathing room on the edges
-        vertical: 20,
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: vertical,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

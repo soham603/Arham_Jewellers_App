@@ -116,7 +116,23 @@ class _HomePageState extends State<HomePage> {
 
                     _CategoryQuickAccess(controller: categoryController),
 
-                    const JewelleryDivider(),
+                    const JewelleryDivider(vertical: 16),
+
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'Collections',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: context.colorPalette.goldDeep,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -125,11 +141,23 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () => _navigateToKaratListing('18K'),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/images/arham-collection.png',
-                                  fit: BoxFit.cover,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.08),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    'assets/images/arham-collection.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -138,11 +166,23 @@ class _HomePageState extends State<HomePage> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () => _navigateToKaratListing('22K'),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/images/ratnesh-collection.png',
-                                  fit: BoxFit.cover,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.08),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    'assets/images/ratnesh-collection.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -574,6 +614,14 @@ class _KaratSection extends StatelessWidget {
 
                             width: isExpanded ? 2 : 1,
                           ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
 
                         child: Column(
