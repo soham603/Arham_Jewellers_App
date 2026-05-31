@@ -278,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                       if (state == CurrentAppState.LOADING &&
                           products.isEmpty) {
                         return SizedBox(
-                          height: context.getScreenHeight(36),
+                          height: context.getScreenHeight(44),
                           child: ListView.separated(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             scrollDirection: Axis.horizontal,
@@ -292,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                                 highlightColor:
                                     context.colorPalette.shimmerHighLightColor,
                                 child: Container(
-                                  width: context.getScreenWidth(42),
+                                  width: context.getScreenWidth(50),
                                   decoration: BoxDecoration(
                                     color: context.colorPalette.cardBg,
                                     borderRadius: BorderRadius.circular(16),
@@ -412,7 +412,7 @@ class _HomePageState extends State<HomePage> {
                       }
 
                       return SizedBox(
-                        height: context.getScreenHeight(38),
+                        height: context.getScreenHeight(44),
                         child: NotificationListener<ScrollNotification>(
                           onNotification: (scrollInfo) {
                             if (scrollInfo.metrics.pixels >=
@@ -435,7 +435,7 @@ class _HomePageState extends State<HomePage> {
                             itemBuilder: (_, index) {
                               if (index >= products.length) {
                                 return SizedBox(
-                                  width: context.getScreenWidth(42),
+                                  width: context.getScreenWidth(50),
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       color: context.colorPalette.gold,
@@ -447,7 +447,7 @@ class _HomePageState extends State<HomePage> {
                               final product = products[index];
 
                               return SizedBox(
-                                width: context.getScreenWidth(42),
+                                width: context.getScreenWidth(50),
                                 child: ProductCard(
                                   product: product,
                                   onTap: () {
