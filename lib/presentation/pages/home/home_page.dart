@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 20),
 
                       Obx(() {
                         if (!categoryController.showProductSection) {
@@ -1562,7 +1562,7 @@ class _CarouselSection extends StatelessWidget {
       if (list.isEmpty) return const SizedBox();
 
       return SizedBox(
-        height: context.getScreenHeight(28),
+        height: context.getScreenHeight(22),
 
         child: Stack(
           children: [
@@ -1742,26 +1742,39 @@ class _CategoryQuickAccess extends StatelessWidget {
               },
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: context.getScreenWidth(8.5),
-                    backgroundColor: context.colorPalette.goldLight,
+                  Container(
+                    width: context.getScreenWidth(20),
+                    height: context.getScreenWidth(20),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: context.colorPalette.gold.withOpacity(0.5),
+                        width: 1.5,
+                      ),
+                    ),
                     child: ClipOval(
                       child: cat.imageUrl.isNotEmpty
                           ? CachedNetworkImage(
                               imageUrl: cat.imageUrl,
-                              width: context.getScreenWidth(17),
-                              height: context.getScreenWidth(17),
+                              width: context.getScreenWidth(20),
+                              height: context.getScreenWidth(20),
                               fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => Icon(
+                              errorWidget: (_, __, ___) => Container(
+                                color: context.colorPalette.goldLight,
+                                child: Icon(
+                                  Icons.diamond_outlined,
+                                  size: context.getScreenWidth(7),
+                                  color: context.colorPalette.goldDark,
+                                ),
+                              ),
+                            )
+                          : Container(
+                              color: context.colorPalette.goldLight,
+                              child: Icon(
                                 Icons.diamond_outlined,
                                 size: context.getScreenWidth(7),
                                 color: context.colorPalette.goldDark,
                               ),
-                            )
-                          : Icon(
-                              Icons.diamond_outlined,
-                              size: context.getScreenWidth(7),
-                              color: context.colorPalette.goldDark,
                             ),
                     ),
                   ),
