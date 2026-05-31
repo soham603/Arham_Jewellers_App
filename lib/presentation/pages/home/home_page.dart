@@ -160,7 +160,7 @@ class _HomePageState extends State<HomePage> {
 
                     _CategoryQuickAccess(controller: categoryController),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
 
                     Container(
                       width: double.infinity,
@@ -1774,7 +1774,7 @@ class _CategoryQuickAccess extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
           itemCount: unique.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 15),
+          separatorBuilder: (_, __) => const SizedBox(width: 6),
           itemBuilder: (_, index) {
             final cat = unique[index];
             return GestureDetector(
