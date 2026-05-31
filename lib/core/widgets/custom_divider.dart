@@ -2,6 +2,139 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
+class CategoryDivider extends StatelessWidget {
+  final double vertical;
+
+  const CategoryDivider({super.key, this.vertical = 16});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: vertical,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    context.colorPalette.gold.withOpacity(0.4),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(
+              color: context.colorPalette.gold.withOpacity(0.5),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    context.colorPalette.gold.withOpacity(0.4),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CollectionsDivider extends StatelessWidget {
+  final String? label;
+  final double vertical;
+
+  const CollectionsDivider({super.key, this.label, this.vertical = 16});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: vertical,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    context.colorPalette.gold.withOpacity(0.8),
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          if (label != null && label!.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                label!.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2.5,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ] else ...[
+            const SizedBox(width: 8),
+            Icon(
+              Icons.diamond_outlined,
+              size: 14,
+              color: Colors.white70,
+            ),
+            const SizedBox(width: 8),
+          ],
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    context.colorPalette.gold.withOpacity(0.8),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class JewelleryDivider extends StatelessWidget {
   final String? label;
   final double vertical;
