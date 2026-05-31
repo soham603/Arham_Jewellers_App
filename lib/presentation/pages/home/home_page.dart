@@ -114,6 +114,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _navigateToMultiKaratListing(List<String> karats, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductListingPage(karats: karats, title: title),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -196,28 +205,28 @@ class _HomePageState extends State<HomePage> {
                               child: Row(
                                 children: [
                                   Expanded(
-                                    child: GestureDetector(
-                                      onTap: () => _navigateToKaratListing('18K'),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.08),
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Image.asset(
-                                            'assets/images/arham-collection.png',
-                                            fit: BoxFit.cover,
+                                  child: GestureDetector(
+                                    onTap: () => _navigateToMultiKaratListing(['18K', '20K'], '18K & 20K Collection'),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.08),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
                                           ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          'assets/images/arham-collection.png',
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),
+                                  ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(

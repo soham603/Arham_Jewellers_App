@@ -186,18 +186,23 @@ class SearchProductController extends GetxController {
   final _karatState = CurrentAppState.INITIAL.obs;
   CurrentAppState get karatState => _karatState.value;
 
-  String _currentKarat = '';
+  List<String> _currentKarats = [];
   int _karatPage = 1;
   bool _karatHasMore = true;
   bool get karatHasMore => _karatHasMore;
 
-  Future<void> loadProductsByKarat(String karat,
+  void loadMoreKaratProducts() {
+    if (!_karatHasMore || _karatState.value == CurrentAppState.LOADING) return;
+    loadProductsByKarats(_currentKarats, isPagination: true);
+  }
+
+  Future<void> loadProductsByKarats(List<String> karats,
       {bool isPagination = false}) async {
     if (!_karatHasMore && isPagination) return;
     if (_karatState.value == CurrentAppState.LOADING) return;
 
     if (!isPagination) {
-      _currentKarat = karat;
+      _currentKarats = karats;
       _karatState.value = CurrentAppState.LOADING;
       _karatPage = 1;
       _karatHasMore = true;
@@ -205,46 +210,44 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        "/api/v1/products/search",
-        queryParameters: {
-          "karat": karat,
-          "page": _karatPage,
-          "limit": _pageLimit,
-        },
-      );
+      List<ProductModel> allFetched = [];
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      for (final karat in karats) {
+        final response = await httpClient.get(
+          "/api/v1/products/search",
+          queryParameters: {
+            "karat": karat,
+            "page": _karatPage,
+            "limit": _pageLimit,
+          },
+        );
 
-        if (isPagination) {
-          _karatProducts.addAll(fetched);
-        } else {
-          _karatProducts.value = fetched;
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = response.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+          allFetched.addAll(fetched);
         }
-
-        if (fetched.length < _pageLimit) {
-          _karatHasMore = false;
-        } else {
-          _karatPage++;
-        }
-
-        _karatState.value = CurrentAppState.SUCCESS;
-      } else {
-        _karatState.value = CurrentAppState.ERROR;
       }
+
+      if (isPagination) {
+        _karatProducts.addAll(allFetched);
+      } else {
+        _karatProducts.value = allFetched;
+      }
+
+      if (allFetched.length < _pageLimit * karats.length) {
+        _karatHasMore = false;
+      } else {
+        _karatPage++;
+      }
+
+      _karatState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _karatState.value = CurrentAppState.ERROR;
       Logger.error(
-          "SearchProductController", "loadProductsByKarat error: $e\n$st");
+          "SearchProductController", "loadProductsByKarats error: $e\n$st");
     }
-  }
-
-  void loadMoreKaratProducts() {
-    if (!_karatHasMore || _karatState.value == CurrentAppState.LOADING) return;
-    loadProductsByKarat(_currentKarat, isPagination: true);
   }
 
   void clearSearch() {
