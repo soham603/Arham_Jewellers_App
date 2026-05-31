@@ -5,7 +5,6 @@ import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
-import '../../../core/widgets/logo_widget.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -75,8 +74,10 @@ class _SplashPageState extends State<SplashPage>
             children: [
               const Spacer(flex: 2),
               Center(
-                child: LogoWidget(
-                  size: context.getScreenWidth(55),
+                child: Image.asset(
+                  'assets/images/ratnesh-logo.png',
+                  width: context.getScreenWidth(55),
+                  color: context.colorPalette.gold,
                 ),
               ),
               SizedBox(height: context.getScreenHeight(3)),
