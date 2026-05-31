@@ -1912,7 +1912,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                     ),
                   ),
 
-                  // Right Side: Graphic/Illustration placeholder
+                  // Right Side: Bespoke Icon
                   Expanded(
                     flex: 4,
                     child: Container(
@@ -1923,20 +1923,19 @@ class CustomiseOrderBanner extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 2),
                       ),
                       child: Center(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              Icons.diamond_outlined,
-                              color: context.colorPalette.gold.withOpacity(0.3),
-                              size: context.getScreenWidth(20),
+                        child: ClipOval(
+                          child: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                              context.colorPalette.goldDeep,
+                              BlendMode.srcIn,
                             ),
-                            Icon(
-                              Icons.draw_outlined,
-                              color: context.colorPalette.goldDeep,
-                              size: context.getScreenWidth(10),
+                            child: Image.asset(
+                              'assets/images/bespoke-icon.png',
+                              width: context.getScreenWidth(22),
+                              height: context.getScreenWidth(22),
+                              fit: BoxFit.contain,
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
