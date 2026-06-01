@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -52,6 +53,94 @@ class CategoryController extends GetxController {
   CurrentAppState get k18State => _k18State.value;
   CurrentAppState get k20State => _k20State.value;
   CurrentAppState get k22State => _k22State.value;
+
+  // ── Fallback product images for categories without images ─────────────────
+  final _fallbackImages = <String, String>{}.obs;
+  Map<String, String> get fallbackImages => _fallbackImages;
+
+  final _fallbackLoadingIds = <String>{}.obs;
+  bool isFallbackLoading(String id) => _fallbackLoadingIds.contains(id);
+
+  final _fallbackAttempted = <String>{}.obs;
+  bool isFallbackAttempted(String id) => _fallbackAttempted.contains(id);
+
+  Future<String?> fetchFallbackImage(String categoryId, {String? categoryName}) async {
+    if (_fallbackAttempted.contains(categoryId)) {
+      final cached = _fallbackImages[categoryId];
+      return (cached != null && cached.isNotEmpty) ? cached : null;
+    }
+    if (_fallbackLoadingIds.contains(categoryId)) return null;
+
+    _fallbackLoadingIds.add(categoryId);
+    try {
+      String searchTerm = categoryName ?? '';
+      String cleanedTerm = '';
+      List<String> rawWords = [];
+      if (searchTerm.isNotEmpty) {
+        cleanedTerm = searchTerm
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim();
+        rawWords = searchTerm
+            .split(RegExp(r'[\s/-]+'))
+            .where((w) => w.length >= 3)
+            .map((w) => w.replaceAll(RegExp(r'collection', caseSensitive: false), '').trim())
+            .where((w) => w.isNotEmpty)
+            .toList();
+      }
+      final termsToTry = [
+        if (cleanedTerm.isNotEmpty) cleanedTerm,
+        ...rawWords,
+      ];
+      final uniqueTerms = termsToTry.toSet().toList();
+
+      String? foundUrl;
+      for (final term in uniqueTerms) {
+        final response = await httpClient.get(
+          '/api/v1/products/search',
+          queryParameters: term.isNotEmpty
+              ? {'search': term, 'page': '1', 'limit': '20'}
+              : {'categoryId': categoryId, 'page': '1', 'limit': '20'},
+          options: Options(
+            sendTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
+          ),
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = response.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          for (final item in raw) {
+            final product = ProductModel.fromJson(item);
+            final imageUrl = product.displayImageUrl;
+            if (imageUrl != null && imageUrl.isNotEmpty) {
+              foundUrl = imageUrl;
+              break;
+            }
+          }
+          if (foundUrl != null) break;
+        }
+      }
+
+      if (foundUrl != null) {
+        _fallbackImages[categoryId] = foundUrl;
+        return foundUrl;
+      }
+    } catch (e) {
+      Logger.error('CategoryController', 'fetchFallbackImage error: $e');
+    } finally {
+      _fallbackLoadingIds.remove(categoryId);
+    }
+    _fallbackAttempted.add(categoryId);
+    return null;
+  }
+
+  Future<void> _fetchFallbackImagesFor(List<CategoryModel> categories) async {
+    for (final cat in categories) {
+      if (cat.imageUrl.isEmpty) {
+        fetchFallbackImage(cat.id, categoryName: cat.name);
+      }
+    }
+  }
 
   // ── Expansion state ───────────────────────────────────────────────────────
   // Which level-2 category is currently expanded (shows its level-3 children)
@@ -129,6 +218,7 @@ class CategoryController extends GetxController {
               .toList();
           _listForKarat(karat).value = fetched;
           stateObs.value = CurrentAppState.SUCCESS;
+          _fetchFallbackImagesFor(fetched);
         } else {
           stateObs.value = CurrentAppState.ERROR;
         }

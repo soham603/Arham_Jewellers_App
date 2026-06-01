@@ -90,7 +90,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   bool get _is22kOnly => !_isMultiKarat && widget.karats.first == Karat.k22;
 
   Future<void> _showLevel3Sheet(CategoryModel parent, Karat karat) async {
-    final children = await controller.fetchLevel3Categories(parentId: parent.id);
+    final children =
+        await controller.fetchLevel3Categories(parentId: parent.id);
 
     if (!mounted) return;
 
@@ -98,7 +99,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'No styles available under ${parent.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').trim()}'),
+            'No styles available under ${parent.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').trim()}',
+          ),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -123,7 +125,10 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                 karat: karat.displayName,
                 title: child.name
                     .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                    .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                    .replaceAll(
+                      RegExp(r'collection', caseSensitive: false),
+                      '',
+                    )
                     .trim(),
               ),
             ),
@@ -135,170 +140,91 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.title ??
-        '${widget.karats.map((k) => k.displayName).join(' & ')} Collection';
-
     return Scaffold(
-      backgroundColor: context.colorPalette.cream,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                children: [
-                  Align(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Image.asset(
-                        _is22kOnly
-                            ? 'assets/images/arham-logo.png'
-                            : 'assets/images/ratnesh-logo.png',
-                        height: _is22kOnly ? 110 : 80,
-                        fit: BoxFit.contain,
-                        color: context.colorPalette.goldDeep,
-                        colorBlendMode: BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 4,
-                    top: 8,
-                    child: IconButton(
-                      icon: Icon(Icons.arrow_back_ios_rounded,
-                          color: context.colorPalette.goldDeep),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ],
-              ),
-              if (!_is22kOnly)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    'RATNESHGOLD',
-                    style: GoogleFonts.bodoniModa(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                      color: context.colorPalette.goldDeep,
-                    ),
-                  ),
-                ),
-              SizedBox(height: _is22kOnly ? 0 : 20),
-              JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
-                child: Text(
-                  title,
+      body: Obx(() {
+        if (_isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (_hasError.value &&
+            widget.karats.every((k) => _listForKarat(k).isEmpty)) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline,
+                    color: context.colorPalette.goldDark, size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  'Failed to load categories',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: context.colorPalette.goldDeep,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  'Explore our exquisite collection of handcrafted jewellery',
-                  style: TextStyle(
-                    fontSize: 13,
                     color: context.colorPalette.goldDark,
+                    fontSize: 16,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Obx(() {
-              if (_isLoading.value &&
-                  widget.karats.every(
-                      (k) => _listForKarat(k).isEmpty)) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (_hasError.value &&
-                  widget.karats
-                      .every((k) => _listForKarat(k).isEmpty)) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.error_outline,
-                          color: context.colorPalette.goldDark, size: 48),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Failed to load categories',
-                        style: TextStyle(
-                            color: context.colorPalette.goldDark, fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadAll,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: context.colorPalette.gold,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Retry'),
-                      ),
-                    ],
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _loadAll,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: context.colorPalette.gold,
+                    foregroundColor: Colors.white,
                   ),
-                );
-              }
-
-              if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.diamond_outlined,
-                          color: context.colorPalette.goldDark, size: 48),
-                      const SizedBox(height: 12),
-                      Text(
-                        'No categories found',
-                        style: TextStyle(
-                            color: context.colorPalette.goldDark, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              if (_isMultiKarat) {
-                return _buildMultiKaratView();
-              }
-
-              final categories = _listForKarat(widget.karats.first);
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: categories.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.85,
-                  ),
-                  itemBuilder: (_, index) {
-                    final cat = categories[index];
-                    return _CategoryCard(
-                      category: cat,
-                      karat: widget.karats.first,
-                      onTap: () =>
-                          _showLevel3Sheet(cat, widget.karats.first),
-                    );
-                  },
+                  child: const Text('Retry'),
                 ),
+              ],
+            ),
+          );
+        }
+
+        if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.diamond_outlined,
+                    color: context.colorPalette.goldDark, size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  'No categories found',
+                  style: TextStyle(
+                    color: context.colorPalette.goldDark,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (_isMultiKarat) {
+          return _buildMultiKaratView();
+        }
+
+        final categories = _listForKarat(widget.karats.first);
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: categories.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.85,
+            ),
+            itemBuilder: (_, index) {
+              final cat = categories[index];
+              return _CategoryCard(
+                category: cat,
+                karat: widget.karats.first,
+                onTap: () => _showLevel3Sheet(cat, widget.karats.first),
               );
-            }),
-        ],
-      ),
-    ),
-  ),
-);
+            },
+          ),
+        );
+      }),
+    );
   }
 
   Widget _buildMultiKaratView() {
@@ -333,6 +259,82 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   }
 }
 
+class _CategoryListingImage extends StatelessWidget {
+  final CategoryModel cat;
+  final CategoryController controller;
+
+  const _CategoryListingImage({
+    required this.cat,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (cat.imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: cat.imageUrl,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _onImageError(context),
+      );
+    }
+
+    return _fallbackOrPlaceholder(context);
+  }
+
+  Widget _onImageError(BuildContext context) {
+    final fallback = controller.fallbackImages[cat.id];
+    if (fallback != null && fallback.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: fallback,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
+      );
+    }
+    return _diamondPlaceholder(context);
+  }
+
+  Widget _fallbackOrPlaceholder(BuildContext context) {
+    final fallback = controller.fallbackImages[cat.id];
+    if (fallback != null && fallback.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: fallback,
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
+      );
+    }
+    return _diamondPlaceholder(context);
+  }
+
+  Widget _diamondPlaceholder(BuildContext context) {
+    if (!controller.isFallbackAttempted(cat.id) &&
+        !controller.isFallbackLoading(cat.id)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.fetchFallbackImage(cat.id, categoryName: cat.name);
+      });
+      return const SizedBox();
+    }
+
+    if (controller.isFallbackLoading(cat.id)) {
+      return const SizedBox();
+    }
+
+    return Container(
+      color: context.colorPalette.goldLight,
+      child: Icon(
+        Icons.diamond_outlined,
+        size: 24,
+        color: context.colorPalette.goldDark,
+      ),
+    );
+  }
+}
+
 class _KaratSectionHeader extends StatelessWidget {
   final Karat karat;
   final bool isExpanded;
@@ -346,9 +348,12 @@ class _KaratSectionHeader extends StatelessWidget {
 
   String _purity(Karat k) {
     switch (k) {
-      case Karat.k18: return '75%';
-      case Karat.k20: return '83%';
-      case Karat.k22: return '92%';
+      case Karat.k18:
+        return '75%';
+      case Karat.k20:
+        return '83%';
+      case Karat.k22:
+        return '92%';
     }
   }
 
@@ -511,6 +516,9 @@ class _Level3Sheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Get controller locally instead of as a field
+    final controller = Get.find<CategoryController>();
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.52,
       decoration: BoxDecoration(
@@ -540,7 +548,9 @@ class _Level3Sheet extends StatelessWidget {
                     parent.name
                         .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                         .replaceAll(
-                            RegExp(r'collection', caseSensitive: false), '')
+                          RegExp(r'collection', caseSensitive: false),
+                          '',
+                        )
                         .trim(),
                     style: TextStyle(
                       fontSize: 18,
@@ -579,7 +589,8 @@ class _Level3Sheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: context.colorPalette.cardBg,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: context.colorPalette.border),
+                      border:
+                          Border.all(color: context.colorPalette.border),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.06),
@@ -593,16 +604,12 @@ class _Level3Sheet extends StatelessWidget {
                         Expanded(
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(13)),
-                            child: CachedNetworkImage(
-                              imageUrl: cat.imageUrl,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => Container(
-                                color: context.colorPalette.goldLight,
-                                child: Icon(Icons.diamond_outlined,
-                                    color: context.colorPalette.goldDark),
-                              ),
+                              top: Radius.circular(13),
+                            ),
+                            // ✅ Fixed: use 'cat' and local 'controller'
+                            child: _CategoryListingImage(
+                              cat: cat,
+                              controller: controller,
                             ),
                           ),
                         ),
@@ -612,8 +619,10 @@ class _Level3Sheet extends StatelessWidget {
                             cat.name
                                 .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                                 .replaceAll(
-                                    RegExp(r'collection', caseSensitive: false),
-                                    '')
+                                  RegExp(r'collection',
+                                      caseSensitive: false),
+                                  '',
+                                )
                                 .trim(),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
