@@ -8,6 +8,8 @@ class SearchBarWidget extends StatelessWidget {
   final ValueChanged<String>? onSubmitted;
   final VoidCallback? onBack;
   final VoidCallback? onClear;
+  final VoidCallback? onFilterTap;
+  final int filterActiveCount;
 
   const SearchBarWidget({
     super.key,
@@ -18,6 +20,8 @@ class SearchBarWidget extends StatelessWidget {
     this.onSubmitted,
     this.onBack,
     this.onClear,
+    this.onFilterTap,
+    this.filterActiveCount = 0,
   });
 
   static const _goldDark = Color(0xFF8B6914);
@@ -26,7 +30,7 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
       decoration: BoxDecoration(
         color: Colors.white,
       ),
@@ -117,6 +121,46 @@ class SearchBarWidget extends StatelessWidget {
               ),
             ),
           ),
+          if (onFilterTap != null) ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: onFilterTap,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      size: 22,
+                      color: filterActiveCount > 0
+                          ? _goldDark
+                          : _goldDark.withOpacity(0.6),
+                    ),
+                  ),
+                  if (filterActiveCount > 0)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: _goldDark,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '$filterActiveCount',
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
