@@ -249,10 +249,13 @@ class _SearchPageState extends State<SearchPage> {
                         SizedBox(
                           width: context.getScreenWidth(20),
                           child: Text(
-                            cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ''),
+                            cat.name
+                                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                                .trim(),
                             style: TextStyle(
                               fontSize: context.getScreenWidth(2.4),
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w700,
                               color: context.colorPalette.goldDeep,
                             ),
                             textAlign: TextAlign.center,
