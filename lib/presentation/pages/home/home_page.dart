@@ -14,6 +14,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:shimmer/shimmer.dart';
@@ -109,9 +110,7 @@ class _HomePageState extends State<HomePage> {
   void _navigateToKaratListing(String karat) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProductListingPage(karat: karat),
-      ),
+      MaterialPageRoute(builder: (_) => ProductListingPage(karat: karat)),
     );
   }
 
@@ -193,38 +192,44 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             children: [
                               const CollectionsDivider(
-                                  vertical: 4, label: 'Collections'),
+                                vertical: 4,
+                                label: 'Collections',
+                              ),
 
                               const SizedBox(height: 24),
 
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                  horizontal: 16,
+                                ),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () =>
-                                            _navigateToMultiKaratListing(
-                                          ['18K', '20K'],
-                                          '18K & 20K Collection',
-                                        ),
+                                            _navigateToMultiKaratListing([
+                                              '18K',
+                                              '20K',
+                                            ], '18K & 20K Collection'),
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.08),
+                                                color: Colors.black.withOpacity(
+                                                  0.08,
+                                                ),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             child: Image.asset(
                                               'assets/images/ratnesh-collection.jpg',
                                               fit: BoxFit.cover,
@@ -240,20 +245,23 @@ class _HomePageState extends State<HomePage> {
                                             _navigateToKaratListing('22K'),
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.08),
+                                                color: Colors.black.withOpacity(
+                                                  0.08,
+                                                ),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                             child: Image.asset(
                                               'assets/images/arham-collection.jpg',
                                               fit: BoxFit.cover,
@@ -271,28 +279,27 @@ class _HomePageState extends State<HomePage> {
                               const SizedBox(height: 12),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                  horizontal: 16,
+                                ),
                                 child: AspectRatio(
                                   aspectRatio: 16 / 9,
                                   child: GestureDetector(
-                                    onTap: () =>
-                                        _navigateToKaratListing('22K'),
+                                    onTap: () => _navigateToKaratListing('22K'),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black
-                                                .withOpacity(0.08),
+                                            color: Colors.black.withOpacity(
+                                              0.08,
+                                            ),
                                             blurRadius: 8,
                                             offset: const Offset(0, 3),
                                           ),
                                         ],
                                       ),
                                       child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         child: Image.asset(
                                           'assets/images/chain-collection-16:9.png',
                                           fit: BoxFit.cover,
@@ -319,14 +326,11 @@ class _HomePageState extends State<HomePage> {
 
                           return Column(
                             children: [
-                              SizedBox(
-                                  height: context.getScreenHeight(1)),
+                              SizedBox(height: context.getScreenHeight(1)),
                               _ProductSection(
                                 key: productSectionKey,
-                                category:
-                                    categoryController.selectedLevel3!,
-                                onClose:
-                                    categoryController.clearSelectedLevel3,
+                                category: categoryController.selectedLevel3!,
+                                onClose: categoryController.clearSelectedLevel3,
                               ),
                             ],
                           );
@@ -335,8 +339,7 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(height: context.getScreenHeight(1)),
 
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: _SectionTitle(
                             label: 'Latest Additions',
                             subtitle: 'Newest jewellery collections',
@@ -348,8 +351,7 @@ class _HomePageState extends State<HomePage> {
 
                         Obx(() {
                           final state = carouselController.productState;
-                          final products =
-                              carouselController.latestProducts;
+                          final products = carouselController.latestProducts;
                           final cardWidth = context.getScreenWidth(50);
                           final cardHeight = cardWidth * 4 / 3 + 96;
 
@@ -359,56 +361,53 @@ class _HomePageState extends State<HomePage> {
                               height: 260,
                               child: ListView.separated(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                  horizontal: 16,
+                                ),
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 5,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(width: 12),
                                 itemBuilder: (_, __) {
-                                  final cardWidth =
-                                      context.getScreenWidth(50);
+                                  final cardWidth = context.getScreenWidth(50);
                                   return Shimmer.fromColors(
-                                    baseColor: context
-                                        .colorPalette.shimmerBaseColor,
-                                    highlightColor: context.colorPalette
+                                    baseColor:
+                                        context.colorPalette.shimmerBaseColor,
+                                    highlightColor: context
+                                        .colorPalette
                                         .shimmerHighLightColor,
                                     child: Container(
                                       width: cardWidth,
                                       height: cardWidth * 0.8 + 110,
                                       decoration: BoxDecoration(
-                                        color:
-                                            context.colorPalette.cardBg,
-                                        borderRadius:
-                                            BorderRadius.circular(16),
+                                        color: context.colorPalette.cardBg,
+                                        borderRadius: BorderRadius.circular(16),
                                         border: Border.all(
-                                          color:
-                                              context.colorPalette.border,
+                                          color: context.colorPalette.border,
                                         ),
                                       ),
                                       child: Column(
                                         children: [
                                           Container(
                                             height: cardWidth * 0.8,
-                                            decoration:
-                                                const BoxDecoration(
+                                            decoration: const BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.vertical(
-                                                top: Radius.circular(15),
-                                              ),
+                                                    top: Radius.circular(15),
+                                                  ),
                                             ),
                                             child: Center(
                                               child: Icon(
                                                 Icons.diamond_outlined,
                                                 size: 36,
                                                 color: context
-                                                    .colorPalette.goldDark,
+                                                    .colorPalette
+                                                    .goldDark,
                                               ),
                                             ),
                                           ),
                                           Container(
                                             height: 110,
-                                            padding:
-                                                const EdgeInsets.all(10),
+                                            padding: const EdgeInsets.all(10),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -419,8 +418,9 @@ class _HomePageState extends State<HomePage> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius
-                                                            .circular(4),
+                                                        BorderRadius.circular(
+                                                          4,
+                                                        ),
                                                   ),
                                                 ),
                                                 const SizedBox(height: 8),
@@ -430,8 +430,9 @@ class _HomePageState extends State<HomePage> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius
-                                                            .circular(4),
+                                                        BorderRadius.circular(
+                                                          4,
+                                                        ),
                                                   ),
                                                 ),
                                               ],
@@ -450,7 +451,8 @@ class _HomePageState extends State<HomePage> {
                               products.isEmpty) {
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16),
+                                horizontal: 16,
+                              ),
                               child: _ErrorRow(
                                 onRetry: () {
                                   carouselController.loadLatestProducts();
@@ -466,8 +468,7 @@ class _HomePageState extends State<HomePage> {
                           return NotificationListener<ScrollNotification>(
                             onNotification: (scrollInfo) {
                               if (scrollInfo.metrics.pixels >=
-                                  scrollInfo.metrics.maxScrollExtent -
-                                      200) {
+                                  scrollInfo.metrics.maxScrollExtent - 200) {
                                 carouselController.loadLatestProducts(
                                   isPagination: true,
                                 );
@@ -478,10 +479,12 @@ class _HomePageState extends State<HomePage> {
                               height: cardHeight,
                               child: ListView.separated(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16),
+                                  horizontal: 16,
+                                ),
                                 scrollDirection: Axis.horizontal,
                                 physics: const BouncingScrollPhysics(),
-                                itemCount: products.length +
+                                itemCount:
+                                    products.length +
                                     (carouselController.productLoadingMore
                                         ? 1
                                         : 0),
@@ -493,8 +496,7 @@ class _HomePageState extends State<HomePage> {
                                       width: context.getScreenWidth(50),
                                       child: Center(
                                         child: CircularProgressIndicator(
-                                          color:
-                                              context.colorPalette.gold,
+                                          color: context.colorPalette.gold,
                                         ),
                                       ),
                                     );
@@ -512,8 +514,8 @@ class _HomePageState extends State<HomePage> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 ProductDetailsPage(
-                                              product: product,
-                                            ),
+                                                  product: product,
+                                                ),
                                           ),
                                         );
                                       },
@@ -1104,8 +1106,7 @@ class _ProductSection extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ProductDetailsPage(product: product),
+                        builder: (_) => ProductDetailsPage(product: product),
                       ),
                     );
                   },
@@ -1309,10 +1310,11 @@ class _TopBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Ratnesh Gold',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                    'RATNESHGOLD',
+                    style: GoogleFonts.bodoniModa(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
                       color: context.colorPalette.goldDeep,
                     ),
                   ),
@@ -1331,11 +1333,13 @@ class _TopBar extends StatelessWidget {
 
           const Spacer(),
 
-          Obx(() => _IconBtn(
-            icon: Icons.notifications_none_rounded,
-            onTap: () => Get.toNamed(AppRoutes.notifications),
-            badgeCount: Get.find<NotificationController>().unreadCount.value,
-          )),
+          Obx(
+            () => _IconBtn(
+              icon: Icons.notifications_none_rounded,
+              onTap: () => Get.toNamed(AppRoutes.notifications),
+              badgeCount: Get.find<NotificationController>().unreadCount.value,
+            ),
+          ),
 
           const SizedBox(width: 8),
 
@@ -1354,7 +1358,11 @@ class _IconBtn extends StatelessWidget {
   final VoidCallback onTap;
   final int badgeCount;
 
-  const _IconBtn({required this.icon, required this.onTap, this.badgeCount = 0});
+  const _IconBtn({
+    required this.icon,
+    required this.onTap,
+    this.badgeCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1379,10 +1387,7 @@ class _IconBtn extends StatelessWidget {
               top: -4,
               child: Container(
                 padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(
-                  minWidth: 18,
-                  minHeight: 18,
-                ),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
@@ -1616,10 +1621,7 @@ class _SectionTitle extends StatelessWidget {
             if (badge != null) ...[
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: context.colorPalette.gold,
                   borderRadius: BorderRadius.circular(4),
@@ -1642,10 +1644,7 @@ class _SectionTitle extends StatelessWidget {
 
         Text(
           subtitle,
-          style: TextStyle(
-            fontSize: 12,
-            color: context.colorPalette.goldDark,
-          ),
+          style: TextStyle(fontSize: 12, color: context.colorPalette.goldDark),
         ),
       ],
     );
@@ -1927,7 +1926,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 style: TextStyle(
                                   color: context.colorPalette.goldDeep,
                                   fontSize: context.getScreenWidth(3),
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
                               SizedBox(width: context.getScreenWidth(1.5)),
