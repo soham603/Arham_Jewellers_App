@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                           final products =
                               carouselController.latestProducts;
                           final cardWidth = context.getScreenWidth(50);
-                          final cardHeight = cardWidth * 1.5 + 100;
+                          final cardHeight = cardWidth * 4 / 3 + 96;
 
                           if (state == CurrentAppState.LOADING &&
                               products.isEmpty) {
@@ -1057,7 +1057,7 @@ class _ProductSection extends StatelessWidget {
                 crossAxisCount: 2,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.70,
+                childAspectRatio: 0.488,
               ),
               itemBuilder: (_, index) {
                 final product = products[index];
