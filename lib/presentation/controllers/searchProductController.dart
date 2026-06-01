@@ -418,14 +418,14 @@ class SearchProductController extends GetxController {
 
   Future<void> _saveRecentSearch(String query) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final existing = prefs.getStringList(_recentSearchesKey) ?? [];
       final updated = [
         query,
-        ..._recentSearches.where((s) => s.toLowerCase() != query.toLowerCase()),
+        ...existing.where((s) => s.toLowerCase() != query.toLowerCase()),
       ].take(_maxRecentSearches).toList();
 
       _recentSearches.value = updated;
-
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_recentSearchesKey, updated);
     } catch (e) {
       Logger.error("SearchProductController", "_saveRecentSearch error: $e");
