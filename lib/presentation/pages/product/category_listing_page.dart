@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
@@ -89,6 +91,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
   bool get _isMultiKarat => widget.karats.length > 1;
 
+  bool get _is22kOnly => !_isMultiKarat && widget.karats.first == Karat.k22;
+
   Future<void> _showLevel3Sheet(CategoryModel parent, Karat karat) async {
     final children = await controller.fetchLevel3Categories(parentId: parent.id);
 
@@ -135,112 +139,175 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final title = widget.title ??
+        '${widget.karats.map((k) => k.displayName).join(' & ')} Collection';
+
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
-      appBar: AppBar(
-        title: Text(
-          widget.title ??
-              widget.karats.map((k) => k.displayName).join(' & ') +
-                  ' Collection',
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: context.colorPalette.goldDeep,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: context.colorPalette.cream,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded,
-              color: context.colorPalette.goldDeep),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Obx(() {
-        if (_isLoading.value &&
-            widget.karats.every(
-                (k) => _listForKarat(k).isEmpty)) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (_hasError.value &&
-            widget.karats
-                .every((k) => _listForKarat(k).isEmpty)) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline,
-                    color: context.colorPalette.goldDark, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  'Failed to load categories',
-                  style: TextStyle(
-                      color: context.colorPalette.goldDark, fontSize: 16),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _loadAll,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colorPalette.gold,
-                    foregroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Align(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Image.asset(
+                        _is22kOnly
+                            ? 'assets/images/arham-logo.png'
+                            : 'assets/images/ratnesh-logo.png',
+                        height: _is22kOnly ? 110 : 80,
+                        fit: BoxFit.contain,
+                        color: context.colorPalette.goldDeep,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                    ),
                   ),
-                  child: const Text('Retry'),
+                  Positioned(
+                    left: 4,
+                    top: 8,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios_rounded,
+                          color: context.colorPalette.goldDeep),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+              if (!_is22kOnly)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'RATNESHGOLD',
+                    style: GoogleFonts.bodoniModa(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: context.colorPalette.goldDeep,
+                    ),
+                  ),
                 ),
-              ],
-            ),
-          );
-        }
-
-        if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.diamond_outlined,
-                    color: context.colorPalette.goldDark, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  'No categories found',
+              SizedBox(height: _is22kOnly ? 0 : 20),
+              JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                child: Text(
+                  title,
                   style: TextStyle(
-                      color: context.colorPalette.goldDark, fontSize: 16),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: context.colorPalette.goldDeep,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ],
-            ),
-          );
-        }
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Explore our exquisite collection of handcrafted jewellery',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: context.colorPalette.goldDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Obx(() {
+              if (_isLoading.value &&
+                  widget.karats.every(
+                      (k) => _listForKarat(k).isEmpty)) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        if (_isMultiKarat) {
-          return _buildMultiKaratView();
-        }
+              if (_hasError.value &&
+                  widget.karats
+                      .every((k) => _listForKarat(k).isEmpty)) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline,
+                          color: context.colorPalette.goldDark, size: 48),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Failed to load categories',
+                        style: TextStyle(
+                            color: context.colorPalette.goldDark, fontSize: 16),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _loadAll,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: context.colorPalette.gold,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
 
-        final categories = _listForKarat(widget.karats.first);
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: GridView.builder(
-            itemCount: categories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.85,
-            ),
-            itemBuilder: (_, index) {
-              final cat = categories[index];
-              return _CategoryCard(
-                category: cat,
-                onTap: () =>
-                    _showLevel3Sheet(cat, widget.karats.first),
+              if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.diamond_outlined,
+                          color: context.colorPalette.goldDark, size: 48),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No categories found',
+                        style: TextStyle(
+                            color: context.colorPalette.goldDark, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              if (_isMultiKarat) {
+                return _buildMultiKaratView();
+              }
+
+              final categories = _listForKarat(widget.karats.first);
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: categories.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemBuilder: (_, index) {
+                    final cat = categories[index];
+                    return _CategoryCard(
+                      category: cat,
+                      onTap: () =>
+                          _showLevel3Sheet(cat, widget.karats.first),
+                    );
+                  },
+                ),
               );
-            },
-          ),
-        );
-      }),
-    );
+            }),
+        ],
+      ),
+    ),
+  ),
+);
   }
 
   Widget _buildMultiKaratView() {
     return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         for (final karat in widget.karats) ...[
