@@ -226,7 +226,7 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                             child: Image.asset(
-                                              'assets/images/arham-collection.png',
+                                              'assets/images/ratnesh-collection.jpg',
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -255,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                             child: Image.asset(
-                                              'assets/images/ratnesh-collection.png',
+                                              'assets/images/arham-collection.jpg',
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -263,6 +263,43 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ),
                                   ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+                              const CategoryDivider(vertical: 8),
+                              const SizedBox(height: 12),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16),
+                                child: AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        _navigateToKaratListing('22K'),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withOpacity(0.08),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(12),
+                                        child: Image.asset(
+                                          'assets/images/chain-collection-16:9.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
 
