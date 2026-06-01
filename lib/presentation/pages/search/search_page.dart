@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
+import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
@@ -43,6 +43,10 @@ class _SearchPageState extends State<SearchPage> {
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _textController.text = widget.initialQuery!;
       controller.onSearchSubmitted(widget.initialQuery!);
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _focusNode.requestFocus();
+      });
     }
   }
 
@@ -51,6 +55,8 @@ class _SearchPageState extends State<SearchPage> {
         _scrollController.position.maxScrollExtent - 200) {
       if (controller.isSearching) {
         controller.loadMoreSearchResults();
+      } else if (controller.hasActiveFilters) {
+        controller.loadFilteredProducts(isPagination: true);
       } else {
         controller.loadInitialProducts(isPagination: true);
       }
@@ -80,7 +86,7 @@ class _SearchPageState extends State<SearchPage> {
             SearchBarWidget(
               controller: _textController,
               focusNode: _focusNode,
-              autofocus: widget.initialQuery == null,
+              autofocus: false,
               onBack: () => Get.back(),
               onChanged: (v) {
                 setState(() {});
@@ -95,7 +101,13 @@ class _SearchPageState extends State<SearchPage> {
                 controller.clearSearch();
                 setState(() {});
               },
+              onFilterTap: () {
+                _focusNode.unfocus();
+                FilterBottomSheet.show(context).then((_) => setState(() {}));
+              },
+              filterActiveCount: controller.activeFilterCount,
             ),
+            _buildFilterBar(context),
             Expanded(
               child: Obx(() {
                 final isSearching = controller.isSearching;
@@ -104,11 +116,15 @@ class _SearchPageState extends State<SearchPage> {
                   controller: _scrollController,
                   slivers: [
                     // ── Browse Categories ────────────────────────────────
-                    if (!isSearching || controller.searchResults.isEmpty)
+                    if (!isSearching &&
+                        !controller.hasActiveFilters &&
+                        controller.searchResults.isEmpty)
                       _browseCategoriesSliver(context),
 
                     // ── Recent Searches ──────────────────────────────────
-                    if (!isSearching && controller.recentSearches.isNotEmpty)
+                    if (!isSearching &&
+                        !controller.hasActiveFilters &&
+                        controller.recentSearches.isNotEmpty)
                       _recentSearchesSliver(context),
 
                     // ── Section Header ───────────────────────────────────
@@ -121,7 +137,11 @@ class _SearchPageState extends State<SearchPage> {
                           context.getScreenHeight(0.8),
                         ),
                         child: Text(
-                          isSearching ? 'Results' : 'Suggested for You',
+                          isSearching
+                              ? 'Results'
+                              : controller.hasActiveFilters
+                                  ? 'Filtered Results'
+                                  : 'Suggested for You',
                           style: TextStyle(
                             fontSize: context.getScreenWidth(4.2),
                             fontWeight: FontWeight.w700,
@@ -134,6 +154,8 @@ class _SearchPageState extends State<SearchPage> {
                     // ── Content ──────────────────────────────────────────
                     if (isSearching)
                       _searchResultsSliver(context)
+                    else if (controller.hasActiveFilters)
+                      _filteredInitialProductsSliver(context)
                     else
                       _initialProductsSliver(context),
 
@@ -151,6 +173,131 @@ class _SearchPageState extends State<SearchPage> {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  Widget _buildFilterBar(BuildContext context) {
+    return Obx(() {
+      if (!controller.hasActiveFilters) return const SizedBox.shrink();
+
+      final karats = controller.selectedKarats;
+      final categoryName = controller.selectedCategoryName;
+
+      return Container(
+        padding: EdgeInsets.fromLTRB(
+          context.getScreenWidth(4),
+          0,
+          context.getScreenWidth(4),
+          context.getScreenHeight(0.5),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final karat in karats)
+                          _activeFilterChip(
+                            context,
+                            label: karat,
+                            onRemove: () {
+                              controller.toggleKaratFilter(karat);
+                              controller.loadFilteredProducts();
+                              setState(() {});
+                            },
+                          ),
+                        if (categoryName.isNotEmpty)
+                          _activeFilterChip(
+                            context,
+                            label: categoryName,
+                            onRemove: () {
+                              controller.setCategoryFilter(null, '');
+                              controller.loadFilteredProducts();
+                              setState(() {});
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    controller.clearAllFilters();
+                    controller.loadInitialProducts();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.cardBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.colorPalette.border),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.close,
+                          size: context.getScreenWidth(3),
+                          color: context.colorPalette.goldDark,
+                        ),
+                        SizedBox(width: context.getScreenWidth(0.8)),
+                        Text(
+                          'Clear',
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(2.8),
+                            fontWeight: FontWeight.w500,
+                            color: context.colorPalette.goldDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _activeFilterChip(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onRemove,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: context.colorPalette.gold,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 4),
+          GestureDetector(
+            onTap: onRemove,
+            child: const Icon(Icons.close, size: 12, color: Colors.white),
+          ),
+        ],
       ),
     );
   }
@@ -419,6 +566,33 @@ class _SearchPageState extends State<SearchPage> {
     return _productGrid(context, list);
   }
 
+  // ── Filtered Initial Products Sliver ───────────────────────────────────────
+  Widget _filteredInitialProductsSliver(BuildContext context) {
+    final state = controller.filteredInitialState;
+    final list = controller.filteredInitialProducts;
+
+    if (state == CurrentAppState.LOADING && list.isEmpty) {
+      return SliverToBoxAdapter(child: _gridShimmer(context));
+    }
+
+    if (state == CurrentAppState.ERROR && list.isEmpty) {
+      return SliverToBoxAdapter(
+        child: _errorWidget(context, onRetry: controller.loadFilteredProducts),
+      );
+    }
+
+    if (state == CurrentAppState.SUCCESS && list.isEmpty) {
+      return SliverToBoxAdapter(
+        child: _emptyWidget(
+          context,
+          'No products match your filters',
+        ),
+      );
+    }
+
+    return _productGrid(context, list);
+  }
+
   // ── Search Results Sliver ─────────────────────────────────────────────────
   Widget _searchResultsSliver(BuildContext context) {
     final state = controller.searchState;
@@ -452,15 +626,22 @@ class _SearchPageState extends State<SearchPage> {
   // ── Load More Sliver ──────────────────────────────────────────────────────
   SliverToBoxAdapter _loadMoreSliver(BuildContext context) {
     final isSearching = controller.isSearching;
+    final hasFilters = controller.hasActiveFilters;
     final state = isSearching
         ? controller.searchState
-        : controller.initialState;
+        : hasFilters
+            ? controller.filteredInitialState
+            : controller.initialState;
     final hasMore = isSearching
         ? controller.searchHasMore
-        : controller.initialHasMore;
+        : hasFilters
+            ? controller.filteredInitialHasMore
+            : controller.initialHasMore;
     final list = isSearching
         ? controller.searchResults
-        : controller.initialProducts;
+        : hasFilters
+            ? controller.filteredInitialProducts
+            : controller.initialProducts;
 
     if (list.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
 

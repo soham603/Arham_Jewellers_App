@@ -7,7 +7,10 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchProductController extends GetxController {
-  static SearchProductController get instance => Get.find();
+  static SearchProductController get instance =>
+      Get.isRegistered<SearchProductController>()
+          ? Get.find<SearchProductController>()
+          : Get.put(SearchProductController());
 
   static const String _recentSearchesKey = 'recent_searches';
   static const int _maxRecentSearches = 5;
@@ -42,6 +45,33 @@ class SearchProductController extends GetxController {
   // ── Recent searches ──────────────────────────────────────────────────────
   final _recentSearches = <String>[].obs;
   List<String> get recentSearches => _recentSearches;
+
+  // ── Filter state ─────────────────────────────────────────────────────────
+  final _selectedKarats = <String>[].obs;
+  List<String> get selectedKarats => _selectedKarats;
+
+  final _selectedCategoryId = Rxn<String>();
+  String? get selectedCategoryId => _selectedCategoryId.value;
+
+  final _selectedCategoryName = ''.obs;
+  String get selectedCategoryName => _selectedCategoryName.value;
+
+  bool get hasActiveFilters =>
+      _selectedKarats.isNotEmpty || _selectedCategoryId.value != null;
+
+  int get activeFilterCount =>
+      _selectedKarats.length + (_selectedCategoryId.value != null ? 1 : 0);
+
+  // ── Filtered initial products (when filters active, no text search) ──────
+  final _filteredInitialProducts = <ProductModel>[].obs;
+  List<ProductModel> get filteredInitialProducts => _filteredInitialProducts;
+
+  final _filteredInitialState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get filteredInitialState => _filteredInitialState.value;
+
+  int _filteredInitialPage = 1;
+  bool _filteredInitialHasMore = true;
+  bool get filteredInitialHasMore => _filteredInitialHasMore;
 
   // ── Debounce ─────────────────────────────────────────────────────────────
   Timer? _debounce;
@@ -106,11 +136,75 @@ class SearchProductController extends GetxController {
     }
   }
 
+  Future<void> loadFilteredProducts({bool isPagination = false}) async {
+    if (!_filteredInitialHasMore && isPagination) return;
+    if (_filteredInitialState.value == CurrentAppState.LOADING) return;
+
+    if (!isPagination) {
+      _filteredInitialState.value = CurrentAppState.LOADING;
+      _filteredInitialPage = 1;
+      _filteredInitialHasMore = true;
+      _filteredInitialProducts.clear();
+    }
+
+    try {
+      final queryParams = <String, dynamic>{
+        "page": _filteredInitialPage,
+        "limit": _pageLimit,
+      };
+      if (_selectedCategoryId.value != null && _selectedCategoryName.isNotEmpty) {
+        final cleaned = _selectedCategoryName.value
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim();
+        if (_selectedKarats.isNotEmpty) {
+          queryParams["search"] =
+              "${_karatToSearchValue(_selectedKarats.first)} $cleaned";
+        } else if (cleaned.isNotEmpty) {
+          queryParams["search"] = cleaned;
+        }
+      } else if (_selectedKarats.isNotEmpty) {
+        queryParams["search"] = _karatToSearchValue(_selectedKarats.first);
+      }
+
+      final response = await httpClient.get(
+        "/api/v1/products/search",
+        queryParameters: queryParams,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final List raw = data['data'] is List ? data['data'] : [];
+        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+
+        if (isPagination) {
+          _filteredInitialProducts.addAll(fetched);
+        } else {
+          _filteredInitialProducts.value = fetched;
+        }
+
+        if (fetched.length < _pageLimit) {
+          _filteredInitialHasMore = false;
+        } else {
+          _filteredInitialPage++;
+        }
+
+        _filteredInitialState.value = CurrentAppState.SUCCESS;
+      } else {
+        _filteredInitialState.value = CurrentAppState.ERROR;
+      }
+    } catch (e, st) {
+      _filteredInitialState.value = CurrentAppState.ERROR;
+      Logger.error("SearchProductController", "loadFilteredProducts error: $e\n$st");
+    }
+  }
+
   void onSearchChanged(String query) {
     _searchQuery.value = query;
 
     if (query.trim().isEmpty) {
       clearSearch();
+      if (hasActiveFilters) loadFilteredProducts();
       return;
     }
 
@@ -150,6 +244,8 @@ class SearchProductController extends GetxController {
           "search": query,
           "page": _searchPage,
           "limit": _pageLimit,
+          if (_selectedKarats.isNotEmpty) "karat": _karatToSearchValue(_selectedKarats.first),
+          if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
         },
       );
 
@@ -394,6 +490,29 @@ class SearchProductController extends GetxController {
     _filteredHasMore = true;
     _currentFilterCategoryId = null;
     _currentFilterKarat = null;
+  }
+
+  void toggleKaratFilter(String karat) {
+    if (_selectedKarats.contains(karat)) {
+      _selectedKarats.remove(karat);
+    } else {
+      _selectedKarats.add(karat);
+    }
+  }
+
+  void setCategoryFilter(String? categoryId, String categoryName) {
+    _selectedCategoryId.value = categoryId;
+    _selectedCategoryName.value = categoryName;
+  }
+
+  void clearAllFilters() {
+    _selectedKarats.clear();
+    _selectedCategoryId.value = null;
+    _selectedCategoryName.value = '';
+    _filteredInitialProducts.clear();
+    _filteredInitialState.value = CurrentAppState.INITIAL;
+    _filteredInitialPage = 1;
+    _filteredInitialHasMore = true;
   }
 
   void clearSearch() {
