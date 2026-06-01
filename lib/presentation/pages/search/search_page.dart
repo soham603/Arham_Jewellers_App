@@ -206,11 +206,15 @@ class _SearchPageState extends State<SearchPage> {
                 separatorBuilder: (_, __) => const SizedBox(width: 4),
                 itemBuilder: (_, index) {
                   final cat = unique[index];
+                  final cleanedName = cat.name
+                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                      .trim();
                   return GestureDetector(
                     onTap: () {
-                      _textController.text = cat.name;
+                      _textController.text = cleanedName;
                       setState(() {});
-                      controller.onSearchSubmitted(cat.name);
+                      controller.onSearchSubmitted(cleanedName);
                       _focusNode.unfocus();
                     },
                     child: Column(
@@ -255,10 +259,7 @@ class _SearchPageState extends State<SearchPage> {
                         SizedBox(
                           width: context.getScreenWidth(20),
                           child: Text(
-                            cat.name
-                                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                                .trim(),
+                            cleanedName,
                             style: TextStyle(
                               fontSize: context.getScreenWidth(2.4),
                               fontWeight: FontWeight.w700,

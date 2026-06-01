@@ -1691,7 +1691,11 @@ class _CategoryQuickAccess extends StatelessWidget {
             final cat = unique[index];
             return GestureDetector(
               onTap: () {
-                controller.toggleExpand(cat);
+                final query = cat.name
+                    .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                    .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                    .trim();
+                Get.to(() => SearchPage(initialQuery: query));
               },
               child: Column(
                 children: [
