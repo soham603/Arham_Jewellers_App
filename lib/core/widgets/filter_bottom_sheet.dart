@@ -30,7 +30,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           : Get.put(CategoryController());
 
   final List<String> _karatOptions = ['18K', '20K', '22K'];
-  String? _tempSelectedKarat;
+  final List<String> _tempSelectedKarats = [];
   String? _tempSelectedCategoryId;
   String _tempSelectedCategoryName = '';
   List<CategoryModel> _allCategories = [];
@@ -38,9 +38,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   @override
   void initState() {
     super.initState();
-    _tempSelectedKarat = _searchController.selectedKarats.isNotEmpty
-        ? _searchController.selectedKarats.first
-        : null;
+    _tempSelectedKarats.addAll(_searchController.selectedKarats);
     _tempSelectedCategoryId = _searchController.selectedCategoryId;
     _tempSelectedCategoryName = _searchController.selectedCategoryName;
     _loadCategories();
@@ -70,14 +68,17 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _toggleKarat(String karat) {
     setState(() {
-      _tempSelectedKarat =
-          _tempSelectedKarat == karat ? null : karat;
+      if (_tempSelectedKarats.contains(karat)) {
+        _tempSelectedKarats.remove(karat);
+      } else {
+        _tempSelectedKarats.add(karat);
+      }
     });
   }
 
   void _clearAll() {
     setState(() {
-      _tempSelectedKarat = null;
+      _tempSelectedKarats.clear();
       _tempSelectedCategoryId = null;
       _tempSelectedCategoryName = '';
     });
@@ -85,8 +86,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _apply() {
     _searchController.clearAllFilters();
-    if (_tempSelectedKarat != null) {
-      _searchController.toggleKaratFilter(_tempSelectedKarat!);
+    for (final karat in _tempSelectedKarats) {
+      _searchController.toggleKaratFilter(karat);
     }
     _searchController.setCategoryFilter(
       _tempSelectedCategoryId,
@@ -98,7 +99,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedCount = (_tempSelectedKarat != null ? 1 : 0) +
+    final selectedCount = _tempSelectedKarats.length +
         (_tempSelectedCategoryId != null ? 1 : 0);
 
     return Container(
@@ -201,7 +202,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         SizedBox(height: context.getScreenHeight(1)),
         Row(
           children: _karatOptions.map((karat) {
-            final isSelected = _tempSelectedKarat == karat;
+            final isSelected = _tempSelectedKarats.contains(karat);
             return Padding(
               padding: const EdgeInsets.only(right: 10),
               child: GestureDetector(
