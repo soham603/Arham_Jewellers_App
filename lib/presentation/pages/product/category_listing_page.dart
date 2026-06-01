@@ -133,15 +133,90 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
               ),
             ),
           );
-        },
-      ),
+        }
+      }),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final title = widget.title ??
+        '${widget.karats.map((k) => k.displayName).join(' & ')} Collection';
+
     return Scaffold(
-      body: Obx(() {
+      backgroundColor: context.colorPalette.cream,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Align(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Image.asset(
+                        _is22kOnly
+                            ? 'assets/images/arham-logo.png'
+                            : 'assets/images/ratnesh-logo.png',
+                        height: _is22kOnly ? 110 : 80,
+                        fit: BoxFit.contain,
+                        color: context.colorPalette.goldDeep,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 4,
+                    top: 8,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios_rounded,
+                          color: context.colorPalette.goldDeep),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+              if (!_is22kOnly)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'RATNESHGOLD',
+                    style: GoogleFonts.bodoniModa(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: context.colorPalette.goldDeep,
+                    ),
+                  ),
+                ),
+              SizedBox(height: _is22kOnly ? 0 : 20),
+              JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: context.colorPalette.goldDeep,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Explore our exquisite collection of handcrafted jewellery',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: context.colorPalette.goldDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Obx(() {
         if (_isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
