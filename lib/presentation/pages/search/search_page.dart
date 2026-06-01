@@ -67,8 +67,13 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.colorPalette.backgroundColor,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        Get.offAllNamed("/home");
+      },
+      child: Scaffold(
+        backgroundColor: context.colorPalette.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -145,6 +150,7 @@ class _SearchPageState extends State<SearchPage> {
             const AppBottomNav(currentIndex: 1),
           ],
         ),
+      ),
       ),
     );
   }
