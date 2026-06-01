@@ -488,12 +488,12 @@ class _SearchPageState extends State<SearchPage> {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: context.getScreenWidth(2),
-          crossAxisSpacing: context.getScreenWidth(2),
-          childAspectRatio: 0.66,
-        ),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: context.getScreenWidth(2),
+        crossAxisSpacing: context.getScreenWidth(2),
+        childAspectRatio: 0.488,
+      ),
         itemBuilder: (context, _) => _shimmerCard(context),
       ),
     );

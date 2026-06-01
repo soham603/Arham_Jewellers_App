@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
@@ -123,12 +125,9 @@ class _ProductCardState extends State<ProductCard>
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: width * 1.5,
-                              ),
-                              child: SizedBox(
-                                width: double.infinity,
+                            Expanded(
+                              child: AspectRatio(
+                                aspectRatio: 3 / 4,
                                 child: _ProductImage(
                                 imageUrl: imageUrl,
                                 productName: displayName,
@@ -138,42 +137,59 @@ class _ProductCardState extends State<ProductCard>
                               ),
                             ),
                           ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: hPad,
-                                vertical: vPad,
-                              ),
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (categoryName != null)
-                                    _CategoryChip(
-                                      label: categoryName,
-                                      maxWidth: width * 0.7,
+                            if (categoryName != null)
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: vPad),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFFFF6DD),
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(100),
+                                      bottomRight: Radius.circular(100),
+                                    ),
+                                  ),
+                                  padding: EdgeInsets.only(
+                                    left: hPad,
+                                    right: vPad,
+                                    top: 1,
+                                    bottom: 1,
+                                  ),
+                                  constraints: BoxConstraints(
+                                      maxWidth: width * 0.7),
+                                  child: Text(
+                                    categoryName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
                                       fontSize: bodySize,
-                                      hPad: gap3,
-                                      vPad: 1,
+                                      color: AppColors.primaryGold,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  if (showWeight) ...[
-                                    SizedBox(height: gap3),
-                                    _WeightInfo(
-                                      fineWeight: fineWeight,
-                                      touchData: touchData,
-                                      fontSize: metaSize,
-                                    ),
-                                  ],
-
-                                ],
+                                  ),
+                                ),
                               ),
-                            ),
+                            if (showWeight)
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  hPad,
+                                  categoryName != null ? gap3 : vPad,
+                                  hPad,
+                                  vPad,
+                                ),
+                                child: _WeightInfo(
+                                  fineWeight: fineWeight,
+                                  touchData: touchData,
+                                  fontSize: metaSize,
+                                ),
+                              ),
                             if (!widget.compact)
-                              const Spacer(),
+                              SizedBox(height: gap3),
                             if (!widget.compact)
                               Padding(
                                 padding: EdgeInsets.fromLTRB(
-                                    hPad, 0, hPad, vPad),
+                                    hPad, 0, hPad, hPad),
                                 child: _ViewButton(
                                   onPressed: primaryAction,
                                   height: buttonHeight,
@@ -260,46 +276,68 @@ class _ProductImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        ColoredBox(
-          color: const Color(0xFFF8F5F0),
-          child: AnimatedScale(
-            scale: isHovered ? 1.05 : 1.0,
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOut,
-            child: imageUrl != null
-                ? Semantics(
-                    image: true,
-                    label: '$productName image',
-                      child: CachedNetworkImage(
-                      imageUrl: imageUrl!,
-                      fit: BoxFit.contain,
-                      width: double.infinity,
-                      fadeInDuration: const Duration(milliseconds: 200),
-                      placeholder: (context, url) => Shimmer.fromColors(
-                        baseColor: const Color(0xFFE8E3DB),
-                        highlightColor: const Color(0xFFF7F3ED),
-                        child: const DecoratedBox(
-                          decoration: BoxDecoration(color: Colors.white),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: Colors.grey.shade400,
-                          size: iconSize,
-                        ),
-                      ),
+        if (imageUrl != null)
+          ClipRect(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+              child: ColoredBox(
+                color: const Color(0xFFF8F5F0),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  placeholder: (context, url) => const DecoratedBox(
+                    decoration: BoxDecoration(color: Color(0xFFF8F5F0)),
+                  ),
+                  errorWidget: (context, url, error) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+        if (imageUrl != null)
+          Positioned.fill(
+            child: AnimatedScale(
+              scale: isHovered ? 1.05 : 1.0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              child: Semantics(
+                image: true,
+                label: '$productName image',
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl!,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  fadeInDuration: const Duration(milliseconds: 200),
+                  placeholder: (context, url) => Shimmer.fromColors(
+                    baseColor: const Color(0xFFE8E3DB),
+                    highlightColor: const Color(0xFFF7F3ED),
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(color: Colors.white),
                     ),
-                  )
-                : Center(
+                  ),
+                  errorWidget: (context, url, error) => Center(
                     child: Icon(
-                      Icons.image_outlined,
-                      color: const Color(0xFF887A67),
+                      Icons.image_not_supported_outlined,
+                      color: Colors.grey.shade400,
                       size: iconSize,
                     ),
                   ),
+                ),
+              ),
+            ),
+          )
+        else
+          ColoredBox(
+            color: const Color(0xFFF8F5F0),
+            child: Center(
+              child: Icon(
+                Icons.image_outlined,
+                color: const Color(0xFF887A67),
+                size: iconSize,
+              ),
+            ),
           ),
-        ),
         if (isNew)
           Positioned(
             top: 6,

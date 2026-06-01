@@ -129,7 +129,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             crossAxisCount: 2,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 0.65,
+            childAspectRatio: 0.488,
           ),
           itemBuilder: (_, index) {
             if (index >= products.length) {
