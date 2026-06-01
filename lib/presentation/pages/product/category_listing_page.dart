@@ -133,8 +133,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
               ),
             ),
           );
-        }
-      }),
+        },
+      ),
     );
   }
 
@@ -217,88 +217,95 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
               ),
               const SizedBox(height: 12),
               Obx(() {
-        if (_isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+                if (_isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-        if (_hasError.value &&
-            widget.karats.every((k) => _listForKarat(k).isEmpty)) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline,
-                    color: context.colorPalette.goldDark, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  'Failed to load categories',
-                  style: TextStyle(
-                    color: context.colorPalette.goldDark,
-                    fontSize: 16,
+                if (_hasError.value &&
+                    widget.karats.every((k) => _listForKarat(k).isEmpty)) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error_outline,
+                            color: context.colorPalette.goldDark, size: 48),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Failed to load categories',
+                          style: TextStyle(
+                            color: context.colorPalette.goldDark,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadAll,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: context.colorPalette.gold,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.diamond_outlined,
+                            color: context.colorPalette.goldDark, size: 48),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No categories found',
+                          style: TextStyle(
+                            color: context.colorPalette.goldDark,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (_isMultiKarat) {
+                  return _buildMultiKaratView();
+                }
+
+                final categories = _listForKarat(widget.karats.first);
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: categories.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemBuilder: (_, index) {
+                      final cat = categories[index];
+                      return _CategoryCard(
+                        category: cat,
+                        karat: widget.karats.first,
+                        controller: controller,
+                        onTap: () =>
+                            _showLevel3Sheet(cat, widget.karats.first),
+                      );
+                    },
                   ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _loadAll,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colorPalette.gold,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.diamond_outlined,
-                    color: context.colorPalette.goldDark, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  'No categories found',
-                  style: TextStyle(
-                    color: context.colorPalette.goldDark,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (_isMultiKarat) {
-          return _buildMultiKaratView();
-        }
-
-        final categories = _listForKarat(widget.karats.first);
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: categories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.85,
-            ),
-            itemBuilder: (_, index) {
-              final cat = categories[index];
-              return _CategoryCard(
-                category: cat,
-                karat: widget.karats.first,
-                onTap: () => _showLevel3Sheet(cat, widget.karats.first),
-              );
-            },
+                );
+              }),
+            ],
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 
@@ -334,6 +341,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   }
 }
 
+// ── _CategoryListingImage ─────────────────────────────────────────────────────
+// Wraps build in Obx so it rebuilds reactively when fallbackImages updates.
 class _CategoryListingImage extends StatelessWidget {
   final CategoryModel cat;
   final CategoryController controller;
@@ -345,19 +354,24 @@ class _CategoryListingImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (cat.imageUrl.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: cat.imageUrl,
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _onImageError(context),
-      );
-    }
+    // Obx makes this widget reactive: it rebuilds whenever fallbackImages,
+    // fallbackAttempted, or fallbackLoading observables change.
+    return Obx(() {
+      if (cat.imageUrl.isNotEmpty) {
+        return CachedNetworkImage(
+          imageUrl: cat.imageUrl,
+          width: double.infinity,
+          height: double.infinity,
+          fit: BoxFit.cover,
+          errorWidget: (_, __, ___) => _onImageError(context),
+        );
+      }
 
-    return _fallbackOrPlaceholder(context);
+      return _fallbackOrPlaceholder(context);
+    });
   }
 
+  // Called when the primary imageUrl fails to load.
   Widget _onImageError(BuildContext context) {
     final fallback = controller.fallbackImages[cat.id];
     if (fallback != null && fallback.isNotEmpty) {
@@ -369,9 +383,11 @@ class _CategoryListingImage extends StatelessWidget {
         errorWidget: (_, __, ___) => _diamondPlaceholder(context),
       );
     }
+    // No fallback cached yet — trigger fetch and show nothing while waiting.
     return _diamondPlaceholder(context);
   }
 
+  // Called when cat.imageUrl is empty from the start.
   Widget _fallbackOrPlaceholder(BuildContext context) {
     final fallback = controller.fallbackImages[cat.id];
     if (fallback != null && fallback.isNotEmpty) {
@@ -387,29 +403,35 @@ class _CategoryListingImage extends StatelessWidget {
   }
 
   Widget _diamondPlaceholder(BuildContext context) {
+    // Not yet attempted — kick off the fetch and show nothing while in-flight.
     if (!controller.isFallbackAttempted(cat.id) &&
         !controller.isFallbackLoading(cat.id)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.fetchFallbackImage(cat.id, categoryName: cat.name);
       });
-      return const SizedBox();
+      return const SizedBox.expand();
     }
 
+    // Fetch is in progress — keep showing nothing.
     if (controller.isFallbackLoading(cat.id)) {
-      return const SizedBox();
+      return const SizedBox.expand();
     }
 
+    // Fetch completed with no result — show the diamond icon as a last resort.
     return Container(
       color: context.colorPalette.goldLight,
-      child: Icon(
-        Icons.diamond_outlined,
-        size: 24,
-        color: context.colorPalette.goldDark,
+      child: Center(
+        child: Icon(
+          Icons.diamond_outlined,
+          size: 24,
+          color: context.colorPalette.goldDark,
+        ),
       ),
     );
   }
 }
 
+// ── _KaratSectionHeader ───────────────────────────────────────────────────────
 class _KaratSectionHeader extends StatelessWidget {
   final Karat karat;
   final bool isExpanded;
@@ -541,6 +563,7 @@ class _KaratSectionHeader extends StatelessWidget {
   }
 }
 
+// ── _CategoryGrid ─────────────────────────────────────────────────────────────
 class _CategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
   final Karat karat;
@@ -554,6 +577,8 @@ class _CategoryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<CategoryController>();
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -569,6 +594,7 @@ class _CategoryGrid extends StatelessWidget {
         return _CategoryCard(
           category: cat,
           karat: karat,
+          controller: controller,
           onTap: () => onTap(cat),
         );
       },
@@ -576,6 +602,7 @@ class _CategoryGrid extends StatelessWidget {
   }
 }
 
+// ── _Level3Sheet ──────────────────────────────────────────────────────────────
 class _Level3Sheet extends StatelessWidget {
   final CategoryModel parent;
   final List<CategoryModel> children;
@@ -591,7 +618,6 @@ class _Level3Sheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Get controller locally instead of as a field
     final controller = Get.find<CategoryController>();
 
     return Container(
@@ -664,8 +690,7 @@ class _Level3Sheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: context.colorPalette.cardBg,
                       borderRadius: BorderRadius.circular(14),
-                      border:
-                          Border.all(color: context.colorPalette.border),
+                      border: Border.all(color: context.colorPalette.border),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.06),
@@ -681,7 +706,6 @@ class _Level3Sheet extends StatelessWidget {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(13),
                             ),
-                            // ✅ Fixed: use 'cat' and local 'controller'
                             child: _CategoryListingImage(
                               cat: cat,
                               controller: controller,
@@ -694,8 +718,7 @@ class _Level3Sheet extends StatelessWidget {
                             cat.name
                                 .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                                 .replaceAll(
-                                  RegExp(r'collection',
-                                      caseSensitive: false),
+                                  RegExp(r'collection', caseSensitive: false),
                                   '',
                                 )
                                 .trim(),
@@ -722,14 +745,17 @@ class _Level3Sheet extends StatelessWidget {
   }
 }
 
+// ── _CategoryCard ─────────────────────────────────────────────────────────────
 class _CategoryCard extends StatelessWidget {
   final CategoryModel category;
   final Karat karat;
+  final CategoryController controller;
   final VoidCallback onTap;
 
   const _CategoryCard({
     required this.category,
     required this.karat,
+    required this.controller,
     required this.onTap,
   });
 
@@ -752,23 +778,16 @@ class _CategoryCard extends StatelessWidget {
                   flex: 7,
                   child: Stack(
                     children: [
+                      // ✅ Replaced old CachedNetworkImage+diamond fallback
+                      // with _CategoryListingImage, which is Obx-reactive and
+                      // fetches a product image when no category image exists.
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(13),
                         ),
-                        child: CachedNetworkImage(
-                          imageUrl: category.imageUrl,
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => Container(
-                            color: context.colorPalette.goldLight,
-                            child: Icon(
-                              Icons.diamond_outlined,
-                              size: 24,
-                              color: context.colorPalette.goldDark,
-                            ),
-                          ),
+                        child: _CategoryListingImage(
+                          cat: category,
+                          controller: controller,
                         ),
                       ),
                       Positioned(

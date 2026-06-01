@@ -73,6 +73,31 @@ class CategoryController extends GetxController {
 
     _fallbackLoadingIds.add(categoryId);
     try {
+      // First try: fetch by categoryId alone (most precise)
+      if (categoryId.isNotEmpty) {
+        final catResponse = await httpClient.get(
+          '/api/v1/products/search',
+          queryParameters: {'categoryId': categoryId, 'page': '1', 'limit': '20'},
+          options: Options(
+            sendTimeout: const Duration(seconds: 10),
+            receiveTimeout: const Duration(seconds: 10),
+          ),
+        );
+        if (catResponse.statusCode == 200 || catResponse.statusCode == 201) {
+          final data = catResponse.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          for (final item in raw) {
+            final product = ProductModel.fromJson(item);
+            final imageUrl = product.displayImageUrl;
+            if (imageUrl != null && imageUrl.isNotEmpty) {
+              _fallbackImages[categoryId] = imageUrl;
+              return imageUrl;
+            }
+          }
+        }
+      }
+
+      // Fallback: text search by category name
       String searchTerm = categoryName ?? '';
       String cleanedTerm = '';
       List<String> rawWords = [];
