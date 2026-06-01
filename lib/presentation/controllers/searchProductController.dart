@@ -148,51 +148,77 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final queryParams = <String, dynamic>{
-        "page": _filteredInitialPage,
-        "limit": _pageLimit,
-      };
+      final List<String> searchQueries = [];
+
       if (_selectedCategoryId.value != null && _selectedCategoryName.isNotEmpty) {
         final cleaned = _selectedCategoryName.value
             .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
             .replaceAll(RegExp(r'collection', caseSensitive: false), '')
             .trim();
         if (_selectedKarats.isNotEmpty) {
-          queryParams["search"] =
-              "${_karatToSearchValue(_selectedKarats.first)} $cleaned";
+          for (final karat in _selectedKarats) {
+            searchQueries.add("${_karatToSearchValue(karat)} $cleaned");
+          }
         } else if (cleaned.isNotEmpty) {
-          queryParams["search"] = cleaned;
+          searchQueries.add(cleaned);
         }
       } else if (_selectedKarats.isNotEmpty) {
-        queryParams["search"] = _karatToSearchValue(_selectedKarats.first);
+        for (final karat in _selectedKarats) {
+          searchQueries.add(_karatToSearchValue(karat));
+        }
       }
 
-      final response = await httpClient.get(
-        "/api/v1/products/search",
-        queryParameters: queryParams,
-      );
+      List<ProductModel> allFetched = [];
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      if (searchQueries.isNotEmpty) {
+        for (final q in searchQueries) {
+          final response = await httpClient.get(
+            "/api/v1/products/search",
+            queryParameters: {
+              "search": q,
+              "page": _filteredInitialPage,
+              "limit": _pageLimit,
+            },
+          );
 
-        if (isPagination) {
-          _filteredInitialProducts.addAll(fetched);
-        } else {
-          _filteredInitialProducts.value = fetched;
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
+          }
         }
-
-        if (fetched.length < _pageLimit) {
-          _filteredInitialHasMore = false;
-        } else {
-          _filteredInitialPage++;
-        }
-
-        _filteredInitialState.value = CurrentAppState.SUCCESS;
       } else {
-        _filteredInitialState.value = CurrentAppState.ERROR;
+        final response = await httpClient.get(
+          "/api/v1/products/get-all",
+          queryParameters: {
+            "page": _filteredInitialPage,
+            "limit": _pageLimit,
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = response.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+        }
       }
+
+      if (isPagination) {
+        _filteredInitialProducts.addAll(allFetched);
+      } else {
+        _filteredInitialProducts.value = allFetched;
+      }
+
+      final expected = searchQueries.isNotEmpty
+          ? _pageLimit * searchQueries.length
+          : _pageLimit;
+      if (allFetched.length < expected) {
+        _filteredInitialHasMore = false;
+      } else {
+        _filteredInitialPage++;
+      }
+
+      _filteredInitialState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _filteredInitialState.value = CurrentAppState.ERROR;
       Logger.error("SearchProductController", "loadFilteredProducts error: $e\n$st");
@@ -238,38 +264,61 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        "/api/v1/products/search",
-        queryParameters: {
-          "search": query,
-          "page": _searchPage,
-          "limit": _pageLimit,
-          if (_selectedKarats.isNotEmpty) "karat": _karatToSearchValue(_selectedKarats.first),
-          if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
-        },
-      );
+      List<ProductModel> allFetched = [];
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      if (_selectedKarats.isNotEmpty) {
+        for (final karat in _selectedKarats) {
+          final searchValue = _karatToSearchValue(karat);
+          final response = await httpClient.get(
+            "/api/v1/products/search",
+            queryParameters: {
+              "search": "$query $searchValue",
+              "page": _searchPage,
+              "limit": _pageLimit,
+              if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
+            },
+          );
 
-        if (isPagination) {
-          _searchResults.addAll(fetched);
-        } else {
-          _searchResults.value = fetched;
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
+          }
         }
-
-        if (fetched.length < _pageLimit) {
-          _searchHasMore = false;
-        } else {
-          _searchPage++;
-        }
-
-        _searchState.value = CurrentAppState.SUCCESS;
       } else {
-        _searchState.value = CurrentAppState.ERROR;
+        final response = await httpClient.get(
+          "/api/v1/products/search",
+          queryParameters: {
+            "search": query,
+            "page": _searchPage,
+            "limit": _pageLimit,
+            if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = response.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+        }
       }
+
+      if (isPagination) {
+        _searchResults.addAll(allFetched);
+      } else {
+        _searchResults.value = allFetched;
+      }
+
+      final expected = _selectedKarats.isNotEmpty
+          ? _pageLimit * _selectedKarats.length
+          : _pageLimit;
+      if (allFetched.length < expected) {
+        _searchHasMore = false;
+      } else {
+        _searchPage++;
+      }
+
+      _searchState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _searchState.value = CurrentAppState.ERROR;
       Logger.error("SearchProductController", "_runSearch error: $e\n$st");
