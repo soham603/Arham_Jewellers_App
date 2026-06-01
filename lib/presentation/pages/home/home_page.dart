@@ -766,7 +766,10 @@ class _KaratSection extends StatelessWidget {
                               ),
 
                               child: Text(
-                                cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ''),
+                                cat.name
+                                    .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                                    .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                                    .trim(),
 
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -967,7 +970,10 @@ class _Level3Panel extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         Text(
-                          cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ''),
+                          cat.name
+                              .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                              .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                              .trim(),
 
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -1732,7 +1738,10 @@ class _CategoryQuickAccess extends StatelessWidget {
                   SizedBox(
                     width: context.getScreenWidth(24),
                     child: Text(
-                      cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ''),
+                      cat.name
+                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                          .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                          .trim(),
                       style: TextStyle(
                         fontSize: context.getScreenWidth(2.8),
                         fontWeight: FontWeight.w600,
