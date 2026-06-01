@@ -85,6 +85,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
     if (_expandedKarats.contains(karat)) {
       _expandedKarats.remove(karat);
     } else {
+      if (karat == Karat.k18) _expandedKarats.remove(Karat.k20);
+      if (karat == Karat.k20) _expandedKarats.remove(Karat.k18);
       _expandedKarats.add(karat);
     }
   }
@@ -346,20 +348,16 @@ class _KaratSectionHeader extends StatelessWidget {
     required this.onToggle,
   });
 
-  Color _accentColor(BuildContext context) {
-    switch (karat) {
-      case Karat.k18:
-        return context.colorPalette.k18Accent;
-      case Karat.k20:
-        return context.colorPalette.k20Accent;
-      case Karat.k22:
-        return context.colorPalette.k22Accent;
+  String _purity(Karat k) {
+    switch (k) {
+      case Karat.k18: return '75%';
+      case Karat.k20: return '83%';
+      case Karat.k22: return '92%';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final accent = _accentColor(context);
     return GestureDetector(
       onTap: onToggle,
       child: Container(
@@ -387,30 +385,69 @@ class _KaratSectionHeader extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
+                shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [accent.withOpacity(0.85), accent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    context.colorPalette.gold,
+                    context.colorPalette.goldDark,
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
-                karat.displayName,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
+              padding: const EdgeInsets.all(2),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isExpanded
+                      ? context.colorPalette.goldLight
+                      : context.colorPalette.cardBg,
+                ),
+                child: Center(
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        context.colorPalette.gold,
+                        context.colorPalette.goldDeep,
+                      ],
+                    ).createShader(bounds),
+                    child: Text(
+                      karat.displayName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              'Gold',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: context.colorPalette.goldDeep,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${karat.displayName} Collection',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: context.colorPalette.goldDeep,
+                  ),
+                ),
+                Text(
+                  '${_purity(karat)} Pure Gold',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+              ],
             ),
             const Spacer(),
             AnimatedRotation(
@@ -444,10 +481,10 @@ class _CategoryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: categories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        crossAxisCount: 3,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 0.95,
       ),
       itemBuilder: (_, index) {
         final cat = categories[index];
@@ -617,13 +654,6 @@ class _CategoryCard extends StatelessWidget {
           color: context.colorPalette.cardBg,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: context.colorPalette.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.06),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -640,7 +670,7 @@ class _CategoryCard extends StatelessWidget {
                     color: context.colorPalette.goldLight,
                     child: Icon(
                       Icons.diamond_outlined,
-                      size: 36,
+                      size: 24,
                       color: context.colorPalette.goldDark,
                     ),
                   ),
@@ -650,26 +680,20 @@ class _CategoryCard extends StatelessWidget {
             Expanded(
               flex: 3,
               child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      category.name
-                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                          .replaceAll(
-                              RegExp(r'collection', caseSensitive: false), '')
-                          .trim(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: context.colorPalette.goldDeep,
-                      ),
-                    ),
-                  ],
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Text(
+                  category.name
+                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                      .replaceAll(
+                          RegExp(r'collection', caseSensitive: false), '')
+                      .trim(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: context.colorPalette.goldDeep,
+                  ),
                 ),
               ),
             ),
