@@ -27,6 +27,7 @@ import '../../../core/widgets/home_search_bar.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -279,30 +280,30 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 child: AspectRatio(
                                   aspectRatio: 16 / 9,
-                                  child: GestureDetector(
-                                    onTap: () => _navigateToCategoryListing([Karat.k22]),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.08,
-                                            ),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 3),
+                                child: GestureDetector(
+                                  onTap: () => Get.to(() => const SearchPage(initialQuery: 'Chain')),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(
+                                            0.08,
                                           ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.asset(
-                                          'assets/images/chain-collection-16:9.png',
-                                          fit: BoxFit.cover,
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 3),
                                         ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.asset(
+                                        'assets/images/chain-collection-16:9.png',
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
+                                ),
                                 ),
                               ),
 

@@ -14,7 +14,9 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({super.key});
+  final String? initialQuery;
+
+  const SearchPage({super.key, this.initialQuery});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -37,6 +39,10 @@ class _SearchPageState extends State<SearchPage> {
         categoryController.k20Categories.isEmpty &&
         categoryController.k22Categories.isEmpty) {
       categoryController.fetchAllKaratCategories();
+    }
+    if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+      _textController.text = widget.initialQuery!;
+      controller.onSearchSubmitted(widget.initialQuery!);
     }
   }
 
@@ -69,7 +75,7 @@ class _SearchPageState extends State<SearchPage> {
             SearchBarWidget(
               controller: _textController,
               focusNode: _focusNode,
-              autofocus: true,
+              autofocus: widget.initialQuery == null,
               onBack: () => Get.back(),
               onChanged: (v) {
                 setState(() {});
