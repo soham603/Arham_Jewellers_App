@@ -197,6 +197,15 @@ class SearchProductController extends GetxController {
     loadProductsByKarats(_currentKarats, isPagination: true);
   }
 
+  String _karatToSearchValue(String karat) {
+    switch (karat) {
+      case '18K': return '76';
+      case '20K': return '84';
+      case '22K': return '92';
+      default: return karat;
+    }
+  }
+
   Future<void> loadProductsByKarats(List<String> karats,
       {bool isPagination = false}) async {
     if (!_karatHasMore && isPagination) return;
@@ -217,7 +226,7 @@ class SearchProductController extends GetxController {
         final response = await httpClient.get(
           "/api/v1/products/search",
           queryParameters: {
-            "karat": karat,
+            "search": _karatToSearchValue(karat),
             "page": _karatPage,
             "limit": _pageLimit,
           },
@@ -291,6 +300,100 @@ class SearchProductController extends GetxController {
   void clearCategoryProducts() {
     _categoryProducts.clear();
     _categoryState.value = CurrentAppState.INITIAL;
+  }
+
+  // ── Category + karat filtered products (client-side touch filter) ───
+  final _filteredProducts = <ProductModel>[].obs;
+  List<ProductModel> get filteredProducts => _filteredProducts;
+
+  final _filteredState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get filteredState => _filteredState.value;
+
+  int _filteredPage = 1;
+  bool _filteredHasMore = true;
+  bool get filteredHasMore => _filteredHasMore;
+  String? _currentFilterCategoryId;
+  String? _currentFilterKarat;
+
+  void loadMoreFilteredProducts() {
+    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING) return;
+    loadByCategoryWithKaratFilter(
+      _currentFilterCategoryId!,
+      _currentFilterKarat!,
+      isPagination: true,
+    );
+  }
+
+  Future<void> loadByCategoryWithKaratFilter(
+    String categoryId,
+    String targetKarat, {
+    bool isPagination = false,
+  }) async {
+    if (!_filteredHasMore && isPagination) return;
+    if (_filteredState.value == CurrentAppState.LOADING) return;
+
+    if (!isPagination) {
+      _currentFilterCategoryId = categoryId;
+      _currentFilterKarat = targetKarat;
+      _filteredState.value = CurrentAppState.LOADING;
+      _filteredPage = 1;
+      _filteredHasMore = true;
+      _filteredProducts.clear();
+    }
+
+    try {
+      final searchValue = _karatToSearchValue(targetKarat);
+      Logger.info("CategoryKaratFilter", "Loading categoryId=$categoryId karat=$targetKarat search=$searchValue page=$_filteredPage");
+
+      final response = await httpClient.get(
+        "/api/v1/products/search",
+        queryParameters: {
+          "search": _karatToSearchValue(targetKarat),
+          "categoryId": categoryId,
+          "page": _filteredPage,
+          "limit": _pageLimit,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final List raw = data['data'] is List ? data['data'] : [];
+        Logger.info("CategoryKaratFilter", "Response: ${raw.length} items, status=${response.statusCode}");
+        if (raw.isNotEmpty) {
+          Logger.info("CategoryKaratFilter", "First item keys: ${(raw.first as Map).keys}");
+        }
+        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+
+        if (isPagination) {
+          _filteredProducts.addAll(fetched);
+        } else {
+          _filteredProducts.value = fetched;
+        }
+
+        if (fetched.length < _pageLimit) {
+          _filteredHasMore = false;
+        } else {
+          _filteredPage++;
+        }
+
+        _filteredState.value = CurrentAppState.SUCCESS;
+      } else {
+        _filteredState.value = CurrentAppState.ERROR;
+      }
+    } catch (e, st) {
+      _filteredState.value = CurrentAppState.ERROR;
+      Logger.error(
+          "SearchProductController", "loadByCategoryWithKaratFilter error: $e\n$st");
+    }
+  }
+
+  void clearFilteredProducts() {
+    _filteredProducts.clear();
+    _filteredState.value = CurrentAppState.INITIAL;
+    _filteredPage = 1;
+    _filteredHasMore = true;
+    _currentFilterCategoryId = null;
+    _currentFilterKarat = null;
   }
 
   void clearSearch() {

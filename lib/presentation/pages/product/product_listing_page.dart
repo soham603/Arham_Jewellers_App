@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
-import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -10,9 +9,10 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 class ProductListingPage extends StatefulWidget {
   final String? karat;
   final List<String>? karats;
+  final String? categoryId;
   final String? title;
 
-  const ProductListingPage({super.key, this.karat, this.karats, this.title});
+  const ProductListingPage({super.key, this.karat, this.karats, this.categoryId, this.title});
 
   @override
   State<ProductListingPage> createState() => _ProductListingPageState();
@@ -22,13 +22,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
   final ScrollController _scrollController = ScrollController();
 
+  bool get _isCategoryFilter => widget.categoryId != null && widget.karat != null;
+
   @override
   void initState() {
     super.initState();
-    _controller = Get.put(SearchProductController(), tag: 'listing_${widget.karat ?? widget.karats?.join("_")}');
+    final tag = _isCategoryFilter
+        ? 'filtered_${widget.categoryId}_${widget.karat}'
+        : 'listing_${widget.karat ?? widget.karats?.join("_")}';
+    _controller = Get.put(SearchProductController(), tag: tag);
 
-    final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
-    _controller.loadProductsByKarats(karatsToLoad);
+    if (_isCategoryFilter) {
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
+    } else {
+      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+      _controller.loadProductsByKarats(karatsToLoad);
+    }
 
     _scrollController.addListener(_onScroll);
   }
@@ -37,14 +46,21 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-    Get.delete<SearchProductController>(tag: 'listing_${widget.karat ?? widget.karats?.join("_")}');
+    final tag = _isCategoryFilter
+        ? 'filtered_${widget.categoryId}_${widget.karat}'
+        : 'listing_${widget.karat ?? widget.karats?.join("_")}';
+    Get.delete<SearchProductController>(tag: tag);
     super.dispose();
   }
 
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300) {
-      _controller.loadMoreKaratProducts();
+      if (_isCategoryFilter) {
+        _controller.loadMoreFilteredProducts();
+      } else {
+        _controller.loadMoreKaratProducts();
+      }
     }
   }
 
@@ -70,8 +86,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ),
       ),
       body: Obx(() {
-        final state = _controller.karatState;
-        final products = _controller.karatProducts;
+        final state = _isCategoryFilter ? _controller.filteredState : _controller.karatState;
+        final products = _isCategoryFilter ? _controller.filteredProducts : _controller.karatProducts;
+        final hasMore = _isCategoryFilter ? _controller.filteredHasMore : _controller.karatHasMore;
 
         if (state == CurrentAppState.LOADING && products.isEmpty) {
           return const Center(child: CircularProgressIndicator());
@@ -91,8 +108,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
-                    _controller.loadProductsByKarats(karatsToLoad);
+                    if (_isCategoryFilter) {
+                      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
+                    } else {
+                      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+                      _controller.loadProductsByKarats(karatsToLoad);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.colorPalette.gold,
@@ -124,7 +145,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         return GridView.builder(
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
-          itemCount: products.length + (_controller.karatHasMore ? 1 : 0),
+          itemCount: products.length + (hasMore ? 1 : 0),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisSpacing: 12,
