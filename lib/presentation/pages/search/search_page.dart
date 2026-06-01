@@ -76,7 +76,17 @@ class _SearchPageState extends State<SearchPage> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        Get.offAllNamed("/home");
+        if (_textController.text.isNotEmpty ||
+            controller.isSearching ||
+            controller.hasActiveFilters) {
+          _textController.clear();
+          controller.clearSearch();
+          controller.clearAllFilters();
+          controller.loadInitialProducts();
+          setState(() {});
+        } else {
+          Get.offAllNamed("/home");
+        }
       },
       child: Scaffold(
         backgroundColor: context.colorPalette.backgroundColor,
