@@ -34,7 +34,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
   }
 
-  String _getConvertedPurity(Map<String, dynamic> rawData, String? karat, {String? tagNo}) {
+  String _getConvertedPurity(Map<String, dynamic> rawData, String? karat, {String? tagNo, String? name}) {
     final touchRaw = rawData['SalesTouch']?.toString().trim() ??
         rawData['Touch']?.toString().trim();
     if (touchRaw != null && touchRaw.isNotEmpty) {
@@ -48,7 +48,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
 
     if (karat != null && karat.isNotEmpty) {
+      final resolved = _resolveKaratValue(karat);
+      if (resolved != null) return resolved;
       return '$karat K Gold';
+    }
+
+    // Fallback: extract from product name
+    if (name != null && name.isNotEmpty) {
+      final resolved = _resolvePurityValue(name);
+      if (resolved != null) return resolved;
+      final resolved2 = _resolveKaratValue(name);
+      if (resolved2 != null) return resolved2;
     }
 
     return '\u2014';
@@ -58,16 +68,36 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final match = RegExp(r'^(\d+(?:\.\d+)?)').firstMatch(raw.trim());
     final numStr = match?.group(1);
     if (numStr == null) return null;
-    final value = double.tryParse(numStr);
+    var value = double.tryParse(numStr);
     if (value == null) return null;
 
-    if (value >= 915 && value <= 917) return "$numStr (22 K)";
-    if (value >= 830 && value <= 835) return "$numStr (20 K)";
-    if (value >= 748 && value <= 752) return "$numStr (18 K)";
-    if (value >= 91 && value <= 92) return "$numStr (22 K)";
-    if (value >= 83 && value <= 84) return "$numStr (20 K)";
-    if (value >= 75 && value <= 76) return "$numStr (18 K)";
+    // Normalize to parts-per-thousand scale
+    if (value < 1) {
+      value *= 1000; // Decimal fraction (0.916 → 916)
+    } else if (value < 100) {
+      value *= 10; // Percentage (91.6 → 916)
+    }
+    value = value.roundToDouble();
 
+    if (value >= 900 && value <= 925) return "$numStr (22 K)";
+    if (value >= 820 && value <= 840) return "$numStr (20 K)";
+    if (value >= 740 && value <= 760) return "$numStr (18 K)";
+
+    return null;
+  }
+
+  String? _resolveKaratValue(String raw) {
+    final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(raw.trim());
+    final numStr = match?.group(1);
+    if (numStr == null) return null;
+    final value = int.tryParse(numStr);
+    if (value == null) return null;
+
+    switch (value) {
+      case 22: return '0.916 (22 K)';
+      case 20: return '0.833 (20 K)';
+      case 18: return '0.750 (18 K)';
+    }
     return null;
   }
 
@@ -76,7 +106,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final rawData = widget.product.rawData ?? {};
     final netWeight = rawData["FineWt"]?.toString() ?? "0.000";
     final grossWeight = rawData["GrossWt"]?.toString() ?? "0.000";
-    final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo);
+    final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo, name: widget.product.name);
     final pieces = rawData["Pieces"]?.toString() ?? "1";
     final designName = rawData["DesignName"]?.toString() ?? "Standard";
 
