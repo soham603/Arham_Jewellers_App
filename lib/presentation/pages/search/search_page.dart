@@ -325,7 +325,12 @@ class _SearchPageState extends State<SearchPage> {
         final seen = <String>{};
         final unique = <CategoryModel>[];
         for (final cat in allCategories) {
-          if (seen.add(cat.name.toLowerCase())) {
+          final displayName = cat.name
+              .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+              .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+              .trim()
+              .toLowerCase();
+          if (seen.add(displayName)) {
             unique.add(cat);
           }
         }
@@ -393,29 +398,10 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                           ),
                           child: ClipOval(
-                            child: cat.imageUrl.isNotEmpty
-                                ? CachedNetworkImage(
-                                    imageUrl: cat.imageUrl,
-                                    width: context.getScreenWidth(16),
-                                    height: context.getScreenWidth(16),
-                                    fit: BoxFit.cover,
-                                    errorWidget: (_, __, ___) => Container(
-                                      color: context.colorPalette.goldLight,
-                                      child: Icon(
-                                        Icons.diamond_outlined,
-                                        size: context.getScreenWidth(5.5),
-                                        color: context.colorPalette.goldDark,
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    color: context.colorPalette.goldLight,
-                                    child: Icon(
-                                      Icons.diamond_outlined,
-                                      size: context.getScreenWidth(5.5),
-                                      color: context.colorPalette.goldDark,
-                                    ),
-                                  ),
+                            child: _BrowseCategoryImage(
+                              cat: cat,
+                              controller: categoryController,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 5),
@@ -872,6 +858,88 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _BrowseCategoryImage extends StatelessWidget {
+  final CategoryModel cat;
+  final CategoryController controller;
+
+  const _BrowseCategoryImage({
+    required this.cat,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (cat.imageUrl.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: cat.imageUrl,
+        width: context.getScreenWidth(16),
+        height: context.getScreenWidth(16),
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _onImageError(context),
+      );
+    }
+
+    return _fallbackOrPlaceholder(context);
+  }
+
+  Widget _onImageError(BuildContext context) {
+    final fallback = controller.fallbackImages[cat.id];
+    if (fallback != null && fallback.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: fallback,
+        width: context.getScreenWidth(16),
+        height: context.getScreenWidth(16),
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
+      );
+    }
+    return _diamondPlaceholder(context);
+  }
+
+  Widget _fallbackOrPlaceholder(BuildContext context) {
+    final fallback = controller.fallbackImages[cat.id];
+    if (fallback != null && fallback.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: fallback,
+        width: context.getScreenWidth(16),
+        height: context.getScreenWidth(16),
+        fit: BoxFit.cover,
+        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
+      );
+    }
+    return _diamondPlaceholder(context);
+  }
+
+  Widget _diamondPlaceholder(BuildContext context) {
+    if (!controller.isFallbackAttempted(cat.id) &&
+        !controller.isFallbackLoading(cat.id)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.fetchFallbackImage(cat.id, categoryName: cat.name);
+      });
+      return SizedBox(
+        width: context.getScreenWidth(16),
+        height: context.getScreenWidth(16),
+      );
+    }
+
+    if (controller.isFallbackLoading(cat.id)) {
+      return SizedBox(
+        width: context.getScreenWidth(16),
+        height: context.getScreenWidth(16),
+      );
+    }
+
+    return Container(
+      color: context.colorPalette.goldLight,
+      child: Icon(
+        Icons.diamond_outlined,
+        size: context.getScreenWidth(5.5),
+        color: context.colorPalette.goldDark,
       ),
     );
   }
