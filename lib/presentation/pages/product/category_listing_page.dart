@@ -25,7 +25,6 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   final _expandedKarats = <Karat>[].obs;
   final _isLoading = false.obs;
   final _hasError = false.obs;
-  bool _initialExpandDone = false;
 
   @override
   void initState() {
@@ -48,11 +47,6 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
           _listForKarat(karat).isEmpty) {
         anyError = true;
       }
-    }
-
-    if (!_initialExpandDone && widget.karats.length > 1) {
-      _expandedKarats.add(widget.karats.first);
-      _initialExpandDone = true;
     }
 
     _isLoading.value = false;
@@ -292,6 +286,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                     final cat = categories[index];
                     return _CategoryCard(
                       category: cat,
+                      karat: widget.karats.first,
                       onTap: () =>
                           _showLevel3Sheet(cat, widget.karats.first),
                     );
@@ -326,6 +321,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _CategoryGrid(
                       categories: _listForKarat(karat),
+                      karat: karat,
                       onTap: (cat) => _showLevel3Sheet(cat, karat),
                     ),
                   )
@@ -467,10 +463,12 @@ class _KaratSectionHeader extends StatelessWidget {
 
 class _CategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
+  final Karat karat;
   final ValueChanged<CategoryModel> onTap;
 
   const _CategoryGrid({
     required this.categories,
+    required this.karat,
     required this.onTap,
   });
 
@@ -481,15 +479,16 @@ class _CategoryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: categories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 0.95,
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.85,
       ),
       itemBuilder: (_, index) {
         final cat = categories[index];
         return _CategoryCard(
           category: cat,
+          karat: karat,
           onTap: () => onTap(cat),
         );
       },
@@ -641,9 +640,14 @@ class _Level3Sheet extends StatelessWidget {
 
 class _CategoryCard extends StatelessWidget {
   final CategoryModel category;
+  final Karat karat;
   final VoidCallback onTap;
 
-  const _CategoryCard({required this.category, required this.onTap});
+  const _CategoryCard({
+    required this.category,
+    required this.karat,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -655,47 +659,88 @@ class _CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: context.colorPalette.border),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            Expanded(
-              flex: 7,
-              child: ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(13)),
-                child: CachedNetworkImage(
-                  imageUrl: category.imageUrl,
-                  fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => Container(
-                    color: context.colorPalette.goldLight,
-                    child: Icon(
-                      Icons.diamond_outlined,
-                      size: 24,
-                      color: context.colorPalette.goldDark,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(13),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: category.imageUrl,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                          errorWidget: (_, __, ___) => Container(
+                            color: context.colorPalette.goldLight,
+                            child: Icon(
+                              Icons.diamond_outlined,
+                              size: 24,
+                              color: context.colorPalette.goldDark,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: context.colorPalette.gold,
+                          ),
+                          child: Center(
+                            child: Text(
+                              karat.displayName,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 2,
+                    ),
+                    child: Text(
+                      category.name
+                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                          .replaceAll(
+                            RegExp(r'collection', caseSensitive: false),
+                            '',
+                          )
+                          .trim(),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: context.colorPalette.goldDeep,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: Text(
-                  category.name
-                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(
-                          RegExp(r'collection', caseSensitive: false), '')
-                      .trim(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: context.colorPalette.goldDeep,
-                  ),
-                ),
-              ),
+              ],
             ),
           ],
         ),
