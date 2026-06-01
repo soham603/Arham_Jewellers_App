@@ -159,6 +159,20 @@ class ProductModel {
       if (result != null) return result;
     }
 
+    // 3. Fallback: karat field (e.g. "22", "22K")
+    if (karat != null) {
+      final result = _resolveKarat(karat!);
+      if (result != null) return result;
+    }
+
+    // 4. Fallback: extract from product name (e.g. "92", "22K")
+    if (name.isNotEmpty) {
+      final result = _resolvePurity(name);
+      if (result != null) return result;
+      final result2 = _resolveKarat(name);
+      if (result2 != null) return result2;
+    }
+
     return null;
   }
 
@@ -166,16 +180,39 @@ class ProductModel {
     final match = RegExp(r'^(\d+(?:\.\d+)?)').firstMatch(raw.trim());
     final numStr = match?.group(1);
     if (numStr == null) return null;
-    final value = double.tryParse(numStr);
+    var value = double.tryParse(numStr);
     if (value == null) return null;
 
-    if (value >= 915 && value <= 917) return "$numStr (22 K)";
-    if (value >= 830 && value <= 835) return "$numStr (20 K)";
-    if (value >= 748 && value <= 752) return "$numStr (18 K)";
-    if (value >= 91 && value <= 92) return "$numStr (22 K)";
-    if (value >= 83 && value <= 84) return "$numStr (20 K)";
-    if (value >= 75 && value <= 76) return "$numStr (18 K)";
+    // Normalize to parts-per-thousand scale
+    if (value < 1) {
+      // Decimal fraction (0.916 → 916)
+      value *= 1000;
+    } else if (value < 100) {
+      // Percentage (91.6 → 916)
+      value *= 10;
+    }
+    value = value.roundToDouble();
 
+    if (value >= 900 && value <= 925) return "$numStr (22 K)";
+    if (value >= 820 && value <= 840) return "$numStr (20 K)";
+    if (value >= 740 && value <= 760) return "$numStr (18 K)";
+
+    return null;
+  }
+
+  /// Maps karat values (18, 20, 22) to their purity strings.
+  static String? _resolveKarat(String raw) {
+    final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(raw.trim());
+    final numStr = match?.group(1);
+    if (numStr == null) return null;
+    final value = int.tryParse(numStr);
+    if (value == null) return null;
+
+    switch (value) {
+      case 22: return '0.916 (22 K)';
+      case 20: return '0.833 (20 K)';
+      case 18: return '0.750 (18 K)';
+    }
     return null;
   }
 
