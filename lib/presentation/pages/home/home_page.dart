@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.da
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
@@ -114,12 +115,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateToMultiKaratListing(List<String> karats, String title) {
+  void _navigateToCategoryListing(List<Karat> karats, {String? title}) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProductListingPage(karats: karats, title: title),
-      ),
+      MaterialPageRoute(builder: (_) => CategoryListingPage(karats: karats, title: title)),
     );
   }
 
@@ -207,10 +206,7 @@ class _HomePageState extends State<HomePage> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () =>
-                                            _navigateToMultiKaratListing([
-                                              '18K',
-                                              '20K',
-                                            ], '18K & 20K Collection'),
+                                            _navigateToCategoryListing([Karat.k18, Karat.k20], title: '18K & 20K Collection'),
                                         child: Container(
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
@@ -240,9 +236,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: GestureDetector(
+                                          child: GestureDetector(
                                         onTap: () =>
-                                            _navigateToKaratListing('22K'),
+                                            _navigateToCategoryListing([Karat.k22]),
                                         child: Container(
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
@@ -284,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                                 child: AspectRatio(
                                   aspectRatio: 16 / 9,
                                   child: GestureDetector(
-                                    onTap: () => _navigateToKaratListing('22K'),
+                                    onTap: () => _navigateToCategoryListing([Karat.k22]),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
