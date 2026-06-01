@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -67,9 +68,7 @@ class _SplashPageState extends State<SplashPage>
       backgroundColor: palette.pageBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(6),
-          ),
+          padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
           child: Column(
             children: [
               const Spacer(flex: 2),
@@ -83,9 +82,10 @@ class _SplashPageState extends State<SplashPage>
               SizedBox(height: context.getScreenHeight(3)),
               Text(
                 'RATNESHGOLD',
-                style: TextStyle(
+                style: GoogleFonts.bodoniModa(
                   fontSize: context.getScreenWidth(7),
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
                   color: palette.textColor,
                 ),
               ),
@@ -105,8 +105,8 @@ class _SplashPageState extends State<SplashPage>
                     alignment: Alignment.centerLeft,
                     child: Container(
                       height: context.getScreenHeight(0.5),
-                      width: context.getScreenWidth(100) *
-                          _widthAnimation.value,
+                      width:
+                          context.getScreenWidth(100) * _widthAnimation.value,
                       color: const Color(0xFFD3C6B5),
                     ),
                   );
