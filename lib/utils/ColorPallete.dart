@@ -9,7 +9,7 @@ class ColorPalette {
       isDarkMode ? const Color(0xFFFFFFFF) : const Color(0xFFFFFFFF);
 
   Color get primaryColor =>
-      isDarkMode ? const Color(0xFFC6F224) : const Color(0xFFC6F224);
+      isDarkMode ? const Color(0xFF8B6914) : const Color(0xFF8B6914);
 
   Color get boxColor =>
       isDarkMode ? const Color(0xffF2F7FE) : const Color(0xffF2F7FE);

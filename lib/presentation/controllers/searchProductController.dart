@@ -123,6 +123,7 @@ class SearchProductController extends GetxController {
   void onSearchSubmitted(String query) {
     if (query.trim().isEmpty) return;
     _debounce?.cancel();
+    _searchQuery.value = query.trim();
     _saveRecentSearch(query.trim());
     _runSearch(query.trim(), isPagination: false);
   }

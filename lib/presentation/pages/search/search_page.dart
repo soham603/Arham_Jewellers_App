@@ -1,13 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
+import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
+import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
+import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_bottom_nav.dart';
-import '../../../core/widgets/product_card.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -18,17 +22,22 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final SearchProductController controller = Get.put(SearchProductController());
+  final CategoryController categoryController = Get.isRegistered<CategoryController>()
+      ? Get.find<CategoryController>()
+      : Get.put(CategoryController());
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
-
-  // toggle: show all recent searches or just 2
-  bool _showAllRecent = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    if (categoryController.k18Categories.isEmpty &&
+        categoryController.k20Categories.isEmpty &&
+        categoryController.k22Categories.isEmpty) {
+      categoryController.fetchAllKaratCategories();
+    }
   }
 
   void _onScroll() {
@@ -57,7 +66,25 @@ class _SearchPageState extends State<SearchPage> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchBar(context),
+            SearchBarWidget(
+              controller: _textController,
+              focusNode: _focusNode,
+              autofocus: true,
+              onBack: () => Get.back(),
+              onChanged: (v) {
+                setState(() {});
+                controller.onSearchChanged(v);
+              },
+              onSubmitted: (v) {
+                controller.onSearchSubmitted(v);
+                _focusNode.unfocus();
+              },
+              onClear: () {
+                _textController.clear();
+                controller.clearSearch();
+                setState(() {});
+              },
+            ),
             Expanded(
               child: Obx(() {
                 final isSearching = controller.isSearching;
@@ -65,6 +92,10 @@ class _SearchPageState extends State<SearchPage> {
                 return CustomScrollView(
                   controller: _scrollController,
                   slivers: [
+                    // ── Browse Categories ────────────────────────────────
+                    if (!isSearching || controller.searchResults.isEmpty)
+                      _browseCategoriesSliver(context),
+
                     // ── Recent Searches ──────────────────────────────────
                     if (!isSearching && controller.recentSearches.isNotEmpty)
                       _recentSearchesSliver(context),
@@ -74,16 +105,16 @@ class _SearchPageState extends State<SearchPage> {
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(
                           context.getScreenWidth(4),
-                          context.getScreenHeight(2),
+                          context.getScreenHeight(1.5),
                           context.getScreenWidth(4),
-                          context.getScreenHeight(1),
+                          context.getScreenHeight(0.8),
                         ),
                         child: Text(
-                          isSearching ? 'Results' : 'Products',
+                          isSearching ? 'Results' : 'Suggested for You',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(6),
+                            fontSize: context.getScreenWidth(4.2),
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
+                            color: const Color(0xFF675F55),
                           ),
                         ),
                       ),
@@ -112,113 +143,143 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
-  Widget _buildSearchBar(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
-        context.getScreenHeight(1.5),
-        context.getScreenWidth(4),
-        context.getScreenHeight(1),
-      ),
-      decoration: BoxDecoration(
-        color: context.colorPalette.backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: context.getScreenWidth(5),
-              color: context.colorPalette.textColor,
+  // ── Browse Categories Sliver ──────────────────────────────────────────────
+  Widget _browseCategoriesSliver(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Obx(() {
+        final allCategories = [
+          ...categoryController.k18Categories,
+          ...categoryController.k20Categories,
+          ...categoryController.k22Categories,
+        ];
+
+        final seen = <String>{};
+        final unique = <CategoryModel>[];
+        for (final cat in allCategories) {
+          if (seen.add(cat.name.toLowerCase())) {
+            unique.add(cat);
+          }
+        }
+
+        if (unique.isEmpty &&
+            categoryController.k18State == CurrentAppState.LOADING) {
+          return Padding(
+            padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+            child: const CategoryShimmer(),
+          );
+        }
+
+        if (unique.isEmpty) return const SizedBox();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.getScreenWidth(4),
+                context.getScreenHeight(1.5),
+                context.getScreenWidth(4),
+                0,
+              ),
+              child: Text(
+                'Browse Categories',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4.2),
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF675F55),
+                ),
+              ),
             ),
-          ),
-          SizedBox(width: context.getScreenWidth(3)),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(3.5),
-                vertical: context.getScreenHeight(1.2),
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFCFC7BC)),
-                color: const Color(0xFFF4F1EC),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.search,
-                    color: const Color(0xFF8D847A),
-                    size: context.getScreenWidth(5),
-                  ),
-                  SizedBox(width: context.getScreenWidth(2)),
-                  Expanded(
-                    child: TextField(
-                      controller: _textController,
-                      focusNode: _focusNode,
-                      autofocus: true,
-                      style: TextStyle(
-                        fontSize: context.getScreenWidth(4),
-                        color: context.colorPalette.textColor,
-                      ),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        hintText: 'Search gold, diamonds, rings...',
-                        hintStyle: TextStyle(
-                          fontSize: context.getScreenWidth(3.8),
-                          color: const Color(0xFFA29A90),
+            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(
+              height: context.getScreenWidth(16) + context.getScreenHeight(4),
+              child: ListView.separated(
+                padding: EdgeInsets.only(left: context.getScreenWidth(4)),
+                scrollDirection: Axis.horizontal,
+                itemCount: unique.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 4),
+                itemBuilder: (_, index) {
+                  final cat = unique[index];
+                  return GestureDetector(
+                    onTap: () {
+                      _textController.text = cat.name;
+                      setState(() {});
+                      controller.onSearchSubmitted(cat.name);
+                      _focusNode.unfocus();
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          width: context.getScreenWidth(16),
+                          height: context.getScreenWidth(16),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: context.colorPalette.gold.withOpacity(0.5),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: cat.imageUrl.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: cat.imageUrl,
+                                    width: context.getScreenWidth(16),
+                                    height: context.getScreenWidth(16),
+                                    fit: BoxFit.cover,
+                                    errorWidget: (_, __, ___) => Container(
+                                      color: context.colorPalette.goldLight,
+                                      child: Icon(
+                                        Icons.diamond_outlined,
+                                        size: context.getScreenWidth(5.5),
+                                        color: context.colorPalette.goldDark,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    color: context.colorPalette.goldLight,
+                                    child: Icon(
+                                      Icons.diamond_outlined,
+                                      size: context.getScreenWidth(5.5),
+                                      color: context.colorPalette.goldDark,
+                                    ),
+                                  ),
+                          ),
                         ),
-                      ),
-                      onChanged: (v) {
-                        setState(() {}); // rebuild clear icon
-                        controller.onSearchChanged(v);
-                      },
-                      onSubmitted: (v) {
-                        controller.onSearchSubmitted(v);
-                        _focusNode.unfocus();
-                      },
+                        const SizedBox(height: 5),
+                        SizedBox(
+                          width: context.getScreenWidth(20),
+                          child: Text(
+                            cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), ''),
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.4),
+                              fontWeight: FontWeight.w500,
+                              color: context.colorPalette.goldDeep,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  if (_textController.text.isNotEmpty)
-                    GestureDetector(
-                      onTap: () {
-                        _textController.clear();
-                        controller.clearSearch();
-                        setState(() {});
-                      },
-                      child: Icon(
-                        Icons.close_rounded,
-                        size: context.getScreenWidth(4.5),
-                        color: const Color(0xFF8D847A),
-                      ),
-                    ),
-                ],
+                  );
+                },
               ),
             ),
-          ),
-        ],
-      ),
+            Padding(
+              padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
+              child: Divider(color: context.colorPalette.boxColor),
+            ),
+          ],
+        );
+      }),
     );
   }
 
   // ── Recent Searches Sliver ────────────────────────────────────────────────
   SliverToBoxAdapter _recentSearchesSliver(BuildContext context) {
     final all = controller.recentSearches;
-    // show 2 by default, up to 5 if expanded
-    final visible = _showAllRecent
-        ? all.take(5).toList()
-        : all.take(2).toList();
-    final hasMore = all.length > 2 && !_showAllRecent;
+    final visible = all.take(5).toList();
 
     return SliverToBoxAdapter(
       child: Padding(
@@ -235,63 +296,32 @@ class _SearchPageState extends State<SearchPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Recent Searches',
+                  'Recent Searches (${all.length})',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.5),
+                    fontSize: context.getScreenWidth(4.2),
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF675F55),
                   ),
                 ),
-                GestureDetector(
-                  onTap: controller.clearAllRecentSearches,
-                  child: Text(
-                    'Clear all',
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(3.2),
-                      color: context.colorPalette.primaryColor,
+                if (all.length >= 3)
+                  GestureDetector(
+                    onTap: controller.clearAllRecentSearches,
+                    child: Text(
+                      'Clear all',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.2),
+                        color: context.colorPalette.goldDark,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             SizedBox(height: context.getScreenHeight(0.8)),
-            ...visible.map((term) => _recentSearchTile(context, term)),
-            if (hasMore)
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () => setState(() => _showAllRecent = true),
-                  child: Padding(
-                    padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
-                    child: Text(
-                      'Show more',
-                      style: TextStyle(
-                        fontSize: context.getScreenWidth(3),
-                        color: context.colorPalette.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            if (_showAllRecent && all.length > 2)
-              Align(
-                alignment: Alignment.centerRight,
-                child: GestureDetector(
-                  onTap: () => setState(() => _showAllRecent = false),
-                  child: Padding(
-                    padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
-                    child: Text(
-                      'Show less',
-                      style: TextStyle(
-                        fontSize: context.getScreenWidth(3),
-                        color: context.colorPalette.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            Wrap(
+              spacing: context.getScreenWidth(2),
+              runSpacing: context.getScreenHeight(0.6),
+              children: visible.map((term) => _buildSearchChip(context, term)).toList(),
+            ),
             SizedBox(height: context.getScreenHeight(1)),
             Divider(color: context.colorPalette.boxColor),
           ],
@@ -300,43 +330,50 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _recentSearchTile(BuildContext context, String term) {
-    return InkWell(
-      onTap: () {
-        _textController.text = term;
-        setState(() {});
-        controller.onSearchSubmitted(term);
-        _focusNode.unfocus();
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
-        child: Row(
-          children: [
-            Icon(
-              Icons.history_rounded,
-              size: context.getScreenWidth(4.5),
-              color: const Color(0xFF8D847A),
-            ),
-            SizedBox(width: context.getScreenWidth(3)),
-            Expanded(
-              child: Text(
+  Widget _buildSearchChip(BuildContext context, String term) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF4F1EC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFCFC7BC)),
+      ),
+      child: InkWell(
+        onTap: () {
+          _textController.text = term;
+          setState(() {});
+          controller.onSearchSubmitted(term);
+          _focusNode.unfocus();
+        },
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: context.getScreenWidth(2.5),
+            right: context.getScreenWidth(1),
+            top: context.getScreenHeight(0.45),
+            bottom: context.getScreenHeight(0.45),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
                 term,
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getScreenWidth(3.2),
                   color: context.colorPalette.textColor,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () => controller.removeRecentSearch(term),
-              child: Icon(
-                Icons.close_rounded,
-                size: context.getScreenWidth(4),
-                color: const Color(0xFF8D847A),
+              SizedBox(width: context.getScreenWidth(1)),
+              GestureDetector(
+                onTap: () => controller.removeRecentSearch(term),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: context.getScreenWidth(3.2),
+                  color: const Color(0xFF8D847A),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
