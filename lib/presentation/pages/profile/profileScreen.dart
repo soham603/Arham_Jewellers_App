@@ -1,7 +1,11 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
@@ -10,6 +14,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminDrawer.da
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -63,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       key: scaffoldKey,
-      endDrawer: isAdmin ? null : const AdminDrawer(),
+      endDrawer: isAdmin ? const AdminDrawer() : null,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
@@ -76,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          if (!isAdmin)
+          if (isAdmin)
             Padding(
               padding: EdgeInsets.only(right: context.getScreenWidth(2)),
               child: GestureDetector(
@@ -312,7 +317,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     bottom: context.getScreenHeight(1.5),
                   ),
 
-                  child: _OrderCard(order: order),
+                  child: _OrderCard(
+                    order: order,
+                    controller: orderController,
+                  ),
                 );
               }),
 
@@ -409,9 +417,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _OrderCard extends StatefulWidget {
-  const _OrderCard({required this.order});
+  const _OrderCard({required this.order, required this.controller});
 
   final UserOrderModel order;
+  final UserOrderController controller;
 
   @override
   State<_OrderCard> createState() => _OrderCardState();
@@ -419,244 +428,447 @@ class _OrderCard extends StatefulWidget {
 
 class _OrderCardState extends State<_OrderCard> {
   bool expanded = false;
+  StreamSubscription? _imageSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _imageSub = widget.controller.productImageCache.listen((_) {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
+    final statusInfo = _getStatusInfo(order.status);
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-
-      width: double.infinity,
-
+    return Container(
       padding: EdgeInsets.all(context.getScreenWidth(4)),
-
       decoration: BoxDecoration(
         color: Colors.white,
-
-        borderRadius: BorderRadius.circular(22),
-
-        border: Border.all(color: const Color(0xFFE7DED2)),
-
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-
       child: Column(
         children: [
-          // ===================================================
-          // TOP CARD
-          // ===================================================
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Container(
-                width: context.getScreenWidth(20),
-
-                height: context.getScreenWidth(20),
-
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-
-                  color: const Color(0xFFF5EFE7),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                expanded = !expanded;
+              });
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _OrderImagesStack(
+                  order: order,
+                  controller: widget.controller,
                 ),
-
-                child: Icon(
-                  Icons.shopping_bag_rounded,
-                  color: AppColors.primaryGold,
-                  size: context.getScreenWidth(9),
-                ),
-              ),
-
-              SizedBox(width: context.getScreenWidth(4)),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                  children: [
-                    Text(
-                      "Order #${order.id.substring(0, 8)}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
-                        fontSize: context.getScreenWidth(4.5),
-                      ),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(0.5)),
-
-                    Text(
-                      DateFormat(
-                        "dd MMM yyyy • hh:mm a",
-                      ).format(order.createdAt.toLocal()),
-
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: context.getScreenWidth(3.4),
-                      ),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(0.8)),
-
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(3),
-                        vertical: context.getScreenHeight(0.5),
-                      ),
-
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF4E5),
-
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-
-                      child: Text(
-                        order.status,
+                SizedBox(width: context.getScreenWidth(4)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        order.orderToken != null
+                            ? 'Order #${order.orderToken}'
+                            : 'Order #${order.id.substring(0, 8).toUpperCase()}',
                         style: TextStyle(
-                          color: Colors.orange,
                           fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(3.2),
+                          fontSize: context.getScreenWidth(4.4),
+                        ),
+                      ),
+                      SizedBox(height: context.getScreenHeight(0.6)),
+                      Text(
+                        DateFormat("dd MMM yyyy • hh:mm a")
+                            .format(order.createdAt.toLocal()),
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: context.getScreenWidth(3.4),
+                        ),
+                      ),
+                      SizedBox(height: context.getScreenHeight(1)),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getScreenWidth(2.5),
+                          vertical: context.getScreenHeight(0.3),
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusInfo.bgColor,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          statusInfo.label,
+                          style: TextStyle(
+                            color: statusInfo.color,
+                            fontWeight: FontWeight.w700,
+                            fontSize: context.getScreenWidth(2.8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  expanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                ),
+              ],
+            ),
+          ),
+
+          if (expanded) ...[
+            SizedBox(height: context.getScreenHeight(2)),
+            Divider(color: Colors.grey.shade300),
+            SizedBox(height: context.getScreenHeight(1)),
+
+            ...List.generate(order.items.length, (index) {
+              final item = order.items[index];
+
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: context.getScreenHeight(1.5),
+                ),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: context.getScreenWidth(12),
+                        height: context.getScreenWidth(12),
+                        child: _ProductImage(
+                          url: widget.controller
+                              .getProductImage(item.product.id),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: context.getScreenWidth(3)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.product.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: context.getScreenWidth(3.8),
+                            ),
+                          ),
+                          SizedBox(height: context.getScreenHeight(0.3)),
+                          Text(
+                            "Qty: ${item.quantity}",
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: context.getScreenWidth(3.2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      "₹${item.price.toStringAsFixed(0)}",
+                      style: TextStyle(
+                        color: AppColors.primaryGold,
+                        fontWeight: FontWeight.w700,
+                        fontSize: context.getScreenWidth(3.7),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+
+            Divider(color: Colors.grey.shade300),
+            SizedBox(height: context.getScreenHeight(1)),
+
+            if (order.adminMessage != null &&
+                order.adminMessage!.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF6F7FB),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: context.getScreenWidth(4),
+                      color: AppColors.primaryGold,
+                    ),
+                    SizedBox(width: context.getScreenWidth(2)),
+                    Expanded(
+                      child: Text(
+                        order.adminMessage!,
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(3.4),
+                          color: AppColors.textMuted,
+                          height: 1.4,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    expanded = !expanded;
-                  });
-                },
-
-                child: AnimatedRotation(
-                  turns: expanded ? 0.5 : 0,
-
-                  duration: const Duration(milliseconds: 250),
-
-                  child: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: context.getScreenWidth(7),
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ),
+              SizedBox(height: context.getScreenHeight(1.5)),
             ],
-          ),
 
-          // ===================================================
-          // EXPANDED
-          // ===================================================
-          if (expanded) ...[
-            SizedBox(height: context.getScreenHeight(1.8)),
-
-            Divider(color: Colors.grey.shade300),
-
-            SizedBox(height: context.getScreenHeight(1)),
-
-            ...List.generate(order.items.length, (index) {
-              final item = order.items[index];
-
-              return Column(
+            if (order.totalAmount != null) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Text(
-                          item.product.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textDark,
-                            fontSize: context.getScreenWidth(3.8),
-                          ),
-                        ),
-                      ),
-
-                      Expanded(
-                        child: Text(
-                          "x${item.quantity}",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: context.getScreenWidth(3.5),
-                          ),
-                        ),
-                      ),
-
-                      Expanded(
-                        child: Text(
-                          "₹${item.price.toStringAsFixed(0)}",
-                          textAlign: TextAlign.end,
-                          style: TextStyle(
-                            color: AppColors.primaryGold,
-                            fontWeight: FontWeight.w700,
-                            fontSize: context.getScreenWidth(3.7),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: context.getScreenHeight(1)),
-
-                  if (index != order.items.length - 1)
-                    Divider(color: Colors.grey.shade200),
-
-                  SizedBox(height: context.getScreenHeight(1)),
-                ],
-              );
-            }),
-
-            Divider(color: Colors.grey.shade300),
-
-            SizedBox(height: context.getScreenHeight(1)),
-
-            Row(
-              children: [
-                Container(
-                  width: context.getScreenWidth(9),
-                  height: context.getScreenWidth(9),
-
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE8F8EC),
-                    shape: BoxShape.circle,
-                  ),
-
-                  child: FaIcon(
-                    FontAwesomeIcons.whatsapp,
-                    color: Colors.green,
-                    size: context.getScreenWidth(4.5),
-                  ),
-                ),
-
-                SizedBox(width: context.getScreenWidth(3)),
-
-                Expanded(
-                  child: Text(
-                    "Contact on WhatsApp for query",
+                  Text(
+                    'Total Amount',
                     style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
-                      fontSize: context.getScreenWidth(3.7),
+                      fontSize: context.getScreenWidth(3.8),
+                      color: AppColors.textMuted,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  Text(
+                    '₹${order.totalAmount!.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(4.2),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryGold,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: context.getScreenHeight(1.5)),
+            ],
+
+            GestureDetector(
+              onTap: () async {
+                final auth = Get.find<AuthController>();
+                final phone = auth.user?.phoneNumber ?? "";
+                final url = "https://wa.me/${phone.replaceAll("+", "")}";
+                if (url != "https://wa.me/") {
+                  await launchUrl(Uri.parse(url));
+                }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: context.getScreenHeight(1.5),
                 ),
-              ],
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE9F9EE),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const FaIcon(
+                      FontAwesomeIcons.whatsapp,
+                      color: Colors.green,
+                    ),
+                    SizedBox(width: context.getScreenWidth(2)),
+                    Text(
+                      "Connect on WhatsApp",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w700,
+                        fontSize: context.getScreenWidth(3.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ],
       ),
     );
   }
+
+  _StatusInfo _getStatusInfo(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return _StatusInfo(
+          label: 'Pending',
+          color: Colors.orange,
+          bgColor: const Color(0xFFFFF4E5),
+        );
+      case 'confirmed':
+        return _StatusInfo(
+          label: 'Confirmed',
+          color: const Color(0xFF2D8C56),
+          bgColor: const Color(0xFFE6F7EE),
+        );
+      case 'processing':
+        return _StatusInfo(
+          label: 'Processing',
+          color: const Color(0xFF3B82F6),
+          bgColor: const Color(0xFFEFF6FF),
+        );
+      case 'completed':
+      case 'delivered':
+        return _StatusInfo(
+          label: 'Delivered',
+          color: AppColors.primaryGold,
+          bgColor: const Color(0xFFF9F3E8),
+        );
+      case 'cancelled':
+        return _StatusInfo(
+          label: 'Cancelled',
+          color: const Color(0xFFDC2626),
+          bgColor: const Color(0xFFFEE2E2),
+        );
+      case 'rejected':
+        return _StatusInfo(
+          label: 'Rejected',
+          color: const Color(0xFFDC2626),
+          bgColor: const Color(0xFFFEE2E2),
+        );
+      default:
+        return _StatusInfo(
+          label: status.isNotEmpty
+              ? '${status[0].toUpperCase()}${status.substring(1)}'
+              : 'Unknown',
+          color: AppColors.textMuted,
+            bgColor: AppColors.tileBg,
+        );
+    }
+  }
+
+  @override
+  void dispose() {
+    _imageSub?.cancel();
+    super.dispose();
+  }
+}
+
+// ── Order Images Stack ───────────────────────────────────────────────────────
+
+class _OrderImagesStack extends StatelessWidget {
+  const _OrderImagesStack({
+    required this.order,
+    required this.controller,
+  });
+
+  final UserOrderModel order;
+  final UserOrderController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.getScreenWidth(20);
+    final items = order.items;
+    final images = items
+        .map((item) => controller.getProductImage(item.product.id))
+        .where((url) => url != null && url.isNotEmpty)
+        .toList();
+
+    if (images.isEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: RatneshFallback.s(width: size, height: size),
+      );
+    }
+
+    final displayImages = images.take(3).toList();
+    final extraCount = order.items.length - displayImages.length;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        children: [
+          for (int i = displayImages.length - 1; i >= 0; i--)
+            Positioned(
+              top: i * 3.0,
+              left: i * 3.0,
+              child: Container(
+                width: size - (displayImages.length - 1) * 3.0,
+                height: size - (displayImages.length - 1) * 3.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: _ProductImage(url: displayImages[i]),
+                ),
+              ),
+            ),
+          if (extraCount > 0)
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(
+                  "+$extraCount",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.getScreenWidth(2.5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Product Image Widget ─────────────────────────────────────────────────────
+
+class _ProductImage extends StatelessWidget {
+  final String? url;
+
+  const _ProductImage({this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    if (url != null && url!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: url!,
+        fit: BoxFit.cover,
+        placeholder: (_, _) => const Center(
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        errorWidget: (_, _, _) => const RatneshFallback.xs(),
+      );
+    }
+    return const RatneshFallback.xs();
+  }
+}
+
+// ── Status Info Model ────────────────────────────────────────────────────────
+
+class _StatusInfo {
+  final String label;
+  final Color color;
+  final Color bgColor;
+
+  const _StatusInfo({
+    required this.label,
+    required this.color,
+    required this.bgColor,
+  });
 }

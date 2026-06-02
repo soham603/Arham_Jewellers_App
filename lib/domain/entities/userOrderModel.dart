@@ -79,12 +79,14 @@ class UserOrderProductModel {
   final String name;
   final String slug;
   final bool isActive;
+  final String? imageUrl;
 
   UserOrderProductModel({
     required this.id,
     required this.name,
     required this.slug,
     required this.isActive,
+    this.imageUrl,
   });
 
   factory UserOrderProductModel.fromJson(Map<String, dynamic> json) {
@@ -93,6 +95,9 @@ class UserOrderProductModel {
       name: json["name"]?.toString() ?? '',
       slug: json["slug"]?.toString() ?? '',
       isActive: json["isActive"] ?? false,
+      imageUrl: json["imageUrl"],
     );
   }
+
+  String? get displayImageUrl => imageUrl;
 }
