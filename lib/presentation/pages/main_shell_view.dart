@@ -26,23 +26,23 @@ class MainShellView extends GetView<NavigationController> {
         if (didPop) return;
         controller.handleBack();
       },
-      child: Scaffold(
-        body: SafeArea(
-          bottom: false,
-          child: Obx(
-            () => IndexedStack(
-              index: controller.selectedIndex.value,
+      child: Obx(() {
+        final index = controller.selectedIndex.value;
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            bottom: false,
+            child: IndexedStack(
+              index: index,
               children: _pages,
             ),
           ),
-        ),
-        bottomNavigationBar: Obx(
-          () => AppBottomNav(
-            currentIndex: controller.selectedIndex.value,
+          bottomNavigationBar: AppBottomNav(
+            currentIndex: index,
             onTap: controller.switchTab,
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }

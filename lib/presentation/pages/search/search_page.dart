@@ -43,7 +43,9 @@ class _SearchPageState extends State<SearchPage> {
     }
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _textController.text = widget.initialQuery!;
-      controller.onSearchSubmitted(widget.initialQuery!);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) controller.onSearchSubmitted(widget.initialQuery!);
+      });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _focusNode.requestFocus();
