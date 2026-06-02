@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -22,9 +21,9 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../app/routes/app_routes.dart';
-import '../../../core/widgets/app_bottom_nav.dart';
 import '../../../core/widgets/custom_divider.dart';
 import '../../../core/widgets/home_search_bar.dart';
+import '../../controllers/navigation_controller.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
@@ -48,7 +47,6 @@ class _HomePageState extends State<HomePage> {
 
   int currentCarouselIndex = 0;
   Timer? _carouselTimer;
-  DateTime? _lastBackPress;
 
   @override
   void initState() {
@@ -126,42 +124,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) return;
-        final now = DateTime.now();
-        if (_lastBackPress != null &&
-            now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
-          SystemNavigator.pop();
-        } else {
-          _lastBackPress = now;
-          HapticFeedback.lightImpact();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Press back again to exit'),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
-            ),
-          );
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  color: AppColors.primaryGold,
-                  backgroundColor: Colors.white,
-                  onRefresh: _onRefresh,
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+    return RefreshIndicator(
+      color: AppColors.primaryGold,
+      backgroundColor: Colors.white,
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        controller: scrollController,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
                         const _TopBar(),
 
                         const SizedBox(height: 8),
@@ -533,15 +504,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-                ),
-              ),
-
-              AppBottomNav(currentIndex: 0),
-            ],
-          ),
-        ),
-      ),
-    );
+                );
   }
 }
 
@@ -1340,7 +1303,13 @@ class _TopBar extends StatelessWidget {
 
           _IconBtn(
             icon: Icons.shopping_bag_outlined,
-            onTap: () => Get.toNamed(AppRoutes.cart),
+            onTap: () {
+              try {
+                Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
+              } catch (_) {
+                Get.toNamed(AppRoutes.cart);
+              }
+            },
           ),
         ],
       ),

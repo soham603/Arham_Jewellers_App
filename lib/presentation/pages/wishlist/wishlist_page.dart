@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_bottom_nav.dart';
 import '../../controllers/wishlist_controller.dart';
 
 class WishlistPage extends StatelessWidget {
@@ -84,7 +83,6 @@ class WishlistPage extends StatelessWidget {
               ),
             ),
           ),
-          const AppBottomNav(currentIndex: 2),
         ],
       ),
     );

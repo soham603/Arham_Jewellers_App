@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -262,7 +263,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         if (!isInCart) {
                           cartController.addToCart(widget.product);
                         }
-                        Get.toNamed(AppRoutes.cart);
+                        try {
+                          Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
+                        } catch (_) {
+                          Get.toNamed(AppRoutes.cart);
+                        }
                       },
                       child: Text(
                         'Buy Now',

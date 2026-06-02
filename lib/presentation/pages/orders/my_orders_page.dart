@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
-import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -149,7 +148,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
               );
             }),
           ),
-          const AppBottomNav(currentIndex: 4),
         ],
       ),
     );

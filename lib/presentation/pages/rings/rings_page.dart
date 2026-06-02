@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/widgets/app_bottom_nav.dart';
 import '../../../core/widgets/product_card.dart';
 import '../../controllers/catalog_controller.dart';
 
@@ -63,7 +62,6 @@ class RingsPage extends StatelessWidget {
               ),
             ),
           ),
-          const AppBottomNav(currentIndex: 0),
         ],
       ),
     );
