@@ -164,10 +164,12 @@ class AdminOrderItemModel {
 class AdminOrderProductModel {
   final String id;
   final String name;
+  final String? imageUrl;
 
   AdminOrderProductModel({
     required this.id,
     required this.name,
+    this.imageUrl,
   });
 
   factory AdminOrderProductModel.fromJson(
@@ -176,6 +178,9 @@ class AdminOrderProductModel {
     return AdminOrderProductModel(
       id: json["id"] ?? "",
       name: json["name"] ?? "",
+      imageUrl: json["imageUrl"],
     );
   }
+
+  String? get displayImageUrl => imageUrl;
 }
