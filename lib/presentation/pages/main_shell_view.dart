@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../core/widgets/app_bottom_nav.dart';
 import '../controllers/navigation_controller.dart';
+import '../controllers/AuthController.dart';
 import 'home/home_page.dart';
 import 'search/search_page.dart';
 import 'cart/cart_page.dart';
@@ -20,6 +21,7 @@ class MainShellView extends GetView<NavigationController> {
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -28,6 +30,7 @@ class MainShellView extends GetView<NavigationController> {
       },
       child: Obx(() {
         final index = controller.selectedIndex.value;
+        final isAdmin = authController.isAdmin;
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
@@ -40,6 +43,7 @@ class MainShellView extends GetView<NavigationController> {
           bottomNavigationBar: AppBottomNav(
             currentIndex: index,
             onTap: controller.switchTab,
+            isAdmin: isAdmin,
           ),
         );
       }),

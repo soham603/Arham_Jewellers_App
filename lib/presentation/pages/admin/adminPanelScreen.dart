@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
@@ -200,48 +199,6 @@ class AdminPanelScreen extends StatelessWidget {
                 onTap: () => Get.to(() => CarouselManagerScreen()),
               ),
             ],
-          ),
-
-          SizedBox(height: context.getScreenHeight(3)),
-
-          // =====================================================
-          // LOGOUT BUTTON
-          // =====================================================
-          GestureDetector(
-            onTap: () {
-              authController.logoutAdmin(context);
-              Get.offAllNamed(AppRoutes.login);
-            },
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                vertical: context.getScreenHeight(1.8),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.redAccent.withOpacity(0.15)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.logout_rounded,
-                    color: Colors.redAccent,
-                    size: context.getScreenWidth(5),
-                  ),
-                  SizedBox(width: context.getScreenWidth(2)),
-                  Text(
-                    "Logout",
-                    style: TextStyle(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.w700,
-                      fontSize: context.getScreenWidth(4.2),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
 
           SizedBox(height: context.getScreenHeight(3)),
