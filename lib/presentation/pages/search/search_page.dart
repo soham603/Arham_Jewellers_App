@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
@@ -921,26 +922,12 @@ class _BrowseCategoryImage extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.fetchFallbackImage(cat.id, categoryName: cat.name);
       });
-      return SizedBox(
-        width: context.getScreenWidth(16),
-        height: context.getScreenWidth(16),
-      );
     }
 
-    if (controller.isFallbackLoading(cat.id)) {
-      return SizedBox(
-        width: context.getScreenWidth(16),
-        height: context.getScreenWidth(16),
-      );
-    }
-
-    return Container(
-      color: context.colorPalette.goldLight,
-      child: Icon(
-        Icons.diamond_outlined,
-        size: context.getScreenWidth(5.5),
-        color: context.colorPalette.goldDark,
-      ),
+    return RatneshFallback(
+      logoSize: context.getScreenWidth(5.5),
+      width: context.getScreenWidth(16),
+      height: context.getScreenWidth(16),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
@@ -746,10 +747,8 @@ class _KaratSection extends StatelessWidget {
                                   imageUrl: cat.imageUrl,
                                   fit: BoxFit.cover,
 
-                                  errorWidget: (_, __, ___) => Icon(
-                                    Icons.diamond_outlined,
-                                    size: context.getScreenWidth(5),
-                                    color: context.colorPalette.goldDark,
+                                  errorWidget: (_, __, ___) => RatneshFallback(
+                                    logoSize: context.getScreenWidth(5),
                                   ),
                                 ),
                               ),
@@ -952,13 +951,8 @@ class _Level3Panel extends StatelessWidget {
                               width: double.infinity,
                               fit: BoxFit.cover,
 
-                              errorWidget: (_, __, ___) => Container(
-                                color: context.colorPalette.goldLight,
-
-                                child: Icon(
-                                  Icons.diamond_outlined,
-                                  color: context.colorPalette.goldDark,
-                                ),
+                              errorWidget: (_, __, ___) => const RatneshFallback(
+                                logoSize: 24,
                               ),
                             ),
                           ),
@@ -1804,26 +1798,12 @@ class _CategoryQuickAccessImage extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.fetchFallbackImage(cat.id, categoryName: cat.name);
       });
-      return SizedBox(
-        width: context.getScreenWidth(20),
-        height: context.getScreenWidth(20),
-      );
     }
 
-    if (controller.isFallbackLoading(cat.id)) {
-      return SizedBox(
-        width: context.getScreenWidth(20),
-        height: context.getScreenWidth(20),
-      );
-    }
-
-    return Container(
-      color: context.colorPalette.goldLight,
-      child: Icon(
-        Icons.diamond_outlined,
-        size: context.getScreenWidth(7),
-        color: context.colorPalette.goldDark,
-      ),
+    return RatneshFallback(
+      logoSize: context.getScreenWidth(7),
+      width: context.getScreenWidth(20),
+      height: context.getScreenWidth(20),
     );
   }
 }
