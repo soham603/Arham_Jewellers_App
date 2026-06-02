@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_text_field.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
@@ -43,6 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
           passwordController.text.trim().isNotEmpty &&
           nameController.text.trim().isNotEmpty &&
           phoneController.text.trim().isNotEmpty &&
+          gstController.text.trim().isNotEmpty &&
           pincodeController.text.trim().isNotEmpty;
     });
   }
@@ -54,6 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
     passwordController.addListener(validateForm);
     nameController.addListener(validateForm);
     phoneController.addListener(validateForm);
+    gstController.addListener(validateForm);
     pincodeController.addListener(validateForm);
   }
 
@@ -85,65 +88,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return 'Unknown Device';
     }
     return 'Unknown Device';
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-    Widget? prefixIcon,
-    bool obscureText = false,
-    int? maxLength,
-    TextCapitalization textCapitalization = TextCapitalization.none,
-  }) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        maxLength: maxLength,
-        textCapitalization: textCapitalization,
-        style: TextStyle(
-          fontSize: context.getScreenWidth(3.5),
-          color: AppColors.textDark,
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade400,
-            fontSize: context.getScreenWidth(3.5),
-          ),
-          counterText: "",
-          filled: true,
-          fillColor: const Color(0xFFF9F9F9),
-          prefixIcon: prefixIcon,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(3.5),
-            vertical: context.getScreenHeight(1.5),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-            borderSide: BorderSide(color: Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-            borderSide: BorderSide(color: AppColors.primaryGold, width: 1.5),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-            borderSide: const BorderSide(color: Colors.redAccent),
-          ),
-        ),
-        validator: validator,
-      ),
-    );
   }
 
   @override
@@ -201,10 +145,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           SizedBox(height: context.getScreenHeight(2.5)),
 
                           // 1. EMAIL
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: emailController,
-                            hintText: 'Email Address *',
+                            hintText: 'Email Address',
                             keyboardType: TextInputType.emailAddress,
+                            isRequired: true,
                             validator: (value) =>
                                 value == null || value.trim().isEmpty
                                 ? 'Email is required'
@@ -212,10 +157,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                           // 2. PASSWORD
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: passwordController,
-                            hintText: 'Create Password *',
+                            hintText: 'Create Password',
                             obscureText: true,
+                            isRequired: true,
                             validator: (value) =>
                                 value == null || value.trim().isEmpty
                                 ? 'Password is required'
@@ -223,10 +169,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                           // 3. NAME
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: nameController,
-                            hintText: 'Full Name *',
+                            hintText: 'Full Name',
                             textCapitalization: TextCapitalization.words,
+                            isRequired: true,
                             validator: (value) =>
                                 value == null || value.trim().isEmpty
                                 ? 'Name is required'
@@ -234,11 +181,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                           // 4. PHONE NUMBER
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: phoneController,
-                            hintText: 'Enter Mobile Number *',
+                            hintText: 'Enter Mobile Number',
                             keyboardType: TextInputType.phone,
                             maxLength: 10,
+                            isRequired: true,
                             prefixIcon: CountryCodePicker(
                               onChanged: (countryCode) {
                                 setState(() {
@@ -250,8 +198,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               favorite: const ['+91', 'IN'],
                               showCountryOnly: false,
                               showOnlyCountryWhenClosed: false,
+                              showDropDownButton: false,
+                              showFlag: false,
                               alignLeft: false,
-                              padding: const EdgeInsets.all(0),
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
                               textStyle: TextStyle(
                                 color: AppColors.textDark,
                                 fontWeight: FontWeight.w600,
@@ -265,32 +215,38 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                           // 5. GST NUMBER
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: gstController,
                             hintText: 'GST NO.',
                             textCapitalization: TextCapitalization.characters,
+                            isRequired: true,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                ? 'GST number is required'
+                                : null,
                           ),
 
                           // 6. CITY
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: cityController,
                             hintText: 'City',
                             textCapitalization: TextCapitalization.words,
                           ),
 
                           // 7. AREA
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: areaController,
                             hintText: 'Area',
                             textCapitalization: TextCapitalization.words,
                           ),
 
                           // 8. PINCODE
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: pincodeController,
-                            hintText: 'Pincode *',
+                            hintText: 'Pincode',
                             keyboardType: TextInputType.number,
                             maxLength: 6,
+                            isRequired: true,
                             validator: (value) =>
                                 value == null || value.trim().isEmpty
                                 ? 'Pincode is required'
@@ -298,7 +254,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
 
                           // 9. COMPANY NAME
-                          _buildTextField(
+                          AnimatedTextField(
                             controller: companyNameController,
                             hintText: 'Company Name',
                             textCapitalization: TextCapitalization.words,
@@ -316,16 +272,26 @@ class _RegisterPageState extends State<RegisterPage> {
                               width: double.infinity,
                               height: context.getScreenHeight(6),
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isFormValid
-                                      ? AppColors.primaryGold
-                                      : Colors.grey.shade400,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      context.getScreenWidth(2.5),
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                    if (states.contains(WidgetState.disabled)) {
+                                      return AppColors.primaryGold.withValues(alpha: 0.35);
+                                    }
+                                    return AppColors.primaryGold;
+                                  }),
+                                  elevation: WidgetStateProperty.resolveWith((states) {
+                                    if (states.contains(WidgetState.disabled)) {
+                                      return 0;
+                                    }
+                                    return 2;
+                                  }),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        context.getScreenWidth(2.5),
+                                      ),
                                     ),
                                   ),
-                                  elevation: isFormValid ? 2 : 0,
                                 ),
                                 onPressed: (!isFormValid || isLoading)
                                     ? null
