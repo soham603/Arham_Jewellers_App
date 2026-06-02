@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
+import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
@@ -156,14 +157,11 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                   Align(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16),
-                      child: Image.asset(
-                        _is22kOnly
-                            ? 'assets/images/arham-logo.png'
-                            : 'assets/images/ratnesh-logo.png',
-                        height: _is22kOnly ? 110 : 80,
-                        fit: BoxFit.contain,
-                        color: context.colorPalette.goldDeep,
-                        colorBlendMode: BlendMode.srcIn,
+                      child: LogoWidget(
+                        showIcon: true,
+                        showName: true,
+                        showSubtitle: false,
+                        logoSize: _is22kOnly ? 110 : 80,
                       ),
                     ),
                   ),
@@ -178,19 +176,6 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                   ),
                 ],
               ),
-              if (!_is22kOnly)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    'RATNESHGOLD',
-                    style: GoogleFonts.bodoniModa(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                      color: context.colorPalette.goldDeep,
-                    ),
-                  ),
-                ),
               SizedBox(height: _is22kOnly ? 0 : 20),
               JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
               Padding(

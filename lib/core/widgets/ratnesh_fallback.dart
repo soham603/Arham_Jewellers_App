@@ -29,35 +29,35 @@ class RatneshFallback extends StatelessWidget {
     super.key,
     this.width,
     this.height,
-  })  : logoSize = 16,
+  })  : logoSize = 12, // Reduced from 16
         nameFontSize = 4;
 
   const RatneshFallback.s({
     super.key,
     this.width,
     this.height,
-  })  : logoSize = 24,
+  })  : logoSize = 18, // Reduced from 24
         nameFontSize = 6;
 
   const RatneshFallback.m({
     super.key,
     this.width,
     this.height,
-  })  : logoSize = 44,
+  })  : logoSize = 32, // Reduced from 44
         nameFontSize = 10;
 
   const RatneshFallback.l({
     super.key,
     this.width,
     this.height,
-  })  : logoSize = 72,
+  })  : logoSize = 56, // Reduced from 72
         nameFontSize = 14;
 
   const RatneshFallback.xl({
     super.key,
     this.width,
     this.height,
-  })  : logoSize = 96,
+  })  : logoSize = 80, // Reduced from 96
         nameFontSize = 18;
 
   @override

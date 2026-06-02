@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -1259,12 +1260,11 @@ class _TopBar extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/ratnesh-logo.png',
-                height: 44,
-                fit: BoxFit.contain,
-                color: context.colorPalette.gold,
-                colorBlendMode: BlendMode.srcIn,
+              const LogoWidget(
+                logoSize: 36,
+                showIcon: true,
+                showName: false,
+                showSubtitle: false,
               ),
               const SizedBox(width: 10),
               Column(
@@ -1771,11 +1771,7 @@ class _CategoryQuickAccessImage extends StatelessWidget {
       });
     }
 
-    return RatneshFallback(
-      logoSize: context.getScreenWidth(7),
-      width: context.getScreenWidth(20),
-      height: context.getScreenWidth(20),
-    );
+    return const RatneshFallback.s();
   }
 }
 
