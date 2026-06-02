@@ -212,34 +212,7 @@ class AdminOrderController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final updatedStatus = action.toUpperCase();
-        final index = _orders.indexWhere((e) => e.id == orderId);
-
-        if (index != -1) {
-          final currentOrder = _orders[index];
-          if (selectedStatus.value != updatedStatus) {
-            _orders.removeAt(index);
-          } else {
-            try {
-              _orders[index] =
-                  (currentOrder as dynamic).copyWith(status: updatedStatus)
-                      as AdminOrderModel;
-            } catch (_) {
-              try {
-                final map =
-                    (currentOrder as dynamic).toJson() as Map<String, dynamic>;
-                map["status"] = updatedStatus;
-                _orders[index] = AdminOrderModel.fromJson(map);
-              } catch (_) {
-                fetchOrders();
-              }
-            }
-          }
-        }
-
-        // if (Get.isDialogOpen ?? false) {
-        //   Get.back(closeOverlays: true);
-        // }
+        await fetchOrders();
 
         Get.snackbar(
           "Success",
