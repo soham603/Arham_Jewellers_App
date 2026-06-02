@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -316,27 +317,16 @@ class _ProductImage extends StatelessWidget {
                       decoration: BoxDecoration(color: Colors.white),
                     ),
                   ),
-                  errorWidget: (context, url, error) => Center(
-                    child: Icon(
-                      Icons.image_not_supported_outlined,
-                      color: Colors.grey.shade400,
-                      size: iconSize,
-                    ),
+                  errorWidget: (context, url, error) => RatneshFallback(
+                    logoSize: iconSize * 0.5,
                   ),
                 ),
               ),
             ),
           )
         else
-          ColoredBox(
-            color: const Color(0xFFF8F5F0),
-            child: Center(
-              child: Icon(
-                Icons.image_outlined,
-                color: const Color(0xFF887A67),
-                size: iconSize,
-              ),
-            ),
+          RatneshFallback(
+            logoSize: iconSize * 0.5,
           ),
         if (isNew)
           Positioned(
