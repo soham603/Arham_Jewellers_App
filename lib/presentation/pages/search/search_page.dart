@@ -354,7 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                 context.getScreenWidth(4),
                 context.getScreenHeight(1.5),
                 context.getScreenWidth(4),
-                0,
+                context.getScreenHeight(0.8),
               ),
               child: Text(
                 'Browse Categories',
