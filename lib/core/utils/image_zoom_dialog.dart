@@ -5,9 +5,8 @@ import 'package:shimmer/shimmer.dart';
 /// Shows a full-screen zoomable image dialog.
 ///
 /// Usage from anywhere:
-/// ```dart
 /// showImageZoomDialog(context, imageUrl);
-/// ```
+
 void showImageZoomDialog(BuildContext context, String imageUrl) {
   showGeneralDialog(
     context: context,

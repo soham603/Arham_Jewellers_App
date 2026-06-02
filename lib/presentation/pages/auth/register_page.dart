@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/logo_widget.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
@@ -180,10 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(
-                            child: LogoWidget(size: context.getScreenWidth(28)),
-                          ),
-                          SizedBox(height: context.getScreenHeight(3)),
+                          SizedBox(height: context.getScreenHeight(2)),
 
                           Text(
                             'Register',
