@@ -6,7 +6,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/custom_divider.dart';
+import '../../../core/widgets/animated_text_field.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
@@ -30,9 +30,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   String selectedCountryCode = "+91";
 
-  final FocusNode _phoneFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
-
   void validateForm() {
     setState(() {
       isFormValid =
@@ -46,62 +43,13 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     phoneController.addListener(validateForm);
     passwordController.addListener(validateForm);
-    _phoneFocusNode.addListener(() => setState(() {}));
-    _passwordFocusNode.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     phoneController.dispose();
     passwordController.dispose();
-    _phoneFocusNode.dispose();
-    _passwordFocusNode.dispose();
     super.dispose();
-  }
-
-  InputDecoration _buildInputDecoration(
-    BuildContext context, {
-    required String hintText,
-    Widget? prefixIcon,
-    Widget? suffixIcon,
-  }) {
-    return InputDecoration(
-      hintText: hintText,
-      hintStyle: TextStyle(
-        color: Colors.grey.shade500,
-        fontSize: context.getScreenWidth(3.5),
-        fontWeight: FontWeight.w400,
-      ),
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-      counterText: "",
-      filled: true,
-      fillColor: const Color(0xFFF9F9F9),
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(3.5),
-        vertical: context.getScreenHeight(1.5),
-      ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-        borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-        borderSide: const BorderSide(color: Colors.redAccent),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-        borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
-      ),
-    );
   }
 
   @override
@@ -213,122 +161,71 @@ class _LoginPageState extends State<LoginPage> {
 
           SizedBox(height: context.getScreenHeight(2)),
 
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-              boxShadow: _phoneFocusNode.hasFocus
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primaryGold.withValues(alpha: 0.15),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: TextFormField(
-              focusNode: _phoneFocusNode,
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
-              maxLength: 10,
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.5),
-                color: AppColors.textDark,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: _buildInputDecoration(
-                context,
-                hintText: 'Mobile Number',
-                prefixIcon: CountryCodePicker(
-                  onChanged: (countryCode) {
-                    setState(() {
-                      selectedCountryCode = countryCode.dialCode ?? "+91";
-                    });
-                  },
-                  initialSelection: 'IN',
-                  favorite: const ['+91', 'IN'],
-                  showCountryOnly: false,
-                  showOnlyCountryWhenClosed: false,
-                  showDropDownButton: false,
-                  showFlag: false,
-                  alignLeft: false,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  textStyle: TextStyle(
-                    color: AppColors.textDark,
-                    fontWeight: FontWeight.w600,
-                    fontSize: context.getScreenWidth(3.5),
-                  ),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Phone number is required";
-                }
-                if (value.trim().length < 10) {
-                  return "Enter valid phone number";
-                }
-                return null;
+          AnimatedTextField(
+            controller: phoneController,
+            hintText: 'Mobile Number',
+            keyboardType: TextInputType.phone,
+            maxLength: 10,
+            prefixIcon: CountryCodePicker(
+              onChanged: (countryCode) {
+                setState(() {
+                  selectedCountryCode = countryCode.dialCode ?? "+91";
+                });
               },
+              initialSelection: 'IN',
+              favorite: const ['+91', 'IN'],
+              showCountryOnly: false,
+              showOnlyCountryWhenClosed: false,
+              showDropDownButton: false,
+              showFlag: false,
+              alignLeft: false,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              textStyle: TextStyle(
+                color: AppColors.textDark,
+                fontWeight: FontWeight.w600,
+                fontSize: context.getScreenWidth(3.5),
+              ),
             ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return "Phone number is required";
+              }
+              if (value.trim().length < 10) {
+                return "Enter valid phone number";
+              }
+              return null;
+            },
           ),
 
-          SizedBox(height: context.getScreenHeight(1.2)),
-
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-              boxShadow: _passwordFocusNode.hasFocus
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primaryGold.withValues(alpha: 0.15),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: TextFormField(
-              focusNode: _passwordFocusNode,
-              controller: passwordController,
-              obscureText: _obscurePassword,
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.5),
-                color: AppColors.textDark,
-                fontWeight: FontWeight.w500,
+          AnimatedTextField(
+            controller: passwordController,
+            hintText: 'Enter Password',
+            obscureText: _obscurePassword,
+            paddingBottom: context.getScreenHeight(0.5),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: Colors.grey.shade500,
+                size: context.getScreenWidth(5),
               ),
-              decoration: _buildInputDecoration(
-                context,
-                hintText: 'Enter Password',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: Colors.grey.shade500,
-                    size: context.getScreenWidth(5),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return "Password is required";
-                }
-                if (value.length < 4) {
-                  return "Password too short";
-                }
-                return null;
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
               },
             ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return "Password is required";
+              }
+              if (value.length < 4) {
+                return "Password too short";
+              }
+              return null;
+            },
           ),
-
-          SizedBox(height: context.getScreenHeight(0.8)),
 
           Align(
             alignment: Alignment.centerRight,
@@ -437,31 +334,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           }),
 
-          SizedBox(height: context.getScreenHeight(0.8)),
-
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  size: context.getScreenWidth(3.8),
-                  color: AppColors.textDark,
-                ),
-                SizedBox(width: context.getScreenWidth(1.2)),
-                Text(
-                  'Secure & Encrypted',
-                  style: TextStyle(
-                    fontSize: context.getScreenWidth(3.2),
-                    color: AppColors.textDark,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.getScreenHeight(1.5)),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
