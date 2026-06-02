@@ -25,8 +25,9 @@ class RatneshFallback extends StatelessWidget {
           showSubtitle: false,
           iconColor: context.colorPalette.goldDark,
           nameColor: context.colorPalette.goldDark,
-          nameLetterSpacing: 1,
+          nameLetterSpacing: 0.5,
           iconNameSpacing: 4,
+          nameFontSize: 6,
         ),
       ),
     );
