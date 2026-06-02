@@ -63,7 +63,7 @@ class OrderSuccessPage extends StatelessWidget {
 
                       // ── "Order Placed!" heading ──────────────────────
                       Text(
-                        'Order Placed!',
+                        'Booking Confirmed!',
                         style: TextStyle(
                           fontSize: context.getScreenWidth(7),
                           fontWeight: FontWeight.w700,
@@ -77,7 +77,7 @@ class OrderSuccessPage extends StatelessWidget {
                       Text(
                         message.isNotEmpty
                             ? message
-                            : 'Your order has been received.\nOur team will contact you shortly.',
+                            : 'Your booking has been received.\nOur team will contact you shortly.',
                         style: TextStyle(
                           fontSize: context.getScreenWidth(3.8),
                           color: AppColors.textMuted,
@@ -212,7 +212,7 @@ class _OrderDetailCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Order Confirmed',
+                      'Booking Received',
                       style: TextStyle(
                         fontSize: context.getScreenWidth(4.5),
                         fontWeight: FontWeight.w700,
@@ -221,7 +221,7 @@ class _OrderDetailCard extends StatelessWidget {
                     ),
                     SizedBox(height: context.getScreenHeight(0.5)),
                     Text(
-                      'Processing your request',
+                      'Your booking has been received',
                       style: TextStyle(
                         fontSize: context.getScreenWidth(3.5),
                         color: AppColors.textMuted,
@@ -316,10 +316,10 @@ class _NextStepsCard extends StatelessWidget {
     final steps = [
       (Icons.phone_in_talk_rounded, 'Team will call you',
           'Our team will contact you within 24 hours'),
-      (Icons.verified_outlined, 'Order verification',
+      (Icons.verified_outlined, 'Booking verification',
           'We confirm stock availability and pricing'),
-      (Icons.local_shipping_outlined, 'Delivery or Pickup',
-          'Choose home delivery or visit our showroom'),
+      (Icons.store_outlined, 'Visit Showroom',
+          'Visit our showroom to complete your purchase'),
     ];
 
     return Container(
