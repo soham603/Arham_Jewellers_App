@@ -300,10 +300,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     height: double.infinity,
                     color: const Color(0xFFE6E1D9),
                     child:
-                        widget.product.imageUrl != null &&
-                            widget.product.imageUrl!.trim().isNotEmpty
+                        widget.product.displayImageUrl != null &&
+                            widget.product.displayImageUrl!.trim().isNotEmpty
                         ? CachedNetworkImage(
-                            imageUrl: widget.product.imageUrl!,
+                            imageUrl: widget.product.displayImageUrl!,
                             fit: BoxFit.contain,
                             placeholder: (context, url) => Shimmer.fromColors(
                               baseColor: const Color(0xFFE7E2DB),

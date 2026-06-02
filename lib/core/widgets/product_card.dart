@@ -59,7 +59,7 @@ class _ProductCardState extends State<ProductCard>
 
         final displayName =
             _cleanText(product.name) ?? 'Untitled Product';
-        final imageUrl = _cleanText(product.imageUrl);
+        final imageUrl = _cleanText(product.displayImageUrl);
         final categoryName = _cleanText(product.category?.name);
         final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.fineWeight);
