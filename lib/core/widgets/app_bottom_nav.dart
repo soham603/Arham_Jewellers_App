@@ -7,19 +7,21 @@ import '../theme/app_colors.dart';
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     required this.currentIndex,
+    this.isAdmin = false,
     super.key,
   });
 
   final int currentIndex;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
-    const labels = [
+    final labels = [
       'Home',
       'Search',
       //'Wishlist',
       'Cart',
-      'Profile',
+      isAdmin ? 'Admin' : 'Profile',
     ];
 
     const icons = [
