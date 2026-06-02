@@ -16,11 +16,13 @@ class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     required this.currentIndex,
     required this.onTap,
+    this.isAdmin = false,
     super.key,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final bool isAdmin;
 
   static const double _barHeight = 66.0;
   static const double _iconContainerSize = 36.0;
@@ -35,11 +37,11 @@ class AppBottomNav extends StatelessWidget {
   static const Color _unselectedBgColor = Color(0xFFF2EEEA);
   static const Color _unselectedContentColor = Color(0xFF847B71);
 
-  static const List<_NavItem> _navItems = [
-    _NavItem(label: 'Home', icon: Icons.home_rounded),
-    _NavItem(label: 'Search', icon: Icons.search_rounded),
-    _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
-    _NavItem(label: 'Profile', icon: Icons.person_rounded),
+  List<_NavItem> get _navItems => [
+    const _NavItem(label: 'Home', icon: Icons.home_rounded),
+    const _NavItem(label: 'Search', icon: Icons.search_rounded),
+    const _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
+    _NavItem(label: isAdmin ? 'Admin' : 'Profile', icon: Icons.person_rounded),
   ];
 
   @override

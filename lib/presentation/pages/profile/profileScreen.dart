@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminDrawer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -68,7 +68,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       key: scaffoldKey,
-      endDrawer: isAdmin ? const AdminDrawer() : null,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
@@ -81,34 +80,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          if (isAdmin)
-            Padding(
-              padding: EdgeInsets.only(right: context.getScreenWidth(2)),
-              child: GestureDetector(
-                onTap: () {
-                  scaffoldKey.currentState?.openEndDrawer();
-                },
-                child: Container(
-                  padding: EdgeInsets.all(context.getScreenWidth(2.5)),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.menu_rounded,
-                    color: AppColors.textDark,
-                    size: context.getScreenWidth(6),
-                  ),
+          Padding(
+            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+            child: GestureDetector(
+              onTap: () async {
+                if (isAdmin) {
+                  await authController.logoutAdmin(context);
+                } else {
+                  await authController.logoutUser(context);
+                }
+                Get.offAllNamed(AppRoutes.login);
+              },
+              child: Container(
+                padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.textDark,
+                  size: context.getScreenWidth(6),
                 ),
               ),
             ),
+          ),
         ],
       ),
 
