@@ -76,6 +76,10 @@ class UserOrderController extends GetxController {
 
   int _ordersPage = 1;
 
+  final _productImageCache = <String, String?>{}.obs;
+  RxMap<String, String?> get productImageCache => _productImageCache;
+  String? getProductImage(String productId) => _productImageCache[productId];
+
 
   Future<bool> createOrder() async {
     if (_isCreatingOrder.value) return false;
@@ -240,6 +244,8 @@ class UserOrderController extends GetxController {
 
         _ordersState.value = CurrentAppState.SUCCESS;
 
+        _fetchProductImages();
+
         Logger.info("UserOrderController", "Orders fetched successfully");
       } else {
         _ordersState.value = CurrentAppState.ERROR;
@@ -266,6 +272,55 @@ class UserOrderController extends GetxController {
       Get.snackbar("Error", errorMessage);
     } finally {
       _isFetchingOrders.value = false;
+    }
+  }
+
+  // =====================================================
+  // FETCH PRODUCT IMAGES
+  // =====================================================
+
+  Future<void> _fetchProductImages() async {
+    final uniqueProducts = <String, String>{};
+    for (final order in _userOrders) {
+      for (final item in order.items) {
+        final id = item.product.id;
+        if (!_productImageCache.containsKey(id) &&
+            !uniqueProducts.containsKey(id)) {
+          uniqueProducts[id] = item.product.name;
+        }
+      }
+    }
+
+    if (uniqueProducts.isEmpty) return;
+
+    for (final entry in uniqueProducts.entries) {
+      try {
+        final response = await httpClient.get(
+          "/api/v1/products/search",
+          queryParameters: {
+            "search": entry.value,
+            "page": 1,
+            "limit": 5,
+            "showAll": true,
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final List raw = response.data['data']['data'] ?? [];
+          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
+                (p) => p?['id'] == entry.key,
+                orElse: () =>
+                    raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+              );
+
+          if (match != null) {
+            _productImageCache[entry.key] = match['imageUrl'];
+          }
+        }
+      } catch (e) {
+        Logger.error(
+            "UserOrderController", "Image fetch failed for ${entry.key}: $e");
+      }
     }
   }
 
