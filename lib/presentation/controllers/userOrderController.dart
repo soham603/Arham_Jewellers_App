@@ -27,6 +27,30 @@ class UserOrderController extends GetxController {
 
   String get createdOrderId => _createdOrderId.value;
 
+  final _lastOrderImages = <String>[].obs;
+
+  List<String> get lastOrderImages => _lastOrderImages;
+
+  final _lastOrderItemNames = <String>[].obs;
+
+  List<String> get lastOrderItemNames => _lastOrderItemNames;
+
+  final _lastOrderItemQuantities = <int>[].obs;
+
+  List<int> get lastOrderItemQuantities => _lastOrderItemQuantities;
+
+  final _lastOrderItemPrices = <double>[].obs;
+
+  List<double> get lastOrderItemPrices => _lastOrderItemPrices;
+
+  double _lastOrderTotal = 0;
+
+  double get lastOrderTotal => _lastOrderTotal;
+
+  DateTime _lastOrderCreatedAt = DateTime.now();
+
+  DateTime get lastOrderCreatedAt => _lastOrderCreatedAt;
+
 
   static const int _ordersLimit = 5;
 
@@ -92,6 +116,31 @@ class UserOrderController extends GetxController {
             data["message"]?.toString() ?? "Order placed successfully";
 
         _createOrderState.value = CurrentAppState.SUCCESS;
+
+        _lastOrderImages.value = cartController.items
+            .map((item) => item.product.displayImageUrl)
+            .where((url) => url != null && url.isNotEmpty)
+            .cast<String>()
+            .toList();
+
+        _lastOrderItemNames.value = cartController.items
+            .map((item) => item.product.name)
+            .toList();
+
+        _lastOrderItemQuantities.value = cartController.items
+            .map((item) => item.quantity)
+            .toList();
+
+        _lastOrderItemPrices.value = cartController.items
+            .map((item) =>
+                ((item.product.rawData?["TagSalesAmount"] ?? 0).toDouble() *
+                    item.quantity))
+            .toList()
+            .cast<double>();
+
+        _lastOrderTotal = _lastOrderItemPrices.fold(0, (sum, p) => sum + p);
+
+        _lastOrderCreatedAt = DateTime.now();
 
         cartController.clearCart();
 
@@ -258,5 +307,17 @@ class UserOrderController extends GetxController {
     _orderMessage.value = '';
 
     _createdOrderId.value = '';
+
+    _lastOrderImages.clear();
+
+    _lastOrderItemNames.clear();
+
+    _lastOrderItemQuantities.clear();
+
+    _lastOrderItemPrices.clear();
+
+    _lastOrderTotal = 0;
+
+    _lastOrderCreatedAt = DateTime.now();
   }
 }
