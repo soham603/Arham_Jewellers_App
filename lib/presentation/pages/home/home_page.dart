@@ -951,9 +951,7 @@ class _Level3Panel extends StatelessWidget {
                               width: double.infinity,
                               fit: BoxFit.cover,
 
-                              errorWidget: (_, __, ___) => const RatneshFallback(
-                                logoSize: 24,
-                              ),
+                              errorWidget: (_, __, ___) => const RatneshFallback.s(),
                             ),
                           ),
                         ),

@@ -411,7 +411,7 @@ class _CategoryListingImage extends StatelessWidget {
       });
     }
 
-    return const RatneshFallback(logoSize: 24);
+    return const RatneshFallback.s();
   }
 }
 

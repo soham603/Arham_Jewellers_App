@@ -924,8 +924,7 @@ class _BrowseCategoryImage extends StatelessWidget {
       });
     }
 
-    return RatneshFallback(
-      logoSize: context.getScreenWidth(5.5),
+    return RatneshFallback.xs(
       width: context.getScreenWidth(16),
       height: context.getScreenWidth(16),
     );
