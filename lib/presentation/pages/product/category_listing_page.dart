@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
@@ -403,31 +404,14 @@ class _CategoryListingImage extends StatelessWidget {
   }
 
   Widget _diamondPlaceholder(BuildContext context) {
-    // Not yet attempted — kick off the fetch and show nothing while in-flight.
     if (!controller.isFallbackAttempted(cat.id) &&
         !controller.isFallbackLoading(cat.id)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         controller.fetchFallbackImage(cat.id, categoryName: cat.name);
       });
-      return const SizedBox.expand();
     }
 
-    // Fetch is in progress — keep showing nothing.
-    if (controller.isFallbackLoading(cat.id)) {
-      return const SizedBox.expand();
-    }
-
-    // Fetch completed with no result — show the diamond icon as a last resort.
-    return Container(
-      color: context.colorPalette.goldLight,
-      child: Center(
-        child: Icon(
-          Icons.diamond_outlined,
-          size: 24,
-          color: context.colorPalette.goldDark,
-        ),
-      ),
-    );
+    return const RatneshFallback(logoSize: 24);
   }
 }
 
