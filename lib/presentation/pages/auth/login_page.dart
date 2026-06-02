@@ -12,6 +12,9 @@ import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
 
+// 🔥 Import the new Change Handset page
+import 'change_handset_page.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -54,50 +57,52 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: AnimatedPadding(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOut,
-            padding: EdgeInsets.only(bottom: keyboardInset),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                context.getScreenWidth(5),
-                context.getScreenHeight(1),
-                context.getScreenWidth(5),
-                context.getScreenHeight(1),
-              ),
-              child: Column(
-                children: [
-                  _buildTopSection(context),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(5),
+                        vertical: context.getScreenHeight(2),
+                      ),
+                      child: Column(
+                        children: [
+                          // 1. Logo & Header
+                          _buildTopSection(context),
 
-                  SizedBox(height: context.getScreenHeight(1)),
+                          SizedBox(height: context.getScreenHeight(2)),
 
-                  Expanded(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        child: Form(
-                          key: _formKey,
-                          child: _buildFormSection(context),
-                        ),
+                          // 2. Form
+                          Expanded(
+                            child: Center(
+                              child: Form(
+                                key: _formKey,
+                                child: _buildFormSection(context),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: context.getScreenHeight(2)),
+
+                          // 3. Bottom Links & Terms
+                          _buildBottomSection(context),
+                        ],
                       ),
                     ),
                   ),
-
-                  SizedBox(height: context.getScreenHeight(1)),
-
-                  _buildBottomSection(context),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -110,19 +115,18 @@ class _LoginPageState extends State<LoginPage> {
         SizedBox(height: context.getScreenHeight(5)),
         Center(
           child: LogoWidget(
-            logoSize: context.getScreenWidth(14.5),
-            nameFontSize: context.getScreenWidth(3.5),
-            subtitleFontSize: context.getScreenWidth(2.1),
+            logoSize: context.getScreenWidth(24),
+            nameFontSize: context.getScreenWidth(5.5),
+            subtitleFontSize: context.getScreenWidth(2.8),
             iconColor: context.colorPalette.gold,
             nameColor: context.colorPalette.goldDeep,
             subtitleColor: context.colorPalette.goldDark,
-            nameLetterSpacing: 2,
-            iconNameSpacing: context.getScreenHeight(0.4),
-            nameSubtitleSpacing: context.getScreenHeight(0.15),
+            nameLetterSpacing: 2.5,
+            iconNameSpacing: context.getScreenHeight(1.5),
+            nameSubtitleSpacing: context.getScreenHeight(0.4),
           ),
         ),
-        SizedBox(height: context.getScreenHeight(0.8)),
-        // const CategoryDivider(vertical: 4),
+        SizedBox(height: context.getScreenHeight(2)),
       ],
     );
   }
@@ -278,7 +282,10 @@ class _LoginPageState extends State<LoginPage> {
                     ? null
                     : () async {
                         if (!_formKey.currentState!.validate()) {
-                          ToastUtils.showError(context, "Please fix the errors");
+                          ToastUtils.showError(
+                            context,
+                            "Please fix the errors",
+                          );
                           return;
                         }
 
@@ -336,6 +343,7 @@ class _LoginPageState extends State<LoginPage> {
 
           SizedBox(height: context.getScreenHeight(1.5)),
 
+          // ── Create Account Section ──
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -359,6 +367,25 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
+
+          SizedBox(height: context.getScreenHeight(1.5)),
+
+          // 🔥 Removed underline and added space before the question mark
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() => const ChangeHandsetPage());
+              },
+              child: Text(
+                'Change Handset ?',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.2),
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -368,7 +395,6 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(height: context.getScreenHeight(7)),
         Center(
           child: GestureDetector(
             onTap: () {
@@ -428,7 +454,7 @@ class _LoginPageState extends State<LoginPage> {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(3)),
+        SizedBox(height: context.getScreenHeight(1)),
       ],
     );
   }

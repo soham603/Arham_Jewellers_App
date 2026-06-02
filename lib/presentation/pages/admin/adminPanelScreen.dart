@@ -236,8 +236,8 @@ class AdminPanelScreen extends StatelessWidget {
             Container(
               width: context.getScreenWidth(14),
               height: context.getScreenWidth(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5EFE7),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5EFE7),
                 shape: BoxShape.circle,
               ),
               child: Icon(
