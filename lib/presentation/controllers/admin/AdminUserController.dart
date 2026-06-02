@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:ratnesh_gold_app/domain/entities/admin/adminAccessModel.dart';
@@ -51,10 +53,18 @@ class AdminUserController extends GetxController {
   final _selectedUserId = Rxn<String>();
   String? get selectedUserId => _selectedUserId.value;
 
+  Timer? _debounce;
+
   @override
   void onInit() {
     super.onInit();
     fetchRequests();
+  }
+
+  @override
+  void onClose() {
+    _debounce?.cancel();
+    super.onClose();
   }
 
   Future<void> fetchRequests({bool isPagination = false}) async {
@@ -129,6 +139,7 @@ class AdminUserController extends GetxController {
     await fetchRequests(isPagination: true);
   }
 
+  @override
   Future<void> refresh() async {
     _page = 1;
     _hasMore = true;
@@ -152,8 +163,14 @@ class AdminUserController extends GetxController {
     _searchQuery.value = query;
     
     if (_searchMode.value == SearchMode.PHONE) {
-      // Direct search - just update query and fetch
-      fetchRequests();
+      _debounce?.cancel();
+      if (query.trim().isEmpty) {
+        fetchRequests();
+      } else {
+        _debounce = Timer(const Duration(milliseconds: 300), () {
+          fetchRequests();
+        });
+      }
     } else {
       // User mode - search users and show dropdown
       if (query.trim().isEmpty) {
@@ -241,7 +258,7 @@ class AdminUserController extends GetxController {
       body: {'requestId': requestId, 'action': 'REJECTED'},
       onSuccess: (req) => req.copyWith(
         status: 'REJECTED',
-        approvedTill: null
+        clearApprovedTill: true,
       ),
     );
   }
@@ -262,7 +279,8 @@ class AdminUserController extends GetxController {
         options: Options(extra: {'requiresAuth': true}),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['success'] != false) {
         final index = _requests.indexWhere((r) => r.id == requestId);
 
         if (index != -1) {
@@ -279,6 +297,7 @@ class AdminUserController extends GetxController {
         _actionState.value = CurrentAppState.SUCCESS;
         _actioningId.value = '';
         Get.snackbar("Success", response.data["message"] ?? "Action completed");
+        await refresh();
         return true;
       }
 
