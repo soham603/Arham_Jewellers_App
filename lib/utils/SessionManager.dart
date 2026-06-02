@@ -122,6 +122,19 @@ class SessionManager {
     }
   }
 
+  // ── Admin flag persistence ──────────────────────────────────────────
+  static const _isAdminKey = 'IS_ADMIN';
+
+  Future<void> saveIsAdmin(bool isAdmin) async {
+    final prefs = await _prefs;
+    await prefs.setBool(_isAdminKey, isAdmin);
+  }
+
+  Future<bool> getIsAdmin() async {
+    final prefs = await _prefs;
+    return prefs.getBool(_isAdminKey) ?? false;
+  }
+
   // ── User data persistence ───────────────────────────────────────────
   Future<bool> saveUserData(UserModel user) async {
     try {

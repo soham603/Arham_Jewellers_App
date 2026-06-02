@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminDrawer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -22,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late final AuthController authController;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  Worker? _adminWorker;
 
   @override
   void initState() {
@@ -39,23 +41,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       authController = Get.put(AuthController());
     }
 
+    _adminWorker = ever(authController.isAdminRx, (_) {
+      if (mounted) setState(() {});
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       orderController.fetchUserOrders();
     });
   }
 
   @override
+  void dispose() {
+    _adminWorker?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isAdmin = authController.isAdmin;
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       key: scaffoldKey,
-      bottomNavigationBar: const AppBottomNav(currentIndex: 4),
-      endDrawer: const AdminDrawer(),
+      bottomNavigationBar: AppBottomNav(currentIndex: 3, isAdmin: isAdmin),
+      endDrawer: isAdmin ? null : const AdminDrawer(),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
         title: Text(
-          "Profile",
+          isAdmin ? "Admin Panel" : "Profile",
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
@@ -63,42 +77,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          Padding(
-            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
-
-            child: GestureDetector(
-              onTap: () {
-                scaffoldKey.currentState?.openEndDrawer();
-              },
-
-              child: Container(
-                padding: EdgeInsets.all(context.getScreenWidth(2.5)),
-
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-
-                child: Icon(
-                  Icons.menu_rounded,
-                  color: AppColors.textDark,
-                  size: context.getScreenWidth(6),
+          if (!isAdmin)
+            Padding(
+              padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+              child: GestureDetector(
+                onTap: () {
+                  scaffoldKey.currentState?.openEndDrawer();
+                },
+                child: Container(
+                  padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.menu_rounded,
+                    color: AppColors.textDark,
+                    size: context.getScreenWidth(6),
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
 
-      body: Obx(() {
+      body: isAdmin
+          ? const AdminPanelScreen()
+          : Obx(() {
         if (orderController.ordersState == CurrentAppState.LOADING &&
             orderController.userOrders.isEmpty) {
           return const Center(child: CircularProgressIndicator());

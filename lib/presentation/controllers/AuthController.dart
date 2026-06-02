@@ -33,6 +33,26 @@ class AuthController extends GetxController {
   final Rxn<UserModel> _user = Rxn<UserModel>();
   UserModel? get user => _user.value;
 
+  final RxBool _isAdmin = false.obs;
+  bool get isAdmin => _isAdmin.value;
+  RxBool get isAdminRx => _isAdmin;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _restoreSession();
+  }
+
+  void _restoreSession() async {
+    final sessionManager = SessionManager();
+    final userData = await sessionManager.getUserData();
+    final isAdminFlag = await sessionManager.getIsAdmin();
+    if (userData != null) {
+      _user.value = userData;
+      _isAdmin.value = isAdminFlag;
+    }
+  }
+
   Future<bool> loginUserWithPhone({
     required String phoneNumber,
     required String password,
@@ -67,7 +87,9 @@ class AuthController extends GetxController {
 
         final user = UserModel.fromJson(data['user']);
         _user.value = user;
+        _isAdmin.value = false;
         await SessionManager().saveUserData(user);
+        await SessionManager().saveIsAdmin(false);
 
         await SessionManager().saveTokens(
           accessToken: data['accessToken'],
@@ -129,7 +151,9 @@ class AuthController extends GetxController {
 
         final user = UserModel.fromJson(data['admin']);
         _user.value = user;
+        _isAdmin.value = true;
         await SessionManager().saveUserData(user);
+        await SessionManager().saveIsAdmin(true);
 
         await SessionManager().saveTokens(
           accessToken: data['accessToken'],
@@ -198,6 +222,7 @@ class AuthController extends GetxController {
     try {
       await sessionManager.clearAll();
       _user.value = null;
+      _isAdmin.value = false;
       ToastUtils.showSuccess(context, "Logged out successfully!");
       onComplete?.call();
     } catch (e) {
@@ -213,6 +238,7 @@ class AuthController extends GetxController {
     try {
       await sessionManager.clearAll();
       _user.value = null;
+      _isAdmin.value = false;
       ToastUtils.showSuccess(context, "Admin logged out successfully!");
       onComplete?.call();
     } catch (e) {

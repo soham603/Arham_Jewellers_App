@@ -233,7 +233,7 @@ class _AdminDrawerState extends State<AdminDrawer> {
 
                         Get.back();
 
-                        auth.user?.role == 'ADMIN'
+                        auth.isAdmin
                             ? auth.logoutAdmin(context)
                             : auth.logoutUser(context);
 
