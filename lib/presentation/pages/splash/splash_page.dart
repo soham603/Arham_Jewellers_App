@@ -74,9 +74,9 @@ class _SplashPageState extends State<SplashPage>
               const Spacer(flex: 2),
               Center(
                 child: LogoWidget(
-                  logoSize: context.getScreenWidth(48),
+                  logoSize: context.getScreenWidth(35),
                   iconColor: context.colorPalette.gold,
-                  nameColor: context.colorPalette.goldDeep,
+                  nameColor: context.colorPalette.goldDark,
                   nameFontSize: context.getScreenWidth(7),
                   nameLetterSpacing: 2,
                   subtitleColor: palette.subTitleColor,
