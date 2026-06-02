@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
-import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
@@ -63,7 +62,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       key: scaffoldKey,
-      bottomNavigationBar: AppBottomNav(currentIndex: 3, isAdmin: isAdmin),
       endDrawer: isAdmin ? null : const AdminDrawer(),
       appBar: AppBar(
         elevation: 0,

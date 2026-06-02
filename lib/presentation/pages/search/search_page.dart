@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/widgets/app_bottom_nav.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
@@ -74,23 +74,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, _) {
-        if (_textController.text.isNotEmpty ||
-            controller.isSearching ||
-            controller.hasActiveFilters) {
-          _textController.clear();
-          controller.clearSearch();
-          controller.clearAllFilters();
-          controller.loadInitialProducts();
-          setState(() {});
-        } else {
-          Get.offAllNamed("/home");
-        }
-      },
-      child: Scaffold(
-        backgroundColor: context.colorPalette.backgroundColor,
+    return Scaffold(
+      backgroundColor: context.colorPalette.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -98,7 +83,23 @@ class _SearchPageState extends State<SearchPage> {
               controller: _textController,
               focusNode: _focusNode,
               autofocus: false,
-              onBack: () => Get.back(),
+              onBack: () {
+                if (_textController.text.isNotEmpty ||
+                    controller.isSearching ||
+                    controller.hasActiveFilters) {
+                  _textController.clear();
+                  controller.clearSearch();
+                  controller.clearAllFilters();
+                  controller.loadInitialProducts();
+                  setState(() {});
+                } else {
+                  try {
+                    Get.find<NavigationController>().switchTab(0);
+                  } catch (_) {
+                    Get.back();
+                  }
+                }
+              },
               onChanged: (v) {
                 setState(() {});
                 controller.onSearchChanged(v);
@@ -180,10 +181,8 @@ class _SearchPageState extends State<SearchPage> {
                 );
               }),
             ),
-            const AppBottomNav(currentIndex: 1),
           ],
         ),
-      ),
       ),
     );
   }

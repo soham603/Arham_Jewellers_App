@@ -1,155 +1,192 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
-
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
+
+class _NavItem {
+  const _NavItem({
+    required this.label,
+    required this.icon,
+  });
+
+  final String label;
+  final IconData icon;
+}
 
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     required this.currentIndex,
-    this.isAdmin = false,
+    required this.onTap,
     super.key,
   });
 
   final int currentIndex;
-  final bool isAdmin;
+  final ValueChanged<int> onTap;
+
+  static const double _barHeight = 66.0;
+  static const double _iconContainerSize = 36.0;
+  static const double _iconSize = 20.0;
+  static const double _labelFontSize = 11.0;
+  static const double _itemVerticalPadding = 6.0;
+  static const double _iconLabelSpacing = 4.0;
+  static const Duration _animationDuration = Duration(milliseconds: 220);
+  static const double _inkwellBorderRadius = 14.0;
+
+  static const Color _selectedBgColor = Color(0xFFE0DAD2);
+  static const Color _unselectedBgColor = Color(0xFFF2EEEA);
+  static const Color _unselectedContentColor = Color(0xFF847B71);
+
+  static const List<_NavItem> _navItems = [
+    _NavItem(label: 'Home', icon: Icons.home_rounded),
+    _NavItem(label: 'Search', icon: Icons.search_rounded),
+    _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
+    _NavItem(label: 'Profile', icon: Icons.person_rounded),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final labels = [
-      'Home',
-      'Search',
-      //'Wishlist',
-      'Cart',
-      isAdmin ? 'Admin' : 'Profile',
-    ];
-
-    const icons = [
-      Icons.home_rounded,
-      Icons.search_rounded,
-      //Icons.favorite_rounded,
-      Icons.shopping_cart_rounded,
-      Icons.person_rounded,
-    ];
+    assert(
+      currentIndex >= 0 && currentIndex < _navItems.length,
+      'currentIndex must be between 0 and ${_navItems.length - 1}, '
+      'but got $currentIndex.',
+    );
 
     return Container(
-      height: 70,
-
+      height: _barHeight,
       decoration: const BoxDecoration(
         color: Colors.white,
-
         border: Border(
-          top: BorderSide(
-            color: AppColors.divider,
+          top: BorderSide(color: AppColors.divider),
+        ),
+      ),
+      child: Row(
+        children: List.generate(
+          _navItems.length,
+          (index) => _NavItemTile(
+            item: _navItems[index],
+            isSelected: index == currentIndex,
+            onTap: () {
+              if (index == currentIndex) return;
+              HapticFeedback.selectionClick();
+              onTap(index);
+            },
+            animationDuration: _animationDuration,
           ),
         ),
       ),
+    );
+  }
+}
 
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+class _NavItemTile extends StatelessWidget {
+  const _NavItemTile({
+    required this.item,
+    required this.isSelected,
+    required this.onTap,
+    required this.animationDuration,
+  });
 
-        children: List.generate(labels.length, (index) {
-          final selected = index == currentIndex;
+  final _NavItem item;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Duration animationDuration;
 
-          return Expanded(
-            child: InkWell(
-              onTap: () {
-                _handleNavigation(index);
-              },
-
-              borderRadius: BorderRadius.circular(14),
-
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                ),
-
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 220),
-                  
-                        width: 38,
-                        height: 38,
-                  
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                  
-                          color: selected
-                              ? const Color(0xFFE0DAD2)
-                              : const Color(0xFFF2EEEA),
-                        ),
-                  
-                        child: Icon(
-                          icons[index],
-                  
-                          size: 20,
-                  
-                          color: selected
-                              ? AppColors.textDark
-                              : const Color(0xFF847B71),
-                        ),
-                      ),
-                  
-                      const SizedBox(height: 6),
-                  
-                      Text(
-                        labels[index],
-                  
-                        style: TextStyle(
-                          fontSize: 11,
-                  
-                          fontWeight: selected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                  
-                          color: selected
-                              ? AppColors.textDark
-                              : const Color(0xFF847B71),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Semantics(
+        label: item.label,
+        selected: isSelected,
+        button: true,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppBottomNav._inkwellBorderRadius),
+          child: AnimatedContainer(
+            duration: animationDuration,
+            padding: const EdgeInsets.symmetric(
+              vertical: AppBottomNav._itemVerticalPadding,
             ),
-          );
-        }),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _AnimatedIconBubble(
+                  icon: item.icon,
+                  isSelected: isSelected,
+                  animationDuration: animationDuration,
+                ),
+                const SizedBox(height: AppBottomNav._iconLabelSpacing),
+                _AnimatedLabel(
+                  label: item.label,
+                  isSelected: isSelected,
+                  animationDuration: animationDuration,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
+}
 
-  void _handleNavigation(int index) {
+class _AnimatedIconBubble extends StatelessWidget {
+  const _AnimatedIconBubble({
+    required this.icon,
+    required this.isSelected,
+    required this.animationDuration,
+  });
 
-    if (index == currentIndex) return;
+  final IconData icon;
+  final bool isSelected;
+  final Duration animationDuration;
 
-    switch (index) {
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: animationDuration,
+      width: AppBottomNav._iconContainerSize,
+      height: AppBottomNav._iconContainerSize,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isSelected
+            ? AppBottomNav._selectedBgColor
+            : AppBottomNav._unselectedBgColor,
+      ),
+      child: Icon(
+        icon,
+        size: AppBottomNav._iconSize,
+        color: isSelected
+            ? AppColors.textDark
+            : AppBottomNav._unselectedContentColor,
+      ),
+    );
+  }
+}
 
-      case 0:
-        Get.offAllNamed("/home");
-        break;
+class _AnimatedLabel extends StatelessWidget {
+  const _AnimatedLabel({
+    required this.label,
+    required this.isSelected,
+    required this.animationDuration,
+  });
 
-      case 1:
-        Get.offAllNamed("/search");
-        break;
+  final String label;
+  final bool isSelected;
+  final Duration animationDuration;
 
-      // case 2:
-      //   Get.offAllNamed("/wishlist");
-      //   break;
-
-      case 2:
-        Get.offAllNamed("/cart");
-        break;
-
-      case 3:
-        Get.offAllNamed(AppRoutes.profile);
-        break;
-    }
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedDefaultTextStyle(
+      duration: animationDuration,
+      style: TextStyle(
+        fontSize: AppBottomNav._labelFontSize,
+        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+        color: isSelected
+            ? AppColors.textDark
+            : AppBottomNav._unselectedContentColor,
+      ),
+      child: Text(label),
+    );
   }
 }

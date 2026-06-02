@@ -13,4 +13,10 @@ abstract class AppRoutes {
   static const myOrders = '/my-orders';
   static const register = '/register';
   static const notifications = '/notifications';
+
+  /// Tab index map for the main shell.
+  static const int tabIndexHome = 0;
+  static const int tabIndexSearch = 1;
+  static const int tabIndexCart = 2;
+  static const int tabIndexProfile = 3;
 }
