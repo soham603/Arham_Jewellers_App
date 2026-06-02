@@ -71,6 +71,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
+        // 🔥 The Nuclear Option to permanently remove the back arrow:
+        automaticallyImplyLeading: false,
+        leading: const SizedBox.shrink(),
+        leadingWidth: 0,
+        centerTitle: false, // 🔥 Forces title to the left
+        titleSpacing: context.getScreenWidth(4),
         title: Text(
           isAdmin ? "Admin Panel" : "Profile",
           style: TextStyle(
@@ -118,268 +124,276 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: isAdmin
           ? const AdminPanelScreen()
           : Obx(() {
-        if (orderController.ordersState == CurrentAppState.LOADING &&
-            orderController.userOrders.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+              if (orderController.ordersState == CurrentAppState.LOADING &&
+                  orderController.userOrders.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        if (orderController.ordersState == CurrentAppState.ERROR &&
-            orderController.userOrders.isEmpty) {
-          return Center(
-            child: Text(
-              "Failed to load orders",
-              style: TextStyle(
-                color: AppColors.textDark,
-                fontSize: context.getScreenWidth(4),
-              ),
-            ),
-          );
-        }
-
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
-            vertical: context.getScreenHeight(1),
-          ),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // =====================================================
-              // PROFILE CARD
-              // =====================================================
-              Container(
-                width: double.infinity,
-                height: context.getScreenHeight(30),
-
-                padding: EdgeInsets.all(context.getScreenWidth(5)),
-
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
+              if (orderController.ordersState == CurrentAppState.ERROR &&
+                  orderController.userOrders.isEmpty) {
+                return Center(
+                  child: Text(
+                    "Failed to load orders",
+                    style: TextStyle(
+                      color: AppColors.textDark,
+                      fontSize: context.getScreenWidth(4),
                     ),
-                  ],
+                  ),
+                );
+              }
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(4),
+                  vertical: context.getScreenHeight(1),
                 ),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: context.getScreenWidth(18),
+                    // =====================================================
+                    // PROFILE CARD
+                    // =====================================================
+                    Container(
+                      width: double.infinity,
+                      height: context.getScreenHeight(30),
 
-                          height: context.getScreenWidth(18),
+                      padding: EdgeInsets.all(context.getScreenWidth(5)),
 
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.15),
-                          ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
 
-                          child: Icon(
-                            Icons.person_rounded,
-                            color: Colors.white,
-                            size: context.getScreenWidth(10),
-                          ),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
 
-                        SizedBox(width: context.getScreenWidth(4)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
 
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
+                        children: [
+                          Row(
                             children: [
-                              Text(
-                                authController.user?.name ?? "User" ,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                              Container(
+                                width: context.getScreenWidth(18),
+
+                                height: context.getScreenWidth(18),
+
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.15),
+                                ),
+
+                                child: Icon(
+                                  Icons.person_rounded,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: context.getScreenWidth(5.3),
+                                  size: context.getScreenWidth(10),
                                 ),
                               ),
 
-                              SizedBox(height: context.getScreenHeight(0.5)),
+                              SizedBox(width: context.getScreenWidth(4)),
 
-                              Text(
-                                "Premium Jewellery Customer",
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: context.getScreenWidth(3.5),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                                  children: [
+                                    Text(
+                                      authController.user?.name ?? "User",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: context.getScreenWidth(5.3),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                      height: context.getScreenHeight(0.5),
+                                    ),
+
+                                    Text(
+                                      "Premium Jewellery Customer",
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.7),
+                                        fontSize: context.getScreenWidth(3.5),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
 
-                    const Spacer(),
+                          const Spacer(),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _profileStat(
-                            context,
-                            "Orders",
-                            "${orderController.totalOrders}",
-                          ),
-                        ),
-
-                        SizedBox(width: context.getScreenWidth(3)),
-
-                        Expanded(
-                          child: _profileStat(context, "Status", "Active"),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(2)),
-
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(4),
-                        vertical: context.getScreenHeight(1.2),
-                      ),
-
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
-
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.workspace_premium,
-                            color: Colors.amber,
-                            size: context.getScreenWidth(5),
-                          ),
-
-                          SizedBox(width: context.getScreenWidth(2)),
-
-                          Expanded(
-                            child: Text(
-                              "Trusted Jewellery Buyer",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: context.getScreenWidth(3.7),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _profileStat(
+                                  context,
+                                  "Orders",
+                                  "${orderController.totalOrders}",
+                                ),
                               ),
+
+                              SizedBox(width: context.getScreenWidth(3)),
+
+                              Expanded(
+                                child: _profileStat(
+                                  context,
+                                  "Status",
+                                  "Active",
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: context.getScreenHeight(2)),
+
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getScreenWidth(4),
+                              vertical: context.getScreenHeight(1.2),
+                            ),
+
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.08),
+
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.workspace_premium,
+                                  color: Colors.amber,
+                                  size: context.getScreenWidth(5),
+                                ),
+
+                                SizedBox(width: context.getScreenWidth(2)),
+
+                                Expanded(
+                                  child: Text(
+                                    "Trusted Jewellery Buyer",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: context.getScreenWidth(3.7),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
 
-              SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.getScreenHeight(3)),
 
-              Divider(color: Colors.grey.shade300),
+                    Divider(color: Colors.grey.shade300),
 
-              SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.getScreenHeight(2)),
 
-              // =====================================================
-              // TITLE
-              // =====================================================
-              Text(
-                "My Orders",
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(6),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-              ),
-
-              SizedBox(height: context.getScreenHeight(2)),
-
-              // =====================================================
-              // ORDERS
-              // =====================================================
-              ...List.generate(orderController.userOrders.length, (index) {
-                final order = orderController.userOrders[index];
-
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: context.getScreenHeight(1.5),
-                  ),
-
-                  child: _OrderCard(
-                    order: order,
-                    controller: orderController,
-                  ),
-                );
-              }),
-
-              if (orderController.hasMoreOrders)
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: context.getScreenHeight(1),
-                    bottom: context.getScreenHeight(3),
-                  ),
-
-                  child: Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: AppColors.primaryGold,
-
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(8),
-                          vertical: context.getScreenHeight(1.4),
-                        ),
-
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
+                    // =====================================================
+                    // TITLE
+                    // =====================================================
+                    Text(
+                      "My Orders",
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(6),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
                       ),
+                    ),
 
-                      onPressed: orderController.isFetchingOrders
-                          ? null
-                          : () {
-                              orderController.loadMoreOrders();
-                            },
+                    SizedBox(height: context.getScreenHeight(2)),
 
-                      child: orderController.isFetchingOrders
-                          ? SizedBox(
-                              width: context.getScreenWidth(4),
-                              height: context.getScreenWidth(4),
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+                    // =====================================================
+                    // ORDERS
+                    // =====================================================
+                    ...List.generate(orderController.userOrders.length, (
+                      index,
+                    ) {
+                      final order = orderController.userOrders[index];
+
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: context.getScreenHeight(1.5),
+                        ),
+
+                        child: _OrderCard(
+                          order: order,
+                          controller: orderController,
+                        ),
+                      );
+                    }),
+
+                    if (orderController.hasMoreOrders)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: context.getScreenHeight(1),
+                          bottom: context.getScreenHeight(3),
+                        ),
+
+                        child: Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: AppColors.primaryGold,
+
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getScreenWidth(8),
+                                vertical: context.getScreenHeight(1.4),
                               ),
-                            )
-                          : Text(
-                              "Load More",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: context.getScreenWidth(4),
+
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
                               ),
                             ),
-                    ),
-                  ),
+
+                            onPressed: orderController.isFetchingOrders
+                                ? null
+                                : () {
+                                    orderController.loadMoreOrders();
+                                  },
+
+                            child: orderController.isFetchingOrders
+                                ? SizedBox(
+                                    width: context.getScreenWidth(4),
+                                    height: context.getScreenWidth(4),
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    "Load More",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: context.getScreenWidth(4),
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
-        );
-      }),
+              );
+            }),
     );
   }
 
@@ -471,10 +485,7 @@ class _OrderCardState extends State<_OrderCard> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _OrderImagesStack(
-                  order: order,
-                  controller: widget.controller,
-                ),
+                _OrderImagesStack(order: order, controller: widget.controller),
                 SizedBox(width: context.getScreenWidth(4)),
                 Expanded(
                   child: Column(
@@ -491,8 +502,9 @@ class _OrderCardState extends State<_OrderCard> {
                       ),
                       SizedBox(height: context.getScreenHeight(0.6)),
                       Text(
-                        DateFormat("dd MMM yyyy • hh:mm a")
-                            .format(order.createdAt.toLocal()),
+                        DateFormat(
+                          "dd MMM yyyy • hh:mm a",
+                        ).format(order.createdAt.toLocal()),
                         style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: context.getScreenWidth(3.4),
@@ -538,9 +550,7 @@ class _OrderCardState extends State<_OrderCard> {
               final item = order.items[index];
 
               return Padding(
-                padding: EdgeInsets.only(
-                  bottom: context.getScreenHeight(1.5),
-                ),
+                padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
                 child: Row(
                   children: [
                     ClipRRect(
@@ -549,8 +559,9 @@ class _OrderCardState extends State<_OrderCard> {
                         width: context.getScreenWidth(12),
                         height: context.getScreenWidth(12),
                         child: _ProductImage(
-                          url: widget.controller
-                              .getProductImage(item.product.id),
+                          url: widget.controller.getProductImage(
+                            item.product.id,
+                          ),
                         ),
                       ),
                     ),
@@ -738,10 +749,10 @@ class _OrderCardState extends State<_OrderCard> {
       default:
         return _StatusInfo(
           label: status.isNotEmpty
-              ? '${status[0].toUpperCase()}${status.substring(1)}'
+              ? '${status.toUpperCase()}${status.substring(1)}'
               : 'Unknown',
           color: AppColors.textMuted,
-            bgColor: AppColors.tileBg,
+          bgColor: AppColors.tileBg,
         );
     }
   }
@@ -756,10 +767,7 @@ class _OrderCardState extends State<_OrderCard> {
 // ── Order Images Stack ───────────────────────────────────────────────────────
 
 class _OrderImagesStack extends StatelessWidget {
-  const _OrderImagesStack({
-    required this.order,
-    required this.controller,
-  });
+  const _OrderImagesStack({required this.order, required this.controller});
 
   final UserOrderModel order;
   final UserOrderController controller;
@@ -852,9 +860,8 @@ class _ProductImage extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: url!,
         fit: BoxFit.cover,
-        placeholder: (_, _) => const Center(
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
+        placeholder: (_, _) =>
+            const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         errorWidget: (_, _, _) => const RatneshFallback.xs(),
       );
     }
