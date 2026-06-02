@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
@@ -632,8 +633,8 @@ class _OrderCardState extends State<_OrderCard> {
                     shape: BoxShape.circle,
                   ),
 
-                  child: Icon(
-                    Icons.whatshot_rounded,
+                  child: FaIcon(
+                    FontAwesomeIcons.whatsapp,
                     color: Colors.green,
                     size: context.getScreenWidth(4.5),
                   ),

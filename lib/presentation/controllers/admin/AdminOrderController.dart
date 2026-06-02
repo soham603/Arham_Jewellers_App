@@ -34,6 +34,9 @@ class AdminOrderController extends GetxController {
 
   bool get hasMore => _hasMore;
 
+  final _productImageCache = <String, String?>{}.obs;
+  String? getProductImage(String productId) => _productImageCache[productId];
+
   @override
   void onInit() {
     super.onInit();
@@ -103,6 +106,8 @@ class AdminOrderController extends GetxController {
         }
 
         _orderState.value = CurrentAppState.SUCCESS;
+
+        _fetchProductImages();
       }
     } catch (e, st) {
       Logger.error("AdminOrderController", "$e\n$st");
@@ -110,6 +115,49 @@ class AdminOrderController extends GetxController {
       _orderState.value = CurrentAppState.ERROR;
     } finally {
       _isPaginationLoading.value = false;
+    }
+  }
+
+  Future<void> _fetchProductImages() async {
+    final uniqueProducts = <String, String>{};
+    for (final order in _orders) {
+      for (final item in order.orderItems) {
+        final id = item.product.id;
+        if (!_productImageCache.containsKey(id) &&
+            !uniqueProducts.containsKey(id)) {
+          uniqueProducts[id] = item.product.name;
+        }
+      }
+    }
+
+    if (uniqueProducts.isEmpty) return;
+
+    for (final entry in uniqueProducts.entries) {
+      try {
+        final response = await httpClient.get(
+          "/api/v1/products/search",
+          queryParameters: {
+            "search": entry.value,
+            "page": 1,
+            "limit": 5,
+            "showAll": true,
+          },
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final List raw = response.data['data']['data'] ?? [];
+          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
+                (p) => p?['id'] == entry.key,
+                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+              );
+
+          if (match != null) {
+            _productImageCache[entry.key] = match['imageUrl'];
+          }
+        }
+      } catch (e) {
+        Logger.error("AdminOrderController", "Image fetch failed for ${entry.key}: $e");
+      }
     }
   }
 

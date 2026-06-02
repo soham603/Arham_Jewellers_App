@@ -10,6 +10,9 @@ class SearchBarWidget extends StatelessWidget {
   final VoidCallback? onClear;
   final VoidCallback? onFilterTap;
   final int filterActiveCount;
+  final Color? outerBackgroundColor;
+  final Color? barBackgroundColor;
+  final String? hintText;
 
   const SearchBarWidget({
     super.key,
@@ -22,6 +25,9 @@ class SearchBarWidget extends StatelessWidget {
     this.onClear,
     this.onFilterTap,
     this.filterActiveCount = 0,
+    this.outerBackgroundColor,
+    this.barBackgroundColor,
+    this.hintText,
   });
 
   static const _goldDark = Color(0xFF8B6914);
@@ -29,10 +35,13 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTransparentOuter = outerBackgroundColor == Colors.transparent;
+    final isTransparentBar = barBackgroundColor == Colors.transparent;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+      padding: isTransparentOuter ? EdgeInsets.zero : const EdgeInsets.fromLTRB(16, 10, 8, 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: outerBackgroundColor ?? Colors.white,
       ),
       child: Row(
         children: [
@@ -53,18 +62,22 @@ class SearchBarWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                color: _barColor,
-                border: Border.all(
-                  color: _goldDark.withOpacity(0.2),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: _goldDark.withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: barBackgroundColor ?? _barColor,
+                border: isTransparentBar
+                    ? null
+                    : Border.all(
+                        color: _goldDark.withOpacity(0.2),
+                        width: 1,
+                      ),
+                boxShadow: isTransparentBar
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: _goldDark.withOpacity(0.06),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
               ),
               child: Row(
                 children: [
@@ -83,7 +96,7 @@ class SearchBarWidget extends StatelessWidget {
                         fontSize: 15,
                         color: Color(0xFF000000),
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
                         border: InputBorder.none,
@@ -91,8 +104,10 @@ class SearchBarWidget extends StatelessWidget {
                         focusedBorder: InputBorder.none,
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
-                        hintText: 'Search gold, diamonds, rings...',
-                        hintStyle: TextStyle(
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        hintText: hintText ?? 'Search gold, diamonds, rings...',
+                        hintStyle: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF9E9590),
