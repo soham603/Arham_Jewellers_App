@@ -62,13 +62,13 @@ class AccessRequestModel {
     );
   }
 
-  AccessRequestModel copyWith({String? status, DateTime? approvedTill}) {
+  AccessRequestModel copyWith({String? status, DateTime? approvedTill, bool clearApprovedTill = false}) {
     return AccessRequestModel(
       id: id,
       userId: userId,
       status: status ?? this.status,
       requestedAt: requestedAt,
-      approvedTill: approvedTill ?? this.approvedTill,
+      approvedTill: clearApprovedTill ? null : (approvedTill ?? this.approvedTill),
       createdAt: createdAt,
       updatedAt: updatedAt,
       user: user,

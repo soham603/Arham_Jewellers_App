@@ -130,6 +130,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             itemBuilder: (context, index) {
               if (index == list.length) return _listFooter(context);
               return _RequestCard(
+                key: ValueKey(list[index].id),
                 request: list[index],
                 controller: controller,
                 onApprove: () => _showDatePicker(context, list[index]),
@@ -946,6 +947,7 @@ class _RequestCard extends StatefulWidget {
   final VoidCallback onReject;
 
   const _RequestCard({
+    super.key,
     required this.request,
     required this.controller,
     required this.onApprove,
