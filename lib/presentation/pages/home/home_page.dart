@@ -51,8 +51,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    carouselController.getAllCarousels();
-    categoryController.fetchAllKaratCategories();
+    if (carouselController.list.isEmpty) {
+      carouselController.getAllCarousels();
+    }
+    if (categoryController.k18Categories.isEmpty) {
+      categoryController.fetchAllKaratCategories();
+    }
     _startCarouselAutoSlide();
   }
 
@@ -627,7 +631,7 @@ class _KaratSection extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          if (state == CurrentAppState.LOADING)
+          if (state == CurrentAppState.LOADING && list.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: CategoryShimmer(),
@@ -1453,7 +1457,7 @@ class _CarouselSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.getCarouselState == CurrentAppState.LOADING) {
+      if (controller.getCarouselState == CurrentAppState.LOADING && controller.list.isEmpty) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CarouselShimmer(),
