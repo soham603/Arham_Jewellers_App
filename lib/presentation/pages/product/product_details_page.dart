@@ -263,11 +263,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         if (!isInCart) {
                           cartController.addToCart(widget.product);
                         }
-                        try {
-                          Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
-                        } catch (_) {
-                          Get.toNamed(AppRoutes.cart);
-                        }
+                        Navigator.of(context).pop();
+                        Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
                       },
                       child: Text(
                         'Buy Now',

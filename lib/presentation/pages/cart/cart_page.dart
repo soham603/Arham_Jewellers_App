@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -278,7 +279,12 @@ class _CartPageState extends State<CartPage> {
                   );
                 }),
               ),
-              _checkoutButton(context),
+              Obx(() {
+                if (cartController.items.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return _checkoutButton(context);
+              }),
             ],
           ),
         ),
@@ -489,7 +495,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ),
                 onPressed: () {
-                  Get.offAllNamed(AppRoutes.home);
+                  Get.find<NavigationController>().switchTab(AppRoutes.tabIndexSearch);
                 },
                 child: Text(
                   'Browse Products',
