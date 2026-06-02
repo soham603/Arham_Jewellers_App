@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+
+import 'logo_widget.dart';
 
 class RatneshFallback extends StatelessWidget {
   final double logoSize;
@@ -18,28 +19,15 @@ class RatneshFallback extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallback = Container(
       color: context.colorPalette.goldLight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/images/ratnesh-logo.png',
-            width: logoSize,
-            height: logoSize,
-            fit: BoxFit.contain,
-            color: context.colorPalette.goldDark,
-            colorBlendMode: BlendMode.srcIn,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'RATNESHGOLD',
-            style: GoogleFonts.bodoniModa(
-              fontSize: logoSize * 0.18,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1,
-              color: context.colorPalette.goldDark,
-            ),
-          ),
-        ],
+      child: Center(
+        child: LogoWidget(
+          logoSize: logoSize,
+          showSubtitle: false,
+          iconColor: context.colorPalette.goldDark,
+          nameColor: context.colorPalette.goldDark,
+          nameLetterSpacing: 1,
+          iconNameSpacing: 4,
+        ),
       ),
     );
 

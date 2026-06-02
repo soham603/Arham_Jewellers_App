@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
+import '../../../core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -73,30 +73,19 @@ class _SplashPageState extends State<SplashPage>
             children: [
               const Spacer(flex: 2),
               Center(
-                child: Image.asset(
-                  'assets/images/ratnesh-logo.png',
-                  width: context.getScreenWidth(55),
-                  color: context.colorPalette.gold,
+                child: LogoWidget(
+                  logoSize: context.getScreenWidth(48),
+                  iconColor: context.colorPalette.gold,
+                  nameColor: context.colorPalette.goldDeep,
+                  nameFontSize: context.getScreenWidth(7),
+                  nameLetterSpacing: 2,
+                  subtitleColor: palette.subTitleColor,
+                  subtitleFontSize: context.getScreenWidth(3.8),
+                  iconNameSpacing: context.getScreenHeight(3),
+                  nameSubtitleSpacing: context.getScreenHeight(1.5),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(3)),
-              Text(
-                'RATNESHGOLD',
-                style: GoogleFonts.bodoniModa(
-                  fontSize: context.getScreenWidth(7),
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.5,
-                  color: palette.textColor,
-                ),
-              ),
-              const Spacer(flex: 3),
-              Text(
-                'Purity  •  Quality  •  Trust',
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(3.8),
-                  color: palette.subTitleColor,
-                ),
-              ),
+              const Spacer(flex: 2),
               SizedBox(height: context.getScreenHeight(1)),
               AnimatedBuilder(
                 animation: _controller,
