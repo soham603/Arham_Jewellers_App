@@ -341,10 +341,10 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                       child: ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(14)),
-                        child: product.imageUrl != null &&
-                                product.imageUrl!.isNotEmpty
+                        child: product.displayImageUrl != null &&
+                                product.displayImageUrl!.isNotEmpty
                             ? CachedNetworkImage(
-                                imageUrl: product.imageUrl!,
+                                imageUrl: product.displayImageUrl!,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                                 placeholder: (_, __) => Container(

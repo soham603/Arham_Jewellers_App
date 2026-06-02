@@ -293,6 +293,10 @@ class ProductModel {
     return rawData?['imageurl'];
   }
 
+  /// Returns the best available image URL: top-level [imageUrl] first,
+  /// falling back to [stockImage] from raw stock data.
+  String? get displayImageUrl => imageUrl ?? stockImage;
+
   /// Example:
   /// product.voucherNo
   String? get voucherNo {

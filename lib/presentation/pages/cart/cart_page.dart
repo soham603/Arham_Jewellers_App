@@ -123,15 +123,15 @@ class _CartPageState extends State<CartPage> {
                                         width: context.getScreenWidth(26),
                                         height: context.getScreenWidth(26),
                                         color: const Color(0xFFF7F3EC),
-                                        child: item.product.imageUrl != null &&
-                                                item.product.imageUrl!
+                                        child: item.product.displayImageUrl != null &&
+                                                item.product.displayImageUrl!
                                                     .trim()
                                                     .isNotEmpty &&
-                                                Uri.tryParse(item.product.imageUrl!)
+                                                Uri.tryParse(item.product.displayImageUrl!)
                                                         ?.hasAbsolutePath ==
                                                     true
                                             ? CachedNetworkImage(
-                                                imageUrl: item.product.imageUrl!,
+                                                imageUrl: item.product.displayImageUrl!,
                                                 fit: BoxFit.contain,
                                                 placeholder: (context, url) {
                                                   return Shimmer.fromColors(
