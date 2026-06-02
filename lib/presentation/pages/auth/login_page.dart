@@ -7,7 +7,8 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/logo_widget.dart';
+import '../../../core/widgets/custom_divider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
@@ -117,9 +118,45 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox(height: context.getScreenHeight(2)),
 
-                    Center(child: LogoWidget(size: context.getScreenWidth(28))), 
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/images/ratnesh-logo.png',
+                            height: context.getScreenWidth(22),
+                            fit: BoxFit.contain,
+                            color: context.colorPalette.gold,
+                            colorBlendMode: BlendMode.srcIn,
+                          ),
+                          SizedBox(height: context.getScreenHeight(1)),
+                          Text(
+                            'RATNESHGOLD',
+                            style: GoogleFonts.bodoniModa(
+                              fontSize: context.getScreenWidth(4),
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2,
+                              color: context.colorPalette.goldDeep,
+                            ),
+                          ),
+                          SizedBox(height: context.getScreenHeight(0.3)),
+                          Text(
+                            'Purity • Quality • Trust',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.5),
+                              color: context.colorPalette.goldDark,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                    SizedBox(height: context.getScreenHeight(3.5)),
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    const CategoryDivider(vertical: 8),
+
+                    SizedBox(height: context.getScreenHeight(2)),
 
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
@@ -288,7 +325,7 @@ class _LoginPageState extends State<LoginPage> {
                                     isAdminLogin ? 'Sign In as Admin' : 'Sign In', 
                                     key: ValueKey<bool>(isAdminLogin),
                                     style: TextStyle(
-                                      fontSize: context.getScreenWidth(4),
+                                      fontSize: context.getScreenWidth(4.5),
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.5,
