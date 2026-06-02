@@ -3,17 +3,62 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import 'logo_widget.dart';
 
+enum FallbackSize {
+  xs,
+  s,
+  m,
+  l,
+  xl,
+}
+
 class RatneshFallback extends StatelessWidget {
   final double logoSize;
+  final double nameFontSize;
   final double? width;
   final double? height;
 
   const RatneshFallback({
     super.key,
     required this.logoSize,
+    this.nameFontSize = 6,
     this.width,
     this.height,
   });
+
+  const RatneshFallback.xs({
+    super.key,
+    this.width,
+    this.height,
+  })  : logoSize = 16,
+        nameFontSize = 4;
+
+  const RatneshFallback.s({
+    super.key,
+    this.width,
+    this.height,
+  })  : logoSize = 24,
+        nameFontSize = 6;
+
+  const RatneshFallback.m({
+    super.key,
+    this.width,
+    this.height,
+  })  : logoSize = 44,
+        nameFontSize = 10;
+
+  const RatneshFallback.l({
+    super.key,
+    this.width,
+    this.height,
+  })  : logoSize = 72,
+        nameFontSize = 14;
+
+  const RatneshFallback.xl({
+    super.key,
+    this.width,
+    this.height,
+  })  : logoSize = 96,
+        nameFontSize = 18;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +72,7 @@ class RatneshFallback extends StatelessWidget {
           nameColor: context.colorPalette.goldDark,
           nameLetterSpacing: 0.5,
           iconNameSpacing: 4,
-          nameFontSize: 6,
+          nameFontSize: nameFontSize,
         ),
       ),
     );

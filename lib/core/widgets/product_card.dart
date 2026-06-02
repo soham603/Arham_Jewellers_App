@@ -317,17 +317,13 @@ class _ProductImage extends StatelessWidget {
                       decoration: BoxDecoration(color: Colors.white),
                     ),
                   ),
-                  errorWidget: (context, url, error) => RatneshFallback(
-                    logoSize: iconSize * 0.5,
-                  ),
+                  errorWidget: (context, url, error) => const RatneshFallback.m(),
                 ),
               ),
             ),
           )
         else
-          RatneshFallback(
-            logoSize: iconSize * 0.5,
-          ),
+          const RatneshFallback.m(),
         if (isNew)
           Positioned(
             top: 6,
