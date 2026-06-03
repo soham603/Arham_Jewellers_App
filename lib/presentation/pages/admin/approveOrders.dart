@@ -87,39 +87,6 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
           padding: EdgeInsets.all(context.getScreenWidth(4)),
           child: Column(
             children: [
-              // STATUS CHIPS
-              Obx(
-                () => Row(
-                  children: [
-                    _StatusChip(
-                      label: "Pending",
-                      isSelected: controller.selectedStatus.value == "PENDING",
-                      selectedColor: const Color(0xFFFFF4E5),
-                      selectedTextColor: Colors.orange,
-                      onTap: () => controller.changeStatus("PENDING"),
-                    ),
-                    SizedBox(width: context.getScreenWidth(2)),
-                    _StatusChip(
-                      label: "Approved",
-                      isSelected: controller.selectedStatus.value == "APPROVED",
-                      selectedColor: const Color(0xFFE9F9EE),
-                      selectedTextColor: Colors.green,
-                      onTap: () => controller.changeStatus("APPROVED"),
-                    ),
-                    SizedBox(width: context.getScreenWidth(2)),
-                    _StatusChip(
-                      label: "Rejected",
-                      isSelected: controller.selectedStatus.value == "REJECTED",
-                      selectedColor: const Color(0xFFFEE9E9),
-                      selectedTextColor: Colors.red,
-                      onTap: () => controller.changeStatus("REJECTED"),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: context.getScreenHeight(1.5)),
-
               // SEARCH BAR
               SearchBarWidget(
                 controller: controller.searchController,
@@ -131,6 +98,39 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                   controller.searchController.clear();
                   controller.onSearchChanged("");
                 },
+              ),
+
+              SizedBox(height: context.getScreenHeight(1.5)),
+
+              // STATUS FILTER
+              Obx(
+                () => Row(
+                  children: [
+                    _filterSegment(
+                      context,
+                      label: 'PENDING',
+                      isActive: controller.selectedStatus.value == 'PENDING',
+                      color: const Color(0xFFD4AF37),
+                      onTap: () => controller.changeStatus('PENDING'),
+                    ),
+                    SizedBox(width: context.getScreenWidth(1)),
+                    _filterSegment(
+                      context,
+                      label: 'APPROVED',
+                      isActive: controller.selectedStatus.value == 'APPROVED',
+                      color: Colors.green,
+                      onTap: () => controller.changeStatus('APPROVED'),
+                    ),
+                    SizedBox(width: context.getScreenWidth(1)),
+                    _filterSegment(
+                      context,
+                      label: 'REJECTED',
+                      isActive: controller.selectedStatus.value == 'REJECTED',
+                      color: Colors.red,
+                      onTap: () => controller.changeStatus('REJECTED'),
+                    ),
+                  ],
+                ),
               ),
 
               SizedBox(height: context.getScreenHeight(2)),
@@ -318,18 +318,14 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                           horizontal: context.getScreenWidth(2.5),
                           vertical: context.getScreenHeight(0.3),
                         ),
-
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF4E5),
-
+                          color: _orderStatusColor(order.status).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(100),
                         ),
-
                         child: Text(
                           order.status,
-
                           style: TextStyle(
-                            color: Colors.orange,
+                            color: _orderStatusColor(order.status),
                             fontWeight: FontWeight.w700,
                             fontSize: context.getScreenWidth(2.8),
                           ),
@@ -792,55 +788,53 @@ class _OrderImagesStack extends StatelessWidget {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({
-    required this.label,
-    required this.isSelected,
-    required this.selectedColor,
-    required this.selectedTextColor,
-    required this.onTap,
-  });
+Color _orderStatusColor(String status) {
+  switch (status.toUpperCase()) {
+    case 'APPROVED':
+    case 'CONFIRMED':
+      return Colors.green;
+    case 'REJECTED':
+    case 'CANCELLED':
+      return Colors.red;
+    case 'PROCESSING':
+      return const Color(0xFF3B82F6);
+    case 'COMPLETED':
+    case 'DELIVERED':
+      return const Color(0xFFD4AF37);
+    default:
+      return Colors.orange;
+  }
+}
 
-  final String label;
-  final bool isSelected;
-  final Color selectedColor;
-  final Color selectedTextColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+Widget _filterSegment(
+  BuildContext context, {
+  required String label,
+  required bool isActive,
+  required Color color,
+  required VoidCallback onTap,
+}) {
+  return Expanded(
+    child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
-          vertical: context.getScreenHeight(0.8),
-        ),
+        margin: EdgeInsets.symmetric(horizontal: context.getScreenWidth(0.5)),
+        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
         decoration: BoxDecoration(
-          color: isSelected ? selectedColor : Colors.white,
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(
-            color: isSelected ? selectedTextColor.withOpacity(0.3) : Colors.grey.shade200,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: selectedTextColor.withOpacity(0.1),
-                    blurRadius: 8,
-                  ),
-                ]
-              : null,
+          color: isActive ? color : color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           label,
+          textAlign: TextAlign.center,
           style: TextStyle(
-            color: isSelected ? selectedTextColor : AppColors.textMuted,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            fontSize: context.getScreenWidth(3.3),
+            fontSize: context.getScreenWidth(3),
+            fontWeight: FontWeight.w700,
+            color: isActive ? Colors.white : color,
+            letterSpacing: 0.5,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 }
