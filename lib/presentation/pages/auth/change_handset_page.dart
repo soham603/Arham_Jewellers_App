@@ -270,7 +270,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 try {
                   final response = await httpClient.post(
                     '/api/v1/auth/device-change-request',
-                    options: Options(extra: {'requiresAuth': true}),
+                    options: Options(extra: {'requiresAuth': false}),
                     data: {
                       'phoneNumber': fullPhoneNumber,
                       'password': passwordController.text.trim(),
