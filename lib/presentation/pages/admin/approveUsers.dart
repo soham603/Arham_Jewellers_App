@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminAccessModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -47,9 +49,9 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colorPalette.backgroundColor,
+      backgroundColor: AppColors.pageBg,
       appBar: AppBar(
-        backgroundColor: context.colorPalette.backgroundColor,
+        backgroundColor: AppColors.pageBg,
         elevation: 0,
         centerTitle: false,
         title: Text(
@@ -87,59 +89,58 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             ),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.getScreenHeight(14)),
-          child: Column(
-            children: [
-              _searchBar(context),
-              _filterBar(context),
-            ],
-          ),
-        ),
       ),
-      body: Obx(() {
-        final state = controller.state;
-        final list = controller.requests;
+      body: Column(
+        children: [
+          _searchBar(context),
+          _filterBar(context),
+          Expanded(
+            child: Obx(() {
+              final state = controller.state;
+              final list = controller.requests;
 
-        if (state == CurrentAppState.LOADING && list.isEmpty) {
-          return _shimmerList(context);
-        }
+              if (state == CurrentAppState.LOADING && list.isEmpty) {
+                return _shimmerList(context);
+              }
 
-        if (state == CurrentAppState.ERROR && list.isEmpty) {
-          return _errorView(context);
-        }
+              if (state == CurrentAppState.ERROR && list.isEmpty) {
+                return _errorView(context);
+              }
 
-        if (state == CurrentAppState.SUCCESS && list.isEmpty) {
-          return _emptyView(context);
-        }
+              if (state == CurrentAppState.SUCCESS && list.isEmpty) {
+                return _emptyView(context);
+              }
 
-        return RefreshIndicator(
-          onRefresh: controller.refresh,
-          color: context.colorPalette.primaryColor,
-          child: ListView.separated(
-            controller: _scroll,
-            padding: EdgeInsets.fromLTRB(
-              context.getScreenWidth(4),
-              context.getScreenHeight(2),
-              context.getScreenWidth(4),
-              context.getScreenHeight(3),
-            ),
-            itemCount: list.length + 1,
-            separatorBuilder: (_, _) =>
-                SizedBox(height: context.getScreenHeight(1.5)),
-            itemBuilder: (context, index) {
-              if (index == list.length) return _listFooter(context);
-              return _RequestCard(
-                key: ValueKey(list[index].id),
-                request: list[index],
-                controller: controller,
-                onApprove: () => _showDatePicker(context, list[index]),
-                onReject: () => _confirmReject(context, list[index]),
+              return RefreshIndicator(
+                onRefresh: controller.refresh,
+                color: context.colorPalette.primaryColor,
+                child: ListView.separated(
+                  controller: _scroll,
+                  padding: EdgeInsets.fromLTRB(
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(1.5),
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(3),
+                  ),
+                  itemCount: list.length + 1,
+                  separatorBuilder: (_, _) =>
+                      SizedBox(height: context.getScreenHeight(1.5)),
+                  itemBuilder: (context, index) {
+                    if (index == list.length) return _listFooter(context);
+                    return _RequestCard(
+                      key: ValueKey(list[index].id),
+                      request: list[index],
+                      controller: controller,
+                      onApprove: () => _showDatePicker(context, list[index]),
+                      onReject: () => _confirmReject(context, list[index]),
+                    );
+                  },
+                ),
               );
-            },
+            }),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 
@@ -227,7 +228,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: context.colorPalette.boxColor,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _searchFocusNode.hasFocus
@@ -239,32 +240,19 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: SearchBarWidget(
                       controller: _searchController,
                       focusNode: _searchFocusNode,
-                      onChanged: (value) {
-                        controller.onSearchTextChanged(value);
-                      },
-                      decoration: InputDecoration(
-                        hintText: controller.searchMode == SearchMode.PHONE
-                            ? 'Search by phone number...'
-                            : 'Search by user name...',
-                        hintStyle: TextStyle(
-                          fontSize: context.getScreenWidth(3.5),
-                          color: context.colorPalette.subTitleColor,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: context.colorPalette.subTitleColor,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(4),
-                          vertical: context.getScreenHeight(1.5),
-                        ),
-                      ),
+                      onChanged: controller.onSearchTextChanged,
+                      hintText: controller.searchMode == SearchMode.PHONE
+                          ? 'Search by phone number...'
+                          : 'Search by user name...',
+                      outerBackgroundColor: Colors.transparent,
+                      barBackgroundColor: context.colorPalette.boxColor,
+                      showShadow: false,
                     ),
                   ),
+                  SizedBox(width: context.getScreenWidth(1.5)),
                   // Mode toggle button (Circle)
                   GestureDetector(
                     onTap: () {
@@ -276,9 +264,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       margin: EdgeInsets.only(right: context.getScreenWidth(2)),
                       padding: EdgeInsets.all(context.getScreenWidth(2.5)),
                       decoration: BoxDecoration(
-                        color: controller.searchMode == SearchMode.USER
-                            ? context.colorPalette.primaryColor
-                            : context.colorPalette.primaryColor.withOpacity(0.1),
+                        color: context.colorPalette.primaryColor,
                         shape: BoxShape.circle,
                       ),
                       child: Obx(
@@ -287,9 +273,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                               ? Icons.phone_android_rounded
                               : Icons.person_rounded,
                           size: context.getScreenWidth(5),
-                          color: controller.searchMode == SearchMode.USER
-                              ? Colors.white
-                              : context.colorPalette.primaryColor,
+                          color: Colors.white,
                         ),
                       ),
                     ),
