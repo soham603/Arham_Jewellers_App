@@ -248,7 +248,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                           ? 'Search by phone number...'
                           : 'Search by user name...',
                       outerBackgroundColor: Colors.transparent,
-                      barBackgroundColor: context.colorPalette.boxColor,
                       showShadow: false,
                     ),
                   ),
