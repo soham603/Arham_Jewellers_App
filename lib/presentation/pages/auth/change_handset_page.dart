@@ -78,8 +78,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Padding(
+                  child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getScreenWidth(5),
                         vertical: context.getScreenHeight(1),
@@ -101,14 +100,10 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                             ),
                           ),
 
-                          // 2. Form Section (Centered vertically)
-                          Expanded(
-                            child: Center(
-                              child: Form(
-                                key: _formKey,
-                                child: _buildCenterForm(context),
-                              ),
-                            ),
+                          // 2. Form Section
+                          Form(
+                            key: _formKey,
+                            child: _buildCenterForm(context),
                           ),
 
                           SizedBox(height: context.getScreenHeight(2)),
@@ -121,8 +116,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                       ),
                     ),
                   ),
-                ),
-              );
+                );
             },
           ),
         ),

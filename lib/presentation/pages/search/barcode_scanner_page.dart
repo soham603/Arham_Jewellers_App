@@ -184,6 +184,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         title: const Text('Scan barcode'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white, size: 24),
         actions: [
           IconButton(
             tooltip: _torchOn ? 'Turn flash off' : 'Turn flash on',

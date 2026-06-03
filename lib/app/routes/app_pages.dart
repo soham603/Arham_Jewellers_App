@@ -11,9 +11,7 @@ import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/orders/my_orders_page.dart';
 import '../../presentation/pages/orders/order_success_page.dart';
 import '../../presentation/pages/product/product_details_page.dart';
-import '../../presentation/pages/rings/rings_page.dart';
 import '../../presentation/pages/splash/splash_page.dart';
-import '../../presentation/pages/wishlist/wishlist_page.dart';
 import 'app_routes.dart';
 
 class _MainShellBinding extends Bindings {
@@ -35,9 +33,7 @@ abstract class AppPages {
       transition: Transition.noTransition,
       binding: _MainShellBinding(),
     ),
-    GetPage(name: AppRoutes.rings, page: RingsPage.new),
     GetPage(name: AppRoutes.details, page: () => ProductDetailsPage(product: Get.arguments)),
-    GetPage(name: AppRoutes.wishlist, page: WishlistPage.new),
     GetPage(name: AppRoutes.checkout, page: CheckoutPage.new),
     GetPage(name: AppRoutes.orderSuccess, page: OrderSuccessPage.new),
     GetPage(name: AppRoutes.myOrders, page: MyOrdersPage.new),
