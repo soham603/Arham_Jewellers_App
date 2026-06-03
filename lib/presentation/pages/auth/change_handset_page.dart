@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -261,23 +263,52 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 });
 
                 final newDeviceID = await getDeviceId();
+                final newDeviceName = await getDeviceName();
                 final fullPhoneNumber =
                     '$selectedCountryCode${phoneController.text.trim()}';
 
-                // TODO: Call your AuthController API to verify credentials and update handset ID.
+                try {
+                  final response = await httpClient.post(
+                    '/api/v1/auth/device-change-request',
+                    options: Options(extra: {'requiresAuth': true}),
+                    data: {
+                      'phoneNumber': fullPhoneNumber,
+                      'password': passwordController.text.trim(),
+                      'newDeviceId': newDeviceID,
+                      'newDeviceName': newDeviceName,
+                    },
+                  );
 
-                // Simulated network delay for UI completeness
-                await Future.delayed(const Duration(seconds: 2));
-
-                setState(() {
-                  _isLoading = false;
-                });
-
-                ToastUtils.showSuccess(
-                  context,
-                  "Handset updated successfully. Please login.",
-                );
-                Get.back(); // Return to login page
+                  if (response.statusCode == 200 || response.statusCode == 201) {
+                    ToastUtils.showSuccess(
+                      context,
+                      response.data['message'] ??
+                          "Handset change request submitted. Please wait for admin approval.",
+                    );
+                    Get.back();
+                  } else {
+                    ToastUtils.showError(
+                      context,
+                      response.data['message'] ?? "Request failed",
+                    );
+                  }
+                } on DioException catch (e) {
+                  String msg = "Something went wrong";
+                  if (e.response?.data != null) {
+                    msg = e.response!.data['error']?['message'] ??
+                        e.response!.data['message'] ??
+                        msg;
+                  }
+                  ToastUtils.showError(context, msg);
+                } catch (e) {
+                  ToastUtils.showError(context, e.toString());
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  }
+                }
               },
         child: _isLoading
             ? SizedBox(

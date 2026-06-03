@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -201,13 +202,19 @@ class AdminPanelScreen extends StatelessWidget {
                 subtitle: "Manage banners",
                 onTap: () => Get.to(() => CarouselManagerScreen()),
               ),
-              // 🔥 NEW TILE: Edit Ancillary Data
               _adminTile(
                 context,
                 icon: Icons.text_snippet_rounded,
                 title: "Ancillary Data",
                 subtitle: "Terms, About, Policies",
                 onTap: () => Get.to(() => const AncillarySelectionScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.phone_android_rounded,
+                title: "Handset Requests",
+                subtitle: "Change requests",
+                onTap: () => Get.to(() => const HandsetChangeScreen()),
               ),
             ],
           ),
