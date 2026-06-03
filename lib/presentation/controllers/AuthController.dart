@@ -106,16 +106,20 @@ class AuthController extends GetxController {
         onSuccess?.call();
         return true;
       } else {
-        _userLoginErrorMsg.value = response.data['message'] ?? "Login failed";
-        _userLoginState.value = CurrentAppState.ERROR;
-        ToastUtils.showError(context, _userLoginErrorMsg.value);
+        _scheduleError(
+          context,
+          response.data['message'] ?? "Login failed",
+          isUserLogin: true,
+        );
       }
     } on DioException catch (e) {
       _handleLoginError(e, isUserLogin: true);
     } catch (e) {
-      _userLoginErrorMsg.value = "An unexpected error occurred";
-      _userLoginState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(context, _userLoginErrorMsg.value);
+      _scheduleError(
+        context,
+        "An unexpected error occurred",
+        isUserLogin: true,
+      );
     }
     return false;
   }
@@ -170,17 +174,20 @@ class AuthController extends GetxController {
         onSuccess?.call();
         return true;
       } else {
-        _adminLoginErrorMsg.value =
-            response.data['message'] ?? "Admin login failed";
-        _adminLoginState.value = CurrentAppState.ERROR;
-        ToastUtils.showError(context, _adminLoginErrorMsg.value);
+        _scheduleError(
+          context,
+          response.data['message'] ?? "Admin login failed",
+          isUserLogin: false,
+        );
       }
     } on DioException catch (e) {
       _handleLoginError(e, isUserLogin: false);
     } catch (e) {
-      _adminLoginErrorMsg.value = "An unexpected error occurred";
-      _adminLoginState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(context, _adminLoginErrorMsg.value);
+      _scheduleError(
+        context,
+        "An unexpected error occurred",
+        isUserLogin: false,
+      );
     }
     return false;
   }
@@ -203,15 +210,24 @@ class AuthController extends GetxController {
       // ignore extraction errors, fall back to default message
     }
 
-    if (isUserLogin) {
-      _userLoginErrorMsg.value = errorMsg;
-      _userLoginState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(Get.context!, _userLoginErrorMsg.value);
-    } else {
-      _adminLoginErrorMsg.value = errorMsg;
-      _adminLoginState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(Get.context!, _adminLoginErrorMsg.value);
-    }
+    _scheduleError(
+      Get.context!,
+      errorMsg,
+      isUserLogin: isUserLogin,
+    );
+  }
+
+  void _scheduleError(BuildContext context, String message, {required bool isUserLogin}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isUserLogin) {
+        _userLoginErrorMsg.value = message;
+        _userLoginState.value = CurrentAppState.ERROR;
+      } else {
+        _adminLoginErrorMsg.value = message;
+        _adminLoginState.value = CurrentAppState.ERROR;
+      }
+      ToastUtils.showError(context, message);
+    });
   }
 
   Future<void> logoutUser(
