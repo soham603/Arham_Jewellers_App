@@ -538,19 +538,116 @@ class _RequestCardState extends State<_RequestCard> {
               padding: EdgeInsets.all(context.getScreenWidth(4)),
               child: Column(
                 children: [
-                  _infoRow(
-                    context,
-                    Icons.phone_android_rounded,
-                    'New Device',
-                    req.newDeviceName,
-                  ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
-                  _infoRow(
-                    context,
-                    Icons.disc_full_rounded,
-                    'Device ID',
-                    req.newDeviceId,
-                  ),
+                  if (req.oldDeviceName != null || req.oldDeviceId != null)
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(context.getScreenWidth(3)),
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.gold.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: context.colorPalette.gold.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Old device
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Old Device',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.8),
+                                    color: context.colorPalette.subTitleColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: context.getScreenHeight(0.3)),
+                                Text(
+                                  req.oldDeviceName ?? '—',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.5),
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colorPalette.textColor,
+                                  ),
+                                ),
+                                SizedBox(height: context.getScreenHeight(0.2)),
+                                Text(
+                                  req.oldDeviceId ?? '—',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.6),
+                                    color: context.colorPalette.subTitleColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Arrow
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getScreenWidth(2),
+                            ),
+                            child: Icon(
+                              Icons.arrow_forward_rounded,
+                              color: context.colorPalette.gold,
+                              size: context.getScreenWidth(5),
+                            ),
+                          ),
+                          // New device
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'New Device',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.8),
+                                    color: context.colorPalette.subTitleColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                SizedBox(height: context.getScreenHeight(0.3)),
+                                Text(
+                                  req.newDeviceName,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.5),
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colorPalette.textColor,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                                SizedBox(height: context.getScreenHeight(0.2)),
+                                Text(
+                                  req.newDeviceId,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.6),
+                                    color: context.colorPalette.subTitleColor,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    _infoRow(
+                      context,
+                      Icons.phone_android_rounded,
+                      'Device',
+                      req.newDeviceName,
+                    ),
+                    SizedBox(height: context.getScreenHeight(0.8)),
+                    _infoRow(
+                      context,
+                      Icons.disc_full_rounded,
+                      'Device ID',
+                      req.newDeviceId,
+                    ),
+                  ],
                   SizedBox(height: context.getScreenHeight(0.8)),
                   _infoRow(
                     context,

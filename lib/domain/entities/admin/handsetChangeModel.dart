@@ -4,6 +4,8 @@ class HandsetChangeRequestModel {
   final String? userRole;
   final String? userName;
   final String? userPhoneNumber;
+  final String? oldDeviceId;
+  final String? oldDeviceName;
   final String newDeviceId;
   final String newDeviceName;
   final String status;
@@ -17,6 +19,8 @@ class HandsetChangeRequestModel {
     this.userRole,
     this.userName,
     this.userPhoneNumber,
+    this.oldDeviceId,
+    this.oldDeviceName,
     required this.newDeviceId,
     required this.newDeviceName,
     required this.status,
@@ -34,6 +38,8 @@ class HandsetChangeRequestModel {
       userRole: json['userRole'] ?? user?['role'],
       userName: json['userName'] ?? user?['name'],
       userPhoneNumber: json['userPhoneNumber'] ?? user?['phoneNumber'],
+      oldDeviceId: json['oldDeviceId'],
+      oldDeviceName: json['oldDeviceName'],
       newDeviceId: json['newDeviceId'] ?? '',
       newDeviceName: json['newDeviceName'] ?? '',
       status: json['status'] ?? 'PENDING',
@@ -54,6 +60,8 @@ class HandsetChangeRequestModel {
       'userRole': userRole,
       'userName': userName,
       'userPhoneNumber': userPhoneNumber,
+      'oldDeviceId': oldDeviceId,
+      'oldDeviceName': oldDeviceName,
       'newDeviceId': newDeviceId,
       'newDeviceName': newDeviceName,
       'status': status,
@@ -69,6 +77,8 @@ class HandsetChangeRequestModel {
     String? userRole,
     String? userName,
     String? userPhoneNumber,
+    String? oldDeviceId,
+    String? oldDeviceName,
     String? newDeviceId,
     String? newDeviceName,
     String? status,
@@ -82,6 +92,8 @@ class HandsetChangeRequestModel {
       userRole: userRole ?? this.userRole,
       userName: userName ?? this.userName,
       userPhoneNumber: userPhoneNumber ?? this.userPhoneNumber,
+      oldDeviceId: oldDeviceId ?? this.oldDeviceId,
+      oldDeviceName: oldDeviceName ?? this.oldDeviceName,
       newDeviceId: newDeviceId ?? this.newDeviceId,
       newDeviceName: newDeviceName ?? this.newDeviceName,
       status: status ?? this.status,

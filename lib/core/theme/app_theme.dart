@@ -50,7 +50,7 @@ abstract class AppTheme {
       centerTitle: false,
       iconTheme: const IconThemeData(color: AppColors.textDark, size: 24),
       titleTextStyle: GoogleFonts.inter(
-        fontSize: 38,
+        fontSize: 20,
         fontWeight: FontWeight.w700,
         color: AppColors.textDark,
       ),

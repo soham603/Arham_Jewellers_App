@@ -79,8 +79,8 @@ class HandsetChangeController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
-        final List raw = (data['data'] ?? data['results'] ?? data) is List
-            ? (data['data'] ?? data['results'] ?? data) as List
+        final List raw = (data['requests'] ?? data['data'] ?? data['results'] ?? data) is List
+            ? (data['requests'] ?? data['data'] ?? data['results'] ?? data) as List
             : [];
         final fetched =
             raw.map((e) => HandsetChangeRequestModel.fromJson(e)).toList();
@@ -91,7 +91,8 @@ class HandsetChangeController extends GetxController {
           _requests.value = fetched;
         }
 
-        _total.value = data['total'] ?? data['totalItems'] ?? fetched.length;
+        final pagination = data['pagination'];
+        _total.value = pagination?['totalRecords'] ?? data['total'] ?? data['totalItems'] ?? fetched.length;
 
         if (fetched.length < _pageLimit) {
           _hasMore = false;
