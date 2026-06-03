@@ -92,7 +92,6 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                 controller: controller.searchController,
                 onChanged: controller.onSearchChanged,
                 outerBackgroundColor: Colors.transparent,
-                barBackgroundColor: const Color(0xFFF6F7FB),
                 hintText: "Search phone",
                 onClear: () {
                   controller.searchController.clear();
