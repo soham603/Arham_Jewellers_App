@@ -13,6 +13,7 @@ class SearchBarWidget extends StatelessWidget {
   final Color? outerBackgroundColor;
   final Color? barBackgroundColor;
   final String? hintText;
+  final bool showShadow;
 
   const SearchBarWidget({
     super.key,
@@ -28,6 +29,7 @@ class SearchBarWidget extends StatelessWidget {
     this.outerBackgroundColor,
     this.barBackgroundColor,
     this.hintText,
+    this.showShadow = true,
   });
 
   static const _goldDark = Color(0xFF8B6914);
@@ -69,15 +71,15 @@ class SearchBarWidget extends StatelessWidget {
                         color: _goldDark.withOpacity(0.2),
                         width: 1,
                       ),
-                boxShadow: isTransparentBar
-                    ? null
-                    : [
+                boxShadow: showShadow
+                    ? [
                         BoxShadow(
                           color: _goldDark.withOpacity(0.06),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
-                      ],
+                      ]
+                    : null,
               ),
               child: Row(
                 children: [

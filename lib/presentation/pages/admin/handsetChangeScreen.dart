@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/handsetChangeModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -18,7 +19,6 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   final HandsetChangeController controller = Get.put(HandsetChangeController());
   final ScrollController _scroll = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
 
   static const _filters = ['PENDING', 'APPROVED', 'REJECTED'];
 
@@ -39,16 +39,15 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   void dispose() {
     _scroll.dispose();
     _searchController.dispose();
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colorPalette.backgroundColor,
+      backgroundColor: AppColors.pageBg,
       appBar: AppBar(
-        backgroundColor: context.colorPalette.backgroundColor,
+        backgroundColor: AppColors.pageBg,
         elevation: 0,
         centerTitle: false,
         title: Text(
@@ -84,115 +83,74 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
             ),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.getScreenHeight(14)),
-          child: Column(
-            children: [
-              _searchBar(context),
-              _filterBar(context),
-            ],
-          ),
-        ),
       ),
-      body: Obx(() {
-        final state = controller.state;
-        final list = controller.requests;
-
-        if (state == CurrentAppState.LOADING && list.isEmpty) {
-          return _shimmerList(context);
-        }
-
-        if (state == CurrentAppState.ERROR && list.isEmpty) {
-          return _errorView(context);
-        }
-
-        if (state == CurrentAppState.SUCCESS && list.isEmpty) {
-          return _emptyView(context);
-        }
-
-        return RefreshIndicator(
-          onRefresh: controller.refresh,
-          color: context.colorPalette.primaryColor,
-          child: ListView.separated(
-            controller: _scroll,
+      body: Column(
+        children: [
+          Padding(
             padding: EdgeInsets.fromLTRB(
               context.getScreenWidth(4),
-              context.getScreenHeight(2),
+              context.getScreenHeight(1),
               context.getScreenWidth(4),
-              context.getScreenHeight(3),
+              0,
             ),
-            itemCount: list.length + 1,
-            separatorBuilder: (_, _) =>
-                SizedBox(height: context.getScreenHeight(1.5)),
-            itemBuilder: (context, index) {
-              if (index == list.length) return _listFooter(context);
-              return _RequestCard(
-                key: ValueKey(list[index].id),
-                request: list[index],
-                controller: controller,
-              );
-            },
+            child: SearchBarWidget(
+              controller: _searchController,
+              onChanged: controller.onSearchChanged,
+              onClear: () {
+                _searchController.clear();
+                controller.clearSearch();
+              },
+              hintText: 'Search by name or phone...',
+              outerBackgroundColor: Colors.transparent,
+              barBackgroundColor: const Color(0xFFF6F7FB),
+            ),
           ),
-        );
-      }),
-    );
-  }
+          SizedBox(height: context.getScreenHeight(0.5)),
+          _filterBar(context),
+          Expanded(
+            child: Obx(() {
+              final state = controller.state;
+              final list = controller.requests;
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
-  Widget _searchBar(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
-        context.getScreenHeight(1),
-        context.getScreenWidth(4),
-        context.getScreenHeight(1),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.colorPalette.boxColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _searchFocusNode.hasFocus
-                ? context.colorPalette.primaryColor
-                : Colors.transparent,
-            width: 1.5,
+              if (state == CurrentAppState.LOADING && list.isEmpty) {
+                return _shimmerList(context);
+              }
+
+              if (state == CurrentAppState.ERROR && list.isEmpty) {
+                return _errorView(context);
+              }
+
+              if (state == CurrentAppState.SUCCESS && list.isEmpty) {
+                return _emptyView(context);
+              }
+
+              return RefreshIndicator(
+                onRefresh: controller.refresh,
+                color: context.colorPalette.primaryColor,
+                child: ListView.separated(
+                  controller: _scroll,
+                  padding: EdgeInsets.fromLTRB(
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(1.5),
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(3),
+                  ),
+                  itemCount: list.length + 1,
+                  separatorBuilder: (_, _) =>
+                      SizedBox(height: context.getScreenHeight(1.5)),
+                  itemBuilder: (context, index) {
+                    if (index == list.length) return _listFooter(context);
+                    return _RequestCard(
+                      key: ValueKey(list[index].id),
+                      request: list[index],
+                      controller: controller,
+                    );
+                  },
+                ),
+              );
+            }),
           ),
-        ),
-        child: TextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          onChanged: (value) {
-            controller.onSearchChanged(value);
-          },
-          decoration: InputDecoration(
-            hintText: 'Search by name or phone...',
-            hintStyle: TextStyle(
-              fontSize: context.getScreenWidth(3.5),
-              color: context.colorPalette.subTitleColor,
-            ),
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              color: context.colorPalette.subTitleColor,
-            ),
-            suffixIcon: _searchController.text.isNotEmpty
-                ? IconButton(
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: context.colorPalette.subTitleColor,
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                      controller.clearSearch();
-                    },
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: context.getScreenWidth(4),
-              vertical: context.getScreenHeight(1.5),
-            ),
-          ),
-        ),
+        ],
       ),
     );
   }
