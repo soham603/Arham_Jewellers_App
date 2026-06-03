@@ -9,11 +9,13 @@ class SearchBarWidget extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onClear;
   final VoidCallback? onFilterTap;
+  final VoidCallback? onScannerTap;
   final int filterActiveCount;
   final Color? outerBackgroundColor;
   final Color? barBackgroundColor;
   final String? hintText;
   final bool showShadow;
+  final bool showScanner;
 
   const SearchBarWidget({
     super.key,
@@ -25,11 +27,13 @@ class SearchBarWidget extends StatelessWidget {
     this.onBack,
     this.onClear,
     this.onFilterTap,
+    this.onScannerTap,
     this.filterActiveCount = 0,
     this.outerBackgroundColor,
     this.barBackgroundColor,
     this.hintText,
     this.showShadow = true,
+    this.showScanner = false,
   });
 
   static const _goldDark = Color(0xFF8B6914);
@@ -128,11 +132,14 @@ class SearchBarWidget extends StatelessWidget {
                         color: _goldDark,
                       ),
                     )
-                  else
-                    const Icon(
-                      Icons.mic_none_rounded,
-                      color: _goldDark,
-                      size: 18,
+                  else if (showScanner)
+                    GestureDetector(
+                      onTap: onScannerTap,
+                      child: const Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: _goldDark,
+                        size: 18,
+                      ),
                     ),
                 ],
               ),

@@ -6,7 +6,12 @@ import '../../app/routes/app_routes.dart';
 import '../../presentation/controllers/navigation_controller.dart';
 
 class HomeSearchBar extends StatelessWidget {
-  const HomeSearchBar({super.key});
+  final VoidCallback? onScannerTap;
+
+  const HomeSearchBar({
+    super.key,
+    this.onScannerTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +64,21 @@ class HomeSearchBar extends StatelessWidget {
               ),
             ),
 
-            Icon(
-              Icons.mic_none_rounded,
-              color: context.colorPalette.goldDark,
-              size: 18,
-            ),
+            if (onScannerTap != null)
+              GestureDetector(
+                onTap: onScannerTap,
+                child: Icon(
+                  Icons.qr_code_scanner_rounded,
+                  color: context.colorPalette.goldDark,
+                  size: 18,
+                ),
+              )
+            else
+              Icon(
+                Icons.qr_code_scanner_rounded,
+                color: context.colorPalette.goldDark,
+                size: 18,
+              ),
           ],
         ),
       ),
