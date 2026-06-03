@@ -29,6 +29,7 @@ import '../../controllers/navigation_controller.dart';
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -127,6 +128,30 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _openScanner() async {
+     final barcode = await Get.to(() => BarcodeScannerPage(
+           onDetect: (barcode) async {
+             // The barcode scanner page will now close itself and return the value
+             // We don't need to do anything here since the page handles closing
+           },
+         )) as String?;
+
+     if (barcode == null) return;
+     
+     final productController = SearchProductController.instance;
+     final product = await productController.searchByBarcode(barcode);
+     if (!mounted) return;
+     if (product != null) {
+       Get.to(() => ProductDetailsPage(product: product));
+     } else {
+       Get.snackbar(
+         'Not Found',
+         'No product found for barcode: $barcode',
+         snackPosition: SnackPosition.BOTTOM,
+       );
+     }
+   }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -142,9 +167,9 @@ class _HomePageState extends State<HomePage> {
 
                         const SizedBox(height: 8),
 
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 14),
-                          child: HomeSearchBar(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          child: HomeSearchBar(onScannerTap: _openScanner),
                         ),
 
                         const SizedBox(height: 18),

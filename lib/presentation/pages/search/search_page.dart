@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -85,6 +86,7 @@ class _SearchPageState extends State<SearchPage> {
               controller: _textController,
               focusNode: _focusNode,
               autofocus: false,
+              showScanner: true,
               onBack: () {
                 if (_textController.text.isNotEmpty ||
                     controller.isSearching ||
@@ -118,6 +120,29 @@ class _SearchPageState extends State<SearchPage> {
               onFilterTap: () {
                 _focusNode.unfocus();
                 FilterBottomSheet.show(context).then((_) => setState(() {}));
+              },
+              onScannerTap: () async {
+                _focusNode.unfocus();
+                final barcode = await Get.to(() => BarcodeScannerPage(
+                  onDetect: (barcode) async {
+                    // The barcode scanner page will now close itself and return the value
+                    // We don't need to do anything here since the page handles closing
+                  },
+                )) as String?;
+                
+                if (barcode == null) return;
+                
+                final product = await controller.searchByBarcode(barcode);
+                if (!mounted) return;
+                if (product != null) {
+                  Get.to(() => ProductDetailsPage(product: product));
+                } else {
+                  Get.snackbar(
+                    'Not Found',
+                    'No product found for barcode: $barcode',
+                    snackPosition: SnackPosition.BOTTOM,
+                  );
+                }
               },
               filterActiveCount: controller.activeFilterCount,
             ),
