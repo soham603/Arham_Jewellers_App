@@ -12,7 +12,6 @@ import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
 
-// 🔥 Import the new Change Handset page
 import 'change_handset_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -57,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final hasKeyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         children: [
                           // 1. Logo & Header
-                          _buildTopSection(context),
+                          _buildTopSection(context, hasKeyboard: hasKeyboard),
 
                           SizedBox(height: context.getScreenHeight(2)),
 
@@ -109,24 +109,42 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildTopSection(BuildContext context) {
+  Widget _buildTopSection(BuildContext context, {bool hasKeyboard = false}) {
     return Column(
       children: [
-        SizedBox(height: context.getScreenHeight(5)),
+        SizedBox(
+          height: hasKeyboard
+              ? context.getScreenHeight(1.5)
+              : context.getScreenHeight(5),
+        ),
         Center(
           child: LogoWidget(
-            logoSize: context.getScreenWidth(24),
-            nameFontSize: context.getScreenWidth(5.5),
-            subtitleFontSize: context.getScreenWidth(2.8),
+            logoSize: hasKeyboard
+                ? context.getScreenWidth(14)
+                : context.getScreenWidth(24),
+            nameFontSize: hasKeyboard
+                ? context.getScreenWidth(3.5)
+                : context.getScreenWidth(5.5),
+            subtitleFontSize: hasKeyboard
+                ? context.getScreenWidth(2.1)
+                : context.getScreenWidth(2.8),
             iconColor: context.colorPalette.gold,
             nameColor: context.colorPalette.goldDeep,
             subtitleColor: context.colorPalette.goldDark,
             nameLetterSpacing: 2.5,
-            iconNameSpacing: context.getScreenHeight(1.5),
-            nameSubtitleSpacing: context.getScreenHeight(0.4),
+            iconNameSpacing: hasKeyboard
+                ? context.getScreenHeight(0.4)
+                : context.getScreenHeight(1.5),
+            nameSubtitleSpacing: hasKeyboard
+                ? context.getScreenHeight(0.15)
+                : context.getScreenHeight(0.4),
           ),
         ),
-        SizedBox(height: context.getScreenHeight(2)),
+        SizedBox(
+          height: hasKeyboard
+              ? context.getScreenHeight(0.5)
+              : context.getScreenHeight(2),
+        ),
       ],
     );
   }
@@ -374,7 +392,12 @@ class _LoginPageState extends State<LoginPage> {
           Center(
             child: GestureDetector(
               onTap: () {
-                Get.to(() => const ChangeHandsetPage());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ChangeHandsetPage(),
+                  ),
+                );
               },
               child: Text(
                 'Change Handset ?',
