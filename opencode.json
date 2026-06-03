@@ -7,6 +7,13 @@
         "dart",
         "mcp-server"
       ]
+    },
+    "flutter-mcp": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@arenukvern/mcp_flutter"
+      ]
     }
   }
 }
