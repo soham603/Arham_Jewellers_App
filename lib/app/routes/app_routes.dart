@@ -13,6 +13,8 @@ abstract class AppRoutes {
   static const myOrders = '/my-orders';
   static const register = '/register';
   static const notifications = '/notifications';
+  static const changeHandset = '/change-handset';
+  static const handsetRequests = '/handset-requests';
 
   /// Tab index map for the main shell.
   static const int tabIndexHome = 0;

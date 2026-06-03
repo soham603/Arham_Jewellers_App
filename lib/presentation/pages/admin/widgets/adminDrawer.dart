@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -147,6 +148,19 @@ class _AdminDrawerState extends State<AdminDrawer> {
                         subtitle: "View all customers",
 
                         onTap: () {},
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.6)),
+
+                      _drawerItem(
+                        context,
+                        icon: Icons.phone_android_rounded,
+                        title: "Handset Requests",
+                        subtitle: "Manage change requests",
+                        onTap: () {
+                          Get.back();
+                          Get.to(() => const HandsetChangeScreen());
+                        },
                       ),
 
                       SizedBox(height: context.getScreenHeight(1.6)),
