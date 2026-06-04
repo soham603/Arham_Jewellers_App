@@ -40,7 +40,10 @@ class AppBottomNav extends StatelessWidget {
   List<_NavItem> get _navItems => [
     const _NavItem(label: 'Home', icon: Icons.home_rounded),
     const _NavItem(label: 'Search', icon: Icons.search_rounded),
-    const _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
+    _NavItem(
+      label: isAdmin ? 'Share' : 'Cart',
+      icon: isAdmin ? Icons.share_rounded : Icons.shopping_cart_rounded,
+    ),
     _NavItem(label: isAdmin ? 'Admin' : 'Profile', icon: Icons.person_rounded),
   ];
 
