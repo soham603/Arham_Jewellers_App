@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
@@ -166,219 +167,234 @@ class _OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusInfo = _getStatusInfo(order.status);
 
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE7DED2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Top accent bar per order status ───────────────────────
-          Container(
-            height: 4,
-            decoration: BoxDecoration(
-              color: statusInfo.color,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => UserOrderDetailScreen(order: order));
+      },
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Top accent bar per order status ───────────────────────
+            Container(
+              height: 4,
+              decoration: BoxDecoration(
+                color: statusInfo.color,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
             ),
-          ),
 
-          Padding(
-            padding: EdgeInsets.all(context.getScreenWidth(4)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Header row: order token + status badge ───────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order.orderToken != null
-                              ? 'Order #${order.orderToken}'
-                              : 'Order #${order.id.substring(0, 8).toUpperCase()}',
-                          style: TextStyle(
-                            fontSize: context.getScreenWidth(4.5),
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
-                          ),
-                        ),
-                        SizedBox(height: context.getScreenHeight(0.4)),
-                        Text(
-                          _formatDate(order.createdAt),
-                          style: TextStyle(
-                            fontSize: context.getScreenWidth(3.2),
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                    _StatusBadge(
-                      label: statusInfo.label,
-                      color: statusInfo.color,
-                      bgColor: statusInfo.bgColor,
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: context.getScreenHeight(2)),
-                Container(height: 1, color: AppColors.divider),
-                SizedBox(height: context.getScreenHeight(1.5)),
-
-                // ── Product thumbnail + items list ───────────────────
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Thumb placeholder (matches Figma "Thumb" rect)
-                    Container(
-                      width: context.getScreenWidth(18),
-                      height: context.getScreenWidth(18),
-                      decoration: BoxDecoration(
-                        color: AppColors.tileBg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.diamond_outlined,
-                          color: AppColors.primaryGold,
-                          size: context.getScreenWidth(8),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: context.getScreenWidth(3)),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (order.items.isEmpty)
-                            Text(
-                              '${order.items.length} item(s)',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(3.8),
-                                color: AppColors.textMuted,
-                              ),
-                            )
-                          else
-                            ...order.items.take(2).map(
-                                  (item) => Padding(
-                                    padding: EdgeInsets.only(
-                                      bottom: context.getScreenHeight(0.5),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            item.product.name,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize:
-                                                  context.getScreenWidth(3.8),
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.textDark,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          'x${item.quantity}',
-                                          style: TextStyle(
-                                            fontSize: context.getScreenWidth(3.4),
-                                            color: AppColors.textMuted,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                          if (order.items.length > 2)
-                            Text(
-                              '+${order.items.length - 2} more items',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(3.2),
-                                color: AppColors.primaryGold,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                // ── Admin message if present ─────────────────────────
-                if (order.adminMessage != null &&
-                    order.adminMessage!.isNotEmpty) ...[
-                  SizedBox(height: context.getScreenHeight(1.5)),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(context.getScreenWidth(3)),
-                    decoration: BoxDecoration(
-                      color: AppColors.tileBg,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: context.getScreenWidth(4),
-                          color: AppColors.primaryGold,
-                        ),
-                        SizedBox(width: context.getScreenWidth(2)),
-                        Expanded(
-                          child: Text(
-                            order.adminMessage!,
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(3.4),
-                              color: AppColors.textMuted,
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                // ── Total amount if present ──────────────────────────
-                if (order.totalAmount != null) ...[
-                  SizedBox(height: context.getScreenHeight(1.5)),
-                  Container(height: 1, color: AppColors.divider),
-                  SizedBox(height: context.getScreenHeight(1.5)),
+            Padding(
+              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Header row: order token + status badge ───────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Total Amount',
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(3.8),
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            order.orderToken != null
+                                ? 'Order #${order.orderToken}'
+                                : 'Order #${order.id.substring(0, 8).toUpperCase()}',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(4.5),
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          SizedBox(height: context.getScreenHeight(0.4)),
+                          Text(
+                            _formatDate(order.createdAt),
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(3.2),
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _StatusBadge(
+                            label: statusInfo.label,
+                            color: statusInfo.color,
+                            bgColor: statusInfo.bgColor,
+                          ),
+                          SizedBox(width: context.getScreenWidth(2)),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: context.getScreenWidth(3),
+                            color: AppColors.textMuted,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: context.getScreenHeight(2)),
+                  Container(height: 1, color: AppColors.divider),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+
+                  // ── Product thumbnail + items list ───────────────────
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Thumb placeholder (matches Figma "Thumb" rect)
+                      Container(
+                        width: context.getScreenWidth(18),
+                        height: context.getScreenWidth(18),
+                        decoration: BoxDecoration(
+                          color: AppColors.tileBg,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.diamond_outlined,
+                            color: AppColors.primaryGold,
+                            size: context.getScreenWidth(8),
+                          ),
                         ),
                       ),
-                      Text(
-                        '₹${_formatAmount(order.totalAmount!)}',
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(4.2),
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primaryGold,
+                      SizedBox(width: context.getScreenWidth(3)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (order.items.isEmpty)
+                              Text(
+                                '${order.items.length} item(s)',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(3.8),
+                                  color: AppColors.textMuted,
+                                ),
+                              )
+                            else
+                              ...order.items.take(2).map(
+                                    (item) => Padding(
+                                      padding: EdgeInsets.only(
+                                        bottom: context.getScreenHeight(0.5),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              item.product.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize:
+                                                    context.getScreenWidth(3.8),
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.textDark,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            'x${item.quantity}',
+                                            style: TextStyle(
+                                              fontSize: context.getScreenWidth(3.4),
+                                              color: AppColors.textMuted,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                            if (order.items.length > 2)
+                              Text(
+                                '+${order.items.length - 2} more items',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(3.2),
+                                  color: AppColors.primaryGold,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
                   ),
+
+                  // ── Admin message if present ─────────────────────────
+                  if (order.adminMessage != null &&
+                      order.adminMessage!.isNotEmpty) ...[
+                    SizedBox(height: context.getScreenHeight(1.5)),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(context.getScreenWidth(3)),
+                      decoration: BoxDecoration(
+                        color: AppColors.tileBg,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            size: context.getScreenWidth(4),
+                            color: AppColors.primaryGold,
+                          ),
+                          SizedBox(width: context.getScreenWidth(2)),
+                          Expanded(
+                            child: Text(
+                              order.adminMessage!,
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(3.4),
+                                color: AppColors.textMuted,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  // ── Total amount if present ──────────────────────────
+                  if (order.totalAmount != null) ...[
+                    SizedBox(height: context.getScreenHeight(1.5)),
+                    Container(height: 1, color: AppColors.divider),
+                    SizedBox(height: context.getScreenHeight(1.5)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Amount',
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(3.8),
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          '₹${_formatAmount(order.totalAmount!)}',
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(4.2),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryGold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

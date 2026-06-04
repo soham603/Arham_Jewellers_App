@@ -7,11 +7,10 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/orderDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminOrderShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ApproveOrdersScreen extends StatefulWidget {
   const ApproveOrdersScreen({super.key});
@@ -229,493 +228,113 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
   }
 }
 
-class _AdminOrderCard extends StatefulWidget {
+class _AdminOrderCard extends StatelessWidget {
   const _AdminOrderCard({required this.order, required this.controller});
 
   final AdminOrderModel order;
   final AdminOrderController controller;
 
   @override
-  State<_AdminOrderCard> createState() => _AdminOrderCardState();
-}
-
-class _AdminOrderCardState extends State<_AdminOrderCard> {
-  bool expanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final order = widget.order;
-
-    return Container(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-
-        borderRadius: BorderRadius.circular(24),
-
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                expanded = !expanded;
-              });
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                _OrderImagesStack(
-                  order: order,
-                  controller: widget.controller,
-                ),
-
-                SizedBox(width: context.getScreenWidth(4)),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      Text(
-                        "Order #${order.id.substring(0, 8)}",
-
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(4.4),
-                        ),
-                      ),
-
-                      if (order.isCustom) ...[
-                        SizedBox(width: context.getScreenWidth(2)),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.getScreenWidth(2),
-                            vertical: context.getScreenHeight(0.2),
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3E0),
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(
-                              color: AppColors.primaryGold.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Text(
-                            "CUSTOM",
-                            style: TextStyle(
-                              color: AppColors.primaryGold,
-                              fontWeight: FontWeight.w800,
-                              fontSize: context.getScreenWidth(2.4),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-
-                      SizedBox(height: context.getScreenHeight(0.6)),
-
-                      Text(
-                        DateFormat(
-                          "dd MMM yyyy • hh:mm a",
-                        ).format(order.createdAt.toLocal()),
-
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: context.getScreenWidth(3.4),
-                        ),
-                      ),
-
-                      SizedBox(height: context.getScreenHeight(1)),
-
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(2.5),
-                          vertical: context.getScreenHeight(0.3),
-                        ),
-                        decoration: BoxDecoration(
-                          color: _orderStatusColor(order.status).withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          order.status,
-                          style: TextStyle(
-                            color: _orderStatusColor(order.status),
-                            fontWeight: FontWeight.w700,
-                            fontSize: context.getScreenWidth(2.8),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
-                ),
-              ],
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => OrderDetailScreen(order: order));
+      },
+      child: Container(
+        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
-          ),
-
-          if (expanded) ...[
-            SizedBox(height: context.getScreenHeight(2)),
-
-            Divider(color: Colors.grey.shade300),
-
-            SizedBox(height: context.getScreenHeight(1)),
-
-            ...List.generate(order.orderItems.length, (index) {
-              final item = order.orderItems[index];
-              final imageUrl = widget.controller.getProductImage(item.product.id);
-
-              return Padding(
-                padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
-
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: context.getScreenWidth(12),
-                        height: context.getScreenWidth(12),
-                        child: imageUrl != null && imageUrl.isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (_, _) => const Center(
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                errorWidget: (_, _, _) =>
-                                    const RatneshFallback.xs(),
-                              )
-                            : const RatneshFallback.xs(),
-                      ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _OrderImagesStack(
+              order: order,
+              controller: controller,
+            ),
+            SizedBox(width: context.getScreenWidth(4)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Order #${order.id.substring(0, 8)}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(4.4),
                     ),
-
-                    SizedBox(width: context.getScreenWidth(3)),
-
-                    Expanded(
-                      child: Text(
-                        item.product.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: context.getScreenWidth(3.8),
+                  ),
+                  if (order.isCustom) ...[
+                    SizedBox(height: context.getScreenHeight(0.4)),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(2),
+                        vertical: context.getScreenHeight(0.2),
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF3E0),
+                        borderRadius: BorderRadius.circular(100),
+                        border: Border.all(
+                          color: AppColors.primaryGold.withOpacity(0.3),
                         ),
                       ),
-                    ),
-
-                    Text(
-                      "x${item.quantity}",
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w600,
-                        fontSize: context.getScreenWidth(3.6),
+                      child: Text(
+                        "CUSTOM",
+                        style: TextStyle(
+                          color: AppColors.primaryGold,
+                          fontWeight: FontWeight.w800,
+                          fontSize: context.getScreenWidth(2.4),
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ],
-                ),
-              );
-            }),
-
-            Divider(color: Colors.grey.shade300),
-
-            SizedBox(height: context.getScreenHeight(1)),
-
-            Row(
-              children: [
-                const Icon(Icons.person),
-
-                SizedBox(width: context.getScreenWidth(2)),
-
-                  Expanded(
-                  child: Text(
-                    order.user.name,
+                  SizedBox(height: context.getScreenHeight(0.6)),
+                  Text(
+                    DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: context.getScreenWidth(3.8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: context.getScreenHeight(1)),
-
-            Row(
-              children: [
-                const Icon(Icons.phone),
-
-                SizedBox(width: context.getScreenWidth(2)),
-
-                Expanded(
-                  child: Text(
-                    order.user.phoneNumber,
-                    style: TextStyle(
+                      color: AppColors.textMuted,
                       fontSize: context.getScreenWidth(3.4),
                     ),
                   ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: context.getScreenHeight(2)),
-
-            if (order.status == "PENDING")
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: widget.controller.isActionLoading
-                          ? null
-                          : () async {
-                              await widget.controller.performOrderAction(
-                                orderId: order.id,
-                                action: "APPROVE",
-                                allocations: order.orderItems.map((item) {
-                                  return {
-                                    "orderItemId": item.id,
-                                    "quantity": item.quantity,
-                                  };
-                                }).toList(),
-                              );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.green,
-                        disabledBackgroundColor: Colors.green.withOpacity(0.5),
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(1.2),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        "Approve",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(3.6),
-                        ),
-                      ),
+                  SizedBox(height: context.getScreenHeight(1)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getScreenWidth(2.5),
+                      vertical: context.getScreenHeight(0.3),
                     ),
-                  ),
-                  SizedBox(width: context.getScreenWidth(3)),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: widget.controller.isActionLoading
-                          ? null
-                          : () => _showRejectDialog(order),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.red,
-                        disabledBackgroundColor: Colors.red.withOpacity(0.5),
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(1.2),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        "Reject",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(3.6),
-                        ),
+                    decoration: BoxDecoration(
+                      color: _orderStatusColor(order.status).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Text(
+                      order.status,
+                      style: TextStyle(
+                        color: _orderStatusColor(order.status),
+                        fontWeight: FontWeight.w700,
+                        fontSize: context.getScreenWidth(2.8),
                       ),
                     ),
                   ),
                 ],
               ),
-
-            SizedBox(height: context.getScreenHeight(1.5)),
-
-            GestureDetector(
-              onTap: () async {
-                final url =
-                    "https://wa.me/${order.user.phoneNumber.replaceAll("+", "")}";
-
-                await launchUrl(Uri.parse(url));
-              },
-
-              child: Container(
-                width: double.infinity,
-
-                padding: EdgeInsets.symmetric(
-                  vertical: context.getScreenHeight(1.5),
-                ),
-
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9F9EE),
-
-                  borderRadius: BorderRadius.circular(18),
-                ),
-
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-
-                  children: [
-                    const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-
-                    SizedBox(width: context.getScreenWidth(2)),
-
-                    Text(
-                      "Connect on WhatsApp",
-
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w700,
-                        fontSize: context.getScreenWidth(3.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: context.getScreenWidth(3.5),
+              color: AppColors.textMuted,
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  void _showRejectDialog(AdminOrderModel order) {
-    final reasonController = TextEditingController();
-
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Reject Order",
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(5),
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              SizedBox(height: context.getScreenHeight(0.8)),
-              Text(
-                "Order #${order.id.substring(0, 8)}",
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: context.getScreenWidth(3.4),
-                ),
-              ),
-              SizedBox(height: context.getScreenHeight(2)),
-              TextField(
-                controller: reasonController,
-                maxLines: 3,
-                textInputAction: TextInputAction.done,
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(3.6),
-                ),
-                decoration: InputDecoration(
-                  hintText: "Enter rejection reason",
-                  hintStyle: TextStyle(
-                    fontSize: context.getScreenWidth(3.4),
-                    color: Colors.grey.shade400,
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFFF9FAFB),
-                  contentPadding: EdgeInsets.all(context.getScreenWidth(3)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: Color(0xFF2563EB),
-                      width: 1.2,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: context.getScreenHeight(2)),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(3.6),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: context.getScreenWidth(3)),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final reason = reasonController.text.trim();
-                        if (reason.isEmpty) {
-                          Get.snackbar(
-                            "Required",
-                            "Please enter rejection reason",
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.orange,
-                            colorText: Colors.white,
-                          );
-                          return;
-                        }
-                        Get.back();
-                        await widget.controller.performOrderAction(
-                          orderId: order.id,
-                          action: "REJECT",
-                          allocations: [],
-                          reason: reason,
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(1.2),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        "Submit",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(3.6),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ),
       ),
-      barrierDismissible: false,
     );
   }
 }
