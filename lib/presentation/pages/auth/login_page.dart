@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -463,6 +465,8 @@ class _LoginPageState extends State<LoginPage> {
                     color: AppColors.primaryGold,
                     fontWeight: FontWeight.w600,
                   ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () => Get.to(() => const AncillaryPageScreen(), arguments: 'TERMS'),
                 ),
                 const TextSpan(text: ' & '),
                 TextSpan(
@@ -471,6 +475,8 @@ class _LoginPageState extends State<LoginPage> {
                     color: AppColors.primaryGold,
                     fontWeight: FontWeight.w600,
                   ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () => Get.to(() => const AncillaryPageScreen(), arguments: 'PRIVACY'),
                 ),
               ],
             ),

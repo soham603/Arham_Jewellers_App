@@ -4,4 +4,7 @@ class ApiUrlConstants {
   static String get BASE_URL => dotenv.env['BASE_URL'] ?? '';
   static const String UPDATE_FCM_TOKEN = '/api/v1/auth/update-fcm-token';
   static const String REFRESH_TOKEN = '/api/v1/auth/refresh-token';
+
+  static String ancillaryGetPage(String page) => '/api/v1/ancillary/get-page/$page';
+  static String ancillaryUpdatePage(String page) => '/api/v1/ancillary/update-page/$page';
 }

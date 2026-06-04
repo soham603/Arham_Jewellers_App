@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/ancillaryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
@@ -224,6 +225,13 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Gold Rate",
                 subtitle: "Set daily rate",
                 onTap: () => Get.to(() => const GoldRateScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.article_rounded,
+                title: "Ancillary Pages",
+                subtitle: "Terms, Policy, etc.",
+                onTap: () => Get.to(() => const AncillaryManagerScreen()),
               ),
               _adminTile(
                 context,

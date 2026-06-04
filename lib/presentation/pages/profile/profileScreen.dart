@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -424,10 +425,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    Divider(color: Colors.grey.shade300),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    Text(
+                      "Help & Info",
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(6),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.description_rounded,
+                      label: "Terms & Conditions",
+                      pageKey: "TERMS",
+                    ),
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.privacy_tip_rounded,
+                      label: "Privacy Policy",
+                      pageKey: "PRIVACY",
+                    ),
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.info_outline_rounded,
+                      label: "About Us",
+                      pageKey: "ABOUT",
+                    ),
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.replay_rounded,
+                      label: "Refund Policy",
+                      pageKey: "REFUND",
+                    ),
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.location_city_rounded,
+                      label: "City Policy",
+                      pageKey: "CITY_POLICY",
+                    ),
+                    _ancillaryLink(
+                      context,
+                      icon: Icons.contact_mail_rounded,
+                      label: "Contact Us",
+                      pageKey: "CONTACT",
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(3)),
                   ],
                 ),
               );
             }),
+    );
+  }
+
+  Widget _ancillaryLink(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String pageKey,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+      child: GestureDetector(
+        onTap: () => Get.to(() => const AncillaryPageScreen(), arguments: pageKey),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getScreenWidth(4),
+            vertical: context.getScreenHeight(1.5),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: AppColors.primaryGold,
+                size: context.getScreenWidth(5.5),
+              ),
+              SizedBox(width: context.getScreenWidth(3)),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: context.getScreenWidth(4),
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textMuted,
+                size: context.getScreenWidth(5),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
