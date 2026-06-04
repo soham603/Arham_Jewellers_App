@@ -80,9 +80,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
     value = value.roundToDouble();
 
-    if (value >= 900 && value <= 925) return "$numStr (22 K)";
-    if (value >= 820 && value <= 840) return "$numStr (20 K)";
-    if (value >= 740 && value <= 760) return "$numStr (18 K)";
+    if (value >= 995 && value <= 1005) return "$numStr (24 K)";
+    if (value >= 915 && value <= 925) return "$numStr (22 K)";
+    if (value >= 835 && value <= 845) return "$numStr (20 K)";
+    if (value >= 755 && value <= 765) return "$numStr (18 K)";
+    if (value >= 595 && value <= 605) return "$numStr (14 K)";
+    if (value >= 375 && value <= 385) return "$numStr (9 K)";
 
     return null;
   }
@@ -95,9 +98,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (value == null) return null;
 
     switch (value) {
-      case 22: return '0.916 (22 K)';
-      case 20: return '0.833 (20 K)';
-      case 18: return '0.750 (18 K)';
+      case 9: return '0.380 (9 K)';
+      case 14: return '0.600 (14 K)';
+      case 18: return '0.760 (18 K)';
+      case 20: return '0.840 (20 K)';
+      case 22: return '0.920 (22 K)';
+      case 24: return '1.000 (24 K)';
     }
     return null;
   }
