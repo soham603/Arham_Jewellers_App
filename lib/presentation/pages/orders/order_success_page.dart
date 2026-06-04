@@ -1,17 +1,72 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/routes/app_routes.dart';
 
-class OrderSuccessPage extends StatelessWidget {
+class OrderSuccessPage extends StatefulWidget {
   const OrderSuccessPage({super.key});
+
+  @override
+  State<OrderSuccessPage> createState() => _OrderSuccessPageState();
+}
+
+class _OrderSuccessPageState extends State<OrderSuccessPage>
+    with TickerProviderStateMixin {
+  late final AnimationController _heroController;
+  late final AnimationController _contentController;
+
+  late final Animation<double> _contentFade;
+  late final Animation<Offset> _contentSlide;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _heroController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _contentController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _contentFade = CurvedAnimation(
+      parent: _contentController,
+      curve: Curves.easeOut,
+    );
+
+    _contentSlide = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _contentController,
+      curve: Curves.easeOutCubic,
+    ));
+
+    _heroController.forward();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _contentController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _heroController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +88,11 @@ class OrderSuccessPage extends StatelessWidget {
           child: Column(
             children: [
               Container(height: 4, color: AppColors.primaryGold),
-
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getScreenWidth(5),
-                    vertical: context.getScreenHeight(3),
                   ),
                   child: Obx(() {
                     final orderId = orderController.createdOrderId;
@@ -48,34 +102,18 @@ class OrderSuccessPage extends StatelessWidget {
                       children: [
                         SizedBox(height: context.getScreenHeight(4)),
 
-                        Container(
-                          width: context.getScreenWidth(28),
-                          height: context.getScreenWidth(28),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.primaryGold.withOpacity(0.1),
-                            border: Border.all(
-                              color: AppColors.primaryGold.withOpacity(0.3),
-                              width: 2,
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.check_circle_outline_rounded,
-                              color: AppColors.primaryGold,
-                              size: context.getScreenWidth(14),
-                            ),
-                          ),
-                        ),
+                        // ── Hero: Animated success icon with gradient bg ──
+                        _AnimatedHero(controller: _heroController),
 
-                        SizedBox(height: context.getScreenHeight(3)),
+                        SizedBox(height: context.getScreenHeight(2.5)),
 
                         Text(
                           'Booking Confirmed!',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(7),
-                            fontWeight: FontWeight.w700,
+                            fontSize: context.getScreenWidth(6),
+                            fontWeight: FontWeight.w800,
                             color: AppColors.textDark,
+                            letterSpacing: -0.3,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -94,77 +132,50 @@ class OrderSuccessPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
 
-                        SizedBox(height: context.getScreenHeight(4)),
-
-                        _OrderDetailCard(
-                          orderId: orderId,
-                          images: orderController.lastOrderImages,
-                          itemNames: orderController.lastOrderItemNames,
-                          itemQuantities: orderController.lastOrderItemQuantities,
-                          itemPrices: orderController.lastOrderItemPrices,
-                          total: orderController.lastOrderTotal,
-                          createdAt: orderController.lastOrderCreatedAt,
-                          context: context,
-                        ),
-
                         SizedBox(height: context.getScreenHeight(3)),
 
-                        _NextStepsCard(context: context),
-
-                        SizedBox(height: context.getScreenHeight(4)),
-
-                        SizedBox(
-                          width: double.infinity,
-                          height: context.getScreenHeight(6.5),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: AppColors.primaryGold,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            onPressed: () =>
-                                Get.offAllNamed(AppRoutes.myOrders),
-                            child: Text(
-                              'View My Orders',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(4.5),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: context.getScreenHeight(1.5)),
-
-                        SizedBox(
-                          width: double.infinity,
-                          height: context.getScreenHeight(6.5),
-                          child: OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                color: AppColors.primaryGold,
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              foregroundColor: AppColors.primaryGold,
-                            ),
-                            onPressed: () => Get.offAllNamed(AppRoutes.home),
-                            child: Text(
-                              'Continue Shopping',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(4.5),
-                                fontWeight: FontWeight.w600,
-                              ),
+                        // ── Content: Slide-up animated sections ──
+                        FadeTransition(
+                          opacity: _contentFade,
+                          child: SlideTransition(
+                            position: _contentSlide,
+                            child: Column(
+                              children: [
+                                _OrderDetailCard(
+                                  orderId: orderId,
+                                  images: orderController.lastOrderImages,
+                                  itemNames:
+                                      orderController.lastOrderItemNames,
+                                  itemQuantities: orderController
+                                      .lastOrderItemQuantities,
+                                  itemPrices:
+                                      orderController.lastOrderItemPrices,
+                                  total: orderController.lastOrderTotal,
+                                  createdAt:
+                                      orderController.lastOrderCreatedAt,
+                                ),
+                                SizedBox(height: context.getScreenHeight(2.5)),
+                                _NextStepsCard(),
+                                SizedBox(height: context.getScreenHeight(2.5)),
+                                _ContactAdminCard(orderId: orderId),
+                                SizedBox(height: context.getScreenHeight(3)),
+                                _PrimaryButton(
+                                  label: 'View My Orders',
+                                  onPressed: () =>
+                                      Get.offAllNamed(AppRoutes.myOrders),
+                                ),
+                                SizedBox(
+                                    height: context.getScreenHeight(1.5)),
+                                _SecondaryButton(
+                                  label: 'Continue Shopping',
+                                  onPressed: () =>
+                                      Get.offAllNamed(AppRoutes.home),
+                                ),
+                                SizedBox(height: context.getScreenHeight(2)),
+                              ],
                             ),
                           ),
                         ),
-
-                        SizedBox(height: context.getScreenHeight(2)),
                       ],
                     );
                   }),
@@ -178,7 +189,88 @@ class OrderSuccessPage extends StatelessWidget {
   }
 }
 
-// ── Order Detail Info Card ──────────────────────────────────────────────────
+// ── Animated Hero Section ──────────────────────────────────────────────────
+
+class _AnimatedHero extends StatelessWidget {
+  final AnimationController controller;
+  const _AnimatedHero({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = CurvedAnimation(
+      parent: controller,
+      curve: Curves.elasticOut,
+    );
+    final fade = CurvedAnimation(
+      parent: controller,
+      curve: const Interval(0, 0.5, curve: Curves.easeIn),
+    );
+
+    return FadeTransition(
+      opacity: fade,
+      child: ScaleTransition(
+        scale: scale,
+        child: Container(
+          width: context.getScreenWidth(22),
+          height: context.getScreenWidth(22),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.success.withOpacity(0.15),
+                AppColors.success.withOpacity(0.05),
+              ],
+            ),
+            border: Border.all(
+              color: AppColors.success.withOpacity(0.25),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.success.withOpacity(0.12),
+                blurRadius: 30,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Container(
+              width: context.getScreenWidth(12),
+              height: context.getScreenWidth(12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.success,
+                    const Color(0xFF248C4B),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.success.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.check_rounded,
+                color: Colors.white,
+                size: context.getScreenWidth(6),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Order Detail Card ──────────────────────────────────────────────────────
 
 class _OrderDetailCard extends StatelessWidget {
   final String orderId;
@@ -188,7 +280,6 @@ class _OrderDetailCard extends StatelessWidget {
   final List<double> itemPrices;
   final double total;
   final DateTime createdAt;
-  final BuildContext context;
 
   const _OrderDetailCard({
     required this.orderId,
@@ -198,23 +289,14 @@ class _OrderDetailCard extends StatelessWidget {
     required this.itemPrices,
     required this.total,
     required this.createdAt,
-    required this.context,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(5)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE7DED2)),
-      ),
+    return _CardContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Thumbnail (product images or fallback) ────────────────
           Row(
             children: [
               _buildThumbnail(context),
@@ -226,7 +308,7 @@ class _OrderDetailCard extends StatelessWidget {
                     Text(
                       'Booking Received',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(4.5),
+                        fontSize: context.getScreenWidth(4.8),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
                       ),
@@ -235,7 +317,7 @@ class _OrderDetailCard extends StatelessWidget {
                     Text(
                       'Your booking has been received',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3.5),
+                        fontSize: context.getScreenWidth(3.4),
                         color: AppColors.textMuted,
                       ),
                     ),
@@ -246,9 +328,9 @@ class _OrderDetailCard extends StatelessWidget {
           ),
 
           if (orderId.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(2)),
-            Container(height: 1, color: AppColors.divider),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.getScreenHeight(2.5)),
+            _Divider(),
+            SizedBox(height: context.getScreenHeight(2.5)),
 
             _infoRow(
               context,
@@ -257,12 +339,11 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ],
 
-          SizedBox(height: context.getScreenHeight(1.2)),
+          SizedBox(height: context.getScreenHeight(1.5)),
 
           _infoRow(
             context,
             label: 'Status',
-            value: 'Pending Confirmation',
             valueWidget: _StatusBadge(
               label: 'Pending',
               color: const Color(0xFFF5A623),
@@ -270,7 +351,7 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(1.2)),
+          SizedBox(height: context.getScreenHeight(1.5)),
 
           _infoRow(
             context,
@@ -279,9 +360,9 @@ class _OrderDetailCard extends StatelessWidget {
           ),
 
           if (itemNames.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(2)),
-            Container(height: 1, color: AppColors.divider),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.getScreenHeight(2.5)),
+            _Divider(),
+            SizedBox(height: context.getScreenHeight(2.5)),
 
             for (int i = 0; i < itemNames.length; i++) ...[
               Row(
@@ -311,17 +392,17 @@ class _OrderDetailCard extends StatelessWidget {
                 SizedBox(height: context.getScreenHeight(1)),
             ],
 
-            SizedBox(height: context.getScreenHeight(1.5)),
-            Container(height: 1, color: AppColors.divider),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.getScreenHeight(2)),
+            _Divider(),
+            SizedBox(height: context.getScreenHeight(2)),
 
             Row(
               children: [
                 Text(
                   'Total',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.2),
-                    fontWeight: FontWeight.w700,
+                    fontSize: context.getScreenWidth(4.5),
+                    fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
                   ),
                 ),
@@ -329,8 +410,8 @@ class _OrderDetailCard extends StatelessWidget {
                 Text(
                   '₹${total.toStringAsFixed(0)}',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.2),
-                    fontWeight: FontWeight.w700,
+                    fontSize: context.getScreenWidth(4.5),
+                    fontWeight: FontWeight.w800,
                     color: AppColors.primaryGold,
                   ),
                 ),
@@ -338,14 +419,15 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ],
 
-          SizedBox(height: context.getScreenHeight(1.5)),
-          Container(height: 1, color: AppColors.divider),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.getScreenHeight(2)),
+          _Divider(),
+          SizedBox(height: context.getScreenHeight(2)),
 
           _infoRow(
             context,
             label: 'Booked On',
-            value: DateFormat('dd MMM yyyy • hh:mm a').format(createdAt.toLocal()),
+            value: DateFormat('dd MMM yyyy • hh:mm a')
+                .format(createdAt.toLocal()),
           ),
         ],
       ),
@@ -362,7 +444,7 @@ class _OrderDetailCard extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           color: AppColors.tileBg,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Center(
           child: Icon(
@@ -376,7 +458,7 @@ class _OrderDetailCard extends StatelessWidget {
 
     if (displayImages.length == 1) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         child: SizedBox(
           width: size,
           height: size,
@@ -385,7 +467,9 @@ class _OrderDetailCard extends StatelessWidget {
             fit: BoxFit.cover,
             placeholder: (_, _) => Container(
               color: AppColors.tileBg,
-              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              child: const Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
             errorWidget: (_, _, _) => RatneshFallback.s(),
           ),
@@ -406,24 +490,27 @@ class _OrderDetailCard extends StatelessWidget {
                 width: size - (displayImages.length - 1) * 3.0,
                 height: size - (displayImages.length - 1) * 3.0,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.08),
-                      blurRadius: 6,
+                      blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                   child: CachedNetworkImage(
                     imageUrl: displayImages[i],
                     fit: BoxFit.cover,
                     placeholder: (_, _) => Container(
                       color: AppColors.tileBg,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: const Center(
+                        child:
+                            CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ),
                     errorWidget: (_, _, _) => RatneshFallback.s(),
                   ),
@@ -477,7 +564,7 @@ class _OrderDetailCard extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
@@ -519,29 +606,47 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _copy,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _copied ? Icons.check_circle : Icons.copy_rounded,
-            size: context.getScreenWidth(4),
-            color: _copied ? Colors.green : AppColors.textMuted,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: _copied
+              ? Colors.green.withOpacity(0.08)
+              : AppColors.primaryGold.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _copied
+                ? Colors.green.withOpacity(0.2)
+                : AppColors.primaryGold.withOpacity(0.15),
           ),
-          SizedBox(width: context.getScreenWidth(1.5)),
-          SizedBox(
-            width: context.getScreenWidth(35),
-            child: Text(
-              '#${widget.orderId}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
-                color: AppColors.primaryGold,
-                fontWeight: FontWeight.w700,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                _copied ? Icons.check_circle : Icons.copy_rounded,
+                key: ValueKey(_copied),
+                size: context.getScreenWidth(3.8),
+                color: _copied ? Colors.green : AppColors.textMuted,
               ),
             ),
-          ),
-        ],
+            SizedBox(width: context.getScreenWidth(1.5)),
+            Flexible(
+              child: Text(
+                '#${widget.orderId}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.8),
+                  color: AppColors.primaryGold,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -550,9 +655,6 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
 // ── Next Steps Card ─────────────────────────────────────────────────────────
 
 class _NextStepsCard extends StatelessWidget {
-  final BuildContext context;
-  const _NextStepsCard({required this.context});
-
   @override
   Widget build(BuildContext context) {
     final steps = [
@@ -564,91 +666,439 @@ class _NextStepsCard extends StatelessWidget {
           'Visit our showroom to complete your purchase'),
     ];
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(5)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE7DED2)),
-      ),
+    return _CardContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "What happens next?",
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getScreenWidth(4.8),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.getScreenHeight(2.5)),
           ...steps.asMap().entries.map((entry) {
             final idx = entry.key;
             final (icon, title, subtitle) = entry.value;
+            final isLast = idx == steps.length - 1;
             return Column(
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: context.getScreenWidth(9),
-                      height: context.getScreenWidth(9),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primaryGold.withOpacity(0.1),
-                      ),
-                      child: Icon(
-                        icon,
-                        color: AppColors.primaryGold,
-                        size: context.getScreenWidth(4.5),
-                      ),
+                    // Numbered step circle
+                    Column(
+                      children: [
+                        Container(
+                          width: context.getScreenWidth(9),
+                          height: context.getScreenWidth(9),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColors.primaryGold,
+                                AppColors.primaryGoldDark,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    AppColors.primaryGold.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${idx + 1}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: context.getScreenWidth(3.8),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (!isLast)
+                          Container(
+                            width: 1.5,
+                            height: context.getScreenHeight(3.5),
+                            margin: EdgeInsets.symmetric(
+                                vertical: context.getScreenHeight(0.6)),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  AppColors.primaryGold.withOpacity(0.3),
+                                  AppColors.primaryGold.withOpacity(0.08),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                      ],
                     ),
                     SizedBox(width: context.getScreenWidth(3)),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(4),
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textDark,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                            top: context.getScreenHeight(0.3)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(4.2),
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textDark,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: context.getScreenHeight(0.4)),
-                          Text(
-                            subtitle,
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(3.4),
-                              color: AppColors.textMuted,
-                              height: 1.4,
+                            SizedBox(
+                                height: context.getScreenHeight(0.5)),
+                            Text(
+                              subtitle,
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(3.3),
+                                color: AppColors.textMuted,
+                                height: 1.4,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                if (idx < steps.length - 1)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: context.getScreenWidth(4.2),
-                      top: context.getScreenHeight(0.8),
-                      bottom: context.getScreenHeight(0.8),
-                    ),
-                    child: Container(
-                      width: 1,
-                      height: context.getScreenHeight(2),
-                      color: AppColors.divider,
-                    ),
-                  ),
               ],
             );
           }),
         ],
+      ),
+    );
+  }
+}
+
+// ── Contact Admin Card ─────────────────────────────────────────────────────
+
+class _ContactAdminCard extends StatelessWidget {
+  final String orderId;
+
+  const _ContactAdminCard({required this.orderId});
+
+  Future<void> _launchCall() async {
+    final uri =
+        Uri(scheme: 'tel', path: AdminConstants.adminPhone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _launchWhatsApp() async {
+    final phone = AdminConstants.adminPhone.replaceAll('+', '');
+    final message = Uri.encodeComponent(
+      'Hi, I need help with my order #$orderId',
+    );
+    final uri = Uri.parse('https://wa.me/$phone?text=$message');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _CardContainer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: context.getScreenWidth(10),
+                height: context.getScreenWidth(10),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primaryGold.withOpacity(0.15),
+                      AppColors.primaryGold.withOpacity(0.05),
+                    ],
+                  ),
+                ),
+                child: Icon(
+                  Icons.headset_mic_rounded,
+                  color: AppColors.primaryGold,
+                  size: context.getScreenWidth(5),
+                ),
+              ),
+              SizedBox(width: context.getScreenWidth(3)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Need Help?',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(4.8),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: context.getScreenHeight(0.4)),
+                    Text(
+                      'Have questions about your order?',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.3),
+                        color: AppColors.textMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.getScreenHeight(2.5)),
+          Row(
+            children: [
+              Expanded(
+                child: _ContactButton(
+                  icon: Icon(Icons.phone_rounded,
+                      color: AppColors.primaryGold,
+                      size: context.getScreenWidth(4.5)),
+                  label: 'Call Us',
+                  color: AppColors.primaryGold,
+                  onTap: _launchCall,
+                ),
+              ),
+              SizedBox(width: context.getScreenWidth(3)),
+              Expanded(
+                child: _ContactButton(
+                  icon: FaIcon(FontAwesomeIcons.whatsapp,
+                      color: const Color(0xFF25D366)),
+                  label: 'WhatsApp',
+                  color: const Color(0xFF25D366),
+                  onTap: _launchWhatsApp,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Reusable Contact Button ─────────────────────────────────────────────────
+
+class _ContactButton extends StatelessWidget {
+  final Widget icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ContactButton({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.04),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: color.withOpacity(0.2),
+            ),
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: context.getScreenHeight(1.6),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              icon,
+              SizedBox(width: context.getScreenWidth(2)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.8),
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Primary Button ──────────────────────────────────────────────────────────
+
+class _PrimaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _PrimaryButton({required this.label, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: context.getScreenHeight(6.5),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(18),
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryGold,
+                  AppColors.primaryGoldDark,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryGold.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4.5),
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Secondary Button ────────────────────────────────────────────────────────
+
+class _SecondaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+
+  const _SecondaryButton({required this.label, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: context.getScreenHeight(6.5),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(
+            color: AppColors.primaryGold.withOpacity(0.4),
+            width: 1.5,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          foregroundColor: AppColors.primaryGold,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: context.getScreenWidth(4.5),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Shared Card Container ───────────────────────────────────────────────────
+
+class _CardContainer extends StatelessWidget {
+  final Widget child;
+
+  const _CardContainer({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.getScreenWidth(5)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE7DED2).withOpacity(0.6)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: AppColors.primaryGold.withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+// ── Shared Divider ──────────────────────────────────────────────────────────
+
+class _Divider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 1,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.divider.withOpacity(0),
+            AppColors.divider,
+            AppColors.divider.withOpacity(0),
+          ],
+        ),
       ),
     );
   }
@@ -670,7 +1120,7 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),

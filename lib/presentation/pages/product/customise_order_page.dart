@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart'; // 🔥 Added Image Picker
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class CustomiseOrderPage extends StatefulWidget {
@@ -18,14 +19,22 @@ class CustomiseOrderPage extends StatefulWidget {
 
 class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   // State variables for visually selectable chips
-  String selectedCarat = '22K';
+  String selectedCarat = '22K (92%)';
   String selectedMarking = 'HUID';
   String selectedStyle = 'Bhungdi';
-  DateTime? deliveryDate;
 
-  // 🔥 Image Picker Variables
-  File? mainUploadedImage;
+  static const _caratOptions = [
+    '9K  (37%)',
+    '14K (58%)',
+    '18K (75%)',
+    '20K (83%)',
+    '22K (92%)',
+    '24K (100%)',
+  ];
+
+  // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];
+  bool _networkImageFailed = false;
   final ImagePicker _picker = ImagePicker();
 
   // Form Controllers
@@ -36,18 +45,60 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   final TextEditingController itemNameCtrl = TextEditingController();
   final TextEditingController weightCtrl = TextEditingController();
   final TextEditingController noOfPcCtrl = TextEditingController();
-  final TextEditingController noOfItemsCtrl = TextEditingController();
   final TextEditingController sizeCtrl = TextEditingController();
   final TextEditingController lengthBroadnessCtrl = TextEditingController();
   final TextEditingController productDescriptionCtrl = TextEditingController();
-  final TextEditingController staffNameCtrl = TextEditingController();
-  final TextEditingController orderRemarksCtrl = TextEditingController();
+
+  bool _isValid(String? value) =>
+      value != null && value.trim().isNotEmpty && value.trim().toLowerCase() != 'nan';
 
   @override
   void initState() {
     super.initState();
+
+    // ── Pre-fill from logged-in user ──
+    if (Get.isRegistered<AuthController>()) {
+      final user = Get.find<AuthController>().user;
+      if (user != null) {
+        partyCodeCtrl.text = user.id;
+        final partyName = _isValid(user.companyName)
+            ? user.companyName!
+            : _isValid(user.name)
+                ? user.name
+                : '';
+        partyNameCtrl.text = partyName;
+        if (_isValid(user.area)) {
+          areaCtrl.text = user.area!;
+        }
+        if (user.phoneNumber.isNotEmpty) {
+          contactCtrl.text = user.phoneNumber;
+        }
+      }
+    }
+
+    // ── Pre-fill from product ──
     if (widget.product != null) {
-      itemNameCtrl.text = widget.product!.name;
+      final p = widget.product!;
+
+      if (p.grossWeight != null && p.grossWeight! > 0) {
+        weightCtrl.text = p.grossWeight!.toStringAsFixed(2);
+      } else if (p.rawData != null && p.rawData!['GrossWt'] != null) {
+        weightCtrl.text = p.rawData!['GrossWt'].toString();
+      }
+
+      if (p.size != null && p.size!.isNotEmpty) {
+        sizeCtrl.text = p.size!;
+      }
+
+      if (p.karat != null) {
+        final karatNum = RegExp(r'(\d+)').firstMatch(p.karat!)?.group(1);
+        if (karatNum != null) {
+          final match = _caratOptions.where((c) => c.startsWith('${karatNum}K'));
+          if (match.isNotEmpty) {
+            selectedCarat = match.first;
+          }
+        }
+      }
     }
   }
 
@@ -60,21 +111,14 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     itemNameCtrl.dispose();
     weightCtrl.dispose();
     noOfPcCtrl.dispose();
-    noOfItemsCtrl.dispose();
     sizeCtrl.dispose();
     lengthBroadnessCtrl.dispose();
     productDescriptionCtrl.dispose();
-    staffNameCtrl.dispose();
-    orderRemarksCtrl.dispose();
     super.dispose();
   }
 
   // --- Image Picking Logic ---
-  void _showImageSourceActionSheet(
-    BuildContext context,
-    bool isMain, {
-    int index = 0,
-  }) {
+  void _showImageSourceActionSheet(BuildContext context, int index) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -88,7 +132,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               title: const Text('Take a Photo'),
               onTap: () {
                 Navigator.of(context).pop();
-                _pickImage(ImageSource.camera, isMain, index: index);
+                _pickImage(ImageSource.camera, index);
               },
             ),
             ListTile(
@@ -96,7 +140,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               title: const Text('Choose from Gallery'),
               onTap: () {
                 Navigator.of(context).pop();
-                _pickImage(ImageSource.gallery, isMain, index: index);
+                _pickImage(ImageSource.gallery, index);
               },
             ),
           ],
@@ -105,20 +149,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     );
   }
 
-  Future<void> _pickImage(
-    ImageSource source,
-    bool isMain, {
-    int index = 0,
-  }) async {
+  Future<void> _pickImage(ImageSource source, int index) async {
     try {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         setState(() {
-          if (isMain) {
-            mainUploadedImage = File(image.path);
-          } else {
-            referenceImages[index] = File(image.path);
-          }
+          referenceImages[index] = File(image.path);
         });
       }
     } catch (e) {
@@ -127,32 +163,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         "Failed to pick image",
         backgroundColor: Colors.red.shade50,
       );
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().add(const Duration(days: 7)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryGold,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textDark,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != deliveryDate) {
-      setState(() {
-        deliveryDate = picked;
-      });
     }
   }
 
@@ -184,23 +194,23 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       ),
 
       // =====================================================
-      // PREMIUM BOTTOM ACTION BAR
+      // BOTTOM ACTION BAR
       // =====================================================
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(5),
-            context.getScreenHeight(1.5),
-            context.getScreenWidth(5),
-            context.getScreenHeight(1.5),
+            context.getScreenWidth(4),
+            context.getScreenHeight(1.2),
+            context.getScreenWidth(4),
+            context.getScreenHeight(1.2),
           ),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
+                color: AppColors.primaryGold.withOpacity(0.08),
+                blurRadius: 24,
+                offset: const Offset(0, -8),
               ),
             ],
           ),
@@ -211,16 +221,16 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 "By continuing you agree to our Terms & Privacy Policy",
                 style: TextStyle(
                   fontSize: context.getScreenWidth(2.8),
-                  color: Colors.grey.shade500,
+                  color: AppColors.textMuted,
                 ),
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
               SizedBox(
                 width: double.infinity,
-                height: context.getScreenHeight(6.2),
+                height: context.getScreenHeight(6),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    elevation: 4,
+                    elevation: 6,
                     shadowColor: AppColors.primaryGold.withOpacity(0.4),
                     backgroundColor: AppColors.primaryGold,
                     foregroundColor: Colors.white,
@@ -262,151 +272,118 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // =====================================================
-              // 1. CUSTOMER & PRODUCT IMAGE
+              // 1. CUSTOMER INFORMATION
               // =====================================================
               _buildSectionHeader("Customer Information"),
-              _buildModernCard(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              _buildCard(
+                child: Column(
                   children: [
-                    SizedBox(
-                      width: 120,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () =>
-                                _showImageSourceActionSheet(context, true),
-                            child: Container(
-                              height: 120,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF9F6F0),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: AppColors.primaryGold.withOpacity(0.2),
-                                ),
-                              ),
-                              child: _buildMainImageDisplay(),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          _buildModernTextField(
-                            "Party Code",
-                            controller: partyCodeCtrl,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildModernTextField(
-                            "Party Name",
-                            controller: partyNameCtrl,
-                          ),
-                          SizedBox(height: 16),
-                          _buildModernTextField("Area", controller: areaCtrl),
-                          SizedBox(height: 16),
-                          _buildModernTextField(
-                            "Contact Number",
-                            controller: contactCtrl,
-                            keyboardType: TextInputType.phone,
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildInfoTile("Party Code", partyCodeCtrl.text),
+                    _buildInfoDivider(),
+                    _buildInfoTile("Party Name", partyNameCtrl.text),
+                    _buildInfoDivider(),
+                    _buildInfoTile("Area", areaCtrl.text),
+                    _buildInfoDivider(),
+                    _buildInfoTile("Contact", contactCtrl.text),
                   ],
                 ),
               ),
+
+              SizedBox(height: context.getScreenHeight(0.5)),
 
               // =====================================================
               // 2. PRODUCT SPECIFICATIONS
               // =====================================================
               _buildSectionHeader("Product Specifications"),
-              _buildModernCard(
+              _buildCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (widget.product?.imageUrl != null &&
+                        !_networkImageFailed) ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 100,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: AppColors.pageBg,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color:
+                                    AppColors.primaryGold.withOpacity(0.25),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: _buildMainImageDisplay(),
+                          ),
+                          SizedBox(width: 14),
+                          Expanded(
+                            child: _buildTextField(
+                              "Item Name",
+                              controller: itemNameCtrl,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 14),
+                    ] else
+                      _buildTextField(
+                        "Item Name",
+                        controller: itemNameCtrl,
+                      ),
+                    SizedBox(height: 14),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex: 2,
-                          child: _buildModernTextField(
-                            "Item Name",
-                            controller: itemNameCtrl,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          flex: 1,
-                          child: _buildModernTextField(
+                          child: _buildTextField(
                             "Weight (g)",
                             controller: weightCtrl,
                             keyboardType: TextInputType.number,
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                        SizedBox(width: 14),
                         Expanded(
-                          child: _buildModernTextField(
+                          child: _buildTextField(
                             "No. of PC",
                             controller: noOfPcCtrl,
                             keyboardType: TextInputType.number,
                           ),
                         ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: _buildModernTextField(
-                            "No. of Items",
-                            controller: noOfItemsCtrl,
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 14),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: _buildModernTextField(
+                          child: _buildTextField(
                             "Size",
                             controller: sizeCtrl,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: 14),
                         Expanded(
-                          child: _buildModernTextField(
+                          child: _buildTextField(
                             "Length/Broad (in)",
                             controller: lengthBroadnessCtrl,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-
-                    _buildModernTextField(
+                    SizedBox(height: 14),
+                    _buildTextField(
                       "Product Description & Requirements",
                       controller: productDescriptionCtrl,
                       maxLines: 3,
                     ),
+                    SizedBox(height: 18),
 
-                    SizedBox(height: 20),
-
-                    // Upload Reference Images Box
-                    Text(
-                      "Upload Reference Images (Max 4)",
-                      style: _labelStyle(),
-                    ),
-                    SizedBox(height: 8),
+                    // Upload Reference Images
+                    _buildLabel("Upload Reference Images (Max 4)"),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(child: _buildImageUploadBox(context, 0)),
@@ -422,181 +399,113 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 ),
               ),
 
+              SizedBox(height: context.getScreenHeight(0.5)),
+
               // =====================================================
               // 3. CUSTOMIZATION OPTIONS
               // =====================================================
               _buildSectionHeader("Customization Options"),
-              _buildModernCard(
+              _buildCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Melting Carat", style: _labelStyle()),
-                    SizedBox(height: 8),
-                    Row(
+                    _buildLabel("Purity"),
+                    SizedBox(height: 10),
+                    Column(
                       children: [
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "18K",
-                            selectedCarat,
-                            (val) => setState(() => selectedCarat = val),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "20K",
-                            selectedCarat,
-                            (val) => setState(() => selectedCarat = val),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "22K",
-                            selectedCarat,
-                            (val) => setState(() => selectedCarat = val),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "24K",
-                            selectedCarat,
-                            (val) => setState(() => selectedCarat = val),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Divider(height: 1, color: Colors.grey.shade200),
-                    ),
-
-                    Text("Style", style: _labelStyle()),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "Bhungdi",
-                            selectedStyle,
-                            (val) => setState(() => selectedStyle = val),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "English",
-                            selectedStyle,
-                            (val) => setState(() => selectedStyle = val),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Divider(height: 1, color: Colors.grey.shade200),
-                    ),
-
-                    Text("Marking", style: _labelStyle()),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "No Marking",
-                            selectedMarking,
-                            (val) => setState(() => selectedMarking = val),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "Hallmark",
-                            selectedMarking,
-                            (val) => setState(() => selectedMarking = val),
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: _buildChoiceChip(
-                            "HUID",
-                            selectedMarking,
-                            (val) => setState(() => selectedMarking = val),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // =====================================================
-              // 4. ORDER DETAILS & REMARKS
-              // =====================================================
-              _buildSectionHeader("Order Administration"),
-              _buildModernCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Delivery Date", style: _labelStyle()),
-                    SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () => _selectDate(context),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9F9F9),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        Row(
                           children: [
-                            Text(
-                              deliveryDate == null
-                                  ? "Select Date"
-                                  : "${deliveryDate!.day}/${deliveryDate!.month}/${deliveryDate!.year}",
-                              style: TextStyle(
-                                color: deliveryDate == null
-                                    ? Colors.grey.shade400
-                                    : AppColors.textDark,
-                                fontSize: context.getScreenWidth(3.5),
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Expanded(
+                              child: _buildChip("9K  (37%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
                             ),
-                            Icon(
-                              Icons.calendar_month_outlined,
-                              color: AppColors.primaryGold,
-                              size: 20,
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _buildChip("14K (58%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _buildChip("18K (75%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
                             ),
                           ],
                         ),
-                      ),
+                        SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildChip("20K (83%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _buildChip("22K (92%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _buildChip("24K (100%)", selectedCarat,
+                                  (val) => setState(() => selectedCarat = val)),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
 
-                    SizedBox(height: 16),
-                    _buildModernTextField(
-                      "Order Confirmed By (Staff Name)",
-                      controller: staffNameCtrl,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Divider(height: 1, color: AppColors.divider),
                     ),
 
-                    SizedBox(height: 16),
-                    _buildModernTextField(
-                      "Administration Remarks",
-                      controller: orderRemarksCtrl,
-                      maxLines: 3,
+                    _buildLabel("Style"),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildChip("Bhungdi", selectedStyle,
+                              (val) => setState(() => selectedStyle = val)),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: _buildChip("English (Pech)", selectedStyle,
+                              (val) => setState(() => selectedStyle = val)),
+                        ),
+                      ],
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Divider(height: 1, color: AppColors.divider),
+                    ),
+
+                    _buildLabel("Marking"),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildChip("No Marking", selectedMarking,
+                              (val) => setState(() => selectedMarking = val)),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _buildChip("Hallmark", selectedMarking,
+                              (val) => setState(() => selectedMarking = val)),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: _buildChip("HUID", selectedMarking,
+                              (val) => setState(() => selectedMarking = val)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
 
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.getScreenHeight(0.5)),
+
+              SizedBox(height: context.getScreenHeight(3)),
             ],
           ),
         ),
@@ -606,47 +515,32 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   // --- UI HELPER METHODS ---
 
-  // Displays the correct main image (User Uploaded > Product Image > Placeholder)
   Widget _buildMainImageDisplay() {
-    if (mainUploadedImage != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.file(mainUploadedImage!, fit: BoxFit.cover),
-      );
-    } else if (widget.product?.imageUrl != null) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: CachedNetworkImage(
-          imageUrl: widget.product!.imageUrl!,
-          fit: BoxFit.cover,
-        ),
-      );
-    } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.add_a_photo_outlined,
-            color: AppColors.primaryGold.withOpacity(0.5),
-          ),
-          SizedBox(height: 4),
-          Text(
-            "Add Image",
-            style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-          ),
-        ],
-      );
-    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(13),
+      child: CachedNetworkImage(
+        imageUrl: widget.product!.imageUrl!,
+        fit: BoxFit.cover,
+        errorWidget: (context, url, error) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && !_networkImageFailed) {
+              setState(() => _networkImageFailed = true);
+            }
+          });
+          return const SizedBox.shrink();
+        },
+      ),
+    );
   }
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12, top: 16),
+      padding: EdgeInsets.only(bottom: 10, top: 14),
       child: Row(
         children: [
           Container(
             width: 4,
-            height: 18,
+            height: 16,
             decoration: BoxDecoration(
               color: AppColors.primaryGold,
               borderRadius: BorderRadius.circular(4),
@@ -656,7 +550,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           Text(
             title,
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.2),
+              fontSize: context.getScreenWidth(4),
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
               letterSpacing: 0.2,
@@ -667,7 +561,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     );
   }
 
-  Widget _buildModernCard({required Widget child}) {
+  Widget _buildCard({required Widget child}) {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 8),
@@ -675,11 +569,14 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGold.withOpacity(0.08)),
+        border: Border.all(
+          color: AppColors.primaryGold.withOpacity(0.12),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
+            color: AppColors.primaryGold.withOpacity(0.06),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
@@ -688,53 +585,115 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     );
   }
 
-  Widget _buildModernTextField(
+  Widget _buildInfoTile(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: context.getScreenWidth(28),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: context.getScreenWidth(3),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textMuted,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value.isNotEmpty ? value : '—',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(3.3),
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoDivider() {
+    return Divider(height: 1, color: AppColors.divider);
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: context.getScreenWidth(3.2),
+        fontWeight: FontWeight.w700,
+        color: AppColors.textMuted,
+      ),
+    );
+  }
+
+  Widget _buildTextField(
     String label, {
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
+    bool readOnly = false,
   }) {
+    if (readOnly) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLabel(label),
+          SizedBox(height: 4),
+          Text(
+            controller.text,
+            style: TextStyle(
+              fontSize: context.getScreenWidth(3.5),
+              color: AppColors.textDark,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: _labelStyle()),
-        SizedBox(height: 6),
+        _buildLabel(label),
+        SizedBox(height: 4),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.5),
+            fontSize: context.getScreenWidth(3.3),
             color: AppColors.textDark,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
+            isDense: true,
             filled: true,
-            fillColor: const Color(0xFFF9F9F9),
-            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            fillColor: AppColors.pageBg,
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.primaryGold, width: 1.5),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: AppColors.primaryGold,
+                width: 1.5,
+              ),
             ),
           ),
         ),
       ],
-    );
-  }
-
-  TextStyle _labelStyle() {
-    return TextStyle(
-      fontSize: context.getScreenWidth(3.2),
-      fontWeight: FontWeight.w700,
-      color: Colors.grey.shade600,
     );
   }
 
@@ -743,17 +702,49 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     return AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
-        onTap: () => _showImageSourceActionSheet(context, false, index: index),
-        child: Container(
+        onTap: () => _showImageSourceActionSheet(context, index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
-            color: const Color(0xFFF9F9F9),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            color: hasImage ? Colors.transparent : AppColors.pageBg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: hasImage
+                  ? AppColors.primaryGold.withOpacity(0.4)
+                  : AppColors.divider,
+              width: hasImage ? 1.5 : 1,
+            ),
           ),
           child: hasImage
               ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(referenceImages[index]!, fit: BoxFit.cover),
+                  borderRadius: BorderRadius.circular(13),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.file(referenceImages[index]!, fit: BoxFit.cover),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => referenceImages[index] = null);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -767,7 +758,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                     Text(
                       "Add",
                       style: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: AppColors.textMuted,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                       ),
@@ -779,7 +770,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     );
   }
 
-  Widget _buildChoiceChip(
+  Widget _buildChip(
     String label,
     String groupValue,
     Function(String) onSelected,
@@ -792,16 +783,19 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         padding: EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryGold : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? AppColors.primaryGold : Colors.grey.shade200,
+            color: isSelected
+                ? AppColors.primaryGold
+                : AppColors.divider,
+            width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primaryGold.withOpacity(0.3),
+                    color: AppColors.primaryGold.withOpacity(0.25),
                     blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    offset: const Offset(0, 3),
                   ),
                 ]
               : [],
@@ -810,7 +804,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey.shade600,
+            color: isSelected ? Colors.white : AppColors.textMuted,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
             fontSize: context.getScreenWidth(3.2),
             letterSpacing: 0.2,
