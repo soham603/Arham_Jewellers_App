@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -12,6 +13,23 @@ class ShareController extends GetxController {
 
   final _state = CurrentAppState.INITIAL.obs;
   CurrentAppState get state => _state.value;
+
+  // ── Sort & Layout state ──────────────────────────────────────
+  final _sortBy = Rx<SortOption>(SortOption.newest);
+  SortOption get sortBy => _sortBy.value;
+  Rx<SortOption> get sortByObs => _sortBy;
+
+  final _isGrid = RxBool(true);
+  bool get isGrid => _isGrid.value;
+  RxBool get isGridObs => _isGrid;
+
+  void setSortOption(SortOption option) {
+    _sortBy.value = option;
+  }
+
+  void toggleLayout() {
+    _isGrid.value = !_isGrid.value;
+  }
 
   int _page = 1;
   static const int _limit = 20;
@@ -40,18 +58,27 @@ class ShareController extends GetxController {
   final _weightMax = 500.0.obs;
   double get weightMax => _weightMax.value;
 
+  final _priceMin = 0.0.obs;
+  double get priceMin => _priceMin.value;
+
+  final _priceMax = 5000000.0.obs;
+  double get priceMax => _priceMax.value;
+
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
       _selectedCategoryIds.isNotEmpty ||
       _showAllStock.value ||
       _weightMin.value > 0 ||
-      _weightMax.value < 500;
+      _weightMax.value < 500 ||
+      _priceMin.value > 0 ||
+      _priceMax.value < 5000000;
 
   int get activeFilterCount {
     var count = _selectedKarats.length;
     if (_selectedCategoryIds.isNotEmpty) count++;
     if (_showAllStock.value) count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
+    if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
     return count;
   }
 
@@ -78,7 +105,7 @@ class ShareController extends GetxController {
 
   void clearSelection() => _selectedProducts.clear();
 
-  // ── Client-side filtered list (after API fetch) ──────────────
+  // ── Client-side filtered & sorted list (after API fetch) ─────
   List<ProductModel> get _filteredProducts {
     var list = List<ProductModel>.from(_products);
 
@@ -89,6 +116,33 @@ class ShareController extends GetxController {
         return gw >= _weightMin.value && gw <= _weightMax.value;
       }).toList();
     }
+
+    if (_priceMin.value > 0 || _priceMax.value < 5000000) {
+      list = list.where((p) {
+        final price = _calculatePrice(p);
+        if (price == null) return true;
+        return price >= _priceMin.value && price <= _priceMax.value;
+      }).toList();
+    }
+
+    list.sort((a, b) {
+      switch (_sortBy.value) {
+        case SortOption.nameAsc:
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        case SortOption.weightAsc:
+          return (a.grossWeight ?? 0).compareTo(b.grossWeight ?? 0);
+        case SortOption.weightDesc:
+          return (b.grossWeight ?? 0).compareTo(a.grossWeight ?? 0);
+        case SortOption.newest:
+          return (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0));
+        case SortOption.oldest:
+          return (a.createdAt ?? DateTime(0)).compareTo(b.createdAt ?? DateTime(0));
+        case SortOption.priceAsc:
+          return (_calculatePrice(a) ?? 0).compareTo(_calculatePrice(b) ?? 0);
+        case SortOption.priceDesc:
+          return (_calculatePrice(b) ?? 0).compareTo(_calculatePrice(a) ?? 0);
+      }
+    });
 
     return list;
   }
@@ -298,6 +352,8 @@ class ShareController extends GetxController {
     _showAllStock.value = false;
     _weightMin.value = 0;
     _weightMax.value = 500;
+    _priceMin.value = 0;
+    _priceMax.value = 5000000;
   }
 
   void applyFilters({
@@ -307,6 +363,8 @@ class ShareController extends GetxController {
     required bool showAll,
     required double wMin,
     required double wMax,
+    required double pMin,
+    required double pMax,
   }) {
     _selectedKarats
       ..clear()
@@ -320,7 +378,21 @@ class ShareController extends GetxController {
     _showAllStock.value = showAll;
     _weightMin.value = wMin;
     _weightMax.value = wMax;
+    _priceMin.value = pMin;
+    _priceMax.value = pMax;
     loadProducts();
+  }
+
+  // ── Price calculation helper ──────────────────────────────────
+  double? _calculatePrice(ProductModel product) {
+    final goldRate = Get.find<GoldRateController>().currentRate;
+    if (goldRate == null || product.fineWeight == null) return null;
+
+    final base = product.fineWeight! * goldRate.ratePerGram;
+    final labour = base * 0.10;
+    final subtotal = base + labour;
+    final gst = subtotal * 0.03;
+    return subtotal + gst;
   }
 
   // ── Share methods ───────────────────────────────────────────
@@ -352,13 +424,14 @@ class ShareController extends GetxController {
     }
   }
 
-  Future<void> shareAsPdf() async {
+  Future<void> shareAsPdf({String? title}) async {
     if (_selectedProducts.isEmpty) return;
     _isSharing.value = true;
     try {
       await ShareService.shareAsPdf(
         products: selectedProductsList,
         filterInfo: filterInfo,
+        title: title,
       );
     } catch (e, st) {
       Logger.error("ShareController", "shareAsPdf error: $e\n$st");

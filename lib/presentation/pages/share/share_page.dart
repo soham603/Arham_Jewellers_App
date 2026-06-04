@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/share_controller.dart';
+import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_list_tile.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_product_card.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -24,6 +26,8 @@ class _SharePageState extends State<SharePage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    ever(controller.sortByObs, (_) => setState(() {}));
+    ever(controller.isGridObs, (_) => setState(() {}));
   }
 
   void _onScroll() {
@@ -69,6 +73,8 @@ class _SharePageState extends State<SharePage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
+                final auth = Get.find<AuthController>();
+                final showPrice = auth.user?.isRetailer == true || auth.isAdmin;
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
@@ -77,12 +83,16 @@ class _SharePageState extends State<SharePage> {
                   initialShowAllStock: controller.showAllStock,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
+                  initialPriceMin: controller.priceMin,
+                  initialPriceMax: controller.priceMax,
+                  showPriceFilter: showPrice,
                   onApply: controller.applyFilters,
                 );
               },
               filterActiveCount: controller.activeFilterCount,
             ),
             _buildFilterChips(context),
+            _buildSortLayoutBar(context),
             Expanded(child: _buildProductGrid(context)),
           ],
         ),
@@ -203,6 +213,165 @@ class _SharePageState extends State<SharePage> {
     });
   }
 
+  Widget _buildSortLayoutBar(BuildContext context) {
+    return Obx(() {
+      final currentSort = controller.sortBy;
+      final isGrid = controller.isGrid;
+
+      return Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(0.6),
+        ),
+        child: Row(
+          children: [
+            // Sort button
+            GestureDetector(
+              onTap: () => _showSortSheet(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: context.colorPalette.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.sort_rounded,
+                      size: context.getScreenWidth(4),
+                      color: context.colorPalette.goldDark,
+                    ),
+                    SizedBox(width: context.getScreenWidth(1)),
+                    Text(
+                      currentSort.label,
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(2.8),
+                        fontWeight: FontWeight.w500,
+                        color: context.colorPalette.goldDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
+            // Layout toggle
+            GestureDetector(
+              onTap: () => controller.toggleLayout(),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: context.colorPalette.border),
+                ),
+                child: Icon(
+                  isGrid ? Icons.list_rounded : Icons.grid_view_rounded,
+                  size: context.getScreenWidth(4.5),
+                  color: context.colorPalette.goldDark,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  void _showSortSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          20 + MediaQuery.of(ctx).padding.bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(2)),
+            Text(
+              'Sort By',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(4.5),
+                fontWeight: FontWeight.w700,
+                color: context.colorPalette.textColor,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1.5)),
+            ...SortOption.values.map((option) {
+              final isSelected = controller.sortBy == option;
+              return GestureDetector(
+                onTap: () {
+                  controller.setSortOption(option);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? context.colorPalette.gold.withOpacity(0.08)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        size: 20,
+                        color: isSelected
+                            ? context.colorPalette.gold
+                            : context.colorPalette.subTitleColor,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        option.label,
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(3.5),
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected
+                              ? context.colorPalette.gold
+                              : context.colorPalette.textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            SizedBox(height: context.getScreenHeight(1)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _activeFilterChip(
     BuildContext context, {
     required String label,
@@ -238,8 +407,10 @@ class _SharePageState extends State<SharePage> {
 
   Widget _buildProductGrid(BuildContext context) {
     return Obx(() {
+      controller.sortBy; // explicit dependency for reactivity
       final state = controller.state;
       final products = controller.displayProducts;
+      final isGrid = controller.isGrid;
 
       if (state == CurrentAppState.LOADING && products.isEmpty) {
         return _gridShimmer(context);
@@ -251,6 +422,49 @@ class _SharePageState extends State<SharePage> {
 
       if (state == CurrentAppState.SUCCESS && products.isEmpty) {
         return _emptyWidget(context);
+      }
+
+      if (!isGrid) {
+        return RefreshIndicator(
+          onRefresh: () => controller.loadProducts(),
+          color: context.colorPalette.gold,
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: EdgeInsets.symmetric(
+              vertical: context.getScreenHeight(0.5),
+            ),
+            itemCount: products.length + (controller.hasMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index == products.length) {
+                return Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(context.getScreenHeight(2)),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: context.colorPalette.gold,
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              final product = products[index];
+              final isSelected = controller.isSelected(product.id);
+
+              return ShareListTile(
+                product: product,
+                isSelected: isSelected,
+                onTap: () {
+                  controller.toggleSelection(product);
+                  setState(() {});
+                },
+              );
+            },
+          ),
+        );
       }
 
       return RefreshIndicator(
@@ -637,7 +851,7 @@ class _SharePageState extends State<SharePage> {
               subtitle: 'Create a branded product catalog',
               onTap: () {
                 Navigator.pop(ctx);
-                _shareWithLoading(context, () => controller.shareAsPdf(), 'Generating PDF...');
+                _showTitleDialog(context);
               },
             ),
             SizedBox(height: context.getScreenHeight(1.5)),
@@ -752,6 +966,83 @@ class _SharePageState extends State<SharePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showTitleDialog(BuildContext context) {
+    final titleController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        titlePadding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+        contentPadding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+        actionsPadding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          'Add a Title',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(4),
+            color: context.colorPalette.textColor,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: TextField(
+          controller: titleController,
+          maxLines: 2,
+          style: TextStyle(
+            fontSize: context.getScreenWidth(3.2),
+            color: context.colorPalette.textColor,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Enter title for PDF (optional)',
+            hintStyle: TextStyle(
+              fontSize: context.getScreenWidth(3),
+              color: context.colorPalette.subTitleColor,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: context.colorPalette.gold),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(3.2),
+                color: context.colorPalette.subTitleColor,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              final title = titleController.text.trim();
+              _shareWithLoading(
+                context,
+                () => controller.shareAsPdf(
+                  title: title.isNotEmpty ? title : null,
+                ),
+                'Generating PDF...',
+              );
+            },
+            child: Text(
+              'Generate',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(3.2),
+                color: context.colorPalette.gold,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
