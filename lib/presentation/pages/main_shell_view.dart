@@ -52,10 +52,13 @@ class MainShellView extends GetView<NavigationController> {
               ),
             ),
           ),
-          bottomNavigationBar: AppBottomNav(
-            currentIndex: index,
-            onTap: controller.switchTab,
-            isAdmin: isAdmin,
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: AppBottomNav(
+              currentIndex: index,
+              onTap: controller.switchTab,
+              isAdmin: isAdmin,
+            ),
           ),
         );
       }),
