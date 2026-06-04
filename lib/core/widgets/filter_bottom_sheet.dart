@@ -11,6 +11,8 @@ typedef FilterApplyCallback = void Function({
   required bool showAll,
   required double wMin,
   required double wMax,
+  required double pMin,
+  required double pMax,
 });
 
 class FilterBottomSheet extends StatefulWidget {
@@ -21,6 +23,14 @@ class FilterBottomSheet extends StatefulWidget {
   final double initialWeightMin;
   final double initialWeightMax;
   final FilterApplyCallback onApply;
+  final bool showKaratFilter;
+  final bool showCategoryFilter;
+  final bool showStockFilter;
+  final bool showWeightFilter;
+  final bool showPriceFilter;
+  final double initialPriceMin;
+  final double initialPriceMax;
+  final double priceSliderMax;
 
   const FilterBottomSheet({
     super.key,
@@ -31,6 +41,14 @@ class FilterBottomSheet extends StatefulWidget {
     required this.initialWeightMin,
     required this.initialWeightMax,
     required this.onApply,
+    this.showKaratFilter = true,
+    this.showCategoryFilter = true,
+    this.showStockFilter = true,
+    this.showWeightFilter = true,
+    this.showPriceFilter = false,
+    this.initialPriceMin = 0,
+    this.initialPriceMax = 5000000,
+    this.priceSliderMax = 5000000,
   });
 
   static Future<void> show(
@@ -42,6 +60,14 @@ class FilterBottomSheet extends StatefulWidget {
     required double initialWeightMin,
     required double initialWeightMax,
     required FilterApplyCallback onApply,
+    bool showKaratFilter = true,
+    bool showCategoryFilter = true,
+    bool showStockFilter = true,
+    bool showWeightFilter = true,
+    bool showPriceFilter = false,
+    double initialPriceMin = 0,
+    double initialPriceMax = 5000000,
+    double priceSliderMax = 5000000,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -55,6 +81,14 @@ class FilterBottomSheet extends StatefulWidget {
         initialWeightMin: initialWeightMin,
         initialWeightMax: initialWeightMax,
         onApply: onApply,
+        showKaratFilter: showKaratFilter,
+        showCategoryFilter: showCategoryFilter,
+        showStockFilter: showStockFilter,
+        showWeightFilter: showWeightFilter,
+        showPriceFilter: showPriceFilter,
+        initialPriceMin: initialPriceMin,
+        initialPriceMax: initialPriceMax,
+        priceSliderMax: priceSliderMax,
       ),
     );
   }
@@ -76,7 +110,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late bool _tempShowAll;
   late double _tempWeightMin;
   late double _tempWeightMax;
+  late double _tempPriceMin;
+  late double _tempPriceMax;
   List<CategoryModel> _allCategories = [];
+  Map<String, List<CategoryModel>> _categoryVariants = {};
 
   @override
   void initState() {
@@ -87,6 +124,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     _tempShowAll = widget.initialShowAllStock;
     _tempWeightMin = widget.initialWeightMin;
     _tempWeightMax = widget.initialWeightMax;
+    _tempPriceMin = widget.initialPriceMin;
+    _tempPriceMax = widget.initialPriceMax;
     _loadCategories();
   }
 
@@ -102,13 +141,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ..._categoryController.k20Categories,
         ..._categoryController.k22Categories,
       ];
-      final seen = <String>{};
-      _allCategories = [];
+      _categoryVariants = {};
       for (final cat in all) {
-        if (seen.add(cat.name.toLowerCase())) {
-          _allCategories.add(cat);
-        }
+        final key = cat.name.toLowerCase();
+        _categoryVariants.putIfAbsent(key, () => []).add(cat);
       }
+      _allCategories = _categoryVariants.values
+          .map((variants) => variants.first)
+          .toList();
     });
   }
 
@@ -124,12 +164,20 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _clearAll() {
     setState(() {
-      _tempSelectedKarats.clear();
-      _tempSelectedCategoryIds.clear();
-      _tempSelectedCategoryNames.clear();
-      _tempShowAll = false;
-      _tempWeightMin = 0;
-      _tempWeightMax = 500;
+      if (widget.showKaratFilter) _tempSelectedKarats.clear();
+      if (widget.showCategoryFilter) {
+        _tempSelectedCategoryIds.clear();
+        _tempSelectedCategoryNames.clear();
+      }
+      if (widget.showStockFilter) _tempShowAll = false;
+      if (widget.showWeightFilter) {
+        _tempWeightMin = 0;
+        _tempWeightMax = 500;
+      }
+      if (widget.showPriceFilter) {
+        _tempPriceMin = 0;
+        _tempPriceMax = widget.priceSliderMax;
+      }
     });
   }
 
@@ -141,16 +189,20 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       showAll: _tempShowAll,
       wMin: _tempWeightMin,
       wMax: _tempWeightMax,
+      pMin: _tempPriceMin,
+      pMax: _tempPriceMax,
     );
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedCount = _tempSelectedKarats.length +
-        (_tempSelectedCategoryIds.isNotEmpty ? 1 : 0) +
-        (_tempShowAll ? 1 : 0) +
-        (_tempWeightMin > 0 || _tempWeightMax < 500 ? 1 : 0);
+    final selectedCount =
+        (widget.showKaratFilter ? _tempSelectedKarats.length : 0) +
+        (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty ? 1 : 0) +
+        (widget.showStockFilter && _tempShowAll ? 1 : 0) +
+        (widget.showWeightFilter && (_tempWeightMin > 0 || _tempWeightMax < 500) ? 1 : 0) +
+        (widget.showPriceFilter && (_tempPriceMin > 0 || _tempPriceMax < widget.priceSliderMax) ? 1 : 0);
 
     return Container(
       height: context.isTablet
@@ -171,13 +223,23 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildKaratSection(context),
-                    SizedBox(height: context.getScreenHeight(2.5)),
-                    _buildCategorySection(context),
-                    SizedBox(height: context.getScreenHeight(2.5)),
-                    _buildStockSection(context),
-                    SizedBox(height: context.getScreenHeight(2.5)),
-                    _buildWeightSection(context),
+                    if (widget.showKaratFilter) ...[
+                      _buildKaratSection(context),
+                      SizedBox(height: context.getScreenHeight(2.5)),
+                    ],
+                    if (widget.showCategoryFilter) ...[
+                      _buildCategorySection(context),
+                      SizedBox(height: context.getScreenHeight(2.5)),
+                    ],
+                    if (widget.showStockFilter) ...[
+                      _buildStockSection(context),
+                      SizedBox(height: context.getScreenHeight(2.5)),
+                    ],
+                    if (widget.showWeightFilter) ...[
+                      _buildWeightSection(context),
+                      SizedBox(height: context.getScreenHeight(2.5)),
+                    ],
+                    if (widget.showPriceFilter) _buildPriceSection(context),
                 ],
               ),
             ),
@@ -428,27 +490,28 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   List<Widget> _buildCategoryDisplayItems(BuildContext context) {
-    final level3Cache = _categoryController.level3Cache;
-    final groupedParents = <String>{};
-    final accountedChildren = <String>{};
-
-    for (final entry in level3Cache.entries) {
-      final children = entry.value;
-      if (children.isNotEmpty &&
-          children.every((child) => _tempSelectedCategoryIds.contains(child.id))) {
-        groupedParents.add(entry.key);
-        for (final child in children) {
-          accountedChildren.add(child.id);
-        }
-      }
-    }
-
     final items = <Widget>[];
 
-    for (final parentId in groupedParents) {
-      final parent = _allCategories.where((c) => c.id == parentId).firstOrNull;
-      if (parent != null) {
-        final cleanedName = parent.name
+    for (final cat in _allCategories) {
+      final variants = _categoryVariants[cat.name.toLowerCase()] ?? [cat];
+      final allChildren = <CategoryModel>[];
+      for (final variant in variants) {
+        final children = _categoryController.level3Cache[variant.id] ?? [];
+        allChildren.addAll(children);
+      }
+      if (allChildren.isEmpty) continue;
+
+      final allSelected = allChildren.every((child) {
+        final cleanedName = child.name
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim();
+        return _tempSelectedCategoryIds.contains(child.id) ||
+            _tempSelectedCategoryNames.contains(cleanedName);
+      });
+
+      if (allSelected) {
+        final cleanedName = cat.name
             .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
             .replaceAll(RegExp(r'collection', caseSensitive: false), '')
             .trim();
@@ -457,12 +520,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           name: cleanedName,
           onRemove: () {
             setState(() {
-              final children = level3Cache[parentId] ?? [];
-              for (final child in children) {
+              for (final child in allChildren) {
                 final ci = _tempSelectedCategoryIds.indexOf(child.id);
                 if (ci != -1) {
                   _tempSelectedCategoryIds.removeAt(ci);
-                  _tempSelectedCategoryNames.removeAt(ci);
+                  final childCleaned = child.name
+                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                      .trim();
+                  _tempSelectedCategoryNames.removeWhere((n) => n == childCleaned);
                 }
               }
             });
@@ -471,9 +537,20 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       }
     }
 
+    final accountedIds = <String>{};
+    for (final cat in _allCategories) {
+      final variants = _categoryVariants[cat.name.toLowerCase()] ?? [cat];
+      for (final variant in variants) {
+        final children = _categoryController.level3Cache[variant.id] ?? [];
+        for (final child in children) {
+          accountedIds.add(child.id);
+        }
+      }
+    }
+
     for (var i = 0; i < _tempSelectedCategoryIds.length; i++) {
       final id = _tempSelectedCategoryIds[i];
-      if (!accountedChildren.contains(id)) {
+      if (!accountedIds.contains(id)) {
         final name = _tempSelectedCategoryNames[i];
         items.add(_buildCategoryChip(
           context,
@@ -642,6 +719,65 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 
+  Widget _buildPriceSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Price Range (\u20B9)',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.goldDeep,
+              ),
+            ),
+            Text(
+              '${_formatPriceLabel(_tempPriceMin)} \u2013 ${_formatPriceLabel(_tempPriceMax)}',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: context.colorPalette.goldDark,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: context.getScreenHeight(0.5)),
+        RangeSlider(
+          values: RangeValues(_tempPriceMin, _tempPriceMax),
+          min: 0,
+          max: widget.priceSliderMax,
+          divisions: 50,
+          activeColor: context.colorPalette.gold,
+          inactiveColor: context.colorPalette.border,
+          labels: RangeLabels(
+            _formatPriceLabel(_tempPriceMin),
+            _formatPriceLabel(_tempPriceMax),
+          ),
+          onChanged: (values) {
+            setState(() {
+              _tempPriceMin = values.start;
+              _tempPriceMax = values.end;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  String _formatPriceLabel(double value) {
+    if (value >= 10000000) {
+      return '\u20B9${(value / 10000000).toStringAsFixed(1)}Cr';
+    } else if (value >= 100000) {
+      return '\u20B9${(value / 100000).toStringAsFixed(1)}L';
+    } else if (value >= 1000) {
+      return '\u20B9${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return '\u20B9${value.round()}';
+  }
+
   void _showCategoryPicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -649,6 +785,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       isScrollControlled: true,
       builder: (_) => _CategoryPickerSheet(
         categories: _allCategories,
+        categoryVariants: _categoryVariants,
+        level3Cache: _categoryController.level3Cache,
         selectedIds: _tempSelectedCategoryIds,
         selectedNames: _tempSelectedCategoryNames,
         onToggle: (cat) {
@@ -743,6 +881,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
 class _CategoryPickerSheet extends StatefulWidget {
   final List<CategoryModel> categories;
+  final Map<String, List<CategoryModel>> categoryVariants;
+  final Map<String, List<CategoryModel>> level3Cache;
   final List<String> selectedIds;
   final List<String> selectedNames;
   final ValueChanged<CategoryModel> onToggle;
@@ -750,6 +890,8 @@ class _CategoryPickerSheet extends StatefulWidget {
 
   const _CategoryPickerSheet({
     required this.categories,
+    required this.categoryVariants,
+    required this.level3Cache,
     required this.selectedIds,
     required this.selectedNames,
     required this.onToggle,
@@ -771,19 +913,44 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
     _localNames = List.from(widget.selectedNames);
   }
 
-  bool _isSubSelected(CategoryModel sub) {
-    final cleanedName = sub.name
+  List<CategoryModel> _mergedLevel3(CategoryModel cat) {
+    final variants = widget.categoryVariants[cat.name.toLowerCase()] ?? [cat];
+    final seen = <String>{};
+    final merged = <CategoryModel>[];
+    for (final variant in variants) {
+      final children = widget.level3Cache[variant.id] ?? [];
+      for (final child in children) {
+        if (seen.add(child.id)) {
+          merged.add(child);
+        }
+      }
+    }
+    return merged;
+  }
+
+  List<CategoryModel> _allVariantLevel3(CategoryModel cat) {
+    final variants = widget.categoryVariants[cat.name.toLowerCase()] ?? [cat];
+    final result = <CategoryModel>[];
+    for (final variant in variants) {
+      result.addAll(widget.level3Cache[variant.id] ?? []);
+    }
+    return result;
+  }
+
+  String _cleanName(String name) {
+    return name
         .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
         .replaceAll(RegExp(r'collection', caseSensitive: false), '')
         .trim();
+  }
+
+  bool _isSubSelected(CategoryModel sub) {
+    final cleanedName = _cleanName(sub.name);
     return _localIds.contains(sub.id) || _localNames.contains(cleanedName);
   }
 
   void _toggle(CategoryModel cat) {
-    final cleanedName = cat.name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
+    final cleanedName = _cleanName(cat.name);
     setState(() {
       final idx = _localIds.indexOf(cat.id);
       if (idx != -1) {
@@ -795,6 +962,31 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
       }
     });
     widget.onToggle(cat);
+  }
+
+  void _toggleAllForParent(CategoryModel parent) {
+    final allChildren = _allVariantLevel3(parent);
+    final allSelected = allChildren.every((sub) => _isSubSelected(sub));
+    setState(() {
+      for (final sub in allChildren) {
+        final subCleaned = _cleanName(sub.name);
+        if (allSelected) {
+          final idx = _localIds.indexOf(sub.id);
+          if (idx != -1) {
+            _localIds.removeAt(idx);
+            _localNames.removeWhere((n) => n == subCleaned);
+          }
+        } else {
+          if (!_localIds.contains(sub.id) && !_localNames.contains(subCleaned)) {
+            _localIds.add(sub.id);
+            _localNames.add(subCleaned);
+          }
+        }
+      }
+    });
+    for (final sub in allChildren) {
+      widget.onToggle(sub);
+    }
   }
 
   Widget _selectedCountBadge(
@@ -825,10 +1017,6 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryController = Get.isRegistered<CategoryController>()
-        ? Get.find<CategoryController>()
-        : Get.put(CategoryController());
-
     return Container(
       height: context.isTablet
           ? MediaQuery.of(context).size.height * 0.5
@@ -912,22 +1100,18 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                     ),
                   )
                 : Obx(() {
+                    final categoryController = Get.isRegistered<CategoryController>()
+                        ? Get.find<CategoryController>()
+                        : Get.put(CategoryController());
                     final expandedId = categoryController.expandedCategoryId;
-                    final level3Cache = categoryController.level3Cache;
-                    final loadingIds = <String>{};
-                    for (final cat in widget.categories) {
-                      if (categoryController.isLevel3Loading(cat.id)) {
-                        loadingIds.add(cat.id);
-                      }
-                    }
                     return ListView.builder(
                       padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 20)),
                       itemCount: widget.categories.length,
                       itemBuilder: (_, index) {
                         final cat = widget.categories[index];
                         final isExpanded = expandedId == cat.id;
-                        final level3 = level3Cache[cat.id];
-                        final isLoading = loadingIds.contains(cat.id);
+                        final level3 = _mergedLevel3(cat);
+                        final isLoading = categoryController.isLevel3Loading(cat.id);
 
                         return Column(
                           children: [
@@ -1003,7 +1187,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                         ),
                                       ),
                                     ),
-                                    if (level3 != null)
+                                    if (level3.isNotEmpty)
                                       _selectedCountBadge(
                                         context,
                                         selected: level3
@@ -1037,15 +1221,9 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                 ),
                               ),
                             ),
-                            if (isExpanded && level3 != null) ...[
+                            if (isExpanded && level3.isNotEmpty) ...[
                               GestureDetector(
-                                onTap: () {
-                                  for (final sub in level3) {
-                                    if (!_isSubSelected(sub)) {
-                                      _toggle(sub);
-                                    }
-                                  }
-                                },
+                                onTap: () => _toggleAllForParent(cat),
                                 child: Container(
                                   margin: EdgeInsets.only(
                                       left: context.responsiveWidth(24, tabletVal: 28),
@@ -1088,15 +1266,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                               ...level3.map((sub) {
                                 final isSubSelected =
                                     _isSubSelected(sub);
-                                final cleanedName = sub.name
-                                    .replaceAll(
-                                        RegExp(r'[^a-zA-Z\s]'), '')
-                                    .replaceAll(
-                                      RegExp(r'collection',
-                                          caseSensitive: false),
-                                      '',
-                                    )
-                                    .trim();
+                                final cleanedName = _cleanName(sub.name);
                                 return GestureDetector(
                                   onTap: () => _toggle(sub),
                                   child: Container(

@@ -38,13 +38,11 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
     _isLoading.value = true;
     _hasError.value = false;
 
-    bool anyError = false;
+    // Always await tree fetch — handles INITIAL, LOADING (waits), and retries on ERROR
+    await controller.fetchAllKaratCategories();
 
+    bool anyError = false;
     for (final karat in widget.karats) {
-      final state = _stateForKarat(karat);
-      if (state == CurrentAppState.INITIAL) {
-        await controller.fetchCategoriesForKarat(karat);
-      }
       if (_stateForKarat(karat) == CurrentAppState.ERROR &&
           _listForKarat(karat).isEmpty) {
         anyError = true;
@@ -92,8 +90,8 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   bool get _is22kOnly => !_isMultiKarat && widget.karats.first == Karat.k22;
 
   Future<void> _showLevel3Sheet(CategoryModel parent, Karat karat) async {
-    final children =
-        await controller.fetchLevel3Categories(parentId: parent.id);
+    // Use pre-cached data from tree response
+    final children = controller.level3Cache[parent.id] ?? [];
 
     if (!mounted) return;
 
@@ -337,72 +335,23 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 }
 
 // ── _CategoryListingImage ─────────────────────────────────────────────────────
-// Wraps build in Obx so it rebuilds reactively when fallbackImages updates.
 class _CategoryListingImage extends StatelessWidget {
   final CategoryModel cat;
-  final CategoryController controller;
 
   const _CategoryListingImage({
     required this.cat,
-    required this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Obx makes this widget reactive: it rebuilds whenever fallbackImages,
-    // fallbackAttempted, or fallbackLoading observables change.
-    return Obx(() {
-      if (cat.imageUrl.isNotEmpty) {
-        return CachedNetworkImage(
-          imageUrl: cat.imageUrl,
-          width: double.infinity,
-          height: double.infinity,
-          fit: BoxFit.cover,
-          errorWidget: (_, __, ___) => _onImageError(context),
-        );
-      }
-
-      return _fallbackOrPlaceholder(context);
-    });
-  }
-
-  // Called when the primary imageUrl fails to load.
-  Widget _onImageError(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
+    if (cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
-        imageUrl: fallback,
+        imageUrl: cat.imageUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
+        errorWidget: (_, __, ___) => const RatneshFallback.s(),
       );
-    }
-    // No fallback cached yet — trigger fetch and show nothing while waiting.
-    return _diamondPlaceholder(context);
-  }
-
-  // Called when cat.imageUrl is empty from the start.
-  Widget _fallbackOrPlaceholder(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: fallback,
-        width: double.infinity,
-        height: double.infinity,
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
-      );
-    }
-    return _diamondPlaceholder(context);
-  }
-
-  Widget _diamondPlaceholder(BuildContext context) {
-    if (!controller.isFallbackAttempted(cat.id) &&
-        !controller.isFallbackLoading(cat.id)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.fetchFallbackImage(cat.id, categoryName: cat.name);
-      });
     }
 
     return const RatneshFallback.s();
@@ -465,42 +414,28 @@ class _KaratSectionHeader extends StatelessWidget {
               height: context.responsiveWidth(38, tabletVal: 46),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    context.colorPalette.gold,
-                    context.colorPalette.goldDark,
-                  ],
+                border: Border.all(
+                  color: context.colorPalette.gold,
+                  width: 2,
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(2),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isExpanded
-                      ? context.colorPalette.goldLight
-                      : context.colorPalette.cardBg,
-                ),
-                child: Center(
-                  child: ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        context.colorPalette.gold,
-                        context.colorPalette.goldDeep,
-                      ],
-                    ).createShader(bounds),
-                    child: Text(
-                      karat.displayName,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
+              child: Center(
+                child: ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      context.colorPalette.gold,
+                      context.colorPalette.goldDeep,
+                    ],
+                  ).createShader(bounds),
+                  child: Text(
+                    karat.displayName,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1,
                     ),
                   ),
                 ),
@@ -693,7 +628,6 @@ class _Level3Sheet extends StatelessWidget {
                             ),
                             child: _CategoryListingImage(
                               cat: cat,
-                              controller: controller,
                             ),
                           ),
                         ),
@@ -772,7 +706,6 @@ class _CategoryCard extends StatelessWidget {
                         ),
                         child: _CategoryListingImage(
                           cat: category,
-                          controller: controller,
                         ),
                       ),
                       Positioned(
