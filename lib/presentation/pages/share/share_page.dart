@@ -377,7 +377,7 @@ class _SharePageState extends State<SharePage> {
             ),
             GestureDetector(
               onTap: () {
-                // TODO: WhatsApp sharing logic
+                _showShareOptions(context);
               },
               child: Container(
                 padding:
@@ -559,6 +559,149 @@ class _SharePageState extends State<SharePage> {
                 fontSize: context.getScreenWidth(3.2),
                 color: context.colorPalette.subTitleColor,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showShareOptions(BuildContext context) {
+    final count = controller.selectedCount;
+    final filterInfo = controller.filterInfo;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          20 + MediaQuery.of(ctx).padding.bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(2)),
+            Text(
+              'Share $count item${count == 1 ? '' : 's'}',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(4.5),
+                fontWeight: FontWeight.w700,
+                color: context.colorPalette.textColor,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(0.5)),
+            Text(
+              'Filters: $filterInfo',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(3),
+                color: context.colorPalette.subTitleColor,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(2.5)),
+            _shareOptionTile(
+              context,
+              icon: Icons.image_outlined,
+              iconColor: const Color(0xFF25D366),
+              title: 'Share Images',
+              subtitle: 'Send product images with filter details',
+              onTap: () {
+                Navigator.pop(ctx);
+                controller.shareImages();
+              },
+            ),
+            SizedBox(height: context.getScreenHeight(1.2)),
+            _shareOptionTile(
+              context,
+              icon: Icons.picture_as_pdf_outlined,
+              iconColor: const Color(0xFFE53935),
+              title: 'Share as PDF',
+              subtitle: 'Create a branded product catalog',
+              onTap: () {
+                Navigator.pop(ctx);
+                controller.shareAsPdf();
+              },
+            ),
+            SizedBox(height: context.getScreenHeight(1.5)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _shareOptionTile(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.cardBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.colorPalette.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: context.getScreenWidth(6)),
+            ),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(3.8),
+                      fontWeight: FontWeight.w600,
+                      color: context.colorPalette.textColor,
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(2.8),
+                      color: context.colorPalette.subTitleColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: context.colorPalette.subTitleColor,
+              size: context.getScreenWidth(5),
             ),
           ],
         ),

@@ -157,97 +157,40 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Expanded(
                   child: SizedBox(
                     height: context.getScreenHeight(6.2),
-                    child: isInCart
-                        ? Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(3),
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF4D6),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: AppColors.primaryGold.withOpacity(0.25),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    cartController.decrementQuantity(
-                                      widget.product.id,
-                                    );
-                                  },
-                                  child: Container(
-                                    height: context.getScreenWidth(9),
-                                    width: context.getScreenWidth(9),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.primaryGold,
-                                    ),
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: Colors.white,
-                                      size: context.getScreenWidth(4.5),
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  quantity.toString(),
-                                  style: TextStyle(
-                                    fontSize: context.getScreenWidth(5),
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textDark,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    cartController.addToCart(widget.product);
-                                  },
-                                  child: Container(
-                                    height: context.getScreenWidth(9),
-                                    width: context.getScreenWidth(9),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.primaryGold,
-                                    ),
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: context.getScreenWidth(4.5),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 2,
-                              shadowColor: AppColors.primaryGold.withOpacity(
-                                0.2,
-                              ),
-                              backgroundColor: const Color(0xFFF9F6F0),
-                              foregroundColor: AppColors.primaryGold,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(
-                                  color: AppColors.primaryGold.withOpacity(0.4),
-                                  width: 1.2,
-                                ),
-                              ),
-                            ),
-                            onPressed: () {
-                              cartController.addToCart(widget.product);
-                            },
-                            child: Text(
-                              'Add to Cart',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(4.2),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 2,
+                        shadowColor: AppColors.primaryGold.withOpacity(0.2),
+                        backgroundColor: const Color(0xFFF9F6F0),
+                        foregroundColor: AppColors.primaryGold,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: AppColors.primaryGold.withOpacity(0.4),
+                            width: 1.2,
                           ),
+                        ),
+                      ),
+                      onPressed: () {
+                        cartController.addToCart(widget.product);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${widget.product.name} added to cart'),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
+                      child: Text(
+                        isInCart ? 'Add More' : 'Add to Cart',
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(4.2),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
 
