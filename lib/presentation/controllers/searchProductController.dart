@@ -56,11 +56,35 @@ class SearchProductController extends GetxController {
   final _selectedCategoryName = ''.obs;
   String get selectedCategoryName => _selectedCategoryName.value;
 
-  bool get hasActiveFilters =>
-      _selectedKarats.isNotEmpty || _selectedCategoryId.value != null;
+  final _selectedCategoryIds = <String>[].obs;
+  List<String> get selectedCategoryIds => _selectedCategoryIds;
 
-  int get activeFilterCount =>
-      _selectedKarats.length + (_selectedCategoryId.value != null ? 1 : 0);
+  final _selectedCategoryNames = <String>[].obs;
+  List<String> get selectedCategoryNames => _selectedCategoryNames;
+
+  final _showAllStock = false.obs;
+  bool get showAllStock => _showAllStock.value;
+
+  final _weightMin = 0.0.obs;
+  double get weightMin => _weightMin.value;
+
+  final _weightMax = 500.0.obs;
+  double get weightMax => _weightMax.value;
+
+  bool get hasActiveFilters =>
+      _selectedKarats.isNotEmpty ||
+      _selectedCategoryIds.isNotEmpty ||
+      _showAllStock.value ||
+      _weightMin.value > 0 ||
+      _weightMax.value < 500;
+
+  int get activeFilterCount {
+    var count = _selectedKarats.length;
+    if (_selectedCategoryIds.isNotEmpty) count++;
+    if (_showAllStock.value) count++;
+    if (_weightMin.value > 0 || _weightMax.value < 500) count++;
+    return count;
+  }
 
   // ── Filtered initial products (when filters active, no text search) ──────
   final _filteredInitialProducts = <ProductModel>[].obs;
@@ -150,17 +174,23 @@ class SearchProductController extends GetxController {
     try {
       final List<String> searchQueries = [];
 
-      if (_selectedCategoryId.value != null && _selectedCategoryName.isNotEmpty) {
-        final cleaned = _selectedCategoryName.value
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim();
+      if (_selectedCategoryIds.isNotEmpty && _selectedCategoryNames.isNotEmpty) {
+        final cleanedNames = _selectedCategoryNames
+            .map((n) => n
+                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                .trim())
+            .where((n) => n.isNotEmpty)
+            .toList();
+
         if (_selectedKarats.isNotEmpty) {
           for (final karat in _selectedKarats) {
-            searchQueries.add("${_karatToSearchValue(karat)} $cleaned");
+            for (final name in cleanedNames) {
+              searchQueries.add("${_karatToSearchValue(karat)} $name");
+            }
           }
-        } else if (cleaned.isNotEmpty) {
-          searchQueries.add(cleaned);
+        } else if (cleanedNames.isNotEmpty) {
+          searchQueries.addAll(cleanedNames);
         }
       } else if (_selectedKarats.isNotEmpty) {
         for (final karat in _selectedKarats) {
@@ -178,6 +208,7 @@ class SearchProductController extends GetxController {
               "search": q,
               "page": _filteredInitialPage,
               "limit": _pageLimit,
+              if (_showAllStock.value) "showAll": true,
             },
           );
 
@@ -193,6 +224,7 @@ class SearchProductController extends GetxController {
           queryParameters: {
             "page": _filteredInitialPage,
             "limit": _pageLimit,
+            if (_showAllStock.value) "showAll": true,
           },
         );
 
@@ -201,6 +233,14 @@ class SearchProductController extends GetxController {
           final List raw = data['data'] is List ? data['data'] : [];
           allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
         }
+      }
+
+      if (_weightMin.value > 0 || _weightMax.value < 500) {
+        allFetched = allFetched.where((p) {
+          final gw = p.grossWeight;
+          if (gw == null) return true;
+          return gw >= _weightMin.value && gw <= _weightMax.value;
+        }).toList();
       }
 
       if (isPagination) {
@@ -276,6 +316,7 @@ class SearchProductController extends GetxController {
               "page": _searchPage,
               "limit": _pageLimit,
               if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
+              if (_showAllStock.value) "showAll": true,
             },
           );
 
@@ -293,6 +334,7 @@ class SearchProductController extends GetxController {
             "page": _searchPage,
             "limit": _pageLimit,
             if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
+            if (_showAllStock.value) "showAll": true,
           },
         );
 
@@ -558,10 +600,40 @@ class SearchProductController extends GetxController {
     _selectedKarats.clear();
     _selectedCategoryId.value = null;
     _selectedCategoryName.value = '';
+    _selectedCategoryIds.clear();
+    _selectedCategoryNames.clear();
+    _showAllStock.value = false;
+    _weightMin.value = 0;
+    _weightMax.value = 500;
     _filteredInitialProducts.clear();
     _filteredInitialState.value = CurrentAppState.INITIAL;
     _filteredInitialPage = 1;
     _filteredInitialHasMore = true;
+  }
+
+  void applyFilters({
+    required List<String> karats,
+    required List<String> categoryIds,
+    required List<String> categoryNames,
+    required bool showAll,
+    required double wMin,
+    required double wMax,
+  }) {
+    _selectedKarats
+      ..clear()
+      ..addAll(karats);
+    _selectedCategoryIds
+      ..clear()
+      ..addAll(categoryIds);
+    _selectedCategoryNames
+      ..clear()
+      ..addAll(categoryNames);
+    _selectedCategoryId.value = null;
+    _selectedCategoryName.value = '';
+    _showAllStock.value = showAll;
+    _weightMin.value = wMin;
+    _weightMax.value = wMax;
+    loadFilteredProducts();
   }
 
   void clearSearch() {

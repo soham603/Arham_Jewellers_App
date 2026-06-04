@@ -63,8 +63,6 @@ class _SearchPageState extends State<SearchPage> {
         controller.loadMoreSearchResults();
       } else if (controller.hasActiveFilters) {
         controller.loadFilteredProducts(isPagination: true);
-      } else {
-        controller.loadInitialProducts(isPagination: true);
       }
     }
   }
@@ -121,7 +119,16 @@ class _SearchPageState extends State<SearchPage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
-                FilterBottomSheet.show(context).then((_) => setState(() {}));
+                FilterBottomSheet.show(
+                  context,
+                  initialSelectedKarats: controller.selectedKarats,
+                  initialSelectedCategoryIds: controller.selectedCategoryIds,
+                  initialSelectedCategoryNames: controller.selectedCategoryNames,
+                  initialShowAllStock: controller.showAllStock,
+                  initialWeightMin: controller.weightMin,
+                  initialWeightMax: controller.weightMax,
+                  onApply: controller.applyFilters,
+                ).then((_) => setState(() {}));
               },
               onScannerTap: () async {
                 _focusNode.unfocus();
@@ -156,12 +163,6 @@ class _SearchPageState extends State<SearchPage> {
                 return CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    // ── Browse Categories ────────────────────────────────
-                    if (!isSearching &&
-                        !controller.hasActiveFilters &&
-                        controller.searchResults.isEmpty)
-                      _browseCategoriesSliver(context),
-
                     // ── Latest Level-3 Categories ────────────────────────
                     if (!isSearching &&
                         !controller.hasActiveFilters &&
@@ -174,40 +175,42 @@ class _SearchPageState extends State<SearchPage> {
                         controller.recentSearches.isNotEmpty)
                       _recentSearchesSliver(context),
 
+                    // ── Browse Categories ────────────────────────────────
+                    if (!isSearching &&
+                        !controller.hasActiveFilters &&
+                        controller.searchResults.isEmpty)
+                      _browseCategoriesSliver(context),
+
                     // ── Section Header ───────────────────────────────────
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          context.getScreenWidth(4),
-                          context.getScreenHeight(1.5),
-                          context.getScreenWidth(4),
-                          context.getScreenHeight(0.8),
-                        ),
-                        child: Text(
-                          isSearching
-                              ? 'Results'
-                              : controller.hasActiveFilters
-                                  ? 'Filtered Results'
-                                  : 'Suggested for You',
-                          style: TextStyle(
-                            fontSize: context.getScreenWidth(4.2),
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF675F55),
+                    if (isSearching || controller.hasActiveFilters)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            context.getScreenWidth(4),
+                            context.getScreenHeight(1.5),
+                            context.getScreenWidth(4),
+                            context.getScreenHeight(0.8),
+                          ),
+                          child: Text(
+                            isSearching ? 'Results' : 'Filtered Results',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(4.2),
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF675F55),
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
                     // ── Content ──────────────────────────────────────────
                     if (isSearching)
                       _searchResultsSliver(context)
                     else if (controller.hasActiveFilters)
-                      _filteredInitialProductsSliver(context)
-                    else
-                      _initialProductsSliver(context),
+                      _filteredInitialProductsSliver(context),
 
                     // ── Load More Indicator ──────────────────────────────
-                    _loadMoreSliver(context),
+                    if (isSearching || controller.hasActiveFilters)
+                      _loadMoreSliver(context),
 
                     SliverToBoxAdapter(
                       child: SizedBox(height: context.getScreenHeight(2)),
@@ -227,7 +230,44 @@ class _SearchPageState extends State<SearchPage> {
       if (!controller.hasActiveFilters) return const SizedBox.shrink();
 
       final karats = controller.selectedKarats;
-      final categoryName = controller.selectedCategoryName;
+      final categoryIds = controller.selectedCategoryIds;
+      final categoryNames = controller.selectedCategoryNames;
+      final showAll = controller.showAllStock;
+      final weightMin = controller.weightMin;
+      final weightMax = controller.weightMax;
+      final weightActive = weightMin > 0 || weightMax < 500;
+
+      void removeKarat(String karat) {
+        final newKarats = List<String>.from(karats)..remove(karat);
+        controller.applyFilters(
+          karats: newKarats,
+          categoryIds: categoryIds,
+          categoryNames: categoryNames,
+          showAll: showAll,
+          wMin: weightMin,
+          wMax: weightMax,
+        );
+        setState(() {});
+      }
+
+      void removeCategory(String name) {
+        final idx = categoryNames.indexOf(name);
+        final newIds = List<String>.from(categoryIds);
+        final newNames = List<String>.from(categoryNames);
+        if (idx != -1) {
+          newIds.removeAt(idx);
+          newNames.removeAt(idx);
+        }
+        controller.applyFilters(
+          karats: karats,
+          categoryIds: newIds,
+          categoryNames: newNames,
+          showAll: showAll,
+          wMin: weightMin,
+          wMax: weightMax,
+        );
+        setState(() {});
+      }
 
       return Container(
         padding: EdgeInsets.fromLTRB(
@@ -249,19 +289,43 @@ class _SearchPageState extends State<SearchPage> {
                           _activeFilterChip(
                             context,
                             label: karat,
+                            onRemove: () => removeKarat(karat),
+                          ),
+                        for (final name in categoryNames)
+                          _activeFilterChip(
+                            context,
+                            label: name,
+                            onRemove: () => removeCategory(name),
+                          ),
+                        if (showAll)
+                          _activeFilterChip(
+                            context,
+                            label: 'Show All',
                             onRemove: () {
-                              controller.toggleKaratFilter(karat);
-                              controller.loadFilteredProducts();
+                              controller.applyFilters(
+                                karats: karats,
+                                categoryIds: categoryIds,
+                                categoryNames: categoryNames,
+                                showAll: false,
+                                wMin: weightMin,
+                                wMax: weightMax,
+                              );
                               setState(() {});
                             },
                           ),
-                        if (categoryName.isNotEmpty)
+                        if (weightActive)
                           _activeFilterChip(
                             context,
-                            label: categoryName,
+                            label: '${weightMin.round()}g - ${weightMax.round()}g',
                             onRemove: () {
-                              controller.setCategoryFilter(null, '');
-                              controller.loadFilteredProducts();
+                              controller.applyFilters(
+                                karats: karats,
+                                categoryIds: categoryIds,
+                                categoryNames: categoryNames,
+                                showAll: showAll,
+                                wMin: 0,
+                                wMax: 500,
+                              );
                               setState(() {});
                             },
                           ),

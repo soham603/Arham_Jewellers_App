@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/share_controller.dart';
-import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_product_card.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -69,7 +69,16 @@ class _SharePageState extends State<SharePage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
-                ShareFilterBottomSheet.show(context);
+                FilterBottomSheet.show(
+                  context,
+                  initialSelectedKarats: controller.selectedKarats,
+                  initialSelectedCategoryIds: controller.selectedCategoryIds,
+                  initialSelectedCategoryNames: controller.selectedCategoryNames,
+                  initialShowAllStock: controller.showAllStock,
+                  initialWeightMin: controller.weightMin,
+                  initialWeightMax: controller.weightMax,
+                  onApply: controller.applyFilters,
+                );
               },
               filterActiveCount: controller.activeFilterCount,
             ),
