@@ -334,12 +334,12 @@ class ShareController extends GetxController {
 
   List<ProductModel> get selectedProductsList => _selectedProducts.values.toList();
 
-  bool _isSharing = false;
-  bool get isSharing => _isSharing;
+  final _isSharing = false.obs;
+  bool get isSharing => _isSharing.value;
 
   Future<void> shareImages() async {
     if (_selectedProducts.isEmpty) return;
-    _isSharing = true;
+    _isSharing.value = true;
     try {
       await ShareService.shareImagesDirectly(
         products: selectedProductsList,
@@ -348,13 +348,13 @@ class ShareController extends GetxController {
     } catch (e, st) {
       Logger.error("ShareController", "shareImages error: $e\n$st");
     } finally {
-      _isSharing = false;
+      _isSharing.value = false;
     }
   }
 
   Future<void> shareAsPdf() async {
     if (_selectedProducts.isEmpty) return;
-    _isSharing = true;
+    _isSharing.value = true;
     try {
       await ShareService.shareAsPdf(
         products: selectedProductsList,
@@ -363,7 +363,7 @@ class ShareController extends GetxController {
     } catch (e, st) {
       Logger.error("ShareController", "shareAsPdf error: $e\n$st");
     } finally {
-      _isSharing = false;
+      _isSharing.value = false;
     }
   }
 }
