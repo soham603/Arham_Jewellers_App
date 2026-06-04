@@ -362,6 +362,10 @@ class CategoryController extends GetxController {
       final response = await httpClient.get(
         '/api/v1/category/get-All',
         queryParameters: {'parentId': parentId, 'level': 3},
+        options: Options(
+          receiveTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 10),
+        ),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

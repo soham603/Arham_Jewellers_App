@@ -8,14 +8,22 @@ import 'home/home_page.dart';
 import 'search/search_page.dart';
 import 'cart/cart_page.dart';
 import 'profile/profileScreen.dart';
+import 'share/share_page.dart';
 
 class MainShellView extends GetView<NavigationController> {
   const MainShellView({super.key});
 
-  static const _pages = <Widget>[
+  static const _regularPages = <Widget>[
     HomePage(),
     SearchPage(),
     CartPage(),
+    ProfileScreen(),
+  ];
+
+  static const _adminPages = <Widget>[
+    HomePage(),
+    SearchPage(),
+    SharePage(),
     ProfileScreen(),
   ];
 
@@ -31,13 +39,14 @@ class MainShellView extends GetView<NavigationController> {
       child: Obx(() {
         final index = controller.selectedIndex.value;
         final isAdmin = authController.isAdmin;
+        final pages = isAdmin ? _adminPages : _regularPages;
         return Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
             bottom: false,
             child: IndexedStack(
               index: index,
-              children: _pages,
+              children: pages,
             ),
           ),
           bottomNavigationBar: AppBottomNav(
