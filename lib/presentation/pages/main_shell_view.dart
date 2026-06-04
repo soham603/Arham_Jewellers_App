@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/widgets/app_bottom_nav.dart';
-import '../../core/widgets/responsive_wrapper.dart';
 import '../controllers/navigation_controller.dart';
 import '../controllers/AuthController.dart';
 import 'home/home_page.dart';
@@ -45,20 +44,15 @@ class MainShellView extends GetView<NavigationController> {
           backgroundColor: Colors.white,
           body: SafeArea(
             bottom: false,
-            child: ResponsiveWrapper(
-              child: IndexedStack(
-                index: index,
-                children: pages,
-              ),
+            child: IndexedStack(
+              index: index,
+              children: pages,
             ),
           ),
-          bottomNavigationBar: SafeArea(
-            top: false,
-            child: AppBottomNav(
-              currentIndex: index,
-              onTap: controller.switchTab,
-              isAdmin: isAdmin,
-            ),
+          bottomNavigationBar: AppBottomNav(
+            currentIndex: index,
+            onTap: controller.switchTab,
+            isAdmin: isAdmin,
           ),
         );
       }),
