@@ -18,6 +18,10 @@ class LogoWidget extends StatelessWidget {
     this.nameLetterSpacing = 2,
     this.iconNameSpacing = 8,
     this.nameSubtitleSpacing = 4,
+    this.logoAsset,
+    this.brandName,
+    this.subtitle,
+    this.applyTint = true,
   });
 
   final double logoSize;
@@ -32,6 +36,10 @@ class LogoWidget extends StatelessWidget {
   final double nameLetterSpacing;
   final double iconNameSpacing;
   final double nameSubtitleSpacing;
+  final String? logoAsset;
+  final String? brandName;
+  final String? subtitle;
+  final bool applyTint;
 
   @override
   Widget build(BuildContext context) {
@@ -40,16 +48,16 @@ class LogoWidget extends StatelessWidget {
       children: [
         if (showIcon)
           Image.asset(
-            'assets/images/ratnesh-logo.png',
+            logoAsset ?? 'assets/images/ratnesh-logo.png',
             height: logoSize,
             fit: BoxFit.contain,
-            color: iconColor ?? AppColors.primaryGold,
-            colorBlendMode: BlendMode.srcIn,
+            color: applyTint ? (iconColor ?? AppColors.primaryGold) : null,
+            colorBlendMode: applyTint ? BlendMode.srcIn : null,
           ),
         if (showIcon && showName) SizedBox(height: iconNameSpacing),
         if (showName)
           Text(
-            'RATNESHGOLD',
+            brandName ?? 'RATNESHGOLD',
             style: GoogleFonts.bodoniModa(
               fontSize: nameFontSize ?? 16,
               fontWeight: FontWeight.w900,
@@ -60,7 +68,7 @@ class LogoWidget extends StatelessWidget {
         if (showName && showSubtitle) SizedBox(height: nameSubtitleSpacing),
         if (showSubtitle)
           Text(
-            'Purity • Quality • Trust',
+            subtitle ?? 'Purity • Quality • Trust',
             style: TextStyle(
               fontSize: subtitleFontSize ?? 11,
               color: subtitleColor ?? AppColors.textMuted,
