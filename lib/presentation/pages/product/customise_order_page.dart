@@ -24,10 +24,10 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   String selectedStyle = 'Bhungdi';
 
   static const _caratOptions = [
-    '9K  (37%)',
-    '14K (58%)',
-    '18K (75%)',
-    '20K (83%)',
+    '9K  (38%)',
+    '14K (60%)',
+    '18K (76%)',
+    '20K (84%)',
     '22K (92%)',
     '24K (100%)',
   ];
@@ -416,17 +416,17 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildChip("9K  (37%)", selectedCarat,
+                              child: _buildChip("9K  (38%)", selectedCarat,
                                   (val) => setState(() => selectedCarat = val)),
                             ),
                             SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("14K (58%)", selectedCarat,
+                              child: _buildChip("14K (60%)", selectedCarat,
                                   (val) => setState(() => selectedCarat = val)),
                             ),
                             SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("18K (75%)", selectedCarat,
+                              child: _buildChip("18K (76%)", selectedCarat,
                                   (val) => setState(() => selectedCarat = val)),
                             ),
                           ],
@@ -435,7 +435,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildChip("20K (83%)", selectedCarat,
+                              child: _buildChip("20K (84%)", selectedCarat,
                                   (val) => setState(() => selectedCarat = val)),
                             ),
                             SizedBox(width: 8),
