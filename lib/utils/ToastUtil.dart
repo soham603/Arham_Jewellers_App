@@ -34,7 +34,7 @@ class ToastUtils {
     _showToast(
       context,
       message,
-      Colors.blue,
+      const Color(0xFFA57A36),
       Icons.info,
     );
   }

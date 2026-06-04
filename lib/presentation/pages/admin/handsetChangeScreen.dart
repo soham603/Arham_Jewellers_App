@@ -419,6 +419,7 @@ class _RequestCardState extends State<_RequestCard> {
   Widget build(BuildContext context) {
     final req = widget.request;
     final statusColor = _statusColor(req.status);
+    final cardColor = AppColors.primaryGold;
     final userName = req.userName ?? 'Unknown';
     final userPhone = req.userPhoneNumber ?? '—';
 
@@ -427,7 +428,7 @@ class _RequestCardState extends State<_RequestCard> {
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: statusColor.withOpacity(0.25)),
+        border: Border.all(color: cardColor.withOpacity(0.25)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -450,7 +451,7 @@ class _RequestCardState extends State<_RequestCard> {
                     width: context.getScreenWidth(11),
                     height: context.getScreenWidth(11),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
+                      color: cardColor.withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -460,7 +461,7 @@ class _RequestCardState extends State<_RequestCard> {
                         style: TextStyle(
                           fontSize: context.getScreenWidth(5),
                           fontWeight: FontWeight.w700,
-                          color: statusColor,
+                          color: cardColor,
                         ),
                       ),
                     ),
@@ -720,7 +721,7 @@ class _RequestCardState extends State<_RequestCard> {
                               context,
                               label: 'Approve',
                               icon: Icons.check_circle_rounded,
-                              color: Colors.green,
+                              color: AppColors.primaryGold,
                               isLoading: isLoading,
                               onTap: () => _showApproveConfirm(context, req),
                             ),
@@ -762,12 +763,12 @@ class _RequestCardState extends State<_RequestCard> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: AppColors.primaryGold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
                 Icons.check_circle_rounded,
-                color: Colors.green,
+                color: AppColors.primaryGold,
                 size: 20,
               ),
             ),
@@ -815,7 +816,7 @@ class _RequestCardState extends State<_RequestCard> {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.primaryGold,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -1073,7 +1074,7 @@ class _RequestCardState extends State<_RequestCard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        backgroundColor: isError ? Colors.red : AppColors.primaryGold,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),

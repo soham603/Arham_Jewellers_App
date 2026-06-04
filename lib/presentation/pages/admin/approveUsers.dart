@@ -488,12 +488,12 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: AppColors.primaryGold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
                   Icons.check_circle_rounded,
-                  color: Colors.green,
+                  color: AppColors.primaryGold,
                   size: 20,
                 ),
               ),
@@ -525,15 +525,15 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               Container(
                 padding: EdgeInsets.all(context.getScreenWidth(3)),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.06),
+                  color: AppColors.primaryGold.withOpacity(0.06),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.green.withOpacity(0.2)),
+                  border: Border.all(color: AppColors.primaryGold.withOpacity(0.2)),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.calendar_today_rounded,
-                      color: Colors.green,
+                      color: AppColors.primaryGold,
                       size: 16,
                     ),
                     SizedBox(width: context.getScreenWidth(2)),
@@ -542,7 +542,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       style: TextStyle(
                         fontSize: context.getScreenWidth(3.5),
                         fontWeight: FontWeight.w700,
-                        color: Colors.green.shade700,
+                        color: AppColors.primaryGold,
                       ),
                     ),
                   ],
@@ -645,7 +645,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                         }
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: AppColors.primaryGold,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -967,7 +967,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       case 'REJECTED':
         return Colors.red;
       default:
-        return const Color(0xFFD4AF37);
+        return AppColors.primaryGold;
     }
   }
 
@@ -975,7 +975,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: isError ? Colors.red : Colors.green,
+        backgroundColor: isError ? Colors.red : AppColors.primaryGold,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
@@ -1010,13 +1010,14 @@ class _RequestCardState extends State<_RequestCard> {
     final req = widget.request;
     final user = req.user;
     final statusColor = _statusColor(req.status);
+    final cardColor = AppColors.primaryGold;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: statusColor.withOpacity(0.25)),
+        border: Border.all(color: cardColor.withOpacity(0.25)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -1040,7 +1041,7 @@ class _RequestCardState extends State<_RequestCard> {
                     width: context.getScreenWidth(11),
                     height: context.getScreenWidth(11),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
+                      color: cardColor.withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -1050,7 +1051,7 @@ class _RequestCardState extends State<_RequestCard> {
                         style: TextStyle(
                           fontSize: context.getScreenWidth(5),
                           fontWeight: FontWeight.w700,
-                          color: statusColor,
+                          color: cardColor,
                         ),
                       ),
                     ),
@@ -1162,17 +1163,17 @@ class _RequestCardState extends State<_RequestCard> {
                     Container(
                       padding: EdgeInsets.all(context.getScreenWidth(3)),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.07),
+                        color: AppColors.primaryGold.withOpacity(0.07),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Colors.green.withOpacity(0.2),
+                          color: AppColors.primaryGold.withOpacity(0.2),
                         ),
                       ),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.verified_rounded,
-                            color: Colors.green,
+                            color: AppColors.primaryGold,
                             size: 18,
                           ),
                           SizedBox(width: context.getScreenWidth(2)),
@@ -1193,7 +1194,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 style: TextStyle(
                                   fontSize: context.getScreenWidth(3.8),
                                   fontWeight: FontWeight.w700,
-                                  color: Colors.green.shade700,
+                                  color: AppColors.primaryGold,
                                 ),
                               ),
                               // Days remaining
@@ -1209,7 +1210,7 @@ class _RequestCardState extends State<_RequestCard> {
                                     style: TextStyle(
                                       fontSize: context.getScreenWidth(2.8),
                                       color: remaining > 0
-                                          ? Colors.green
+                                          ? AppColors.primaryGold
                                           : Colors.red,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -1274,7 +1275,7 @@ class _RequestCardState extends State<_RequestCard> {
                               context,
                               label: 'Approve',
                               icon: Icons.check_circle_rounded,
-                              color: Colors.green,
+                              color: AppColors.primaryGold,
                               isLoading: isLoading,
                               onTap: widget.onApprove,
                             ),
@@ -1316,7 +1317,7 @@ class _RequestCardState extends State<_RequestCard> {
                           context,
                           label: 'Approve Now',
                           icon: Icons.check_circle_rounded,
-                          color: Colors.green,
+                          color: AppColors.primaryGold,
                           isLoading: isLoading,
                           onTap: widget.onApprove,
                         ),
@@ -1425,7 +1426,7 @@ class _RequestCardState extends State<_RequestCard> {
       case 'REJECTED':
         return Colors.red;
       default:
-        return const Color(0xFFD4AF37);
+        return AppColors.primaryGold;
     }
   }
 }
@@ -1514,7 +1515,7 @@ class _SearchResultTile extends StatelessWidget {
       case 'REJECTED':
         return Colors.red;
       default:
-        return const Color(0xFFD4AF37);
+        return AppColors.primaryGold;
     }
   }
 }

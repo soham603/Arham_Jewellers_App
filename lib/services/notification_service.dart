@@ -23,7 +23,7 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  late final FirebaseMessaging _messaging;
+  FirebaseMessaging? _messaging;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   static const String _counterKey = 'notification_id_counter';
   int _notificationIdCounter = 0;
@@ -63,7 +63,8 @@ class NotificationService {
   }
 
   Future<void> _requestPermission() async {
-    final settings = await _messaging.requestPermission(
+    if (_messaging == null) return;
+    final settings = await _messaging!.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -135,14 +136,27 @@ class NotificationService {
   }
 
   Future<void> _getFcmToken() async {
-    _fcmToken = await _messaging.getToken();
-    Logger.info("NotificationService", "FCM Token obtained");
+    if (_messaging == null) {
+      Logger.info("NotificationService", "Firebase not configured, FCM disabled");
+      return;
+    }
 
-    _messaging.onTokenRefresh.listen((newToken) {
-      _fcmToken = newToken;
-      Logger.info("NotificationService", "FCM Token refreshed");
-      onTokenRefreshed?.call(newToken);
-    });
+    try {
+      _fcmToken = await _messaging!.getToken();
+      if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+        Logger.info("NotificationService", "FCM Token obtained");
+      } else {
+        Logger.info("NotificationService", "FCM Token empty, notifications disabled");
+      }
+
+      _messaging!.onTokenRefresh.listen((newToken) {
+        _fcmToken = newToken;
+        Logger.info("NotificationService", "FCM Token refreshed");
+        onTokenRefreshed?.call(newToken);
+      });
+    } catch (e) {
+      Logger.info("NotificationService", "FCM not available: $e");
+    }
   }
 
   void _setupMessageListeners() {
@@ -157,7 +171,7 @@ class NotificationService {
       onMessageOpenedApp?.call(message);
     });
 
-    _messaging.getInitialMessage().then((RemoteMessage? message) {
+    _messaging?.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
         Logger.info("NotificationService", "App opened from notification: ${message.notification?.title}");
         onMessageOpenedApp?.call(message);
@@ -222,13 +236,36 @@ class NotificationService {
     }
   }
 
+  /// Retry obtaining FCM token. Useful when initial retrieval failed.
+  Future<String?> retryGetFcmToken() async {
+    if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+      return _fcmToken;
+    }
+
+    if (_messaging == null) {
+      Logger.info("NotificationService", "Firebase not initialized, skipping FCM token");
+      return null;
+    }
+
+    try {
+      _fcmToken = await _messaging!.getToken();
+      if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+        Logger.info("NotificationService", "FCM Token obtained on retry");
+      }
+    } catch (e) {
+      Logger.warning("NotificationService", "FCM Token not available: $e");
+    }
+
+    return _fcmToken;
+  }
+
   Future<void> subscribeToTopic(String topic) async {
-    await _messaging.subscribeToTopic(topic);
+    await _messaging?.subscribeToTopic(topic);
     Logger.info("NotificationService", "Subscribed to topic: $topic");
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
-    await _messaging.unsubscribeFromTopic(topic);
+    await _messaging?.unsubscribeFromTopic(topic);
     Logger.info("NotificationService", "Unsubscribed from topic: $topic");
   }
 

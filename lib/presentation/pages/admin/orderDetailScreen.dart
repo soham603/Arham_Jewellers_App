@@ -826,7 +826,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       case 'CANCELLED':
         return Colors.red;
       case 'PROCESSING':
-        return const Color(0xFF3B82F6);
+        return const Color(0xFFA57A36);
       case 'COMPLETED':
       case 'DELIVERED':
         return const Color(0xFFD4AF37);

@@ -156,7 +156,7 @@ class _SplashPageState extends State<SplashPage>
                             height:
                                 context.getScreenWidth(20) * _dividerHeight.value,
                             margin: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(4),
+                              horizontal: context.getScreenWidth(6),
                             ),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(

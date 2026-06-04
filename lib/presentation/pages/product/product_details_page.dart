@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -130,107 +131,109 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       // =====================================================
       // PREMIUM BOTTOM ACTION BAR
       // =====================================================
-      bottomNavigationBar: Obx(() {
-        final quantity = cartController.getProductQuantity(widget.product.id);
-        final isInCart = quantity > 0;
+      bottomNavigationBar: Get.find<AuthController>().isAdmin
+          ? const SizedBox.shrink()
+          : Obx(() {
+              final quantity = cartController.getProductQuantity(widget.product.id);
+              final isInCart = quantity > 0;
 
-        return SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-            ),
-            padding: EdgeInsets.fromLTRB(
-              context.getScreenWidth(4),
-              context.getScreenHeight(1.5),
-              context.getScreenWidth(4),
-              context.getScreenHeight(1.5),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: context.getScreenHeight(6.2),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 2,
-                        shadowColor: AppColors.primaryGold.withOpacity(0.2),
-                        backgroundColor: const Color(0xFFF9F6F0),
-                        foregroundColor: AppColors.primaryGold,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: AppColors.primaryGold.withOpacity(0.4),
-                            width: 1.2,
+              return SafeArea(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.fromLTRB(
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(1.5),
+                    context.getScreenWidth(4),
+                    context.getScreenHeight(1.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: context.getScreenHeight(6.2),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 2,
+                              shadowColor: AppColors.primaryGold.withOpacity(0.2),
+                              backgroundColor: const Color(0xFFF9F6F0),
+                              foregroundColor: AppColors.primaryGold,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: AppColors.primaryGold.withOpacity(0.4),
+                                  width: 1.2,
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              cartController.addToCart(widget.product);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${widget.product.name} added to cart'),
+                                    duration: const Duration(seconds: 2),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              isInCart ? 'Add More' : 'Add to Cart',
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(4.2),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      onPressed: () {
-                        cartController.addToCart(widget.product);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${widget.product.name} added to cart'),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
-                      child: Text(
-                        isInCart ? 'Add More' : 'Add to Cart',
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(4.2),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
 
-                SizedBox(width: context.getScreenWidth(3)),
-                Expanded(
-                  child: SizedBox(
-                    height: context.getScreenHeight(6.2),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 6,
-                        shadowColor: AppColors.primaryGold.withOpacity(0.5),
-                        backgroundColor: AppColors.primaryGold,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
+                      SizedBox(width: context.getScreenWidth(3)),
+                      Expanded(
+                        child: SizedBox(
+                          height: context.getScreenHeight(6.2),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 6,
+                              shadowColor: AppColors.primaryGold.withOpacity(0.5),
+                              backgroundColor: AppColors.primaryGold,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () {
+                              if (!isInCart) {
+                                cartController.addToCart(widget.product);
+                              }
+                              Navigator.of(context).pop();
+                              Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
+                            },
+                            child: Text(
+                              'Buy Now',
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(4.2),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                      onPressed: () {
-                        if (!isInCart) {
-                          cartController.addToCart(widget.product);
-                        }
-                        Navigator.of(context).pop();
-                        Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
-                      },
-                      child: Text(
-                        'Buy Now',
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(4.2),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
-      }),
+              );
+            }),
 
       // =====================================================
       // MODERN CURVED BODY LAYOUT

@@ -5,7 +5,7 @@ import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
+
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
@@ -67,9 +67,6 @@ class AuthController extends GetxController {
       _userLoginErrorMsg.value = "";
 
       final fcmToken = NotificationService().fcmToken;
-      if (fcmToken == null || fcmToken.isEmpty) {
-        Logger.warning("AuthController", "FCM token not available during login");
-      }
 
       final response = await httpClient.post(
         "/api/v1/auth/user-login",

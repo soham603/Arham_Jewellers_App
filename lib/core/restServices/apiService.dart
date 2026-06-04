@@ -67,12 +67,37 @@ class BaseHttpService {
         },
 
         onError: (dio.DioException error, handler) async {
+          final statusCode = error.response?.statusCode;
           Logger.error(
             "BaseHttpService",
-            "Error [${error.response?.statusCode}]: ${error.message}",
+            "Error [$statusCode]: ${error.message}",
           );
 
-          if (error.response?.statusCode == 401) {
+          // Retry on 502/503/504 (server temporarily unavailable)
+          if (statusCode == 502 || statusCode == 503 || statusCode == 504) {
+            if (error.requestOptions.extra["retried"] != true) {
+              Logger.info("BaseHttpService", "Retrying request due to server error $statusCode...");
+              error.requestOptions.extra["retried"] = true;
+              await Future.delayed(const Duration(seconds: 2));
+              try {
+                final retryResponse = await _dio.fetch(error.requestOptions);
+                return handler.resolve(retryResponse);
+              } on dio.DioException catch (retryError) {
+                // Fall through to normal error handling
+                final errorMessage = _extractErrorMessage(retryError.response);
+                return handler.reject(
+                  dio.DioException(
+                    requestOptions: retryError.requestOptions,
+                    response: retryError.response,
+                    error: errorMessage ?? _getServerErrorMessage(statusCode),
+                    type: retryError.type,
+                  ),
+                );
+              }
+            }
+          }
+
+          if (statusCode == 401) {
             final requiresAuth =
                 error.requestOptions.extra["requiresAuth"] ?? true;
 
@@ -117,12 +142,13 @@ class BaseHttpService {
           }
 
           final errorMessage = _extractErrorMessage(error.response);
+          final isServerError = statusCode == 502 || statusCode == 503 || statusCode == 504;
 
           handler.reject(
             dio.DioException(
               requestOptions: error.requestOptions,
               response: error.response,
-              error: errorMessage ?? "An unexpected error occurred.",
+              error: errorMessage ?? (isServerError ? _getServerErrorMessage(statusCode) : "An unexpected error occurred."),
               type: error.type,
             ),
           );
@@ -205,6 +231,19 @@ class BaseHttpService {
       return false;
     } finally {
       _refreshCompleter = null;
+    }
+  }
+
+  String _getServerErrorMessage(int? statusCode) {
+    switch (statusCode) {
+      case 502:
+        return "Server is temporarily unavailable. Please try again.";
+      case 503:
+        return "Service is currently unavailable. Please try again later.";
+      case 504:
+        return "Server took too long to respond. Please try again.";
+      default:
+        return "Server error. Please try again.";
     }
   }
 

@@ -185,6 +185,7 @@ class CarouselsController extends GetxController {
     String? descHtml,
     String? linkUrl,
     String? mobileImageUrl,
+    bool? isActive,
     required File imageFile,
   }) async {
     try {
@@ -198,6 +199,7 @@ class CarouselsController extends GetxController {
         if (linkUrl != null) "linkUrl": linkUrl,
         if (mobileImageUrl != null)
           "mobileImageUrl": mobileImageUrl,
+        if (isActive != null) "isActive": isActive,
         "image": await MultipartFile.fromFile(imageFile.path),
       };
 
@@ -267,7 +269,7 @@ class CarouselsController extends GetxController {
         if (mobileImageUrl != null)
           "mobileImageUrl": mobileImageUrl,
         if (position != null) "position": position,
-        if (isActive != null) "isActive": isActive.toString(),
+        if (isActive != null) "isActive": isActive,
       };
 
       if (imageFile != null) {
