@@ -1,7 +1,9 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -120,6 +122,17 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   color: Colors.red.shade400,
                 ),
               ),
+              SizedBox(height: context.getScreenHeight(1.5)),
+              ElevatedButton(
+                onPressed: controller.fetchCurrentRate,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade400,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Retry', style: TextStyle(color: Colors.white)),
+              ),
             ],
           ),
         );
@@ -215,44 +228,246 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   }
 
   Widget _graphPlaceholder(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: context.getScreenHeight(20),
-      decoration: BoxDecoration(
-        color: context.colorPalette.boxColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: context.colorPalette.subTitleColor.withOpacity(0.15),
+    return Obx(() {
+      final history = controller.history;
+      final state = controller.state;
+
+      if (state == CurrentAppState.LOADING && history.isEmpty) {
+        return Container(
+          width: double.infinity,
+          height: context.getScreenHeight(22),
+          decoration: BoxDecoration(
+            color: context.colorPalette.shimmerBaseColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+        );
+      }
+
+      if (history.length < 2) {
+        return Container(
+          width: double.infinity,
+          height: context.getScreenHeight(20),
+          decoration: BoxDecoration(
+            color: context.colorPalette.boxColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: context.colorPalette.subTitleColor.withOpacity(0.15),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.show_chart_rounded,
+                size: context.getScreenWidth(12),
+                color: context.colorPalette.subTitleColor.withOpacity(0.4),
+              ),
+              SizedBox(height: context.getScreenHeight(1)),
+              Text(
+                'Need at least 2 data points for graph',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.5),
+                  color: context.colorPalette.subTitleColor.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      final sorted = List<GoldRateModel>.from(history)..sort(
+        (a, b) => a.createdAt.compareTo(b.createdAt),
+      );
+
+      final spots = <FlSpot>[];
+      for (var i = 0; i < sorted.length; i++) {
+        spots.add(FlSpot(i.toDouble(), sorted[i].ratePerGram));
+      }
+
+      final rates = spots.map((s) => s.y).toList();
+      final minY = rates.reduce((a, b) => a < b ? a : b);
+      final maxY = rates.reduce((a, b) => a > b ? a : b);
+      final padding = (maxY - minY) * 0.15;
+
+      final lineColor = AppColors.primaryGold;
+
+      return Container(
+        width: double.infinity,
+        height: context.getScreenHeight(22),
+        padding: EdgeInsets.fromLTRB(
+          context.getScreenWidth(2),
+          context.getScreenHeight(2),
+          context.getScreenWidth(2),
+          context.getScreenHeight(1),
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.show_chart_rounded,
-            size: context.getScreenWidth(12),
-            color: context.colorPalette.subTitleColor.withOpacity(0.4),
+        decoration: BoxDecoration(
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: context.colorPalette.subTitleColor.withOpacity(0.15),
           ),
-          SizedBox(height: context.getScreenHeight(1)),
-          Text(
-            'Gold Price Graph',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(4),
-              fontWeight: FontWeight.w600,
-              color: context.colorPalette.subTitleColor.withOpacity(0.6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: context.getScreenWidth(1)),
+              child: Text(
+                'Gold Price Graph',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.8),
+                  fontWeight: FontWeight.w600,
+                  color: context.colorPalette.textColor,
+                ),
+              ),
             ),
-          ),
-          SizedBox(height: context.getScreenHeight(0.5)),
-          Text(
-            'Coming soon',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(3),
-              color: context.colorPalette.subTitleColor.withOpacity(0.4),
+            SizedBox(height: context.getScreenHeight(0.5)),
+            Expanded(
+              child: LineChart(
+                LineChartData(
+                  minY: minY - padding,
+                  maxY: maxY + padding,
+                  minX: 0,
+                  maxX: (spots.length - 1).toDouble(),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval:
+                        padding > 0 ? (padding * 2) / 3 : 100,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: context.colorPalette.subTitleColor.withOpacity(0.08),
+                      strokeWidth: 1,
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: context.getScreenWidth(10),
+                        interval: padding > 0 ? (padding * 2) / 3 : 100,
+                        getTitlesWidget: (value, meta) => Padding(
+                          padding: const EdgeInsets.only(right: 4),
+                          child: Text(
+                            '₹${(value / 1000).toStringAsFixed(1)}k',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.2),
+                              color: context.colorPalette.subTitleColor.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: context.getScreenHeight(3),
+                        interval: spots.length > 7
+                            ? (spots.length / 6).ceilToDouble()
+                            : 1,
+                        getTitlesWidget: (value, meta) {
+                          final idx = value.toInt();
+                          if (idx < 0 || idx >= sorted.length) {
+                            return const SizedBox.shrink();
+                          }
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              top: context.getScreenHeight(0.5),
+                            ),
+                            child: Text(
+                              DateFormat('dd MMM').format(
+                                sorted[idx].createdAt.toLocal(),
+                              ),
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(2),
+                                color: context.colorPalette.subTitleColor
+                                    .withOpacity(0.5),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  lineTouchData: LineTouchData(
+                    enabled: true,
+                    handleBuiltInTouches: true,
+                    touchTooltipData: LineTouchTooltipData(
+                      getTooltipColor: (_) => const Color(0xFF1E1E1E),
+                      tooltipRoundedRadius: 12,
+                      tooltipPadding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(3),
+                        vertical: context.getScreenHeight(0.8),
+                      ),
+                      getTooltipItems: (touchedSpots) {
+                        return touchedSpots.map((spot) {
+                          final date = sorted[spot.x.toInt()].createdAt.toLocal();
+                          return LineTooltipItem(
+                            '₹${spot.y.toStringAsFixed(0)}\n',
+                            TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: context.getScreenWidth(3),
+                            ),
+                            children: [
+                              TextSpan(
+                                text: DateFormat('dd MMM yyyy').format(date),
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: context.getScreenWidth(2.3),
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: spots,
+                      isCurved: true,
+                      preventCurveOverShooting: true,
+                      color: lineColor,
+                      barWidth: 2.5,
+                      isStrokeCapRound: true,
+                      dotData: FlDotData(
+                        show: spots.length <= 15,
+                        getDotPainter: (spot, percent, bar, index) {
+                          final isFirst = index == spots.length - 1;
+                          return FlDotCirclePainter(
+                            radius: isFirst ? 4 : 2.5,
+                            color: isFirst ? lineColor : Colors.white,
+                            strokeWidth: isFirst ? 2 : 1.5,
+                            strokeColor: lineColor,
+                          );
+                        },
+                      ),
+                      belowBarData: BarAreaData(
+                        show: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            lineColor.withOpacity(0.25),
+                            lineColor.withOpacity(0.0),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _historyList(BuildContext context) {
@@ -267,6 +482,18 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             (_) => Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
               child: _shimmerHistoryTile(context),
+            ),
+          ),
+        );
+      }
+
+      if (state == CurrentAppState.ERROR && history.isEmpty) {
+        return Center(
+          child: Text(
+            controller.error.isNotEmpty ? controller.error : 'No history available',
+            style: TextStyle(
+              fontSize: context.getScreenWidth(3.5),
+              color: context.colorPalette.subTitleColor,
             ),
           ),
         );
@@ -394,6 +621,14 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
+                if (rate.setBy != null)
+                  Text(
+                    'Set by ${rate.setBy}',
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(2.8),
+                      color: context.colorPalette.subTitleColor,
+                    ),
+                  ),
               ],
             ),
           ),
