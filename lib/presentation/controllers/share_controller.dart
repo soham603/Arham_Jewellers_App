@@ -111,12 +111,18 @@ class ShareController extends GetxController {
 
   String _karatToSearchValue(String karat) {
     switch (karat) {
+      case '9K':
+        return '38';
+      case '14K':
+        return '60';
       case '18K':
         return '76';
       case '20K':
         return '84';
       case '22K':
         return '92';
+      case '24K':
+        return '100';
       default:
         return karat;
     }
