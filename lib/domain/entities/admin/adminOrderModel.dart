@@ -5,6 +5,7 @@ class AdminOrderModel {
   final double? totalAmount;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isCustom;
 
   final AdminOrderUserModel user;
   final List<AdminOrderItemModel> orderItems;
@@ -16,6 +17,7 @@ class AdminOrderModel {
     required this.totalAmount,
     required this.createdAt,
     required this.updatedAt,
+    required this.isCustom,
     required this.user,
     required this.orderItems,
   });
@@ -45,6 +47,8 @@ class AdminOrderModel {
       updatedAt: DateTime.parse(
         json["updatedAt"],
       ),
+
+      isCustom: json["isCustom"] ?? false,
 
       user: AdminOrderUserModel.fromJson(
         json["user"] ?? {},

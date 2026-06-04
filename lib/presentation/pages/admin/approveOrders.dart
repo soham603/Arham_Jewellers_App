@@ -297,6 +297,32 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                         ),
                       ),
 
+                      if (order.isCustom) ...[
+                        SizedBox(width: context.getScreenWidth(2)),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getScreenWidth(2),
+                            vertical: context.getScreenHeight(0.2),
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: AppColors.primaryGold.withOpacity(0.3),
+                            ),
+                          ),
+                          child: Text(
+                            "CUSTOM",
+                            style: TextStyle(
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w800,
+                              fontSize: context.getScreenWidth(2.4),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+
                       SizedBox(height: context.getScreenHeight(0.6)),
 
                       Text(
