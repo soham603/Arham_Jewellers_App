@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
@@ -12,6 +13,7 @@ Future<void> main() async {
   await dotenv.load();
   Get.put(CartController());
   Get.put(AuthController());
+  Get.put(GoldRateController());
   await NotificationService().init();
   Get.put(NotificationController());
   runApp(const RatneshGoldApp());

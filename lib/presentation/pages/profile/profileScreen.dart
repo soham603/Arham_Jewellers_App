@@ -297,6 +297,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                           ),
+
+                          if (authController.user?.isRetailer == true) ...[
+                            SizedBox(height: context.getScreenHeight(1)),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getScreenWidth(4),
+                                vertical: context.getScreenHeight(1.2),
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD4AF37).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.store_rounded,
+                                    color: const Color(0xFFD4AF37),
+                                    size: context.getScreenWidth(5),
+                                  ),
+                                  SizedBox(width: context.getScreenWidth(2)),
+                                  Expanded(
+                                    child: Text(
+                                      "Retailer",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: context.getScreenWidth(3.7),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

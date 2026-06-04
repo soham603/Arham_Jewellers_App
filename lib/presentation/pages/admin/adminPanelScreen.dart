@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
@@ -216,6 +217,13 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Handset Requests",
                 subtitle: "Change requests",
                 onTap: () => Get.to(() => const HandsetChangeScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.monetization_on_rounded,
+                title: "Gold Rate",
+                subtitle: "Set daily rate",
+                onTap: () => Get.to(() => const GoldRateScreen()),
               ),
               _adminTile(
                 context,
