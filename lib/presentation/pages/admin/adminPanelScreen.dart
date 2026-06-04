@@ -9,6 +9,9 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
+// 🔥 Import the new Ancillary Data selection screen
+import 'ancillary_selection_screen.dart';
+
 class AdminPanelScreen extends StatelessWidget {
   const AdminPanelScreen({super.key});
 
@@ -197,6 +200,14 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Carousel",
                 subtitle: "Manage banners",
                 onTap: () => Get.to(() => CarouselManagerScreen()),
+              ),
+              // 🔥 NEW TILE: Edit Ancillary Data
+              _adminTile(
+                context,
+                icon: Icons.text_snippet_rounded,
+                title: "Ancillary Data",
+                subtitle: "Terms, About, Policies",
+                onTap: () => Get.to(() => const AncillarySelectionScreen()),
               ),
             ],
           ),

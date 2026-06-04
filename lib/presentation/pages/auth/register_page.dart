@@ -29,13 +29,63 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController gstController = TextEditingController();
+  final TextEditingController stateController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
   final TextEditingController areaController = TextEditingController();
   final TextEditingController pincodeController = TextEditingController();
   final TextEditingController companyNameController = TextEditingController();
 
+  final FocusNode stateFocusNode = FocusNode();
+  final FocusNode cityFocusNode = FocusNode();
+
   String selectedCountryCode = "+91";
   bool isFormValid = false;
+
+  // Starter dataset for India States & Cities
+  final Map<String, List<String>> _indiaData = {
+    "Andhra Pradesh": [
+      "Visakhapatnam",
+      "Vijayawada",
+      "Guntur",
+      "Nellore",
+      "Tirupati",
+    ],
+    "Delhi": ["New Delhi", "North Delhi", "South Delhi", "Dwarka"],
+    "Gujarat": [
+      "Ahmedabad",
+      "Surat",
+      "Vadodara",
+      "Rajkot",
+      "Bhavnagar",
+      "Jamnagar",
+    ],
+    "Karnataka": ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Belagavi"],
+    "Maharashtra": [
+      "Mumbai",
+      "Pune",
+      "Nagpur",
+      "Thane",
+      "Nashik",
+      "Aurangabad",
+    ],
+    "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Bikaner", "Ajmer"],
+    "Tamil Nadu": [
+      "Chennai",
+      "Coimbatore",
+      "Madurai",
+      "Tiruchirappalli",
+      "Salem",
+    ],
+    "Uttar Pradesh": [
+      "Lucknow",
+      "Kanpur",
+      "Agra",
+      "Varanasi",
+      "Meerut",
+      "Noida",
+    ],
+    "West Bengal": ["Kolkata", "Howrah", "Darjeeling", "Siliguri", "Asansol"],
+  };
 
   void validateForm() {
     setState(() {
@@ -45,7 +95,11 @@ class _RegisterPageState extends State<RegisterPage> {
           nameController.text.trim().isNotEmpty &&
           phoneController.text.trim().isNotEmpty &&
           gstController.text.trim().isNotEmpty &&
-          pincodeController.text.trim().isNotEmpty;
+          stateController.text.trim().isNotEmpty &&
+          cityController.text.trim().isNotEmpty &&
+          areaController.text.trim().isNotEmpty &&
+          pincodeController.text.trim().isNotEmpty &&
+          companyNameController.text.trim().isNotEmpty;
     });
   }
 
@@ -57,7 +111,11 @@ class _RegisterPageState extends State<RegisterPage> {
     nameController.addListener(validateForm);
     phoneController.addListener(validateForm);
     gstController.addListener(validateForm);
+    stateController.addListener(validateForm);
+    cityController.addListener(validateForm);
+    areaController.addListener(validateForm);
     pincodeController.addListener(validateForm);
+    companyNameController.addListener(validateForm);
   }
 
   @override
@@ -67,10 +125,13 @@ class _RegisterPageState extends State<RegisterPage> {
     nameController.dispose();
     phoneController.dispose();
     gstController.dispose();
+    stateController.dispose();
     cityController.dispose();
     areaController.dispose();
     pincodeController.dispose();
     companyNameController.dispose();
+    stateFocusNode.dispose();
+    cityFocusNode.dispose();
     super.dispose();
   }
 
@@ -92,7 +153,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate safe height
     final safeHeight =
         MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
@@ -147,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           // 1. EMAIL
                           AnimatedTextField(
                             controller: emailController,
-                            hintText: 'Email Address',
+                            hintText: 'Email Address *',
                             keyboardType: TextInputType.emailAddress,
                             isRequired: true,
                             validator: (value) =>
@@ -159,7 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           // 2. PASSWORD
                           AnimatedTextField(
                             controller: passwordController,
-                            hintText: 'Create Password',
+                            hintText: 'Create Password *',
                             obscureText: true,
                             isRequired: true,
                             validator: (value) =>
@@ -171,7 +231,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           // 3. NAME
                           AnimatedTextField(
                             controller: nameController,
-                            hintText: 'Full Name',
+                            hintText: 'Full Name *',
                             textCapitalization: TextCapitalization.words,
                             isRequired: true,
                             validator: (value) =>
@@ -183,7 +243,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           // 4. PHONE NUMBER
                           AnimatedTextField(
                             controller: phoneController,
-                            hintText: 'Enter Mobile Number',
+                            hintText: 'Enter Mobile Number *',
                             keyboardType: TextInputType.phone,
                             maxLength: 10,
                             isRequired: true,
@@ -201,7 +261,9 @@ class _RegisterPageState extends State<RegisterPage> {
                               showDropDownButton: false,
                               showFlag: false,
                               alignLeft: false,
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               textStyle: TextStyle(
                                 color: AppColors.textDark,
                                 fontWeight: FontWeight.w600,
@@ -217,7 +279,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           // 5. GST NUMBER
                           AnimatedTextField(
                             controller: gstController,
-                            hintText: 'GST NO.',
+                            hintText: 'GST NO. *',
                             textCapitalization: TextCapitalization.characters,
                             isRequired: true,
                             validator: (value) =>
@@ -226,24 +288,193 @@ class _RegisterPageState extends State<RegisterPage> {
                                 : null,
                           ),
 
-                          // 6. CITY
-                          AnimatedTextField(
-                            controller: cityController,
-                            hintText: 'City',
-                            textCapitalization: TextCapitalization.words,
+                          // 6. STATE (Autocomplete & Manual Entry) - 🔥 LayoutBuilder Removed!
+                          RawAutocomplete<String>(
+                            textEditingController: stateController,
+                            focusNode: stateFocusNode,
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                                  if (textEditingValue.text.isEmpty) {
+                                    return const Iterable<String>.empty();
+                                  }
+                                  return _indiaData.keys.where((String option) {
+                                    return option.toLowerCase().contains(
+                                      textEditingValue.text.toLowerCase(),
+                                    );
+                                  });
+                                },
+                            onSelected: (String selection) {
+                              cityController.clear();
+                            },
+                            fieldViewBuilder:
+                                (
+                                  context,
+                                  textController,
+                                  focusNode,
+                                  onFieldSubmitted,
+                                ) {
+                                  return AnimatedTextField(
+                                    controller: textController,
+                                    focusNode: focusNode,
+                                    hintText: 'State *',
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    isRequired: true,
+                                    validator: (value) =>
+                                        value == null || value.trim().isEmpty
+                                        ? 'State is required'
+                                        : null,
+                                  );
+                                },
+                            optionsViewBuilder: (context, onSelected, options) {
+                              return Align(
+                                alignment: Alignment.topLeft,
+                                child: Material(
+                                  color: Colors.white,
+                                  elevation: 8.0,
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: ConstrainedBox(
+                                    // 🔥 Sized using MediaQuery instead of LayoutBuilder
+                                    constraints: BoxConstraints(
+                                      maxHeight: 200,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width -
+                                          context.getScreenWidth(10),
+                                    ),
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      itemCount: options.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                            final String option = options
+                                                .elementAt(index);
+                                            return InkWell(
+                                              onTap: () => onSelected(option),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(
+                                                  context.getScreenWidth(4),
+                                                ),
+                                                child: Text(
+                                                  option,
+                                                  style: TextStyle(
+                                                    color: AppColors.textDark,
+                                                    fontSize: context
+                                                        .getScreenWidth(3.5),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
 
-                          // 7. AREA
+                          // 7. CITY (Dynamic Autocomplete based on State & Manual Entry) - 🔥 LayoutBuilder Removed!
+                          RawAutocomplete<String>(
+                            textEditingController: cityController,
+                            focusNode: cityFocusNode,
+                            optionsBuilder:
+                                (TextEditingValue textEditingValue) {
+                                  if (textEditingValue.text.isEmpty) {
+                                    return const Iterable<String>.empty();
+                                  }
+                                  final currentState = stateController.text
+                                      .trim();
+                                  final citiesInState =
+                                      _indiaData[currentState] ?? [];
+                                  return citiesInState.where((String option) {
+                                    return option.toLowerCase().contains(
+                                      textEditingValue.text.toLowerCase(),
+                                    );
+                                  });
+                                },
+                            fieldViewBuilder:
+                                (
+                                  context,
+                                  textController,
+                                  focusNode,
+                                  onFieldSubmitted,
+                                ) {
+                                  return AnimatedTextField(
+                                    controller: textController,
+                                    focusNode: focusNode,
+                                    hintText: 'City *',
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    isRequired: true,
+                                    validator: (value) =>
+                                        value == null || value.trim().isEmpty
+                                        ? 'City is required'
+                                        : null,
+                                  );
+                                },
+                            optionsViewBuilder: (context, onSelected, options) {
+                              return Align(
+                                alignment: Alignment.topLeft,
+                                child: Material(
+                                  color: Colors.white,
+                                  elevation: 8.0,
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: ConstrainedBox(
+                                    // 🔥 Sized using MediaQuery instead of LayoutBuilder
+                                    constraints: BoxConstraints(
+                                      maxHeight: 200,
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width -
+                                          context.getScreenWidth(10),
+                                    ),
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      itemCount: options.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                            final String option = options
+                                                .elementAt(index);
+                                            return InkWell(
+                                              onTap: () => onSelected(option),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(
+                                                  context.getScreenWidth(4),
+                                                ),
+                                                child: Text(
+                                                  option,
+                                                  style: TextStyle(
+                                                    color: AppColors.textDark,
+                                                    fontSize: context
+                                                        .getScreenWidth(3.5),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+
+                          // 8. AREA
                           AnimatedTextField(
                             controller: areaController,
-                            hintText: 'Area',
+                            hintText: 'Area *',
                             textCapitalization: TextCapitalization.words,
+                            isRequired: true,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                ? 'Area is required'
+                                : null,
                           ),
 
-                          // 8. PINCODE
+                          // 9. PINCODE
                           AnimatedTextField(
                             controller: pincodeController,
-                            hintText: 'Pincode',
+                            hintText: 'Pincode *',
                             keyboardType: TextInputType.number,
                             maxLength: 6,
                             isRequired: true,
@@ -253,11 +484,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                 : null,
                           ),
 
-                          // 9. COMPANY NAME
+                          // 10. COMPANY NAME
                           AnimatedTextField(
                             controller: companyNameController,
-                            hintText: 'Company Name',
+                            hintText: 'Company Name *',
                             textCapitalization: TextCapitalization.words,
+                            isRequired: true,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                ? 'Company Name is required'
+                                : null,
                           ),
 
                           SizedBox(height: context.getScreenHeight(1)),
@@ -273,13 +509,19 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: context.getScreenHeight(6),
                               child: ElevatedButton(
                                 style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.resolveWith((states) {
-                                    if (states.contains(WidgetState.disabled)) {
-                                      return AppColors.primaryGold.withValues(alpha: 0.35);
-                                    }
-                                    return AppColors.primaryGold;
-                                  }),
-                                  elevation: WidgetStateProperty.resolveWith((states) {
+                                  backgroundColor:
+                                      WidgetStateProperty.resolveWith((states) {
+                                        if (states.contains(
+                                          WidgetState.disabled,
+                                        )) {
+                                          return AppColors.primaryGold
+                                              .withValues(alpha: 0.35);
+                                        }
+                                        return AppColors.primaryGold;
+                                      }),
+                                  elevation: WidgetStateProperty.resolveWith((
+                                    states,
+                                  ) {
                                     if (states.contains(WidgetState.disabled)) {
                                       return 0;
                                     }
@@ -310,7 +552,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                             await getDeviceName();
                                         final fullPhoneNumber =
                                             '$selectedCountryCode${phoneController.text.trim()}';
-
                                         final fcmToken =
                                             NotificationService().fcmToken;
 
@@ -323,6 +564,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           deviceId: deviceID,
                                           deviceName: deviceName,
                                           gstNumber: gstController.text.trim(),
+                                          // state: stateController.text.trim(), <-- Remember to add this in AuthController if saving state!
                                           city: cityController.text.trim(),
                                           area: areaController.text.trim(),
                                           pincode: pincodeController.text
@@ -333,7 +575,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                           fcmToken: fcmToken,
                                           context: context,
                                           onSuccess: () {
-                                            // 🔥 This handles the direct routing to Login upon success
                                             Get.offNamed(AppRoutes.login);
                                             ToastUtils.showSuccess(
                                               context,
@@ -429,7 +670,6 @@ class _RegisterPageState extends State<RegisterPage> {
           onPressed: () => Get.back(),
         ),
       ),
-      // 🔥 Removed the local SafeArea wrapper here since it is now handled globally in app.dart!
       body: body,
     );
   }

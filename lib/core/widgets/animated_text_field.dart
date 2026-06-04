@@ -14,6 +14,7 @@ class AnimatedTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final double? paddingBottom;
+  final FocusNode? focusNode; // 🔥 Added this to support Autocomplete!
 
   const AnimatedTextField({
     super.key,
@@ -28,6 +29,7 @@ class AnimatedTextField extends StatefulWidget {
     this.suffixIcon,
     this.validator,
     this.paddingBottom,
+    this.focusNode, // 🔥 Added here
   });
 
   @override
@@ -35,26 +37,50 @@ class AnimatedTextField extends StatefulWidget {
 }
 
 class _AnimatedTextFieldState extends State<AnimatedTextField> {
-  final FocusNode _focusNode = FocusNode();
+  late FocusNode _focusNode;
+  bool _isLocalFocusNode = false;
 
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() => setState(() {}));
+    // Use the provided focusNode if it exists, otherwise create a local one
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    } else {
+      _focusNode = FocusNode();
+      _isLocalFocusNode = true;
+    }
+    _focusNode.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
+    _focusNode.removeListener(_onFocusChange);
+    // Only dispose the focusNode if we created it locally
+    if (_isLocalFocusNode) {
+      _focusNode.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final displayHintText = widget.isRequired ? '${widget.hintText} *' : widget.hintText;
+    // 🔥 Added a safety check: only append '*' if it doesn't already have one!
+    final displayHintText =
+        widget.isRequired && !widget.hintText.trim().endsWith('*')
+        ? '${widget.hintText} *'
+        : widget.hintText;
 
     return Padding(
-      padding: EdgeInsets.only(bottom: widget.paddingBottom ?? context.getScreenHeight(1.5)),
+      padding: EdgeInsets.only(
+        bottom: widget.paddingBottom ?? context.getScreenHeight(1.5),
+      ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -70,7 +96,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
               : [],
         ),
         child: TextFormField(
-          focusNode: _focusNode,
+          focusNode: _focusNode, // 🔥 Now perfectly wired up!
           controller: widget.controller,
           keyboardType: widget.keyboardType,
           obscureText: widget.obscureText,
@@ -106,7 +132,10 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
-              borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
+              borderSide: const BorderSide(
+                color: AppColors.primaryGold,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
