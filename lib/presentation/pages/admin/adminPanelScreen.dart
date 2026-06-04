@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 // 🔥 Import the new Ancillary Data selection screen
@@ -215,6 +216,13 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Handset Requests",
                 subtitle: "Change requests",
                 onTap: () => Get.to(() => const HandsetChangeScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.play_circle_outline_rounded,
+                title: "View Splash",
+                subtitle: "Preview splash screen",
+                onTap: () => Get.to(() => const SplashPage()),
               ),
             ],
           ),
