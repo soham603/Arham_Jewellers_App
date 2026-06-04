@@ -274,7 +274,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       color: isSelected
                           ? context.colorPalette.gold
                           : context.colorPalette.border,
-                      width: isSelected ? 2 : 1,
+                      width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -565,7 +565,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               color: isSelected
                   ? context.colorPalette.gold
                   : context.colorPalette.border,
-              width: isSelected ? 2 : 1,
+              width: 2,
             ),
           ),
           child: Center(
@@ -1100,7 +1100,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                             ? context.colorPalette.gold
                                             : context
                                                 .colorPalette.border,
-                                        width: isSubSelected ? 2 : 1,
+                                        width: 2,
                                       ),
                                     ),
                                     child: Row(
