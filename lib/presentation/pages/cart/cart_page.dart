@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CartPage extends StatefulWidget {
@@ -17,6 +24,8 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   final CartController cartController = Get.find<CartController>();
+
+  bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
   String _formatPrice(num value) {
     if (value >= 10000000) {
@@ -237,15 +246,16 @@ class _CartPageState extends State<CartPage> {
                                         SizedBox(
                                             height:
                                                 context.getScreenHeight(0.8)),
-                                        Text(
-                                          "₹${_formatPrice(price)}",
-                                          style: TextStyle(
-                                            fontSize:
-                                                context.getScreenWidth(4.8),
-                                            color: AppColors.primaryGold,
-                                            fontWeight: FontWeight.w700,
+                                        if (_isRetailer)
+                                          Text(
+                                            "₹${_formatPrice(price)}",
+                                            style: TextStyle(
+                                              fontSize:
+                                                  context.getScreenWidth(4.8),
+                                              color: AppColors.primaryGold,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
-                                        ),
                                         SizedBox(
                                             height:
                                                 context.getScreenHeight(1)),
@@ -273,7 +283,7 @@ class _CartPageState extends State<CartPage> {
                         );
                       }),
                       SizedBox(height: context.getScreenHeight(0.5)),
-                      _priceBreakdown(context),
+                      if (_isRetailer) _priceBreakdown(context),
                       SizedBox(height: context.getScreenHeight(2)),
                     ],
                   );
@@ -283,7 +293,7 @@ class _CartPageState extends State<CartPage> {
                 if (cartController.items.isEmpty) {
                   return const SizedBox.shrink();
                 }
-                return _checkoutButton(context);
+                return _actionButtons(context);
               }),
             ],
           ),
@@ -409,38 +419,129 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
-  Widget _checkoutButton(BuildContext context) {
+  Widget _actionButtons(BuildContext context) {
     return Obx(() {
       final hasItems = cartController.items.isNotEmpty;
 
-      return SizedBox(
-        width: double.infinity,
-        height: context.getScreenHeight(6.5),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: AppColors.primaryGold,
-            disabledBackgroundColor: AppColors.primaryGold.withOpacity(0.45),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+      return Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: context.getScreenHeight(6.5),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.green),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                onPressed: hasItems
+                    ? () => _enquireOnWhatsApp(context)
+                    : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const FaIcon(
+                      FontAwesomeIcons.whatsapp,
+                      color: Colors.green,
+                      size: 18,
+                    ),
+                    SizedBox(width: context.getScreenWidth(2)),
+                    Text(
+                      'Enquire',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(4.5),
+                        color: Colors.green,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          onPressed: hasItems
-              ? () {
-                  Get.toNamed(AppRoutes.checkout);
-                }
-              : null,
-          child: Text(
-            'Proceed to Checkout',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(5),
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+          SizedBox(width: context.getScreenWidth(3)),
+          Expanded(
+            flex: 2,
+            child: SizedBox(
+              height: context.getScreenHeight(6.5),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: AppColors.primaryGold,
+                  disabledBackgroundColor:
+                      AppColors.primaryGold.withOpacity(0.45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                ),
+                onPressed: hasItems
+                    ? () {
+                        Get.toNamed(AppRoutes.checkout);
+                      }
+                    : null,
+                child: Text(
+                  'Proceed',
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(5),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       );
     });
+  }
+
+  Future<void> _enquireOnWhatsApp(BuildContext context) async {
+    final items = cartController.items;
+    if (items.isEmpty) return;
+
+    final dio = Dio();
+    final tempDir = await getTemporaryDirectory();
+    final imageFiles = <File>[];
+    final buffer = StringBuffer(
+      'Hi, I\'d like to enquire about the following products from Arham Jewellers:\n\n',
+    );
+
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      final product = item.product;
+
+      buffer.writeln('${i + 1}. ${product.name}');
+      if (product.karat != null) buffer.writeln('   Karat: ${product.karat}');
+      if (product.tagNo != null) buffer.writeln('   Tag: ${product.tagNo}');
+      if (product.grossWeight != null) {
+        buffer.writeln('   Weight: ${product.grossWeight}g');
+      }
+      buffer.writeln();
+
+      final imageURL = product.displayImageUrl;
+      if (imageURL != null && imageURL.trim().isNotEmpty) {
+        try {
+          final response = await dio.get(
+            imageURL,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          final filePath = '${tempDir.path}/product_$i.jpg';
+          final file = File(filePath);
+          await file.writeAsBytes(response.data);
+          imageFiles.add(file);
+        } catch (_) {}
+      }
+    }
+
+    if (imageFiles.isNotEmpty) {
+      await Share.shareXFiles(
+        imageFiles.map((f) => XFile(f.path)).toList(),
+        text: buffer.toString(),
+      );
+    } else {
+      await Share.share(buffer.toString());
+    }
   }
 
   Widget _emptyCart(BuildContext context) {
