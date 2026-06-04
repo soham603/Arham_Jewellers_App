@@ -33,6 +33,7 @@ class AccessRequestModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final AccessRequestUser? user;
+  final bool isRetailer;
 
   AccessRequestModel({
     required this.id,
@@ -43,6 +44,7 @@ class AccessRequestModel {
     required this.createdAt,
     required this.updatedAt,
     this.user,
+    this.isRetailer = false,
   });
 
   factory AccessRequestModel.fromJson(Map<String, dynamic> json) {
@@ -59,10 +61,11 @@ class AccessRequestModel {
       user: json['user'] != null
           ? AccessRequestUser.fromJson(json['user'])
           : null,
+      isRetailer: json['isRetailer'] ?? false,
     );
   }
 
-  AccessRequestModel copyWith({String? status, DateTime? approvedTill, bool clearApprovedTill = false}) {
+  AccessRequestModel copyWith({String? status, DateTime? approvedTill, bool clearApprovedTill = false, bool? isRetailer}) {
     return AccessRequestModel(
       id: id,
       userId: userId,
@@ -72,6 +75,7 @@ class AccessRequestModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       user: user,
+      isRetailer: isRetailer ?? this.isRetailer,
     );
   }
 }

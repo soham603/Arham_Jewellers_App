@@ -2,10 +2,13 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatefulWidget {
@@ -185,6 +188,19 @@ class _ProductCardState extends State<ProductCard>
                                   fontSize: metaSize,
                                 ),
                               ),
+                            if (!widget.compact && _showRetailerPrice(product))
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  hPad,
+                                  gap3,
+                                  hPad,
+                                  vPad,
+                                ),
+                                child: _RetailerPrice(
+                                  product: product,
+                                  fontSize: metaSize,
+                                ),
+                              ),
                             if (!widget.compact)
                               SizedBox(height: gap3),
                             if (!widget.compact)
@@ -249,6 +265,20 @@ class _ProductCardState extends State<ProductCard>
   static bool _isRecent(ProductModel product) {
     if (product.createdAt == null) return false;
     return DateTime.now().difference(product.createdAt!).inDays < 7;
+  }
+
+  static bool _showRetailerPrice(ProductModel product) {
+    if (product.fineWeight == null) return false;
+    try {
+      final auth = Get.find<AuthController>();
+      final isRetailer = auth.user?.isRetailer == true;
+      final isAdmin = auth.isAdmin;
+      if (!isRetailer && !isAdmin) return false;
+      final goldRate = Get.find<GoldRateController>().currentRate;
+      return goldRate != null;
+    } catch (_) {
+      return false;
+    }
   }
 }
 
@@ -479,6 +509,57 @@ class _PurityRow extends StatelessWidget {
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
+  }
+}
+
+class _RetailerPrice extends StatelessWidget {
+  const _RetailerPrice({
+    required this.product,
+    required this.fontSize,
+  });
+
+  final ProductModel product;
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final goldRate = Get.find<GoldRateController>().currentRate;
+    if (goldRate == null || product.fineWeight == null) {
+      return const SizedBox.shrink();
+    }
+
+    final base = product.fineWeight! * goldRate.ratePerGram;
+    final labour = base * 0.10;
+    final subtotal = base + labour;
+    final gst = subtotal * 0.03;
+    final total = subtotal + gst;
+
+    final formatted = _formatPrice(total);
+
+    return Row(
+      children: [
+        Text(
+          '₹$formatted',
+          style: TextStyle(
+            fontSize: fontSize + 4,
+            color: AppColors.primaryGold,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _formatPrice(double price) {
+    final rounded = price.round();
+    final parts = rounded.toStringAsFixed(0).split('.');
+    final intPart = parts[0];
+    final buffer = StringBuffer();
+    for (int i = 0; i < intPart.length; i++) {
+      if (i > 0 && (intPart.length - i) % 3 == 0) buffer.write(',');
+      buffer.write(intPart[i]);
+    }
+    return buffer.toString();
   }
 }
 

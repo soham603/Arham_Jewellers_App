@@ -237,6 +237,7 @@ class AdminUserController extends GetxController {
   Future<bool> approveRequest({
     required String requestId,
     required DateTime approvedTillDate,
+    bool isRetailer = false,
   }) async {
     return _handleAction(
       requestId: requestId,
@@ -244,10 +245,12 @@ class AdminUserController extends GetxController {
         'requestId': requestId,
         'action': 'APPROVED',
         'approvedTillDate': approvedTillDate.toIso8601String(),
+        'isRetailer': isRetailer,
       },
       onSuccess: (req) => req.copyWith(
         status: 'APPROVED', 
-        approvedTill: approvedTillDate
+        approvedTill: approvedTillDate,
+        isRetailer: isRetailer,
       ),
     );
   }

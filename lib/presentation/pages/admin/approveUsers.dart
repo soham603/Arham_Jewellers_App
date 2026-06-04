@@ -475,140 +475,201 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     AccessRequestModel req,
     DateTime date,
   ) {
+    bool isRetailer = false;
+
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: context.colorPalette.backgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.check_circle_rounded,
-                color: Colors.green,
-                size: 20,
-              ),
-            ),
-            SizedBox(width: context.getScreenWidth(2)),
-            Text(
-              req.status == 'APPROVED' ? 'Extend Access' : 'Approve Access',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(4.5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              req.status == 'APPROVED'
-                  ? 'Extend access for ${req.user?.name ?? 'this user'} until:'
-                  : 'Grant access to ${req.user?.name ?? 'this user'} until:',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
-                color: context.colorPalette.textColor,
-              ),
-            ),
-            SizedBox(height: context.getScreenHeight(1)),
-            Container(
-              padding: EdgeInsets.all(context.getScreenWidth(3)),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.green.withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_today_rounded,
-                    color: Colors.green,
-                    size: 16,
-                  ),
-                  SizedBox(width: context.getScreenWidth(2)),
-                  Text(
-                    DateFormat('dd MMM yyyy').format(date),
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(3.5),
-                      fontWeight: FontWeight.w700,
-                      color: Colors.green.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (req.approvedTill != null && req.status == 'APPROVED')
-              Padding(
-                padding: EdgeInsets.only(top: context.getScreenHeight(1)),
-                child: Text(
-                  'Current access until: ${DateFormat('dd MMM yyyy').format(req.approvedTill!.toLocal())}',
-                  style: TextStyle(
-                    fontSize: context.getScreenWidth(3),
-                    color: context.colorPalette.subTitleColor,
-                  ),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: context.colorPalette.backgroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.green,
+                  size: 20,
                 ),
               ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: context.colorPalette.subTitleColor),
-            ),
+              SizedBox(width: context.getScreenWidth(2)),
+              Text(
+                req.status == 'APPROVED' ? 'Extend Access' : 'Approve Access',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4.5),
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+            ],
           ),
-          Obx(
-            () => ElevatedButton(
-              onPressed: controller.actionState == CurrentAppState.LOADING
-                  ? null
-                  : () async {
-                      final ok = await controller.approveRequest(
-                        requestId: req.id,
-                        approvedTillDate: date,
-                      );
-                      if (context.mounted) {
-                        Get.back();
-                        _snack(
-                          context,
-                          ok ? 'Access ${req.status == 'APPROVED' ? 'extended' : 'approved'} ✅' : controller.error,
-                          isError: !ok,
-                        );
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                req.status == 'APPROVED'
+                    ? 'Extend access for ${req.user?.name ?? 'this user'} until:'
+                    : 'Grant access to ${req.user?.name ?? 'this user'} until:',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.8),
+                  color: context.colorPalette.textColor,
+                ),
+              ),
+              SizedBox(height: context.getScreenHeight(1)),
+              Container(
+                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.06),
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.green.withOpacity(0.2)),
                 ),
-              ),
-              child: controller.actionState == CurrentAppState.LOADING
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      req.status == 'APPROVED' ? 'Extend' : 'Approve',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.calendar_today_rounded,
+                      color: Colors.green,
+                      size: 16,
+                    ),
+                    SizedBox(width: context.getScreenWidth(2)),
+                    Text(
+                      DateFormat('dd MMM yyyy').format(date),
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.5),
+                        fontWeight: FontWeight.w700,
+                        color: Colors.green.shade700,
                       ),
                     ),
-            ),
+                  ],
+                ),
+              ),
+              if (req.approvedTill != null && req.status == 'APPROVED')
+                Padding(
+                  padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+                  child: Text(
+                    'Current access until: ${DateFormat('dd MMM yyyy').format(req.approvedTill!.toLocal())}',
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(3),
+                      color: context.colorPalette.subTitleColor,
+                    ),
+                  ),
+                ),
+              SizedBox(height: context.getScreenHeight(1.5)),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(3),
+                  vertical: context.getScreenHeight(0.5),
+                ),
+                decoration: BoxDecoration(
+                  color: isRetailer
+                      ? const Color(0xFFD4AF37).withOpacity(0.1)
+                      : context.colorPalette.boxColor,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isRetailer
+                        ? const Color(0xFFD4AF37).withOpacity(0.4)
+                        : context.colorPalette.subTitleColor.withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.store_rounded,
+                      color: isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
+                      size: context.getScreenWidth(5),
+                    ),
+                    SizedBox(width: context.getScreenWidth(3)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mark as Retailer',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(3.5),
+                              fontWeight: FontWeight.w600,
+                              color: context.colorPalette.textColor,
+                            ),
+                          ),
+                          Text(
+                            'Grant retailer privileges',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.8),
+                              color: context.colorPalette.subTitleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: isRetailer,
+                      onChanged: (val) => setDialogState(() => isRetailer = val),
+                      activeColor: const Color(0xFFD4AF37),
+                      activeTrackColor: const Color(0xFFD4AF37).withOpacity(0.3),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: context.colorPalette.subTitleColor),
+              ),
+            ),
+            Obx(
+              () => ElevatedButton(
+                onPressed: controller.actionState == CurrentAppState.LOADING
+                    ? null
+                    : () async {
+                        final ok = await controller.approveRequest(
+                          requestId: req.id,
+                          approvedTillDate: date,
+                          isRetailer: isRetailer,
+                        );
+                        if (context.mounted) {
+                          Get.back();
+                          _snack(
+                            context,
+                            ok ? 'Access ${req.status == 'APPROVED' ? 'extended' : 'approved'} ✅' : controller.error,
+                            isError: !ok,
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: controller.actionState == CurrentAppState.LOADING
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        req.status == 'APPROVED' ? 'Extend' : 'Approve',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1161,6 +1222,43 @@ class _RequestCardState extends State<_RequestCard> {
                       ),
                     ),
                   ],
+
+                  // Retailer badge
+                  if (req.isRetailer)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getScreenWidth(3),
+                          vertical: context.getScreenHeight(0.8),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD4AF37).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFD4AF37).withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.store_rounded,
+                              color: Color(0xFFD4AF37),
+                              size: 18,
+                            ),
+                            SizedBox(width: context.getScreenWidth(2)),
+                            Text(
+                              'Retailer',
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(3.5),
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFFD4AF37),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
 
                   SizedBox(height: context.getScreenHeight(1.5)),
 

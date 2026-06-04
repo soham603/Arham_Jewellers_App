@@ -28,6 +28,7 @@ import '../../controllers/navigation_controller.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/profile/goldRateDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 
@@ -169,7 +170,33 @@ class _HomePageState extends State<HomePage> {
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 14),
-                          child: HomeSearchBar(onScannerTap: _openScanner),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: HomeSearchBar(onScannerTap: _openScanner),
+                              ),
+                              const SizedBox(width: 10),
+                              GestureDetector(
+                                onTap: () => Get.to(() => const GoldRateDetailScreen()),
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF5F1EC),
+                                    borderRadius: BorderRadius.circular(50),
+                                    border: Border.all(
+                                      color: context.colorPalette.gold.withOpacity(0.2),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.show_chart_rounded,
+                                    color: context.colorPalette.goldDark,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
 
                         const SizedBox(height: 18),

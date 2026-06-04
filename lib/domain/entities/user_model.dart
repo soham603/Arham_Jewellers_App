@@ -18,6 +18,7 @@ class UserModel {
   final String? role;
   final String? userActivationStatus;
   final bool? completedProfile;
+  final bool? isRetailer;
 
   UserModel({
     required this.id,
@@ -39,6 +40,7 @@ class UserModel {
     this.role,
     this.userActivationStatus,
     this.completedProfile,
+    this.isRetailer,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,7 @@ class UserModel {
       role: json['role'],
       userActivationStatus: json['userActivationStatus'],
       completedProfile: json['completedProfile'],
+      isRetailer: json['isRetailer'],
     );
   }
 
@@ -86,6 +89,7 @@ class UserModel {
       'role': role,
       'userActivationStatus': userActivationStatus,
       'completedProfile': completedProfile,
+      'isRetailer': isRetailer,
     };
   }
 }
