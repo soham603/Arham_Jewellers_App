@@ -152,12 +152,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildFormSection(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 400),
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: Text(
@@ -412,6 +415,8 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }

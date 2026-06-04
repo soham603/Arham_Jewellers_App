@@ -83,7 +83,10 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         horizontal: context.getScreenWidth(5),
                         vertical: context.getScreenHeight(1),
                       ),
-                      child: Column(
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 400),
+                          child: Column(
                         children: [
                           // 1. Logo (Smaller as requested)
                           Center(
@@ -116,7 +119,9 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                       ),
                     ),
                   ),
-                );
+                ),
+              ),
+            );
             },
           ),
         ),

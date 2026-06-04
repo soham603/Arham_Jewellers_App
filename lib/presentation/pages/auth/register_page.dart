@@ -178,11 +178,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       MediaQuery.of(context).viewInsets.bottom +
                           context.getScreenHeight(2),
                     ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                      child: Form(
+                        key: _formKey,
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 400),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                           SizedBox(height: context.getScreenHeight(2)),
 
                           Text(
@@ -652,11 +655,13 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-        ],
+        ),
       ),
-    );
+    ],
+  ),
+);
 
-    return Scaffold(
+  return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,

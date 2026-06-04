@@ -153,10 +153,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         (_tempWeightMin > 0 || _tempWeightMax < 500 ? 1 : 0);
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: context.isTablet
+          ? MediaQuery.of(context).size.height * 0.55
+          : MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(context.responsiveWidth(20, tabletVal: 24))),
       ),
       child: Column(
         children: [
@@ -165,7 +167,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           Divider(height: 1, color: context.colorPalette.border),
           Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 20)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -188,48 +190,55 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget _buildHandle() {
+    final handleWidth = context.responsiveWidth(40, tabletVal: 48);
+    final handleHeight = context.responsiveWidth(4, tabletVal: 5);
     return Container(
-      margin: const EdgeInsets.only(top: 10),
-      width: 40,
-      height: 4,
+      margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
+      width: handleWidth,
+      height: handleHeight,
       decoration: BoxDecoration(
         color: context.colorPalette.goldDark.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(handleHeight * 0.5),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context, int count) {
+    final hPad = context.responsiveWidth(20, tabletVal: 24);
+    final vPad = context.responsiveWidth(12, tabletVal: 14);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, vPad),
       child: Row(
         children: [
           Icon(
             Icons.tune_rounded,
-            size: 20,
+            size: context.responsiveWidth(20, tabletVal: 24),
             color: context.colorPalette.goldDark,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
           Text(
             'Filter Products',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: context.responsiveWidth(18, tabletVal: 22),
               fontWeight: FontWeight.w700,
               color: context.colorPalette.goldDeep,
             ),
           ),
           if (count > 0) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.responsiveWidth(8, tabletVal: 10),
+                vertical: context.responsiveWidth(2, tabletVal: 3),
+              ),
               decoration: BoxDecoration(
                 color: context.colorPalette.gold,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
               ),
               child: Text(
                 '$count',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: context.responsiveWidth(12, tabletVal: 14),
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -821,37 +830,44 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
         : Get.put(CategoryController());
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
+      height: context.isTablet
+          ? MediaQuery.of(context).size.height * 0.5
+          : MediaQuery.of(context).size.height * 0.6,
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(context.responsiveWidth(20, tabletVal: 24))),
       ),
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 10),
-            width: 40,
-            height: 4,
+            margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
+            width: context.responsiveWidth(40, tabletVal: 48),
+            height: context.responsiveWidth(4, tabletVal: 5),
             decoration: BoxDecoration(
               color: context.colorPalette.goldDark.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(16, tabletVal: 20),
+        context.responsiveWidth(10, tabletVal: 12),
+        context.responsiveWidth(16, tabletVal: 20),
+        context.responsiveWidth(10, tabletVal: 12),
+      ),
       child: Row(
               children: [
                 Icon(
                   Icons.grid_view_rounded,
-                  size: 20,
+                  size: context.responsiveWidth(20, tabletVal: 24),
                   color: context.colorPalette.goldDark,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
                 Expanded(
                   child: Text(
                     'Select Categories',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: context.responsiveWidth(18, tabletVal: 22),
                       fontWeight: FontWeight.w700,
                       color: context.colorPalette.goldDeep,
                     ),
@@ -863,7 +879,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                     child: Text(
                       'Clear',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: context.responsiveWidth(14, tabletVal: 16),
                         color: context.colorPalette.goldDark,
                         fontWeight: FontWeight.w600,
                       ),
@@ -881,14 +897,14 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                       children: [
                         Icon(
                           Icons.category_outlined,
-                          size: 48,
+                          size: context.responsiveWidth(48, tabletVal: 56),
                           color: context.colorPalette.goldDark,
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: context.responsiveWidth(12, tabletVal: 14)),
                         Text(
                           'No categories found',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: context.responsiveWidth(14, tabletVal: 16),
                             color: context.colorPalette.goldDark,
                           ),
                         ),
@@ -905,7 +921,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                       }
                     }
                     return ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 20)),
                       itemCount: widget.categories.length,
                       itemBuilder: (_, index) {
                         final cat = widget.categories[index];
@@ -939,33 +955,33 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                     if (cat.imageUrl.isNotEmpty) ...[
                                       ClipRRect(
                                         borderRadius:
-                                            BorderRadius.circular(8),
+                                            BorderRadius.circular(context.responsiveWidth(8, tabletVal: 10)),
                                         child: Image.network(
                                           cat.imageUrl,
-                                          width: 36,
-                                          height: 36,
+                                          width: context.responsiveWidth(36, tabletVal: 44),
+                                          height: context.responsiveWidth(36, tabletVal: 44),
                                           fit: BoxFit.cover,
                                           errorBuilder:
                                               (ctx, err, stack) =>
                                                   Container(
-                                            width: 36,
-                                            height: 36,
+                                            width: context.responsiveWidth(36, tabletVal: 44),
+                                            height: context.responsiveWidth(36, tabletVal: 44),
                                             decoration: BoxDecoration(
                                               color: context
                                                   .colorPalette.goldLight,
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(context.responsiveWidth(8, tabletVal: 10)),
                                             ),
                                             child: Icon(
                                               Icons.diamond_outlined,
                                               color: context
                                                   .colorPalette.goldDark,
-                                              size: 18,
+                                              size: context.responsiveWidth(18, tabletVal: 22),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: context.responsiveWidth(12, tabletVal: 14)),
                                     ],
                                     Expanded(
                                       child: Text(
@@ -980,7 +996,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                             )
                                             .trim(),
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: context.responsiveWidth(14, tabletVal: 16),
                                           fontWeight: FontWeight.w600,
                                           color: context
                                               .colorPalette.goldDeep,
@@ -998,8 +1014,8 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                       ),
                                     if (isLoading)
                                       SizedBox(
-                                        width: 18,
-                                        height: 18,
+                                        width: context.responsiveWidth(18, tabletVal: 22),
+                                        height: context.responsiveWidth(18, tabletVal: 22),
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color:
@@ -1031,15 +1047,17 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                   }
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.only(
-                                      left: 24, top: 4, bottom: 4),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
+                                  margin: EdgeInsets.only(
+                                      left: context.responsiveWidth(24, tabletVal: 28),
+                                      top: context.responsiveWidth(4, tabletVal: 5),
+                                      bottom: context.responsiveWidth(4, tabletVal: 5)),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: context.responsiveWidth(14, tabletVal: 18),
+                                    vertical: context.responsiveWidth(10, tabletVal: 12),
                                   ),
                                   decoration: BoxDecoration(
                                     color: context.colorPalette.cardBg,
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
                                     border: Border.all(
                                       color: context.colorPalette.border,
                                     ),
@@ -1050,7 +1068,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                         child: Text(
                                           'All',
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: context.responsiveWidth(13, tabletVal: 15),
                                             fontWeight: FontWeight.w700,
                                             color: context
                                                 .colorPalette.goldDeep,
@@ -1059,7 +1077,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                       ),
                                       Icon(
                                         Icons.select_all_rounded,
-                                        size: 18,
+                                        size: context.responsiveWidth(18, tabletVal: 22),
                                         color:
                                             context.colorPalette.goldDark,
                                       ),
@@ -1082,11 +1100,13 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                 return GestureDetector(
                                   onTap: () => _toggle(sub),
                                   child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 24, top: 4, bottom: 4),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
+                                    margin: EdgeInsets.only(
+                                        left: context.responsiveWidth(24, tabletVal: 28),
+                                        top: context.responsiveWidth(4, tabletVal: 5),
+                                        bottom: context.responsiveWidth(4, tabletVal: 5)),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.responsiveWidth(14, tabletVal: 18),
+                                      vertical: context.responsiveWidth(10, tabletVal: 12),
                                     ),
                                     decoration: BoxDecoration(
                                       color: isSubSelected
@@ -1094,7 +1114,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                           : context
                                               .colorPalette.backgroundColor,
                                       borderRadius:
-                                          BorderRadius.circular(10),
+                                          BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
                                       border: Border.all(
                                         color: isSubSelected
                                             ? context.colorPalette.gold
@@ -1109,7 +1129,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                           child: Text(
                                             cleanedName,
                                             style: TextStyle(
-                                              fontSize: 13,
+                                              fontSize: context.responsiveWidth(13, tabletVal: 15),
                                               fontWeight: isSubSelected
                                                   ? FontWeight.w700
                                                   : FontWeight.w500,
@@ -1123,16 +1143,16 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                         ),
                                         if (isSubSelected)
                                           Container(
-                                            width: 20,
-                                            height: 20,
+                                            width: context.responsiveWidth(20, tabletVal: 24),
+                                            height: context.responsiveWidth(20, tabletVal: 24),
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               color: context
                                                   .colorPalette.gold,
                                             ),
-                                            child: const Icon(
+                                            child: Icon(
                                               Icons.check,
-                                              size: 12,
+                                              size: context.responsiveWidth(12, tabletVal: 14),
                                               color: Colors.white,
                                             ),
                                           ),

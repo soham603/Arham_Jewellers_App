@@ -263,10 +263,10 @@ class _SharePageState extends State<SharePage> {
             vertical: context.getScreenHeight(0.5),
           ),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
             mainAxisSpacing: context.getScreenWidth(2.5),
             crossAxisSpacing: context.getScreenWidth(2.5),
-            childAspectRatio: 0.62,
+            childAspectRatio: context.isTablet ? 0.68 : 0.62,
           ),
           itemCount: products.length + (controller.hasMore ? 1 : 0),
           itemBuilder: (context, index) {
@@ -417,10 +417,10 @@ class _SharePageState extends State<SharePage> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
           mainAxisSpacing: context.getScreenWidth(2.5),
           crossAxisSpacing: context.getScreenWidth(2.5),
-          childAspectRatio: 0.62,
+          childAspectRatio: context.isTablet ? 0.68 : 0.62,
         ),
         itemBuilder: (context, _) => Container(
           decoration: BoxDecoration(

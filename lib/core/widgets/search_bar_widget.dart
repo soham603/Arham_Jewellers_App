@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
@@ -44,8 +45,19 @@ class SearchBarWidget extends StatelessWidget {
     final isTransparentOuter = outerBackgroundColor == Colors.transparent;
     final isTransparentBar = barBackgroundColor == Colors.transparent;
 
+    final iconSize = context.responsiveWidth(20, tabletVal: 24);
+    final smallIconSize = context.responsiveWidth(18, tabletVal: 22);
+    final filterIconSize = context.responsiveWidth(22, tabletVal: 26);
+    final hPad = context.responsiveWidth(16, tabletVal: 20);
+    final vPad = context.responsiveWidth(10, tabletVal: 12);
+    final spacing = context.responsiveWidth(10, tabletVal: 12);
+    final textSize = context.responsiveWidth(15, tabletVal: 17);
+    final hintSize = context.responsiveWidth(14, tabletVal: 16);
+    final badgeFontSize = context.responsiveWidth(9, tabletVal: 10);
+    const pillRadius = 50.0;
+
     return Container(
-      padding: isTransparentOuter ? EdgeInsets.zero : const EdgeInsets.fromLTRB(16, 10, 8, 10),
+      padding: isTransparentOuter ? EdgeInsets.zero : EdgeInsets.fromLTRB(hPad, vPad * 0.8, hPad * 0.5, vPad * 0.8),
       decoration: BoxDecoration(
         color: outerBackgroundColor ?? Colors.white,
       ),
@@ -54,20 +66,20 @@ class SearchBarWidget extends StatelessWidget {
           if (onBack != null)
             GestureDetector(
               onTap: onBack,
-              child: const Padding(
-                padding: EdgeInsets.only(right: 8),
+              child: Padding(
+                padding: EdgeInsets.only(right: spacing * 0.8),
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  size: 20,
+                  size: iconSize,
                   color: _goldDark,
                 ),
               ),
             ),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(pillRadius),
                 color: barBackgroundColor ?? _barColor,
                 border: isTransparentBar
                     ? null
@@ -87,20 +99,20 @@ class SearchBarWidget extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.search_rounded,
                     color: _goldDark,
-                    size: 20,
+                    size: iconSize,
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: spacing),
                   Expanded(
                     child: TextField(
                       controller: controller,
                       focusNode: focusNode,
                       autofocus: autofocus,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFF000000),
+                      style: TextStyle(
+                        fontSize: textSize,
+                        color: const Color(0xFF000000),
                       ),
                       decoration: InputDecoration(
                         isDense: true,
@@ -113,10 +125,10 @@ class SearchBarWidget extends StatelessWidget {
                         filled: true,
                         fillColor: Colors.transparent,
                         hintText: hintText ?? 'Search gold, diamonds, rings...',
-                        hintStyle: const TextStyle(
-                          fontSize: 14,
+                        hintStyle: TextStyle(
+                          fontSize: hintSize,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF9E9590),
+                          color: const Color(0xFF9E9590),
                         ),
                       ),
                       onChanged: onChanged,
@@ -126,19 +138,19 @@ class SearchBarWidget extends StatelessWidget {
                   if (controller.text.isNotEmpty && onClear != null)
                     GestureDetector(
                       onTap: onClear,
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
-                        size: 20,
+                        size: iconSize,
                         color: _goldDark,
                       ),
                     )
                   else if (showScanner)
                     GestureDetector(
                       onTap: onScannerTap,
-                      child: const Icon(
+                      child: Icon(
                         Icons.qr_code_scanner_rounded,
                         color: _goldDark,
-                        size: 18,
+                        size: smallIconSize,
                       ),
                     ),
                 ],
@@ -146,16 +158,16 @@ class SearchBarWidget extends StatelessWidget {
             ),
           ),
           if (onFilterTap != null) ...[
-            const SizedBox(width: 8),
+            SizedBox(width: spacing * 0.8),
             GestureDetector(
               onTap: onFilterTap,
               child: Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(spacing * 0.8),
                     child: Icon(
                       Icons.tune_rounded,
-                      size: 22,
+                      size: filterIconSize,
                       color: filterActiveCount > 0
                           ? _goldDark
                           : _goldDark.withOpacity(0.6),
@@ -163,18 +175,18 @@ class SearchBarWidget extends StatelessWidget {
                   ),
                   if (filterActiveCount > 0)
                     Positioned(
-                      top: 4,
-                      right: 4,
+                      top: spacing * 0.2,
+                      right: spacing * 0.2,
                       child: Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: EdgeInsets.all(spacing * 0.35),
                         decoration: const BoxDecoration(
                           color: _goldDark,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
                           '$filterActiveCount',
-                          style: const TextStyle(
-                            fontSize: 9,
+                          style: TextStyle(
+                            fontSize: badgeFontSize,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),

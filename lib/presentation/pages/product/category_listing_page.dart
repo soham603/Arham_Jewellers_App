@@ -278,11 +278,11 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: categories.length,
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
-                      childAspectRatio: 0.85,
+                      childAspectRatio: context.isTablet ? 0.72 : 0.85,
                     ),
                     itemBuilder: (_, index) {
                       final cat = categories[index];
@@ -461,8 +461,8 @@ class _KaratSectionHeader extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 38,
-              height: 38,
+              width: context.responsiveWidth(38, tabletVal: 46),
+              height: context.responsiveWidth(38, tabletVal: 46),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -474,6 +474,8 @@ class _KaratSectionHeader extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(2),
               child: Container(
                 decoration: BoxDecoration(
@@ -561,11 +563,11 @@ class _CategoryGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: categories.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.85,
+        childAspectRatio: context.isTablet ? 0.72 : 0.85,
       ),
       itemBuilder: (_, index) {
         final cat = categories[index];
@@ -607,16 +609,21 @@ class _Level3Sheet extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 10),
-            width: 40,
-            height: 4,
+            margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
+            width: context.responsiveWidth(40, tabletVal: 48),
+            height: context.responsiveWidth(4, tabletVal: 5),
             decoration: BoxDecoration(
               color: context.colorPalette.goldDark.withOpacity(0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+            padding: EdgeInsets.fromLTRB(
+              context.responsiveWidth(20, tabletVal: 24),
+              context.responsiveWidth(16, tabletVal: 18),
+              context.responsiveWidth(20, tabletVal: 24),
+              context.responsiveWidth(12, tabletVal: 14),
+            ),
             child: Row(
               children: [
                 Icon(Icons.grid_view_rounded,
@@ -654,8 +661,8 @@ class _Level3Sheet extends StatelessWidget {
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: children.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.78,

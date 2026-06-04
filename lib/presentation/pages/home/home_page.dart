@@ -385,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                           if (state == CurrentAppState.LOADING &&
                               products.isEmpty) {
                             return SizedBox(
-                              height: 260,
+                              height: context.getScreenHeight(34),
                               child: ListView.separated(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -433,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                           Container(
-                                            height: 110,
+                                            height: context.getScreenHeight(14),
                                             padding: const EdgeInsets.all(10),
                                             child: Column(
                                               crossAxisAlignment:
@@ -924,8 +924,8 @@ class _Level3Panel extends StatelessWidget {
 
               itemCount: children.length,
 
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.78,
@@ -1080,7 +1080,7 @@ class _ProductSection extends StatelessWidget {
 
             if (state == CurrentAppState.LOADING) {
               return SizedBox(
-                height: 280,
+                height: context.getScreenHeight(36),
                 child: Center(
                   child: CircularProgressIndicator(
                     color: context.colorPalette.gold,
@@ -1091,7 +1091,7 @@ class _ProductSection extends StatelessWidget {
 
             if (state == CurrentAppState.ERROR || products.isEmpty) {
               return SizedBox(
-                height: 120,
+                height: context.getScreenHeight(16),
                 child: Center(
                   child: Text(
                     'No products found',
@@ -1108,11 +1108,11 @@ class _ProductSection extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.488,
+                childAspectRatio: context.isTablet ? 0.55 : 0.488,
               ),
               itemBuilder: (_, index) {
                 final product = products[index];
@@ -1243,8 +1243,8 @@ class _Level3Shimmer extends StatelessWidget {
 
       itemCount: 6,
 
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
         childAspectRatio: 0.78,
@@ -1447,7 +1447,7 @@ class _QuickStatsStrip extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 60,
+      height: context.getScreenHeight(8),
 
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1523,7 +1523,7 @@ class _CarouselSection extends StatelessWidget {
       if (controller.getCarouselState == CurrentAppState.ERROR) {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
-          height: 160,
+          height: context.getScreenHeight(20),
 
           decoration: BoxDecoration(
             color: Colors.red.withOpacity(0.06),

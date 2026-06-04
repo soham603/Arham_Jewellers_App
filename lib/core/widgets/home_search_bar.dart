@@ -92,6 +92,15 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = context.responsiveWidth(20, tabletVal: 24);
+    final smallIconSize = context.responsiveWidth(18, tabletVal: 22);
+    final spacing = context.responsiveWidth(12, tabletVal: 14);
+    final hPad = context.responsiveWidth(14, tabletVal: 18);
+    final vPad = context.responsiveWidth(5, tabletVal: 7);
+    final fontSize = context.responsiveWidth(14, tabletVal: 16);
+    final stackHeight = context.responsiveWidth(20, tabletVal: 24);
+    final searchTextWidth = context.getScreenWidth(14);
+
     return GestureDetector(
       onTap: () {
         try {
@@ -102,7 +111,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
       },
 
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
 
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(50),
@@ -125,33 +134,33 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
             Icon(
               Icons.search_rounded,
               color: context.colorPalette.goldDark,
-              size: 20,
+              size: iconSize,
             ),
 
-            const SizedBox(width: 12),
+            SizedBox(width: spacing),
 
             Expanded(
               child: _categoryNames.isNotEmpty
                   ? SizedBox(
-                      height: 20,
+                      height: stackHeight,
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
-                          const Positioned(
+                          Positioned(
                             left: 0,
                             top: 0,
                             bottom: 0,
                             child: Text(
                               'Search ',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: fontSize,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9E9590),
+                                color: const Color(0xFF9E9590),
                               ),
                             ),
                           ),
                           Positioned(
-                            left: 52,
+                            left: searchTextWidth,
                             top: 0,
                             bottom: 0,
                             right: 0,
@@ -176,10 +185,10 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                                   _currentCategoryName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 14,
+                                  style: TextStyle(
+                                    fontSize: fontSize,
                                     fontWeight: FontWeight.w400,
-                                    color: Color(0xFF9E9590),
+                                    color: const Color(0xFF9E9590),
                                   ),
                                 ),
                               ),
@@ -188,12 +197,12 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                         ],
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'Search',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: fontSize,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF9E9590),
+                        color: const Color(0xFF9E9590),
                       ),
                     ),
             ),
@@ -204,14 +213,14 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                 child: Icon(
                   Icons.qr_code_scanner_rounded,
                   color: context.colorPalette.goldDark,
-                  size: 18,
+                  size: smallIconSize,
                 ),
               )
             else
               Icon(
                 Icons.qr_code_scanner_rounded,
                 color: context.colorPalette.goldDark,
-                size: 18,
+                size: smallIconSize,
               ),
           ],
         ),

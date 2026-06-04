@@ -2,26 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/utils/ColorPallete.dart';
 import 'package:ratnesh_gold_app/utils/TextThemeDecoration.dart';
 
-extension ContextExtensions on BuildContext {
-  // Get the current theme
-  ThemeData get theme => Theme.of(this);
+extension AppContextExtensions on BuildContext {
+  ColorPalette get colorPalette => ColorPalette(Theme.of(this).brightness == Brightness.dark);
 
-  bool get isDarkMode => theme.brightness == Brightness.dark;
-
-  ColorPalette get colorPalette => ColorPalette(isDarkMode);
-
-  TextThemeDecoration get textThemeDecoration => TextThemeDecoration(isDarkMode, this);
+  TextThemeDecoration get textThemeDecoration =>
+      TextThemeDecoration(Theme.of(this).brightness == Brightness.dark, this);
 
   double getScreenWidth(double percentage) => MediaQuery.of(this).size.width * (percentage / 100);
 
   double getScreenHeight(double percentage) => MediaQuery.of(this).size.height * (percentage / 100);
 
-  Orientation get orientation => MediaQuery.of(this).orientation;
+  double get maxContentWidth => 600.0;
 
-  bool get isLandscape => orientation == Orientation.landscape;
-  bool get isPortrait => orientation == Orientation.portrait;
+  double responsiveWidth(double phoneVal, {double? tabletVal}) =>
+      _isTablet ? (tabletVal ?? phoneVal * 1.15) : phoneVal;
 
-  TargetPlatform get platform => theme.platform;
+  double responsiveFont(double baseSize, {double tabletMultiplier = 1.1}) =>
+      _isTablet ? baseSize * tabletMultiplier : baseSize;
+
+  int gridColumns({int phone = 2, int tablet = 3}) =>
+      _isTablet ? tablet : phone;
+
+  bool get _isTablet => MediaQuery.of(this).size.width >= 600;
+
+  TargetPlatform get platform => Theme.of(this).platform;
   bool get isIOS => platform == TargetPlatform.iOS;
   bool get isAndroid => platform == TargetPlatform.android;
   bool get isMacOS => platform == TargetPlatform.macOS;

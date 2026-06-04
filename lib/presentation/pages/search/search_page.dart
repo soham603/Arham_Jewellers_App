@@ -929,10 +929,10 @@ class _SearchPageState extends State<SearchPage> {
         childCount: list.length,
       ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
         mainAxisSpacing: context.getScreenWidth(2),
         crossAxisSpacing: context.getScreenWidth(2),
-        childAspectRatio: 0.66,
+        childAspectRatio: context.isTablet ? 0.72 : 0.66,
       ),
     );
   }
@@ -946,10 +946,10 @@ class _SearchPageState extends State<SearchPage> {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
         mainAxisSpacing: context.getScreenWidth(2),
         crossAxisSpacing: context.getScreenWidth(2),
-        childAspectRatio: 0.488,
+        childAspectRatio: context.isTablet ? 0.55 : 0.488,
       ),
         itemBuilder: (context, _) => _shimmerCard(context),
       ),
