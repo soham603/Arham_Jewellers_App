@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Icon(
                   Icons.logout_rounded,
-                  color: AppColors.textDark,
+                  color: Colors.redAccent,
                   size: context.getScreenWidth(6),
                 ),
               ),
