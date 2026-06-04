@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -19,6 +20,8 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   final CartController cartController = Get.find<CartController>();
   late final UserOrderController userOrderController;
+
+  bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
   @override
   void initState() {
@@ -188,27 +191,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ),
                                 ),
                               SizedBox(height: context.getScreenHeight(0.8)),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "₹${price.toStringAsFixed(0)} × ${item.quantity}",
-                                    style: TextStyle(
-                                      fontSize: context.getScreenWidth(3.6),
-                                      color: AppColors.textMuted,
+                              if (_isRetailer)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "₹${price.toStringAsFixed(0)} × ${item.quantity}",
+                                      style: TextStyle(
+                                        fontSize: context.getScreenWidth(3.6),
+                                        color: AppColors.textMuted,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    "₹${itemTotal.toStringAsFixed(0)}",
-                                    style: TextStyle(
-                                      fontSize: context.getScreenWidth(4.2),
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primaryGold,
+                                    Text(
+                                      "₹${itemTotal.toStringAsFixed(0)}",
+                                      style: TextStyle(
+                                        fontSize: context.getScreenWidth(4.2),
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryGold,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
@@ -217,44 +221,45 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   );
                 }),
 
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(context.getScreenWidth(4)),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE7DED2)),
-                  ),
-                  child: Column(
-                    children: [
-                      _summaryRow(
-                        context,
-                        "Subtotal",
-                        "₹${subtotal.toStringAsFixed(0)}",
-                      ),
-                      SizedBox(height: context.getScreenHeight(0.8)),
-                      _summaryRow(
-                        context,
-                        "GST (3%)",
-                        "₹${gst.toStringAsFixed(0)}",
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(1),
+                if (_isRetailer)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(context.getScreenWidth(4)),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE7DED2)),
+                    ),
+                    child: Column(
+                      children: [
+                        _summaryRow(
+                          context,
+                          "Subtotal",
+                          "₹${subtotal.toStringAsFixed(0)}",
                         ),
-                        child: Container(
-                          height: 1,
-                          color: const Color(0xFFE7DED2),
+                        SizedBox(height: context.getScreenHeight(0.8)),
+                        _summaryRow(
+                          context,
+                          "GST (3%)",
+                          "₹${gst.toStringAsFixed(0)}",
                         ),
-                      ),
-                      _summaryRow(
-                        context,
-                        "Total",
-                        "₹${total.toStringAsFixed(0)}",
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            vertical: context.getScreenHeight(1),
+                          ),
+                          child: Container(
+                            height: 1,
+                            color: const Color(0xFFE7DED2),
+                          ),
+                        ),
+                        _summaryRow(
+                          context,
+                          "Total",
+                          "₹${total.toStringAsFixed(0)}",
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
                 SizedBox(height: context.getScreenHeight(3)),
               ],
