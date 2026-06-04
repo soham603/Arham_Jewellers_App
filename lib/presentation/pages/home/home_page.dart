@@ -59,7 +59,9 @@ class _HomePageState extends State<HomePage> {
       carouselController.getAllCarousels();
     }
     if (categoryController.k18Categories.isEmpty) {
-      categoryController.fetchAllKaratCategories();
+      // Use full=false for initial load (only level-1 & level-2)
+      // Level-3 will be fetched on-demand when a level-2 is expanded
+      categoryController.fetchCategoryTree(full: false);
     }
     _startCarouselAutoSlide();
   }
@@ -96,7 +98,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _onRefresh() async {
     await Future.wait([
       carouselController.getAllCarousels(),
-      categoryController.fetchAllKaratCategories(),
+      // On pull-to-refresh, fetch full tree (level-3 included)
+      categoryController.fetchCategoryTree(full: true),
       carouselController.loadLatestProducts(),
     ]);
   }
@@ -189,10 +192,12 @@ class _HomePageState extends State<HomePage> {
                                       width: 1,
                                     ),
                                   ),
-                                  child: Icon(
-                                    Icons.show_chart_rounded,
+                                  child: Image.asset(
+                                    'assets/images/gold-price-graph-icon-vector-Photoroom.png',
+                                    width: 28,
+                                    height: 28,
                                     color: context.colorPalette.goldDark,
-                                    size: 20,
+                                    colorBlendMode: BlendMode.srcIn,
                                   ),
                                 ),
                               ),
@@ -434,7 +439,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Container(
                                             height: context.getScreenHeight(14),
-                                            padding: const EdgeInsets.all(10),
+                                            padding: const EdgeInsets.all(8),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -694,7 +699,7 @@ class _KaratSection extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: _ErrorRow(
-                onRetry: () => controller.fetchCategoriesForKarat(karat),
+                onRetry: () => controller.fetchAllKaratCategories(),
               ),
             )
           else
@@ -1704,10 +1709,47 @@ class _CategoryQuickAccess extends StatelessWidget {
           unique.add(cat);
         }
       }
-      if (unique.isEmpty) return const SizedBox();
+      if (unique.isEmpty) {
+        return SizedBox(
+          height: context.getScreenWidth(20) + 7 + context.getScreenHeight(3),
+          child: Shimmer.fromColors(
+            baseColor: context.colorPalette.shimmerBaseColor,
+            highlightColor: context.colorPalette.shimmerHighLightColor,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              scrollDirection: Axis.horizontal,
+              itemCount: 6,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, __) {
+                return Column(
+                  children: [
+                    Container(
+                      width: context.getScreenWidth(20),
+                      height: context.getScreenWidth(20),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Container(
+                      width: context.getScreenWidth(16),
+                      height: context.getScreenHeight(1.5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      }
 
       return SizedBox(
-        height: context.getScreenHeight(13),
+        height: context.getScreenWidth(20) + 7 + context.getScreenHeight(3),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
@@ -1736,7 +1778,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                       ),
                     ),
                     child: ClipOval(
-                      child: _CategoryQuickAccessImage(cat: cat, controller: controller),
+                      child: _CategoryQuickAccessImage(cat: cat),
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -1769,11 +1811,9 @@ class _CategoryQuickAccess extends StatelessWidget {
 
 class _CategoryQuickAccessImage extends StatelessWidget {
   final CategoryModel cat;
-  final CategoryController controller;
 
   const _CategoryQuickAccessImage({
     required this.cat,
-    required this.controller,
   });
 
   @override
@@ -1784,47 +1824,8 @@ class _CategoryQuickAccessImage extends StatelessWidget {
         width: context.getScreenWidth(20),
         height: context.getScreenWidth(20),
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _onImageError(context),
+        errorWidget: (_, __, ___) => const RatneshFallback.s(),
       );
-    }
-
-    return _fallbackOrPlaceholder(context);
-  }
-
-  Widget _onImageError(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: fallback,
-        width: context.getScreenWidth(20),
-        height: context.getScreenWidth(20),
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
-      );
-    }
-    return _diamondPlaceholder(context);
-  }
-
-  Widget _fallbackOrPlaceholder(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: fallback,
-        width: context.getScreenWidth(20),
-        height: context.getScreenWidth(20),
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
-      );
-    }
-    return _diamondPlaceholder(context);
-  }
-
-  Widget _diamondPlaceholder(BuildContext context) {
-    if (!controller.isFallbackAttempted(cat.id) &&
-        !controller.isFallbackLoading(cat.id)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.fetchFallbackImage(cat.id, categoryName: cat.name);
-      });
     }
 
     return const RatneshFallback.s();

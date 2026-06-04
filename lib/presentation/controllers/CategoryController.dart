@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
-import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -61,121 +60,7 @@ class CategoryController extends GetxController {
   final _latestLevel3State = CurrentAppState.INITIAL.obs;
   CurrentAppState get latestLevel3State => _latestLevel3State.value;
 
-  // ── Fallback product images for categories without images ─────────────────
-  final _fallbackImages = <String, String>{}.obs;
-  Map<String, String> get fallbackImages => _fallbackImages;
-
-  final _fallbackLoadingIds = <String>{}.obs;
-  bool isFallbackLoading(String id) => _fallbackLoadingIds.contains(id);
-
-  final _fallbackAttempted = <String>{}.obs;
-  bool isFallbackAttempted(String id) => _fallbackAttempted.contains(id);
-
-  Future<String?> fetchFallbackImage(String categoryId, {String? categoryName}) async {
-    if (_fallbackAttempted.contains(categoryId)) {
-      final cached = _fallbackImages[categoryId];
-      return (cached != null && cached.isNotEmpty) ? cached : null;
-    }
-    if (_fallbackLoadingIds.contains(categoryId)) return null;
-
-    _fallbackLoadingIds.add(categoryId);
-    try {
-      // First try: fetch by categoryId alone (most precise)
-      if (categoryId.isNotEmpty) {
-        final catResponse = await httpClient.get(
-          '/api/v1/products/search',
-          queryParameters: {'categoryId': categoryId, 'page': '1', 'limit': '20'},
-          options: Options(
-            sendTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
-          ),
-        );
-        if (catResponse.statusCode == 200 || catResponse.statusCode == 201) {
-          final data = catResponse.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          for (final item in raw) {
-            final product = ProductModel.fromJson(item);
-            final imageUrl = product.displayImageUrl;
-            if (imageUrl != null && imageUrl.isNotEmpty) {
-              _fallbackImages[categoryId] = imageUrl;
-              return imageUrl;
-            }
-          }
-        }
-      }
-
-      // Fallback: text search by category name
-      String searchTerm = categoryName ?? '';
-      String cleanedTerm = '';
-      List<String> rawWords = [];
-      if (searchTerm.isNotEmpty) {
-        cleanedTerm = searchTerm
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim();
-        rawWords = searchTerm
-            .split(RegExp(r'[\s/-]+'))
-            .where((w) => w.length >= 3)
-            .map((w) => w.replaceAll(RegExp(r'collection', caseSensitive: false), '').trim())
-            .where((w) => w.isNotEmpty)
-            .toList();
-      }
-      final termsToTry = [
-        if (cleanedTerm.isNotEmpty) cleanedTerm,
-        ...rawWords,
-      ];
-      final uniqueTerms = termsToTry.toSet().toList();
-
-      String? foundUrl;
-      for (final term in uniqueTerms) {
-        final response = await httpClient.get(
-          '/api/v1/products/search',
-          queryParameters: term.isNotEmpty
-              ? {'search': term, 'page': '1', 'limit': '20'}
-              : {'categoryId': categoryId, 'page': '1', 'limit': '20'},
-          options: Options(
-            sendTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
-          ),
-        );
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final data = response.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          for (final item in raw) {
-            final product = ProductModel.fromJson(item);
-            final imageUrl = product.displayImageUrl;
-            if (imageUrl != null && imageUrl.isNotEmpty) {
-              foundUrl = imageUrl;
-              break;
-            }
-          }
-          if (foundUrl != null) break;
-        }
-      }
-
-      if (foundUrl != null) {
-        _fallbackImages[categoryId] = foundUrl;
-        return foundUrl;
-      }
-    } catch (e) {
-      Logger.error('CategoryController', 'fetchFallbackImage error: $e');
-    } finally {
-      _fallbackLoadingIds.remove(categoryId);
-    }
-    _fallbackAttempted.add(categoryId);
-    return null;
-  }
-
-  Future<void> _fetchFallbackImagesFor(List<CategoryModel> categories) async {
-    for (final cat in categories) {
-      if (cat.imageUrl.isEmpty) {
-        fetchFallbackImage(cat.id, categoryName: cat.name);
-      }
-    }
-  }
-
   // ── Expansion state ───────────────────────────────────────────────────────
-  // Which level-2 category is currently expanded (shows its level-3 children)
   final _expandedCategoryId = RxnString();
   String? get expandedCategoryId => _expandedCategoryId.value;
 
@@ -191,7 +76,6 @@ class CategoryController extends GetxController {
   final _selectedLevel3 = Rxn<CategoryModel>();
   CategoryModel? get selectedLevel3 => _selectedLevel3.value;
 
-  // Whether the product section should be visible
   final _showProductSection = false.obs;
   bool get showProductSection => _showProductSection.value;
 
@@ -221,104 +105,145 @@ class CategoryController extends GetxController {
   final _error = ''.obs;
   String get error => _error.value;
 
-  // ── Public: fetch level-2 for a karat ────────────────────────────────────
-  Future<void> fetchCategoriesForKarat(Karat karat) async {
-    final stateObs = _stateForKarat(karat);
-    if (stateObs.value == CurrentAppState.LOADING) return;
+  // ── Karat name → Karat enum mapping ─────────────────────────────────────
+  static const _karatNameMap = {
+    '18K': Karat.k18,
+    '20K': Karat.k20,
+    '22K': Karat.k22,
+  };
 
-    stateObs.value = CurrentAppState.LOADING;
+  // ── Single API call: fetch full category tree ────────────────────────────
+  // Replaces: _getKaratId × 3 + fetchCategoriesForKarat × 3 + _fetchSubcategories per tap
+  Future<void>? _treeFetchFuture;
+  bool _treeHasFullData = false;
 
-    try {
-      final karatId = await _getKaratId(karat);
-      if (karatId == null) {
-        stateObs.value = CurrentAppState.ERROR;
-        Logger.error(
-            'CategoryController', 'Karat not found: ${karat.displayName}');
-        return;
-      }
-
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {'parentId': karatId, 'level': 2},
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          final fetched = (data['results'] as List)
-              .map((e) => CategoryModel.fromJson(e))
-              .toList();
-          _listForKarat(karat).value = fetched;
-          stateObs.value = CurrentAppState.SUCCESS;
-          _fetchFallbackImagesFor(fetched);
-        } else {
-          stateObs.value = CurrentAppState.ERROR;
-        }
-      } else {
-        stateObs.value = CurrentAppState.ERROR;
-      }
-    } catch (e, st) {
-      stateObs.value = CurrentAppState.ERROR;
-      Logger.error(
-          'CategoryController', 'fetchCategoriesForKarat error: $e\n$st');
+  /// Fetches the full category tree in a single API call.
+  ///
+  /// When [full] is `true` (default), returns all 3 levels (Karat → Collection → Style).
+  /// When [full] is `false`, returns only Level 1 & Level 2 (useful for initial load).
+  Future<void> fetchCategoryTree({bool full = true}) async {
+    // If already fetching with the same or greater scope, return the in-progress future
+    if (_treeFetchFuture != null) {
+      // If we already have full data or are fetching full, just wait
+      if (_treeHasFullData || full) return _treeFetchFuture!;
+      // If requesting full but current fetch is partial, wait and re-fetch
+      await _treeFetchFuture;
+      if (_treeHasFullData) return;
     }
+
+    _k18State.value = CurrentAppState.LOADING;
+    _k20State.value = CurrentAppState.LOADING;
+    _k22State.value = CurrentAppState.LOADING;
+
+    _treeFetchFuture = _doFetchCategoryTree(full: full);
+    await _treeFetchFuture;
+    _treeFetchFuture = null;
   }
 
-  Future<void> fetchAllKaratCategories() async {
-    await Future.wait([
-      fetchCategoriesForKarat(Karat.k18),
-      fetchCategoriesForKarat(Karat.k20),
-      fetchCategoriesForKarat(Karat.k22),
-    ]);
-  }
-
-  // ── Fetch latest level-3 categories (for search page) ───────────────────
-  Future<void> fetchLatestLevel3Categories() async {
-    if (_latestLevel3State.value == CurrentAppState.LOADING) return;
-    if (_latestLevel3Categories.isNotEmpty) return;
-
-    _latestLevel3State.value = CurrentAppState.LOADING;
+  Future<void> _doFetchCategoryTree({bool full = true}) async {
 
     try {
       final response = await httpClient.get(
         '/api/v1/category/get-All',
-        queryParameters: {'level': 3, 'page': 1, 'limit': 50, 'full': true},
+        queryParameters: {'tree': true, 'full': full},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         if (data is Map && data['results'] is List) {
-          final fetched = (data['results'] as List)
-              .map((e) => CategoryModel.fromJson(e))
-              .toList();
+          final results = data['results'] as List;
 
-          fetched.sort((a, b) {
-            final aDate = a.createdAt ?? DateTime(0);
-            final bDate = b.createdAt ?? DateTime(0);
-            return bDate.compareTo(aDate);
-          });
+          for (final item in results) {
+            final karatCat = CategoryModel.fromJson(item);
+            final karat = _karatNameMap[karatCat.name];
+            if (karat == null) continue;
 
-          _latestLevel3Categories.value = fetched.take(10).toList();
-          _latestLevel3State.value = CurrentAppState.SUCCESS;
-          _fetchFallbackImagesFor(_latestLevel3Categories);
+            final level2List = <CategoryModel>[];
+            final children = karatCat.children;
+            if (children != null) {
+              for (final level2 in children) {
+                level2List.add(level2);
+
+                // Pre-cache level-3 children
+                final level3Children = level2.children;
+                if (level3Children != null && level3Children.isNotEmpty) {
+                  _level3Cache[level2.id] = level3Children;
+                }
+              }
+            }
+
+            _listForKarat(karat).value = level2List;
+            _stateForKarat(karat).value = CurrentAppState.SUCCESS;
+          }
+
+          // Populate latest level-3 categories from tree
+          _populateLatestLevel3FromTree(results);
+
+          _treeHasFullData = full;
           return;
         }
       }
-      _latestLevel3State.value = CurrentAppState.ERROR;
+
+      _k18State.value = CurrentAppState.ERROR;
+      _k20State.value = CurrentAppState.ERROR;
+      _k22State.value = CurrentAppState.ERROR;
     } catch (e, st) {
-      _latestLevel3State.value = CurrentAppState.ERROR;
-      Logger.error(
-          'CategoryController', 'fetchLatestLevel3Categories error: $e\n$st');
+      _k18State.value = CurrentAppState.ERROR;
+      _k20State.value = CurrentAppState.ERROR;
+      _k22State.value = CurrentAppState.ERROR;
+      Logger.error('CategoryController', 'fetchCategoryTree error: $e\n$st');
     }
   }
 
+  // Backward-compatible alias (always fetches full tree)
+  Future<void> fetchAllKaratCategories() => fetchCategoryTree(full: true);
+
+  void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
+    final allLevel3 = <CategoryModel>[];
+    for (final karatNode in treeResults) {
+      final children = karatNode['children'] as List? ?? [];
+      for (final level2 in children) {
+        final level3List = level2['children'] as List? ?? [];
+        for (final level3 in level3List) {
+          allLevel3.add(CategoryModel.fromJson(level3));
+        }
+      }
+    }
+
+    allLevel3.sort((a, b) {
+      final aDate = a.createdAt ?? DateTime(0);
+      final bDate = b.createdAt ?? DateTime(0);
+      return bDate.compareTo(aDate);
+    });
+
+    _latestLevel3Categories.value = allLevel3.take(10).toList();
+    _latestLevel3State.value = CurrentAppState.SUCCESS;
+  }
+
+  // ── Fetch latest level-3 categories (for search page) ───────────────────
+  // Now just extracts from tree if available, otherwise falls back to API
+  Future<void> fetchLatestLevel3Categories() async {
+    if (_latestLevel3State.value == CurrentAppState.LOADING) return;
+    if (_latestLevel3Categories.isNotEmpty && _treeHasFullData) return;
+
+    // If tree was fetched but without full data, fetch full tree
+    if (_k18State.value == CurrentAppState.SUCCESS && !_treeHasFullData) {
+      await fetchCategoryTree(full: true);
+      return;
+    }
+
+    // If tree was already fetched with full data, level-3 data is already populated
+    if (_k18State.value == CurrentAppState.SUCCESS) return;
+
+    // Fallback: fetch tree (which includes level-3)
+    await fetchCategoryTree(full: true);
+  }
+
   // ── Toggle expansion of a level-2 category ───────────────────────────────
-  // If the same card is tapped again → collapse.
-  // Otherwise → expand and fetch level-3 children (cached after first load).
+  // Level-3 data is pre-cached from tree; falls back to fetching full tree if empty
   Future<void> toggleExpand(CategoryModel category) async {
     final id = category.id;
 
-    // Tapping the already-expanded one → collapse
     if (_expandedCategoryId.value == id) {
       _expandedCategoryId.value = null;
       _selectedLevel3.value = null;
@@ -330,16 +255,14 @@ class CategoryController extends GetxController {
     _selectedLevel3.value = null;
     _showProductSection.value = false;
 
-    // Already cached → nothing to fetch
-    if (_level3Cache.containsKey(id)) return;
-
-    // Fetch level-3 children
-    _level3LoadingIds.add(id);
-    try {
-      final children = await _fetchSubcategories(id);
-      _level3Cache[id] = children;
-    } finally {
-      _level3LoadingIds.remove(id);
+    // Level-3 data is already cached from tree response
+    // If not cached (e.g., initial load used full=false), fetch full tree on demand
+    if (!_level3Cache.containsKey(id) || (_level3Cache[id]?.isEmpty ?? true)) {
+      if (!_treeHasFullData) {
+        _level3LoadingIds.add(id);
+        await fetchCategoryTree(full: true);
+        _level3LoadingIds.remove(id);
+      }
     }
   }
 
@@ -354,32 +277,6 @@ class CategoryController extends GetxController {
     _selectedLevel3.value = null;
     _showProductSection.value = false;
     SearchProductController.instance.clearCategoryProducts();
-  }
-
-  // ── Fetch level-3 under a level-2 ────────────────────────────────────────
-  Future<List<CategoryModel>> _fetchSubcategories(String parentId) async {
-    try {
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {'parentId': parentId, 'level': 3},
-        options: Options(
-          receiveTimeout: const Duration(seconds: 10),
-          sendTimeout: const Duration(seconds: 10),
-        ),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          return (data['results'] as List)
-              .map((e) => CategoryModel.fromJson(e))
-              .toList();
-        }
-      }
-    } catch (e) {
-      Logger.error('CategoryController', 'fetchSubcategories error: $e');
-    }
-    return [];
   }
 
   // ── Admin ─────────────────────────────────────────────────────────────────
@@ -462,13 +359,11 @@ class CategoryController extends GetxController {
     return _fetchLevelFlat(level: 1);
   }
 
-  Future<List<CategoryModel>> fetchLevel2Categories(
-      {String? parentId}) async {
+  Future<List<CategoryModel>> fetchLevel2Categories({String? parentId}) async {
     return _fetchLevelFlat(level: 2, parentId: parentId);
   }
 
-  Future<List<CategoryModel>> fetchLevel3Categories(
-      {String? parentId}) async {
+  Future<List<CategoryModel>> fetchLevel3Categories({String? parentId}) async {
     return _fetchLevelFlat(level: 3, parentId: parentId);
   }
 
@@ -596,38 +491,18 @@ class CategoryController extends GetxController {
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
-  final Map<Karat, String> _karatIdCache = {};
-
-  Future<String?> _getKaratId(Karat karat) async {
-    if (_karatIdCache.containsKey(karat)) return _karatIdCache[karat];
-
-    try {
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {'level': 1, 'name': karat.displayName},
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          final list = data['results'] as List;
-          if (list.isNotEmpty) {
-            final id = list.first['id'] as String;
-            _karatIdCache[karat] = id;
-            return id;
-          }
-        }
-      }
-    } catch (e) {
-      Logger.error('CategoryController', '_getKaratId error: $e');
-    }
-    return null;
-  }
-
   Future<List<CategoryModel>> _fetchLevelFlat({
     required int level,
     String? parentId,
   }) async {
+    // Try to use cached tree data for level-3 (most common admin query)
+    if (level == 3 && parentId != null && _treeHasFullData) {
+      final cached = _level3Cache[parentId];
+      if (cached != null && cached.isNotEmpty) {
+        return cached;
+      }
+    }
+
     try {
       final response = await httpClient.get(
         '/api/v1/category/get-All',

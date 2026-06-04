@@ -637,6 +637,9 @@ class _CartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAdmin = Get.find<AuthController>().isAdmin;
+    if (isAdmin) return const SizedBox.shrink();
+
     return SizedBox(
       width: height,
       height: height,

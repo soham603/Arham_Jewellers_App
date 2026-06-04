@@ -508,8 +508,8 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       case 'processing':
         return _StatusInfo(
           label: 'Processing',
-          color: const Color(0xFF3B82F6),
-          bgColor: const Color(0xFFEFF6FF),
+          color: const Color(0xFFA57A36),
+          bgColor: const Color(0xFFF9F3E8),
         );
       case 'completed':
       case 'delivered':

@@ -608,6 +608,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 description: description,
                 linkUrl: linkUrl,
                 imageFile: imageFile,
+                isActive: isActive ?? true,
               );
               if (ok && context.mounted) {
                 Get.back();
@@ -1230,28 +1231,26 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // ── isActive toggle (edit only) ───────────────────────────
-              if (isEdit) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Show on homepage',
-                      style: TextStyle(
-                        fontSize: context.getScreenWidth(4),
-                        color: context.colorPalette.textColor,
-                        fontWeight: FontWeight.w500,
-                      ),
+              // ── isActive toggle ───────────────────────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Show on homepage',
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(4),
+                      color: context.colorPalette.textColor,
+                      fontWeight: FontWeight.w500,
                     ),
-                    Switch(
-                      value: _isActive,
-                      onChanged: (v) => setState(() => _isActive = v),
-                      activeColor: context.colorPalette.primaryColor,
-                    ),
-                  ],
-                ),
-                SizedBox(height: context.getScreenHeight(1.5)),
-              ],
+                  ),
+                  Switch(
+                    value: _isActive,
+                    onChanged: (v) => setState(() => _isActive = v),
+                    activeColor: context.colorPalette.primaryColor,
+                  ),
+                ],
+              ),
+              SizedBox(height: context.getScreenHeight(1.5)),
 
               // ── Submit ───────────────────────────────────────────────────
               SizedBox(
@@ -1268,7 +1267,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 ? null
                                 : _linkController.text.trim(),
                             imageFile: _pickedImage,
-                            isActive: isEdit ? _isActive : null,
+                            isActive: _isActive,
                           );
                           if (mounted) setState(() => _isSubmitting = false);
                         },

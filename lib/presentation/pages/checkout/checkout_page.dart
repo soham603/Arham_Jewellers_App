@@ -182,9 +182,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               SizedBox(height: context.getScreenHeight(0.5)),
-                              if (item.product.karat != null)
+                              if (item.product.touch != null)
                                 Text(
-                                  item.product.karat!,
+                                  item.product.touch!,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.4),
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              if (item.product.grossWeight != null)
+                                Text(
+                                  'Gross Wt: ${item.product.grossWeight}g',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.4),
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              if (item.product.fineWeight != null)
+                                Text(
+                                  'Fine Wt: ${item.product.fineWeight}g',
                                   style: TextStyle(
                                     fontSize: context.getScreenWidth(3.4),
                                     color: AppColors.textMuted,

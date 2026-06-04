@@ -148,8 +148,6 @@ class UserOrderController extends GetxController {
 
         cartController.clearCart();
 
-        Get.snackbar("Order Placed", _orderMessage.value);
-
         Logger.info("UserOrderController", "Order created successfully");
 
         return true;

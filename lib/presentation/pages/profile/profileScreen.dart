@@ -90,13 +90,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: EdgeInsets.only(right: context.getScreenWidth(2)),
             child: GestureDetector(
-              onTap: () async {
-                if (isAdmin) {
-                  await authController.logoutAdmin(context);
-                } else {
-                  await authController.logoutUser(context);
-                }
-                Get.offAllNamed(AppRoutes.login);
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    backgroundColor: context.colorPalette.backgroundColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    title: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                        ),
+                        SizedBox(width: context.getScreenWidth(2)),
+                        Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(4.5),
+                            fontWeight: FontWeight.w700,
+                            color: context.colorPalette.textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Are you sure you want to logout?',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.8),
+                        color: context.colorPalette.subTitleColor,
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: context.colorPalette.subTitleColor,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          Get.back();
+                          if (isAdmin) {
+                            await authController.logoutAdmin(context);
+                          } else {
+                            await authController.logoutUser(context);
+                          }
+                          Get.offAllNamed(AppRoutes.login);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
               child: Container(
                 padding: EdgeInsets.all(context.getScreenWidth(2.5)),
@@ -871,8 +941,8 @@ class _OrderCardState extends State<_OrderCard> {
       case 'processing':
         return _StatusInfo(
           label: 'Processing',
-          color: const Color(0xFF3B82F6),
-          bgColor: const Color(0xFFEFF6FF),
+          color: const Color(0xFFA57A36),
+          bgColor: const Color(0xFFF9F3E8),
         );
       case 'completed':
       case 'delivered':

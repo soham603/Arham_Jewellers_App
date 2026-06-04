@@ -14,7 +14,7 @@ class CarouselShimmer extends StatelessWidget {
       highlightColor: palette.shimmerHighLightColor,
       child: Container(
         width: double.infinity,
-        height: context.getScreenHeight(28),
+        height: context.getScreenHeight(22),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
