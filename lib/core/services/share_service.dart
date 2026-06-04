@@ -1,10 +1,12 @@
 import 'dart:io';
-import 'package:http/http.dart' as http;
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class ShareService {
   static const String _brandName = 'ARHAM JEWELLERS';
@@ -48,6 +50,7 @@ class ShareService {
   }) async {
     final tempDir = await getTemporaryDirectory();
     final files = <XFile>[];
+    final dio = Dio();
 
     for (var i = 0; i < products.length; i++) {
       final product = products[i];
@@ -55,15 +58,18 @@ class ShareService {
       if (imageUrl == null || imageUrl.isEmpty) continue;
 
       try {
-        final response = await http.get(Uri.parse(imageUrl));
-        if (response.statusCode == 200) {
+        final response = await dio.get<List<int>>(
+          imageUrl,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        if (response.statusCode == 200 && response.data != null) {
           final fileName = 'product_${i + 1}_${product.id}.jpg';
           final file = File('${tempDir.path}/$fileName');
-          await file.writeAsBytes(response.bodyBytes);
+          await file.writeAsBytes(response.data!);
           files.add(XFile(file.path, name: fileName));
         }
-      } catch (_) {
-        // Skip failed downloads
+      } catch (e) {
+        Logger.error("ShareService", "Failed to download image for product ${product.id}: $imageUrl\n$e");
       }
     }
 
@@ -137,6 +143,7 @@ class ShareService {
 
     // Download images and build product entries
     final productWidgets = <pw.Widget>[];
+    final dio = Dio();
 
     for (var i = 0; i < products.length; i++) {
       final product = products[i];
@@ -145,12 +152,15 @@ class ShareService {
       pw.MemoryImage? image;
       if (imageUrl != null && imageUrl.isNotEmpty) {
         try {
-          final response = await http.get(Uri.parse(imageUrl));
-          if (response.statusCode == 200) {
-            image = pw.MemoryImage(response.bodyBytes);
+          final response = await dio.get<List<int>>(
+            imageUrl,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          if (response.statusCode == 200 && response.data != null) {
+            image = pw.MemoryImage(Uint8List.fromList(response.data!));
           }
-        } catch (_) {
-          // Skip failed downloads
+        } catch (e) {
+          Logger.error("ShareService", "Failed to download image for PDF: product ${product.id}: $imageUrl\n$e");
         }
       }
 

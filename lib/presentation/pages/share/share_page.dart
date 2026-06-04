@@ -625,7 +625,7 @@ class _SharePageState extends State<SharePage> {
               subtitle: 'Send product images with filter details',
               onTap: () {
                 Navigator.pop(ctx);
-                controller.shareImages();
+                _shareWithLoading(context, () => controller.shareImages(), 'Downloading images...');
               },
             ),
             SizedBox(height: context.getScreenHeight(1.2)),
@@ -637,7 +637,7 @@ class _SharePageState extends State<SharePage> {
               subtitle: 'Create a branded product catalog',
               onTap: () {
                 Navigator.pop(ctx);
-                controller.shareAsPdf();
+                _shareWithLoading(context, () => controller.shareAsPdf(), 'Generating PDF...');
               },
             ),
             SizedBox(height: context.getScreenHeight(1.5)),
@@ -645,6 +645,53 @@ class _SharePageState extends State<SharePage> {
         ),
       ),
     );
+  }
+
+  void _shareWithLoading(BuildContext context, Future<void> Function() shareFn, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: context.colorPalette.gold,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.5),
+                    fontWeight: FontWeight.w500,
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final navigator = Navigator.of(context);
+
+    shareFn().whenComplete(() {
+      if (mounted) navigator.pop();
+    });
   }
 
   Widget _shareOptionTile(
