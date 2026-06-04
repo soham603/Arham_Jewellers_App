@@ -608,9 +608,17 @@ class _SearchPageState extends State<SearchPage> {
                 children: categories.map((cat) {
                   final cleanedName = cat.name
                       .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(
-                          RegExp(r'collection', caseSensitive: false), '')
+                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                       .trim();
+                  String? purity;
+                  if (categoryController.k18Categories.any((c) => c.id == cat.parentId)) {
+                    purity = '76';
+                  } else if (categoryController.k20Categories.any((c) => c.id == cat.parentId)) {
+                    purity = '84';
+                  } else if (categoryController.k22Categories.any((c) => c.id == cat.parentId)) {
+                    purity = '92';
+                  }
+                  final displayName = purity != null ? '$purity $cleanedName' : cleanedName;
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -634,7 +642,7 @@ class _SearchPageState extends State<SearchPage> {
                         border: Border.all(color: const Color(0xFFCFC7BC)),
                       ),
                       child: Text(
-                        cleanedName,
+                        displayName,
                         style: TextStyle(
                           fontSize: context.getScreenWidth(3),
                           color: context.colorPalette.textColor,
