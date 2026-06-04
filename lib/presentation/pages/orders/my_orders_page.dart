@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
@@ -79,7 +80,8 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           SizedBox(width: context.getScreenWidth(2)),
         ],
       ),
-      body: Column(
+      body: ResponsiveWrapper(
+        child: Column(
         children: [
           // ── Top gold accent bar (matches Figma TopAccent) ──────────
           Container(height: 3, color: AppColors.divider),
@@ -150,6 +152,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
             }),
           ),
         ],
+      ),
       ),
     );
   }

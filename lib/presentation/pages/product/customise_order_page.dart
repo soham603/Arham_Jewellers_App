@@ -305,8 +305,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 100,
-                            width: 100,
+                            height: context.responsiveWidth(100, tabletVal: 120),
+                            width: context.responsiveWidth(100, tabletVal: 120),
                             decoration: BoxDecoration(
                               color: AppColors.pageBg,
                               borderRadius: BorderRadius.circular(14),

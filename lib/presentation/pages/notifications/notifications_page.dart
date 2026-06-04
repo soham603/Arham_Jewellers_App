@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -64,7 +65,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
           SizedBox(width: context.getScreenWidth(2)),
         ],
       ),
-      body: Column(
+      body: ResponsiveWrapper(
+        child: Column(
         children: [
           Container(height: 3, color: AppColors.divider),
           Expanded(
@@ -76,6 +78,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             }),
           ),
         ],
+      ),
       ),
     );
   }

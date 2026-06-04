@@ -48,15 +48,15 @@ class _ProductCardState extends State<ProductCard>
                 ? constraints.maxWidth
                 : MediaQuery.sizeOf(context).width * 0.45;
 
-        final radius = (width * 0.075).clamp(10.0, 18.0);
-        final hPad = (width * 0.055).clamp(7.0, 11.0);
-        final vPad = (width * 0.03).clamp(4.0, 8.0);
+        final radius = (width * 0.075).clamp(10.0, 22.0);
+        final hPad = (width * 0.055).clamp(7.0, 14.0);
+        final vPad = (width * 0.03).clamp(4.0, 10.0);
 
-        final bodySize = (width * 0.05).clamp(8.0, 10.0);
-        final metaSize = (width * 0.05).clamp(8.0, 10.0);
-        final buttonTextSize = (width * 0.06).clamp(10.0, 12.0);
-        final buttonHeight = (width * 0.145).clamp(28.0, 34.0);
-        final iconSize = (width * 0.18).clamp(22.0, 32.0);
+        final bodySize = (width * 0.05).clamp(8.0, 12.0);
+        final metaSize = (width * 0.05).clamp(8.0, 12.0);
+        final buttonTextSize = (width * 0.06).clamp(10.0, 14.0);
+        final buttonHeight = (width * 0.145).clamp(28.0, 40.0);
+        final iconSize = (width * 0.18).clamp(22.0, 38.0);
 
         final gap2 = (width * 0.01).clamp(1.5, 3.0);
         final gap3 = (width * 0.015).clamp(2.0, 4.0);
@@ -138,6 +138,7 @@ class _ProductCardState extends State<ProductCard>
                                 iconSize: iconSize,
                                 isNew: _isRecent(product),
                                 isHovered: _isHovered,
+                                width: width,
                               ),
                             ),
                           ),
@@ -304,6 +305,7 @@ class _ProductImage extends StatelessWidget {
     required this.iconSize,
     required this.isNew,
     required this.isHovered,
+    required this.width,
   });
 
   final String? imageUrl;
@@ -311,9 +313,15 @@ class _ProductImage extends StatelessWidget {
   final double iconSize;
   final bool isNew;
   final bool isHovered;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
+    final badgeSize = (width * 0.03).clamp(6.0, 10.0);
+    final badgeFontSize = (width * 0.04).clamp(8.0, 11.0);
+    final zoomIconSize = (width * 0.07).clamp(16.0, 22.0);
+    final zoomPad = (width * 0.025).clamp(6.0, 10.0);
+
     return Stack(
       children: [
         if (imageUrl != null)
@@ -365,19 +373,19 @@ class _ProductImage extends StatelessWidget {
           const RatneshFallback.m(),
         if (isNew)
           Positioned(
-            top: 6,
-            left: 6,
+            top: badgeSize,
+            left: badgeSize,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: EdgeInsets.symmetric(horizontal: badgeSize * 0.8, vertical: badgeSize * 0.3),
               decoration: BoxDecoration(
                 color: AppColors.primaryGold,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(badgeSize * 0.5),
               ),
-              child: const Text(
+              child: Text(
                 'NEW',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 8,
+                  fontSize: badgeFontSize,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,
                 ),
@@ -386,17 +394,17 @@ class _ProductImage extends StatelessWidget {
           ),
         if (imageUrl != null)
           Positioned(
-            bottom: 6,
-            right: 6,
+            bottom: zoomPad,
+            right: zoomPad,
             child: GestureDetector(
               onTap: () => showImageZoomDialog(context, imageUrl!),
               child: Container(
-                padding: const EdgeInsets.all(6),
+                padding: EdgeInsets.all(zoomPad * 0.6),
                 decoration: const BoxDecoration(
                   color: Colors.black54,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.open_in_full, color: Colors.white, size: 16),
+                child: Icon(Icons.open_in_full, color: Colors.white, size: zoomIconSize),
               ),
             ),
           ),

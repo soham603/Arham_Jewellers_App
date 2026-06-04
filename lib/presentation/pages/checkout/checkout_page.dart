@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -58,7 +59,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
 
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: ResponsiveWrapper(
+          child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getScreenWidth(4),
             vertical: context.getScreenHeight(1),
@@ -258,6 +260,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ],
             );
           }),
+        ),
         ),
       ),
 

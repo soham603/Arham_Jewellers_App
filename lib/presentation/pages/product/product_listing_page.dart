@@ -166,11 +166,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           itemCount: products.length + (hasMore ? 1 : 0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: 0.488,
+            childAspectRatio: context.isTablet ? 0.55 : 0.488,
           ),
           itemBuilder: (_, index) {
             if (index >= products.length) {
