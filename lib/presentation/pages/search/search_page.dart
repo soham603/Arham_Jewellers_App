@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
@@ -119,6 +120,8 @@ class _SearchPageState extends State<SearchPage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
+                final auth = Get.find<AuthController>();
+                final showPrice = auth.user?.isRetailer == true || auth.isAdmin;
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
@@ -127,6 +130,9 @@ class _SearchPageState extends State<SearchPage> {
                   initialShowAllStock: controller.showAllStock,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
+                  initialPriceMin: controller.priceMin,
+                  initialPriceMax: controller.priceMax,
+                  showPriceFilter: showPrice,
                   onApply: controller.applyFilters,
                 ).then((_) => setState(() {}));
               },
@@ -236,6 +242,9 @@ class _SearchPageState extends State<SearchPage> {
       final weightMin = controller.weightMin;
       final weightMax = controller.weightMax;
       final weightActive = weightMin > 0 || weightMax < 500;
+      final priceMin = controller.priceMin;
+      final priceMax = controller.priceMax;
+      final priceActive = priceMin > 0 || priceMax < 5000000;
 
       void removeKarat(String karat) {
         final newKarats = List<String>.from(karats)..remove(karat);
@@ -246,6 +255,8 @@ class _SearchPageState extends State<SearchPage> {
           showAll: showAll,
           wMin: weightMin,
           wMax: weightMax,
+          pMin: priceMin,
+          pMax: priceMax,
         );
         setState(() {});
       }
@@ -265,6 +276,8 @@ class _SearchPageState extends State<SearchPage> {
           showAll: showAll,
           wMin: weightMin,
           wMax: weightMax,
+          pMin: priceMin,
+          pMax: priceMax,
         );
         setState(() {});
       }
@@ -309,6 +322,8 @@ class _SearchPageState extends State<SearchPage> {
                                 showAll: false,
                                 wMin: weightMin,
                                 wMax: weightMax,
+                                pMin: priceMin,
+                                pMax: priceMax,
                               );
                               setState(() {});
                             },
@@ -325,6 +340,26 @@ class _SearchPageState extends State<SearchPage> {
                                 showAll: showAll,
                                 wMin: 0,
                                 wMax: 500,
+                                pMin: priceMin,
+                                pMax: priceMax,
+                              );
+                              setState(() {});
+                            },
+                          ),
+                        if (priceActive)
+                          _activeFilterChip(
+                            context,
+                            label: _formatPriceChip(priceMin, priceMax),
+                            onRemove: () {
+                              controller.applyFilters(
+                                karats: karats,
+                                categoryIds: categoryIds,
+                                categoryNames: categoryNames,
+                                showAll: showAll,
+                                wMin: weightMin,
+                                wMax: weightMax,
+                                pMin: 0,
+                                pMax: 5000000,
                               );
                               setState(() {});
                             },
@@ -376,6 +411,16 @@ class _SearchPageState extends State<SearchPage> {
         ),
       );
     });
+  }
+
+  String _formatPriceChip(double min, double max) {
+    String fmt(double v) {
+      if (v >= 10000000) return '\u20B9${(v / 10000000).toStringAsFixed(1)}Cr';
+      if (v >= 100000) return '\u20B9${(v / 100000).toStringAsFixed(1)}L';
+      if (v >= 1000) return '\u20B9${(v / 1000).toStringAsFixed(1)}K';
+      return '\u20B9${v.round()}';
+    }
+    return '${fmt(min)} – ${fmt(max)}';
   }
 
   Widget _activeFilterChip(
@@ -465,7 +510,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             SizedBox(height: context.getScreenHeight(0.6)),
             SizedBox(
-              height: context.getScreenWidth(16) + context.getScreenHeight(4),
+              height: context.getScreenWidth(16) + 5 + context.getScreenWidth(2.4) * 3.2,
               child: ListView.separated(
                 padding: EdgeInsets.only(left: context.getScreenWidth(4)),
                 scrollDirection: Axis.horizontal,
@@ -499,7 +544,6 @@ class _SearchPageState extends State<SearchPage> {
                           child: ClipOval(
                             child: _BrowseCategoryImage(
                               cat: cat,
-                              controller: categoryController,
                             ),
                           ),
                         ),
@@ -1092,11 +1136,9 @@ class _SearchPageState extends State<SearchPage> {
 
 class _BrowseCategoryImage extends StatelessWidget {
   final CategoryModel cat;
-  final CategoryController controller;
 
   const _BrowseCategoryImage({
     required this.cat,
-    required this.controller,
   });
 
   @override
@@ -1107,47 +1149,11 @@ class _BrowseCategoryImage extends StatelessWidget {
         width: context.getScreenWidth(16),
         height: context.getScreenWidth(16),
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _onImageError(context),
+        errorWidget: (_, __, ___) => RatneshFallback.xs(
+          width: context.getScreenWidth(16),
+          height: context.getScreenWidth(16),
+        ),
       );
-    }
-
-    return _fallbackOrPlaceholder(context);
-  }
-
-  Widget _onImageError(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: fallback,
-        width: context.getScreenWidth(16),
-        height: context.getScreenWidth(16),
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
-      );
-    }
-    return _diamondPlaceholder(context);
-  }
-
-  Widget _fallbackOrPlaceholder(BuildContext context) {
-    final fallback = controller.fallbackImages[cat.id];
-    if (fallback != null && fallback.isNotEmpty) {
-      return CachedNetworkImage(
-        imageUrl: fallback,
-        width: context.getScreenWidth(16),
-        height: context.getScreenWidth(16),
-        fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _diamondPlaceholder(context),
-      );
-    }
-    return _diamondPlaceholder(context);
-  }
-
-  Widget _diamondPlaceholder(BuildContext context) {
-    if (!controller.isFallbackAttempted(cat.id) &&
-        !controller.isFallbackLoading(cat.id)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.fetchFallbackImage(cat.id, categoryName: cat.name);
-      });
     }
 
     return RatneshFallback.xs(

@@ -24,32 +24,6 @@ class HomeSearchBar extends StatefulWidget {
 class _HomeSearchBarState extends State<HomeSearchBar> {
   Timer? _timer;
   int _currentIndex = 0;
-  List<String> _categoryNames = [];
-  String _currentCategoryName = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshCategories();
-    _startTimer();
-  }
-
-  void _refreshCategories() {
-    final names = _extractCategoryNames();
-    if (names.isNotEmpty) {
-      _categoryNames = names;
-    }
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    if (_categoryNames.isEmpty) return;
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (!mounted) return;
-      _refreshCategories();
-      setState(() => _pickNextPlaceholder());
-    });
-  }
 
   static String _cleanCategoryName(String name) {
     return name
@@ -58,8 +32,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
         .trim();
   }
 
-  List<String> _extractCategoryNames() {
-    final controller = Get.find<CategoryController>();
+  List<String> _extractCategoryNames(CategoryController controller) {
     final all = <CategoryModel>[
       ...controller.k18Categories,
       ...controller.k20Categories,
@@ -77,11 +50,13 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
     return names;
   }
 
-  void _pickNextPlaceholder() {
-    if (_categoryNames.isNotEmpty) {
-      _currentCategoryName = _categoryNames[_currentIndex % _categoryNames.length];
-      _currentIndex++;
-    }
+  void _startTimer(List<String> names) {
+    _timer?.cancel();
+    if (names.isEmpty) return;
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      setState(() => _currentIndex++);
+    });
   }
 
   @override
@@ -96,10 +71,12 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
     final smallIconSize = context.responsiveWidth(18, tabletVal: 22);
     final spacing = context.responsiveWidth(12, tabletVal: 14);
     final hPad = context.responsiveWidth(14, tabletVal: 18);
-    final vPad = context.responsiveWidth(5, tabletVal: 7);
+    final vPad = context.responsiveWidth(7, tabletVal: 9);
     final fontSize = context.responsiveWidth(14, tabletVal: 16);
     final stackHeight = context.responsiveWidth(20, tabletVal: 24);
     final searchTextWidth = context.getScreenWidth(14);
+
+    final categoryController = Get.find<CategoryController>();
 
     return GestureDetector(
       onTap: () {
@@ -140,18 +117,73 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
             SizedBox(width: spacing),
 
             Expanded(
-              child: _categoryNames.isNotEmpty
-                  ? SizedBox(
-                      height: stackHeight,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
+              child: Obx(() {
+                final names = _extractCategoryNames(categoryController);
+
+                if (names.isEmpty) {
+                  return Text(
+                    'Search',
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF9E9590),
+                    ),
+                  );
+                }
+
+                // Start rotation timer when categories become available
+                if (_timer == null || !_timer!.isActive) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) _startTimer(names);
+                  });
+                }
+
+                final currentName = names[_currentIndex % names.length];
+
+                return SizedBox(
+                  height: stackHeight,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        child: Text(
+                          'Search ',
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF9E9590),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: searchTextWidth,
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          transitionBuilder: (child, animation) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0.0, 0.3),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: Align(
+                            key: ValueKey(currentName),
+                            alignment: Alignment.centerLeft,
                             child: Text(
-                              'Search ',
+                              currentName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: fontSize,
                                 fontWeight: FontWeight.w400,
@@ -159,52 +191,12 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                               ),
                             ),
                           ),
-                          Positioned(
-                            left: searchTextWidth,
-                            top: 0,
-                            bottom: 0,
-                            right: 0,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 500),
-                              transitionBuilder: (child, animation) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0.0, 0.3),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: child,
-                                  ),
-                                );
-                              },
-                              child: Align(
-                                key: ValueKey(_currentCategoryName),
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  _currentCategoryName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: fontSize,
-                                    fontWeight: FontWeight.w400,
-                                    color: const Color(0xFF9E9590),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    )
-                  : Text(
-                      'Search',
-                      style: TextStyle(
-                        fontSize: fontSize,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF9E9590),
-                      ),
-                    ),
+                    ],
+                  ),
+                );
+              }),
             ),
 
             if (widget.onScannerTap != null)
