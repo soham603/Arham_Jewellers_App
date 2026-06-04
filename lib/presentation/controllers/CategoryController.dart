@@ -54,6 +54,13 @@ class CategoryController extends GetxController {
   CurrentAppState get k20State => _k20State.value;
   CurrentAppState get k22State => _k22State.value;
 
+  // ── Latest level-3 categories (for search page) ─────────────────────────
+  final _latestLevel3Categories = <CategoryModel>[].obs;
+  List<CategoryModel> get latestLevel3Categories => _latestLevel3Categories;
+
+  final _latestLevel3State = CurrentAppState.INITIAL.obs;
+  CurrentAppState get latestLevel3State => _latestLevel3State.value;
+
   // ── Fallback product images for categories without images ─────────────────
   final _fallbackImages = <String, String>{}.obs;
   Map<String, String> get fallbackImages => _fallbackImages;
@@ -263,6 +270,46 @@ class CategoryController extends GetxController {
       fetchCategoriesForKarat(Karat.k20),
       fetchCategoriesForKarat(Karat.k22),
     ]);
+  }
+
+  // ── Fetch latest level-3 categories (for search page) ───────────────────
+  Future<void> fetchLatestLevel3Categories() async {
+    if (_latestLevel3State.value == CurrentAppState.LOADING) return;
+    if (_latestLevel3Categories.isNotEmpty) return;
+
+    _latestLevel3State.value = CurrentAppState.LOADING;
+
+    try {
+      final response = await httpClient.get(
+        '/api/v1/category/get-All',
+        queryParameters: {'level': 3, 'page': 1, 'limit': 50, 'full': true},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        if (data is Map && data['results'] is List) {
+          final fetched = (data['results'] as List)
+              .map((e) => CategoryModel.fromJson(e))
+              .toList();
+
+          fetched.sort((a, b) {
+            final aDate = a.createdAt ?? DateTime(0);
+            final bDate = b.createdAt ?? DateTime(0);
+            return bDate.compareTo(aDate);
+          });
+
+          _latestLevel3Categories.value = fetched.take(10).toList();
+          _latestLevel3State.value = CurrentAppState.SUCCESS;
+          _fetchFallbackImagesFor(_latestLevel3Categories);
+          return;
+        }
+      }
+      _latestLevel3State.value = CurrentAppState.ERROR;
+    } catch (e, st) {
+      _latestLevel3State.value = CurrentAppState.ERROR;
+      Logger.error(
+          'CategoryController', 'fetchLatestLevel3Categories error: $e\n$st');
+    }
   }
 
   // ── Toggle expansion of a level-2 category ───────────────────────────────

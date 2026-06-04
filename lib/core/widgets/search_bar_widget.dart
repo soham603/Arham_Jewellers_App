@@ -37,7 +37,7 @@ class SearchBarWidget extends StatelessWidget {
   });
 
   static const _goldDark = Color(0xFF8B6914);
-  static const _barColor = Color(0xFFF6F7FB);
+  static const _barColor = Color(0xFFF6F3EF);
 
   @override
   Widget build(BuildContext context) {

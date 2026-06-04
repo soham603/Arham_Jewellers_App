@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -42,6 +43,7 @@ class _SearchPageState extends State<SearchPage> {
         categoryController.k22Categories.isEmpty) {
       categoryController.fetchAllKaratCategories();
     }
+    categoryController.fetchLatestLevel3Categories();
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _textController.text = widget.initialQuery!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -159,6 +161,12 @@ class _SearchPageState extends State<SearchPage> {
                         !controller.hasActiveFilters &&
                         controller.searchResults.isEmpty)
                       _browseCategoriesSliver(context),
+
+                    // ── Latest Level-3 Categories ────────────────────────
+                    if (!isSearching &&
+                        !controller.hasActiveFilters &&
+                        controller.searchResults.isEmpty)
+                      _latestLevel3CategoriesSliver(context),
 
                     // ── Recent Searches ──────────────────────────────────
                     if (!isSearching &&
@@ -457,6 +465,126 @@ class _SearchPageState extends State<SearchPage> {
               child: Divider(color: context.colorPalette.boxColor),
             ),
           ],
+        );
+      }),
+    );
+  }
+
+  // ── Latest Level-3 Categories Sliver ──────────────────────────────────────
+  Widget _latestLevel3CategoriesSliver(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Obx(() {
+        final categories = categoryController.latestLevel3Categories;
+        final state = categoryController.latestLevel3State;
+
+        if (state == CurrentAppState.LOADING && categories.isEmpty) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.getScreenWidth(4),
+              context.getScreenHeight(1.5),
+              context.getScreenWidth(4),
+              0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Latest Collections',
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(4.2),
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF675F55),
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(0.8)),
+                Wrap(
+                  spacing: context.getScreenWidth(2),
+                  runSpacing: context.getScreenHeight(0.6),
+                  children: List.generate(
+                    6,
+                    (_) => Container(
+                      width: context.getScreenWidth(22),
+                      height: context.getScreenHeight(3.2),
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.shimmerBaseColor,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (categories.isEmpty) return const SizedBox();
+
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(4),
+            context.getScreenHeight(1.5),
+            context.getScreenWidth(4),
+            0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Latest Collections',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4.2),
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF675F55),
+                ),
+              ),
+              SizedBox(height: context.getScreenHeight(0.8)),
+              Wrap(
+                spacing: context.getScreenWidth(2),
+                runSpacing: context.getScreenHeight(0.6),
+                children: categories.map((cat) {
+                  final cleanedName = cat.name
+                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                      .replaceAll(
+                          RegExp(r'collection', caseSensitive: false), '')
+                      .trim();
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProductListingPage(
+                            categoryId: cat.id,
+                            title: cleanedName,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(3),
+                        vertical: context.getScreenHeight(0.6),
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF4F1EC),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFCFC7BC)),
+                      ),
+                      child: Text(
+                        cleanedName,
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(3),
+                          color: context.colorPalette.textColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: context.getScreenHeight(0.5)),
+              Divider(color: context.colorPalette.boxColor),
+            ],
+          ),
         );
       }),
     );
