@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -320,5 +321,49 @@ class ShareController extends GetxController {
     _weightMin.value = wMin;
     _weightMax.value = wMax;
     loadProducts();
+  }
+
+  // ── Share methods ───────────────────────────────────────────
+  String get filterInfo => ShareService.buildFilterInfo(
+        selectedKarats: _selectedKarats,
+        selectedCategoryNames: _selectedCategoryNames,
+        showAllStock: _showAllStock.value,
+        weightMin: _weightMin.value,
+        weightMax: _weightMax.value,
+      );
+
+  List<ProductModel> get selectedProductsList => _selectedProducts.values.toList();
+
+  bool _isSharing = false;
+  bool get isSharing => _isSharing;
+
+  Future<void> shareImages() async {
+    if (_selectedProducts.isEmpty) return;
+    _isSharing = true;
+    try {
+      await ShareService.shareImagesDirectly(
+        products: selectedProductsList,
+        filterInfo: filterInfo,
+      );
+    } catch (e, st) {
+      Logger.error("ShareController", "shareImages error: $e\n$st");
+    } finally {
+      _isSharing = false;
+    }
+  }
+
+  Future<void> shareAsPdf() async {
+    if (_selectedProducts.isEmpty) return;
+    _isSharing = true;
+    try {
+      await ShareService.shareAsPdf(
+        products: selectedProductsList,
+        filterInfo: filterInfo,
+      );
+    } catch (e, st) {
+      Logger.error("ShareController", "shareAsPdf error: $e\n$st");
+    } finally {
+      _isSharing = false;
+    }
   }
 }

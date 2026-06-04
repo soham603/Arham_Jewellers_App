@@ -9,6 +9,7 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatefulWidget {
@@ -38,7 +39,6 @@ class _ProductCardState extends State<ProductCard>
 
   @override
   Widget build(BuildContext context) {
-    final primaryAction = widget.onAddToCart ?? widget.onTap;
     final product = widget.product;
 
     return LayoutBuilder(
@@ -202,15 +202,24 @@ class _ProductCardState extends State<ProductCard>
                                 ),
                               ),
                             if (!widget.compact)
-                              SizedBox(height: gap3),
-                            if (!widget.compact)
                               Padding(
                                 padding: EdgeInsets.fromLTRB(
-                                    hPad, 0, hPad, hPad),
-                                child: _ViewButton(
-                                  onPressed: primaryAction,
-                                  height: buttonHeight,
-                                  fontSize: buttonTextSize,
+                                    hPad, gap3, hPad, hPad),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ViewButton(
+                                        onPressed: widget.onTap,
+                                        height: buttonHeight,
+                                        fontSize: buttonTextSize,
+                                      ),
+                                    ),
+                                    SizedBox(width: gap2),
+                                    _CartButton(
+                                      product: widget.product,
+                                      height: buttonHeight,
+                                    ),
+                                  ],
                                 ),
                               ),
                           ],
@@ -604,6 +613,48 @@ class _ViewButton extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CartButton extends StatelessWidget {
+  const _CartButton({
+    required this.product,
+    required this.height,
+  });
+
+  final ProductModel product;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: height,
+      height: height,
+      child: ElevatedButton(
+        onPressed: () {
+          CartController.instance.addToCart(product);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${product.name} added to cart'),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: AppColors.primaryGold,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.zero,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: const Icon(Icons.shopping_cart_outlined, size: 18),
       ),
     );
   }

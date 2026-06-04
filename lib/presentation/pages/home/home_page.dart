@@ -25,6 +25,7 @@ import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/custom_divider.dart';
 import '../../../core/widgets/home_search_bar.dart';
 import '../../controllers/navigation_controller.dart';
+import '../../controllers/AuthController.dart';
 
 // Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
@@ -1357,16 +1358,19 @@ class _TopBar extends StatelessWidget {
 
           const SizedBox(width: 8),
 
-          _IconBtn(
-            icon: Icons.shopping_bag_outlined,
-            onTap: () {
-              try {
-                Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
-              } catch (_) {
-                Get.toNamed(AppRoutes.cart);
-              }
-            },
-          ),
+          Obx(() {
+            final auth = Get.find<AuthController>();
+            return auth.isAdmin ? const SizedBox() : _IconBtn(
+              icon: Icons.shopping_bag_outlined,
+              onTap: () {
+                try {
+                  Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
+                } catch (_) {
+                  Get.toNamed(AppRoutes.cart);
+                }
+              },
+            );
+          }),
         ],
       ),
     );
