@@ -157,12 +157,21 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                   Align(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16),
-                      child: LogoWidget(
-                        showIcon: true,
-                        showName: true,
-                        showSubtitle: false,
-                        logoSize: _is22kOnly ? 110 : 80,
-                      ),
+                      child: _is22kOnly
+                          ? LogoWidget(
+                              showIcon: true,
+                              showName: false,
+                              showSubtitle: false,
+                              logoSize: 80,
+                              logoAsset: 'assets/images/arham-logo.png',
+                              iconColor: context.colorPalette.goldDark,
+                            )
+                          : LogoWidget(
+                              showIcon: true,
+                              showName: true,
+                              showSubtitle: false,
+                              logoSize: 80,
+                            ),
                     ),
                   ),
                   Positioned(
@@ -176,7 +185,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                   ),
                 ],
               ),
-              SizedBox(height: _is22kOnly ? 0 : 20),
+              SizedBox(height: _is22kOnly ? 16 : 20),
               JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
@@ -415,9 +424,9 @@ class _KaratSectionHeader extends StatelessWidget {
   String _purity(Karat k) {
     switch (k) {
       case Karat.k18:
-        return '75%';
+        return '76%';
       case Karat.k20:
-        return '83%';
+        return '84%';
       case Karat.k22:
         return '92%';
     }
