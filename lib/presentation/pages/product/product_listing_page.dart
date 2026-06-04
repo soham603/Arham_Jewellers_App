@@ -22,18 +22,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
   final ScrollController _scrollController = ScrollController();
 
-  bool get _isCategoryFilter => widget.categoryId != null && widget.karat != null;
+  bool get _isCategoryFilter => widget.categoryId != null;
+  bool get _hasKarat => widget.karat != null;
+  bool get _isCategoryOnly => _isCategoryFilter && !_hasKarat;
 
   @override
   void initState() {
     super.initState();
     final tag = _isCategoryFilter
-        ? 'filtered_${widget.categoryId}_${widget.karat}'
+        ? 'filtered_${widget.categoryId}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     _controller = Get.put(SearchProductController(), tag: tag);
 
-    if (_isCategoryFilter) {
+    if (_isCategoryFilter && _hasKarat) {
       _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
+    } else if (_isCategoryFilter) {
+      _controller.loadProductsByCategory(widget.categoryId!);
     } else {
       final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
       _controller.loadProductsByKarats(karatsToLoad);
@@ -47,7 +51,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     final tag = _isCategoryFilter
-        ? 'filtered_${widget.categoryId}_${widget.karat}'
+        ? 'filtered_${widget.categoryId}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     Get.delete<SearchProductController>(tag: tag);
     super.dispose();
@@ -56,7 +60,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300) {
-      if (_isCategoryFilter) {
+      if (_isCategoryOnly) {
+        // Category-only mode doesn't support pagination yet
+      } else if (_isCategoryFilter) {
         _controller.loadMoreFilteredProducts();
       } else {
         _controller.loadMoreKaratProducts();
@@ -86,9 +92,21 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ),
       ),
       body: Obx(() {
-        final state = _isCategoryFilter ? _controller.filteredState : _controller.karatState;
-        final products = _isCategoryFilter ? _controller.filteredProducts : _controller.karatProducts;
-        final hasMore = _isCategoryFilter ? _controller.filteredHasMore : _controller.karatHasMore;
+        final state = _isCategoryOnly
+            ? _controller.categoryState
+            : _isCategoryFilter
+                ? _controller.filteredState
+                : _controller.karatState;
+        final products = _isCategoryOnly
+            ? _controller.categoryProducts
+            : _isCategoryFilter
+                ? _controller.filteredProducts
+                : _controller.karatProducts;
+        final hasMore = _isCategoryOnly
+            ? false
+            : _isCategoryFilter
+                ? _controller.filteredHasMore
+                : _controller.karatHasMore;
 
         if (state == CurrentAppState.LOADING && products.isEmpty) {
           return const Center(child: CircularProgressIndicator());
@@ -108,7 +126,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    if (_isCategoryFilter) {
+                    if (_isCategoryOnly) {
+                      _controller.loadProductsByCategory(widget.categoryId!);
+                    } else if (_isCategoryFilter) {
                       _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
                     } else {
                       final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
