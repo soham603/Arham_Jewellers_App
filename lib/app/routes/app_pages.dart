@@ -11,6 +11,8 @@ import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/orders/my_orders_page.dart';
 import '../../presentation/pages/orders/order_success_page.dart';
 import '../../presentation/pages/product/product_details_page.dart';
+import '../../presentation/pages/ancillary/ancillary_page_screen.dart';
+import '../../presentation/pages/share/share_page.dart';
 import '../../presentation/pages/splash/splash_page.dart';
 import 'app_routes.dart';
 
@@ -41,5 +43,7 @@ abstract class AppPages {
     GetPage(name: AppRoutes.notifications, page: NotificationsPage.new),
     GetPage(name: AppRoutes.changeHandset, page: ChangeHandsetPage.new),
     GetPage(name: AppRoutes.handsetRequests, page: HandsetChangeScreen.new),
+    GetPage(name: AppRoutes.share, page: SharePage.new),
+    GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),
   ];
 }

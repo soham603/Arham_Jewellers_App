@@ -51,6 +51,7 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   html_editor_enhanced: ^2.5.1
   mobile_scanner: ^7.2.0
+  flutter_html: ^3.0.0
 
 dev_dependencies:
   flutter_test:
