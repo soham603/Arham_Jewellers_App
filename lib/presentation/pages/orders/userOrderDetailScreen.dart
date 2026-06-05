@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
@@ -413,8 +414,12 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   Widget _buildWhatsAppButton(BuildContext context, UserOrderModel order) {
     return GestureDetector(
       onTap: () async {
-        const url = "https://wa.me/919879879870";
-        await launchUrl(Uri.parse(url));
+        final orderHashtag = order.orderToken != null
+            ? '#${order.orderToken}'
+            : '#${order.id.substring(0, 8).toUpperCase()}';
+        final message = Uri.encodeComponent('Hello, I need help with my order $orderHashtag');
+        final url = Uri.parse("https://wa.me/${AdminConstants.adminPhone.replaceAll('+', '')}?text=$message");
+        await launchUrl(url);
       },
       child: Container(
         width: double.infinity,

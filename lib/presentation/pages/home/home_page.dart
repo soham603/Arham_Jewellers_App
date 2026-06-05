@@ -183,7 +183,8 @@ class _HomePageState extends State<HomePage> {
                               GestureDetector(
                                 onTap: () => Get.to(() => const GoldRateDetailScreen()),
                                 child: Container(
-                                  padding: const EdgeInsets.all(10),
+                                  height: context.responsiveWidth(34, tabletVal: 42),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFF5F1EC),
                                     borderRadius: BorderRadius.circular(50),
@@ -192,12 +193,14 @@ class _HomePageState extends State<HomePage> {
                                       width: 1,
                                     ),
                                   ),
-                                  child: Image.asset(
-                                    'assets/images/gold-price-graph-icon-vector-Photoroom.png',
-                                    width: 28,
-                                    height: 28,
-                                    color: context.colorPalette.goldDark,
-                                    colorBlendMode: BlendMode.srcIn,
+                                  child: Center(
+                                    child: Image.asset(
+                                      'assets/images/gold-price-graph-icon-vector-Photoroom.png',
+                                      width: 24,
+                                      height: 24,
+                                      color: context.colorPalette.goldDark,
+                                      colorBlendMode: BlendMode.srcIn,
+                                    ),
                                   ),
                                 ),
                               ),

@@ -74,7 +74,6 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
     final vPad = context.responsiveWidth(7, tabletVal: 9);
     final fontSize = context.responsiveWidth(14, tabletVal: 16);
     final stackHeight = context.responsiveWidth(20, tabletVal: 24);
-    final searchTextWidth = context.getScreenWidth(14);
 
     final categoryController = Get.find<CategoryController>();
 
@@ -131,7 +130,6 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                   );
                 }
 
-                // Start rotation timer when categories become available
                 if (_timer == null || !_timer!.isActive) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (mounted) _startTimer(names);
@@ -142,58 +140,34 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
 
                 return SizedBox(
                   height: stackHeight,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        child: Text(
-                          'Search ',
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFF9E9590),
-                          ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.0, 0.3),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Align(
+                      key: ValueKey(currentName),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        currentName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF9E9590),
                         ),
                       ),
-                      Positioned(
-                        left: searchTextWidth,
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 500),
-                          transitionBuilder: (child, animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(0.0, 0.3),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: Align(
-                            key: ValueKey(currentName),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              currentName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF9E9590),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               }),

@@ -51,14 +51,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
         ),
 
-        title: Text(
-          "Checkout",
-          style: TextStyle(
-            fontSize: context.getScreenWidth(6),
-            fontWeight: FontWeight.w700,
-            color: AppColors.textDark,
-          ),
-        ),
+        title: const SizedBox.shrink(),
       ),
 
       body: SafeArea(
@@ -82,7 +75,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 SizedBox(height: context.getScreenHeight(1)),
 
                 Text(
-                  "Booking Summary",
+                  "Enquiry Summary",
                   style: TextStyle(
                     fontSize: context.getScreenWidth(5.5),
                     fontWeight: FontWeight.w700,
@@ -93,7 +86,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 SizedBox(height: context.getScreenHeight(0.5)),
 
                 Text(
-                  "$totalItems item${totalItems != 1 ? 's' : ''} in your booking",
+                  "$totalItems item${totalItems != 1 ? 's' : ''} in your enquiry",
                   style: TextStyle(
                     fontSize: context.getScreenWidth(3.8),
                     color: AppColors.textMuted,
@@ -207,6 +200,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ),
                                 ),
                               SizedBox(height: context.getScreenHeight(0.8)),
+                              Text(
+                                'Qty: ${item.quantity}',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(3.4),
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
                               if (_isRetailer)
                                 Row(
                                   mainAxisAlignment:
@@ -353,7 +353,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(height: context.getScreenHeight(2)),
 
                           Text(
-                            "Place Booking?",
+                            "Place Enquiry?",
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
@@ -366,7 +366,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(height: context.getScreenHeight(1)),
 
                           Text(
-                            "Are you sure you want to place this booking?\nOnce submitted, our team will contact you shortly.",
+                            "Are you sure you want to send this enquiry?\nOnce submitted, our team will contact you shortly.",
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
@@ -432,7 +432,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     },
 
                                     child: Text(
-                                      "Book Now",
+                                      "Send Enquiry",
                                       style: TextStyle(
                                         fontSize: context.getScreenWidth(4),
                                         fontWeight: FontWeight.w700,
@@ -476,7 +476,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(width: context.getScreenWidth(3)),
 
                           Text(
-                            "Booking...",
+                            "Sending...",
                             style: TextStyle(
                               fontSize: context.getScreenWidth(4.3),
                               fontWeight: FontWeight.w700,
@@ -486,7 +486,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ],
                       )
                     : Text(
-                        "Book Now",
+                        "Send Enquiry",
                         style: TextStyle(
                           fontSize: context.getScreenWidth(4.5),
                           fontWeight: FontWeight.w700,

@@ -58,31 +58,36 @@ class AppBottomNav extends StatelessWidget {
     final inkwellBorderRadius = context.responsiveWidth(14, tabletVal: 16);
 
     return Container(
-      height: barHeight,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewPaddingOf(context).bottom,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(
           top: BorderSide(color: AppColors.divider),
         ),
       ),
-      child: Row(
-        children: List.generate(
-          _navItems.length,
-          (index) => _NavItemTile(
-            item: _navItems[index],
-            isSelected: index == currentIndex,
-            onTap: () {
-              if (index == currentIndex) return;
-              HapticFeedback.selectionClick();
-              onTap(index);
-            },
-            animationDuration: _animationDuration,
-            iconContainerSize: iconContainerSize,
-            iconSize: iconSize,
-            labelFontSize: labelFontSize,
-            itemVerticalPadding: itemVerticalPadding,
-            iconLabelSpacing: iconLabelSpacing,
-            inkwellBorderRadius: inkwellBorderRadius,
+      child: SizedBox(
+        height: barHeight,
+        child: Row(
+          children: List.generate(
+            _navItems.length,
+            (index) => _NavItemTile(
+              item: _navItems[index],
+              isSelected: index == currentIndex,
+              onTap: () {
+                if (index == currentIndex) return;
+                HapticFeedback.selectionClick();
+                onTap(index);
+              },
+              animationDuration: _animationDuration,
+              iconContainerSize: iconContainerSize,
+              iconSize: iconSize,
+              labelFontSize: labelFontSize,
+              itemVerticalPadding: itemVerticalPadding,
+              iconLabelSpacing: iconLabelSpacing,
+              inkwellBorderRadius: inkwellBorderRadius,
+            ),
           ),
         ),
       ),

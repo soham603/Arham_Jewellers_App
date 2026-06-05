@@ -54,8 +54,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
 
     _scrollController.addListener(_onScroll);
-    ever(_controller.sortByObs, (_) => setState(() {}));
-    ever(_controller.isGridObs, (_) => setState(() {}));
+    ever(_controller.sortByObs, (_) {
+      setState(() {});
+    });
   }
 
   @override
@@ -87,13 +88,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
       appBar: AppBar(
-        title: Text(
-          _buildAppBarTitle(),
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: context.colorPalette.goldDeep,
-          ),
-        ),
+        title: _buildAppBarTitleWidget(context),
         centerTitle: true,
         backgroundColor: context.colorPalette.cream,
         elevation: 0,
@@ -108,7 +103,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           _buildSortLayoutBar(context),
           Expanded(
             child: Obx(() {
-              _controller.sortBy; // explicit dependency for reactivity
+              _controller.sortByObs.value;
               final state = _isCategoryOnly
                   ? _controller.categoryState
                   : _isCategoryFilter
@@ -126,7 +121,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       : _controller.karatHasMore;
 
               final filteredProducts = _applyClientSideFilters(rawProducts);
-              final products = _controller.sortProducts(filteredProducts);
+              final products = _controller.sortProducts(filteredProducts, _controller.sortBy);
               final isGrid = _controller.isGrid;
 
               if (state == CurrentAppState.LOADING && products.isEmpty) {
@@ -427,13 +422,58 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return '\u20B9${value.round()}';
   }
 
-  String _buildAppBarTitle() {
+  Widget _buildAppBarTitleWidget(BuildContext context) {
     final title = widget.title ?? '${widget.karat} Collection';
     final karatLabel = widget.karat ?? (widget.karats != null && widget.karats!.isNotEmpty ? widget.karats!.join(', ') : null);
-    if (karatLabel != null) {
-      return '$title — $karatLabel';
+    final purity = karatLabel != null ? _purityForKarat(karatLabel) : null;
+
+    if (purity != null && karatLabel != null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: context.colorPalette.goldDeep,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: context.colorPalette.gold.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '$karatLabel · $purity%',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.goldDeep,
+              ),
+            ),
+          ),
+        ],
+      );
     }
-    return title;
+
+    return Text(
+      title,
+      style: TextStyle(
+        fontWeight: FontWeight.w700,
+        color: context.colorPalette.goldDeep,
+        fontSize: 18,
+      ),
+    );
+  }
+
+  String? _purityForKarat(String karat) {
+    if (karat.contains('18')) return '76';
+    if (karat.contains('20')) return '84';
+    if (karat.contains('22')) return '92';
+    return null;
   }
 
   void _showFilterSheet(BuildContext context) {

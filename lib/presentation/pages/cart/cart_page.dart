@@ -39,31 +39,13 @@ class _CartPageState extends State<CartPage> {
         elevation: 0,
         backgroundColor: AppColors.pageBg,
         titleSpacing: context.getScreenWidth(4),
-        title: Row(
-          children: [
-            Container(
-              width: context.getScreenWidth(10),
-              height: context.getScreenWidth(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF5E6),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.shopping_bag_outlined,
-                color: AppColors.primaryGold,
-                size: context.getScreenWidth(5.2),
-              ),
-            ),
-            SizedBox(width: context.getScreenWidth(3)),
-            Text(
-              'Cart',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(5.5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-          ],
+        title: Text(
+          'Cart',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(5.5),
+            fontWeight: FontWeight.w700,
+            color: AppColors.textDark,
+          ),
         ),
         actions: [
           Obx(
@@ -464,7 +446,7 @@ class _CartPageState extends State<CartPage> {
                 }
               : null,
           child: Text(
-            'Proceed',
+            'Proceed to Enquiry',
             style: TextStyle(
               fontSize: context.getScreenWidth(5),
               color: Colors.white,

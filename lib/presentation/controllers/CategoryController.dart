@@ -216,7 +216,7 @@ class CategoryController extends GetxController {
       return bDate.compareTo(aDate);
     });
 
-    _latestLevel3Categories.value = allLevel3.take(10).toList();
+    _latestLevel3Categories.value = allLevel3.take(7).toList();
     _latestLevel3State.value = CurrentAppState.SUCCESS;
   }
 

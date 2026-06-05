@@ -38,7 +38,7 @@ abstract class AppTheme {
         color: AppColors.textMuted,
       ),
       labelLarge: GoogleFonts.inter(
-        fontSize: 20,
+        fontSize: 14,
         fontWeight: FontWeight.w600,
         color: AppColors.white,
       ),

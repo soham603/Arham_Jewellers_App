@@ -34,16 +34,16 @@ class SearchProductController extends GetxController {
     _isGrid.value = !_isGrid.value;
   }
 
-  List<ProductModel> sortProducts(List<ProductModel> products) {
+  List<ProductModel> sortProducts(List<ProductModel> products, SortOption sortBy) {
     final list = List<ProductModel>.from(products);
     list.sort((a, b) {
-      switch (_sortBy.value) {
+      switch (sortBy) {
         case SortOption.nameAsc:
           return a.name.toLowerCase().compareTo(b.name.toLowerCase());
         case SortOption.weightAsc:
-          return (a.grossWeight ?? 0).compareTo(b.grossWeight ?? 0);
+          return (a.grossWeight ?? a.fineWeight ?? 0).compareTo(b.grossWeight ?? b.fineWeight ?? 0);
         case SortOption.weightDesc:
-          return (b.grossWeight ?? 0).compareTo(a.grossWeight ?? 0);
+          return (b.grossWeight ?? b.fineWeight ?? 0).compareTo(a.grossWeight ?? a.fineWeight ?? 0);
         case SortOption.newest:
           return (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0));
         case SortOption.oldest:
@@ -225,47 +225,25 @@ class SearchProductController extends GetxController {
       List<ProductModel> allFetched = [];
 
       if (_selectedCategoryIds.isNotEmpty) {
-        // Use category IDs directly via categoryId param
         for (final categoryId in _selectedCategoryIds) {
-          if (_selectedKarats.isNotEmpty) {
-            for (final karat in _selectedKarats) {
-              final response = await httpClient.get(
-                "/api/v1/products/search",
-                queryParameters: {
-                  "categoryId": categoryId,
-                  "search": _karatToSearchValue(karat),
-                  "page": _filteredInitialPage,
-                  "limit": _pageLimit,
-                  if (_showAllStock.value) "showAll": true,
-                },
-              );
+          final response = await httpClient.get(
+            "/api/v1/products/get-all",
+            queryParameters: {
+              "categoryId": categoryId,
+              "page": _filteredInitialPage,
+              "limit": _pageLimit,
+              if (_showAllStock.value) "showAll": true,
+            },
+          );
 
-              if (response.statusCode == 200 || response.statusCode == 201) {
-                final data = response.data['data'];
-                final List raw = data['data'] is List ? data['data'] : [];
-                allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
-              }
-            }
-          } else {
-            final response = await httpClient.get(
-              "/api/v1/products/search",
-              queryParameters: {
-                "categoryId": categoryId,
-                "page": _filteredInitialPage,
-                "limit": _pageLimit,
-                if (_showAllStock.value) "showAll": true,
-              },
-            );
-
-            if (response.statusCode == 200 || response.statusCode == 201) {
-              final data = response.data['data'];
-              final List raw = data['data'] is List ? data['data'] : [];
-              allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
-            }
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
           }
         }
       } else if (_selectedKarats.isNotEmpty) {
-        // Karat only, no category
+        // Karat only, no category — use search endpoint
         for (final karat in _selectedKarats) {
           final response = await httpClient.get(
             "/api/v1/products/search",
@@ -327,11 +305,9 @@ class SearchProductController extends GetxController {
         _filteredInitialProducts.value = allFetched;
       }
 
-      final queryCount = _selectedCategoryIds.isEmpty
-          ? 1
-          : (_selectedKarats.isEmpty
-              ? _selectedCategoryIds.length
-              : _selectedCategoryIds.length * _selectedKarats.length);
+      final queryCount = _selectedCategoryIds.isNotEmpty
+          ? _selectedCategoryIds.length
+          : _selectedKarats.length;
       final expected = _pageLimit * queryCount;
       if (allFetched.length < expected) {
         _filteredInitialHasMore = false;
@@ -544,7 +520,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/search",
+        "/api/v1/products/get-all",
         queryParameters: {
           "categoryId": categoryId,
           "page": 1,
@@ -613,13 +589,9 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final searchValue = _karatToSearchValue(targetKarat);
-      Logger.info("CategoryKaratFilter", "Loading categoryId=$categoryId karat=$targetKarat search=$searchValue page=$_filteredPage");
-
       final response = await httpClient.get(
-        "/api/v1/products/search",
+        "/api/v1/products/get-all",
         queryParameters: {
-          "search": _karatToSearchValue(targetKarat),
           "categoryId": categoryId,
           "page": _filteredPage,
           "limit": _pageLimit,
@@ -629,19 +601,15 @@ class SearchProductController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
-        Logger.info("CategoryKaratFilter", "Response: ${raw.length} items, status=${response.statusCode}");
-        if (raw.isNotEmpty) {
-          Logger.info("CategoryKaratFilter", "First item keys: ${(raw.first as Map).keys}");
-        }
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+        final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
         if (isPagination) {
-          _filteredProducts.addAll(fetched);
+          _filteredProducts.addAll(allFetched);
         } else {
-          _filteredProducts.value = fetched;
+          _filteredProducts.value = allFetched;
         }
 
-        if (fetched.length < _pageLimit) {
+        if (allFetched.length < _pageLimit) {
           _filteredHasMore = false;
         } else {
           _filteredPage++;
