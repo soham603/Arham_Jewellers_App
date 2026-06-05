@@ -112,8 +112,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final rawData = widget.product.rawData ?? {};
-    final netWeight = rawData["FineWt"]?.toString() ?? "0.000";
-    final grossWeight = rawData["GrossWt"]?.toString() ?? "0.000";
+    final netWeight = rawData["FineWt"]?.toString();
+    final grossWeight = rawData["GrossWt"]?.toString();
     final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo, name: widget.product.name);
     final pieces = rawData["Pieces"]?.toString() ?? "1";
     final designName = rawData["DesignName"]?.toString() ?? "Standard";
@@ -351,36 +351,37 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: EdgeInsets.fromLTRB(
-                            context.getScreenWidth(4),
-                            context.getScreenHeight(0.6),
-                            context.getScreenWidth(3),
-                            context.getScreenHeight(0.6),
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGold,
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
+                        if (netWeight != null)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(
+                              context.getScreenWidth(4),
+                              context.getScreenHeight(0.6),
+                              context.getScreenWidth(3),
+                              context.getScreenHeight(0.6),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(2, 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGold,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
                               ),
-                            ],
-                          ),
-                          child: Text(
-                            "Net Weight: $netWeight g",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: context.getScreenWidth(3.2),
-                              fontWeight: FontWeight.w600,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "Net Weight: $netWeight g",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: context.getScreenWidth(3.2),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -518,49 +519,80 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       SizedBox(height: context.getScreenHeight(2)),
 
                       // 2x2 Specifications Grid
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildSpecBox(
-                              context,
-                              Icons.scale_outlined,
-                              "NET WEIGHT",
-                              "$netWeight g",
+                      if (grossWeight != null || netWeight != null) ...[
+                        Row(
+                          children: [
+                            if (netWeight != null)
+                              Expanded(
+                                child: _buildSpecBox(
+                                  context,
+                                  Icons.scale_outlined,
+                                  "NET WEIGHT",
+                                  "$netWeight g",
+                                ),
+                              ),
+                            if (netWeight != null && grossWeight != null)
+                              SizedBox(width: context.getScreenWidth(3)),
+                            if (grossWeight != null)
+                              Expanded(
+                                child: _buildSpecBox(
+                                  context,
+                                  Icons.work_outline,
+                                  "GROSS WEIGHT",
+                                  "$grossWeight g",
+                                ),
+                              ),
+                          ],
+                        ),
+                        SizedBox(height: context.getScreenHeight(1.5)),
+                        Row(
+                          children: [
+                            if (netWeight != null)
+                              Expanded(
+                                child: _buildSpecBox(
+                                  context,
+                                  Icons.diamond_outlined,
+                                  "PURITY",
+                                  purity,
+                                ),
+                              ),
+                            if (netWeight != null && grossWeight != null)
+                              SizedBox(width: context.getScreenWidth(3)),
+                            if (grossWeight != null)
+                              Expanded(
+                                child: _buildSpecBox(
+                                  context,
+                                  Icons.grid_view_outlined,
+                                  "PIECES",
+                                  pieces,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                      if (netWeight == null && grossWeight == null) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSpecBox(
+                                context,
+                                Icons.diamond_outlined,
+                                "PURITY",
+                                purity,
+                              ),
                             ),
-                          ),
-                          SizedBox(width: context.getScreenWidth(3)),
-                          Expanded(
-                            child: _buildSpecBox(
-                              context,
-                              Icons.work_outline,
-                              "GROSS WEIGHT",
-                              "$grossWeight g",
+                            SizedBox(width: context.getScreenWidth(3)),
+                            Expanded(
+                              child: _buildSpecBox(
+                                context,
+                                Icons.grid_view_outlined,
+                                "PIECES",
+                                pieces,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: context.getScreenHeight(1.5)),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildSpecBox(
-                              context,
-                              Icons.diamond_outlined,
-                              "PURITY",
-                              purity,
-                            ),
-                          ),
-                          SizedBox(width: context.getScreenWidth(3)),
-                          Expanded(
-                            child: _buildSpecBox(
-                              context,
-                              Icons.grid_view_outlined,
-                              "PIECES",
-                              pieces,
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      ],
 
                       SizedBox(height: context.getScreenHeight(1.5)),
 
