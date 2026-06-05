@@ -53,6 +53,55 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   Timer? _timer;
   int _currentIndex = 0;
+  FocusNode? _internalFocusNode;
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _internalFocusNode!;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode();
+    }
+
+    _effectiveFocusNode.addListener(_handleRebuild);
+    widget.controller.addListener(_handleRebuild);
+
+    _loadCategoryNames();
+  }
+
+  @override
+  void didUpdateWidget(covariant SearchBarWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_handleRebuild);
+      widget.controller.addListener(_handleRebuild);
+    }
+
+    if (oldWidget.focusNode != widget.focusNode) {
+      final oldFocusNode = oldWidget.focusNode ?? _internalFocusNode;
+      oldFocusNode?.removeListener(_handleRebuild);
+
+      if (oldWidget.focusNode == null && widget.focusNode != null) {
+        _internalFocusNode?.dispose();
+        _internalFocusNode = null;
+      }
+
+      if (widget.focusNode == null && _internalFocusNode == null) {
+        _internalFocusNode = FocusNode();
+      }
+
+      _effectiveFocusNode.addListener(_handleRebuild);
+    }
+  }
+
+  void _handleRebuild() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   static String _cleanCategoryName(String name) {
     return name
@@ -67,16 +116,32 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       ...controller.k20Categories,
       ...controller.k22Categories,
     ];
+
     final seen = <String>{};
     final names = <String>[];
+
     for (final cat in all) {
       final cleaned = _cleanCategoryName(cat.name);
       if (cleaned.isNotEmpty && seen.add(cleaned.toLowerCase())) {
         names.add(cleaned);
       }
     }
+
     names.shuffle();
     return names;
+  }
+
+  void _loadCategoryNames() {
+    try {
+      final categoryController = Get.find<CategoryController>();
+      final names = _extractCategoryNames(categoryController);
+
+      if (!mounted) return;
+
+      _startTimer(names);
+    } catch (_) {
+      _timer?.cancel();
+    }
   }
 
   void _startTimer(List<String> names) {
@@ -91,12 +156,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   @override
   void dispose() {
     _timer?.cancel();
+    widget.controller.removeListener(_handleRebuild);
+    _effectiveFocusNode.removeListener(_handleRebuild);
+    _internalFocusNode?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isTransparentOuter = widget.outerBackgroundColor == Colors.transparent;
+    final isTransparentOuter =
+        widget.outerBackgroundColor == Colors.transparent;
     final isTransparentBar = widget.barBackgroundColor == Colors.transparent;
 
     final iconSize = context.responsiveWidth(20, tabletVal: 24);
@@ -109,11 +178,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     final hintSize = context.responsiveWidth(14, tabletVal: 16);
     final badgeFontSize = context.responsiveWidth(9, tabletVal: 10);
     final stackHeight = context.responsiveWidth(20, tabletVal: 24);
-    final searchTextWidth = context.getScreenWidth(14);
     const pillRadius = 50.0;
 
     final showAnimatedHint =
-        widget.controller.text.isEmpty && widget.hintText == null;
+        widget.controller.text.isEmpty && widget.hintText == null && !_effectiveFocusNode.hasFocus;
 
     return Container(
       padding: isTransparentOuter
@@ -166,53 +234,50 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     size: iconSize,
                   ),
                   SizedBox(width: spacing),
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        TextField(
-                          controller: widget.controller,
-                          focusNode: widget.focusNode,
-                          autofocus: widget.autofocus,
-                          style: TextStyle(
-                            fontSize: textSize,
-                            color: const Color(0xFF000000),
-                          ),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            hintText: showAnimatedHint
-                                ? null
-                                : (widget.hintText ??
-                                    'Search gold, diamonds, rings...'),
-                            hintStyle: TextStyle(
-                              fontSize: hintSize,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF9E9590),
+                    Expanded(
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          TextField(
+                            controller: widget.controller,
+                            focusNode: widget.focusNode,
+                            autofocus: widget.autofocus,
+                            style: TextStyle(
+                              fontSize: textSize,
+                              color: const Color(0xFF000000),
                             ),
-                          ),
-                          onChanged: widget.onChanged,
-                          onSubmitted: widget.onSubmitted,
-                        ),
-                        if (showAnimatedHint)
-                          Positioned.fill(
-                            child: _AnimatedHint(
-                              currentIndex: _currentIndex,
-                              searchTextWidth: searchTextWidth,
-                              fontSize: hintSize,
-                              stackHeight: stackHeight,
-                              onNamesReady: _startTimer,
+                            decoration: InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              hintText: showAnimatedHint ? null : widget.hintText,
+                              hintStyle: TextStyle(
+                                fontSize: hintSize,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9E9590),
+                              ),
                             ),
+                            onChanged: widget.onChanged,
+                            onSubmitted: widget.onSubmitted,
                           ),
-                      ],
+                              if (showAnimatedHint)
+                            IgnorePointer(
+                              child: _AnimatedHint(
+                                currentIndex: _currentIndex,
+                                fontSize: hintSize,
+                                stackHeight: stackHeight,
+                                onNamesReady: _startTimer,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
                   if (widget.controller.text.isNotEmpty &&
                       widget.onClear != null)
                     GestureDetector(
@@ -284,14 +349,12 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
 class _AnimatedHint extends StatefulWidget {
   final int currentIndex;
-  final double searchTextWidth;
   final double fontSize;
   final double stackHeight;
   final ValueChanged<List<String>> onNamesReady;
 
   const _AnimatedHint({
     required this.currentIndex,
-    required this.searchTextWidth,
     required this.fontSize,
     required this.stackHeight,
     required this.onNamesReady,
@@ -357,58 +420,34 @@ class _AnimatedHintState extends State<_AnimatedHint> {
 
       return SizedBox(
         height: widget.stackHeight,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Positioned(
-              left: 0,
-              top: 0,
-              bottom: 0,
-              child: Text(
-                'Search ',
-                style: TextStyle(
-                  fontSize: widget.fontSize,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF9E9590),
-                ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0.0, 0.3),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          child: Align(
+            key: ValueKey(currentName),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              currentName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: widget.fontSize,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF9E9590),
               ),
             ),
-            Positioned(
-              left: widget.searchTextWidth,
-              top: 0,
-              bottom: 0,
-              right: 0,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0.0, 0.3),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Align(
-                  key: ValueKey(currentName),
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    currentName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: widget.fontSize,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF9E9590),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       );
     } catch (_) {
@@ -417,16 +456,14 @@ class _AnimatedHintState extends State<_AnimatedHint> {
   }
 
   Widget _buildStaticHint() {
-    return Center(
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          'Search gold, diamonds, rings...',
-          style: TextStyle(
-            fontSize: widget.fontSize,
-            fontWeight: FontWeight.w400,
-            color: const Color(0xFF9E9590),
-          ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        'gold, diamonds, rings...',
+        style: TextStyle(
+          fontSize: widget.fontSize,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF9E9590),
         ),
       ),
     );

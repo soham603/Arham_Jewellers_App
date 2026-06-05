@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -12,10 +9,11 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -415,13 +413,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // =====================================================
                     // TITLE
                     // =====================================================
-                    Text(
-                      "My Orders",
-                      style: TextStyle(
-                        fontSize: context.getScreenWidth(6),
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "My Orders",
+                          style: TextStyle(
+                            fontSize: context.getScreenWidth(6),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Get.to(() => const MyOrdersPage()),
+                          child: Text(
+                            "View All",
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(4),
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
 
                     SizedBox(height: context.getScreenHeight(2)),
@@ -650,276 +664,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-class _OrderCard extends StatefulWidget {
+class _OrderCard extends StatelessWidget {
   const _OrderCard({required this.order, required this.controller});
 
   final UserOrderModel order;
   final UserOrderController controller;
 
   @override
-  State<_OrderCard> createState() => _OrderCardState();
-}
-
-class _OrderCardState extends State<_OrderCard> {
-  bool expanded = false;
-  StreamSubscription? _imageSub;
-
-  @override
-  void initState() {
-    super.initState();
-    _imageSub = widget.controller.productImageCache.listen((_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final order = widget.order;
     final statusInfo = _getStatusInfo(order.status);
 
-    return Container(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                expanded = !expanded;
-              });
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _OrderImagesStack(order: order, controller: widget.controller),
-                SizedBox(width: context.getScreenWidth(4)),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        order.orderToken != null
-                            ? 'Order #${order.orderToken}'
-                            : 'Order #${order.id.substring(0, 8).toUpperCase()}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(4.4),
-                        ),
-                      ),
-                      SizedBox(height: context.getScreenHeight(0.6)),
-                      Text(
-                        DateFormat(
-                          "dd MMM yyyy • hh:mm a",
-                        ).format(order.createdAt.toLocal()),
-                        style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontSize: context.getScreenWidth(3.4),
-                        ),
-                      ),
-                      SizedBox(height: context.getScreenHeight(1)),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(2.5),
-                          vertical: context.getScreenHeight(0.3),
-                        ),
-                        decoration: BoxDecoration(
-                          color: statusInfo.bgColor,
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          statusInfo.label,
-                          style: TextStyle(
-                            color: statusInfo.color,
-                            fontWeight: FontWeight.w700,
-                            fontSize: context.getScreenWidth(2.8),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  expanded
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
-                ),
-              ],
-            ),
-          ),
-
-          if (expanded) ...[
-            SizedBox(height: context.getScreenHeight(2)),
-            Divider(color: Colors.grey.shade300),
-            SizedBox(height: context.getScreenHeight(1)),
-
-            ...List.generate(order.items.length, (index) {
-              final item = order.items[index];
-
-              return Padding(
-                padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: context.getScreenWidth(12),
-                        height: context.getScreenWidth(12),
-                        child: _ProductImage(
-                          url: widget.controller.getProductImage(
-                            item.product.id,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: context.getScreenWidth(3)),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.product.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: context.getScreenWidth(3.8),
-                            ),
-                          ),
-                          SizedBox(height: context.getScreenHeight(0.3)),
-                          Text(
-                            "Qty: ${item.quantity}",
-                            style: TextStyle(
-                              color: AppColors.textMuted,
-                              fontSize: context.getScreenWidth(3.2),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      "₹${item.price.toStringAsFixed(0)}",
-                      style: TextStyle(
-                        color: AppColors.primaryGold,
-                        fontWeight: FontWeight.w700,
-                        fontSize: context.getScreenWidth(3.7),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-
-            Divider(color: Colors.grey.shade300),
-            SizedBox(height: context.getScreenHeight(1)),
-
-            if (order.adminMessage != null &&
-                order.adminMessage!.isNotEmpty) ...[
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(context.getScreenWidth(3)),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF6F7FB),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: context.getScreenWidth(4),
-                      color: AppColors.primaryGold,
-                    ),
-                    SizedBox(width: context.getScreenWidth(2)),
-                    Expanded(
-                      child: Text(
-                        order.adminMessage!,
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(3.4),
-                          color: AppColors.textMuted,
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: context.getScreenHeight(1.5)),
-            ],
-
-            if (order.totalAmount != null) ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => UserOrderDetailScreen(order: order));
+      },
+      child: Container(
+        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+        ),
+        child: Row(
+          children: [
+            _OrderImagesStack(order: order, controller: controller),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total Amount',
+                    order.orderToken != null
+                        ? 'Order #${order.orderToken}'
+                        : 'Order #${order.id.substring(0, 8).toUpperCase()}',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.8),
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(4),
                     ),
                   ),
+                  SizedBox(height: context.getScreenHeight(0.4)),
                   Text(
-                    '₹${order.totalAmount!.toStringAsFixed(0)}',
+                    DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(4.2),
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryGold,
+                      color: AppColors.textMuted,
+                      fontSize: context.getScreenWidth(3),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
-            ],
-
-            GestureDetector(
-              onTap: () async {
-                final auth = Get.find<AuthController>();
-                final phone = auth.user?.phoneNumber ?? "";
-                final url = "https://wa.me/${phone.replaceAll("+", "")}";
-                if (url != "https://wa.me/") {
-                  await launchUrl(Uri.parse(url));
-                }
-              },
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  vertical: context.getScreenHeight(1.5),
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9F9EE),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const FaIcon(
-                      FontAwesomeIcons.whatsapp,
-                      color: Colors.green,
-                    ),
-                    SizedBox(width: context.getScreenWidth(2)),
-                    Text(
-                      "Connect on WhatsApp",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.w700,
-                        fontSize: context.getScreenWidth(3.6),
-                      ),
-                    ),
-                  ],
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getScreenWidth(2.5),
+                vertical: context.getScreenHeight(0.3),
+              ),
+              decoration: BoxDecoration(
+                color: statusInfo.bgColor,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Text(
+                statusInfo.label,
+                style: TextStyle(
+                  color: statusInfo.color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: context.getScreenWidth(2.8),
                 ),
               ),
             ),
+            SizedBox(width: context.getScreenWidth(2)),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textMuted,
+              size: context.getScreenWidth(5),
+            ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -966,18 +785,12 @@ class _OrderCardState extends State<_OrderCard> {
       default:
         return _StatusInfo(
           label: status.isNotEmpty
-              ? '${status.toUpperCase()}${status.substring(1)}'
+              ? '${status[0].toUpperCase()}${status.substring(1)}'
               : 'Unknown',
           color: AppColors.textMuted,
           bgColor: AppColors.tileBg,
         );
     }
-  }
-
-  @override
-  void dispose() {
-    _imageSub?.cancel();
-    super.dispose();
   }
 }
 
@@ -1000,7 +813,7 @@ class _OrderImagesStack extends StatelessWidget {
 
     if (images.isEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(14),
         child: RatneshFallback.s(width: size, height: size),
       );
     }
@@ -1021,7 +834,7 @@ class _OrderImagesStack extends StatelessWidget {
                 width: size - (displayImages.length - 1) * 3.0,
                 height: size - (displayImages.length - 1) * 3.0,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
@@ -1032,7 +845,7 @@ class _OrderImagesStack extends StatelessWidget {
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   child: _ProductImage(url: displayImages[i]),
                 ),
               ),

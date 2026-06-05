@@ -219,7 +219,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
                             },
                             child: Text(
-                              'Buy Now',
+                              'Send Enquiry',
                               style: TextStyle(
                                 fontSize: context.getScreenWidth(4.2),
                                 fontWeight: FontWeight.w800,

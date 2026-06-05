@@ -38,8 +38,18 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
     _isLoading.value = true;
     _hasError.value = false;
 
-    // Always await tree fetch — handles INITIAL, LOADING (waits), and retries on ERROR
-    await controller.fetchAllKaratCategories();
+    // If data is already loaded for all requested karats, skip fetch
+    final allHaveData = widget.karats.every((k) =>
+        _stateForKarat(k) == CurrentAppState.SUCCESS &&
+        _listForKarat(k).isNotEmpty);
+
+    if (!allHaveData) {
+      try {
+        await controller.fetchAllKaratCategories().timeout(
+              const Duration(seconds: 15),
+            );
+      } catch (_) {}
+    }
 
     bool anyError = false;
     for (final karat in widget.karats) {
@@ -47,6 +57,13 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
           _listForKarat(karat).isEmpty) {
         anyError = true;
       }
+    }
+
+    // If timed out (state still LOADING with empty lists), treat as error
+    if (!anyError && !allHaveData) {
+      anyError = widget.karats.every((k) =>
+          _stateForKarat(k) != CurrentAppState.SUCCESS &&
+          _listForKarat(k).isEmpty);
     }
 
     _isLoading.value = false;

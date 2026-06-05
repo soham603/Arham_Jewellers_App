@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
@@ -145,6 +147,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                     return _OrderCard(
                       order: orders[index],
                       context: context,
+                      controller: _orderController,
                     );
                   },
                 ),
@@ -163,8 +166,9 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
 class _OrderCard extends StatelessWidget {
   final UserOrderModel order;
   final BuildContext context;
+  final UserOrderController controller;
 
-  const _OrderCard({required this.order, required this.context});
+  const _OrderCard({required this.order, required this.context, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -255,22 +259,7 @@ class _OrderCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Thumb placeholder (matches Figma "Thumb" rect)
-                      Container(
-                        width: context.getScreenWidth(18),
-                        height: context.getScreenWidth(18),
-                        decoration: BoxDecoration(
-                          color: AppColors.tileBg,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.diamond_outlined,
-                            color: AppColors.primaryGold,
-                            size: context.getScreenWidth(8),
-                          ),
-                        ),
-                      ),
+                      _OrderImagesStack(order: order, controller: controller),
                       SizedBox(width: context.getScreenWidth(3)),
                       Expanded(
                         child: Column(
@@ -713,5 +702,110 @@ class _ErrorView extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// ── Order Images Stack ───────────────────────────────────────────────────────
+
+class _OrderImagesStack extends StatelessWidget {
+  const _OrderImagesStack({required this.order, required this.controller});
+
+  final UserOrderModel order;
+  final UserOrderController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = context.getScreenWidth(20);
+    final items = order.items;
+    final images = items
+        .map((item) => controller.getProductImage(item.product.id))
+        .where((url) => url != null && url.isNotEmpty)
+        .toList();
+
+    if (images.isEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: RatneshFallback.s(width: size, height: size),
+      );
+    }
+
+    final displayImages = images.take(3).toList();
+    final extraCount = order.items.length - displayImages.length;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        children: [
+          for (int i = displayImages.length - 1; i >= 0; i--)
+            Positioned(
+              top: i * 3.0,
+              left: i * 3.0,
+              child: Container(
+                width: size - (displayImages.length - 1) * 3.0,
+                height: size - (displayImages.length - 1) * 3.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: _ProductImage(url: displayImages[i]),
+                ),
+              ),
+            ),
+          if (extraCount > 0)
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                child: Text(
+                  "+$extraCount",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.getScreenWidth(2.5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Product Image Widget ─────────────────────────────────────────────────────
+
+class _ProductImage extends StatelessWidget {
+  final String? url;
+
+  const _ProductImage({this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    if (url != null && url!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: url!,
+        fit: BoxFit.cover,
+        placeholder: (_, _) =>
+            const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        errorWidget: (_, _, _) => const RatneshFallback.xs(),
+      );
+    }
+    return const RatneshFallback.xs();
   }
 }

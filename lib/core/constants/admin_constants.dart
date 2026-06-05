@@ -1,3 +1,3 @@
 class AdminConstants {
-  static const String adminPhone = '+91XXXXXXXXXX';
+  static const String adminPhone = '+919408451986';
 }

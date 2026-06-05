@@ -654,15 +654,15 @@ class _SearchPageState extends State<SearchPage> {
                       .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                       .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                       .trim();
-                  String? purity;
+                  String? karatName;
                   if (categoryController.k18Categories.any((c) => c.id == cat.parentId)) {
-                    purity = '76';
+                    karatName = '18K';
                   } else if (categoryController.k20Categories.any((c) => c.id == cat.parentId)) {
-                    purity = '84';
+                    karatName = '20K';
                   } else if (categoryController.k22Categories.any((c) => c.id == cat.parentId)) {
-                    purity = '92';
+                    karatName = '22K';
                   }
-                  final displayName = purity != null ? '$purity $cleanedName' : cleanedName;
+                  final displayName = karatName != null ? '$cleanedName — $karatName' : cleanedName;
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -670,6 +670,7 @@ class _SearchPageState extends State<SearchPage> {
                         MaterialPageRoute(
                           builder: (_) => ProductListingPage(
                             categoryId: cat.id,
+                            karat: karatName,
                             title: cleanedName,
                           ),
                         ),
