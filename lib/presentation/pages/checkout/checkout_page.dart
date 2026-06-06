@@ -51,7 +51,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
         ),
 
-        title: const SizedBox.shrink(),
+        title: Text(
+          'Checkout',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(5.5),
+            fontWeight: FontWeight.w700,
+            color: AppColors.textDark,
+          ),
+        ),
+        titleSpacing: context.getScreenWidth(4),
       ),
 
       body: SafeArea(
@@ -75,25 +83,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 SizedBox(height: context.getScreenHeight(1)),
 
                 Text(
-                  "Enquiry Summary",
+                  "Booking Summary",
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(5.5),
+                    fontSize: context.getScreenWidth(4.5),
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),
                 ),
 
-                SizedBox(height: context.getScreenHeight(0.5)),
+                SizedBox(height: context.getScreenHeight(0.3)),
 
                 Text(
-                  "$totalItems item${totalItems != 1 ? 's' : ''} in your enquiry",
+                   "$totalItems item${totalItems != 1 ? 's' : ''} in your booking",
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.8),
+                    fontSize: context.getScreenWidth(3.4),
                     color: AppColors.textMuted,
                   ),
                 ),
 
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.getScreenHeight(1.5)),
 
                 ...List.generate(items.length, (index) {
                   final item = items[index];
@@ -104,21 +112,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                   return Container(
                     margin: EdgeInsets.only(
-                      bottom: context.getScreenHeight(1.2),
+                      bottom: context.getScreenHeight(0.8),
                     ),
-                    padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+                    padding: EdgeInsets.all(context.getScreenWidth(2.5)),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: const Color(0xFFE7DED2)),
                     ),
                     child: Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                           child: Container(
-                            width: context.getScreenWidth(20),
-                            height: context.getScreenWidth(20),
+                            width: context.getScreenWidth(18),
+                            height: context.getScreenWidth(18),
                             color: const Color(0xFFF7F3EC),
                             child: imageURL != null &&
                                     imageURL.trim().isNotEmpty &&
@@ -144,7 +152,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           Icons
                                               .image_not_supported_outlined,
                                           color: Colors.grey.shade500,
-                                          size: context.getScreenWidth(7),
+                                          size: context.getScreenWidth(6),
                                         ),
                                       );
                                     },
@@ -153,12 +161,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     child: Icon(
                                       Icons.image_outlined,
                                       color: const Color(0xFF8C7E68),
-                                      size: context.getScreenWidth(7),
+                                      size: context.getScreenWidth(6),
                                     ),
                                   ),
                           ),
                         ),
-                        SizedBox(width: context.getScreenWidth(3)),
+                        SizedBox(width: context.getScreenWidth(2)),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,18 +176,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(4),
+                                  fontSize: context.getScreenWidth(3.6),
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textDark,
                                   height: 1.2,
                                 ),
                               ),
-                              SizedBox(height: context.getScreenHeight(0.5)),
+                              SizedBox(height: context.getScreenHeight(0.2)),
                               if (item.product.touch != null)
                                 Text(
                                   item.product.touch!,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.4),
+                                    fontSize: context.getScreenWidth(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -187,15 +195,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   'Gross Wt: ${item.product.grossWeight}g',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.4),
+                                    fontSize: context.getScreenWidth(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                              if (item.product.fineWeight != null)
+                              if ((item.product.netWeight ?? item.product.fineWeight) != null)
                                 Text(
-                                  'Fine Wt: ${item.product.fineWeight}g',
+                                  'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.4),
+                                    fontSize: context.getScreenWidth(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -203,15 +211,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   item.product.size!,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.4),
+                                    fontSize: context.getScreenWidth(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                              SizedBox(height: context.getScreenHeight(0.8)),
+                              SizedBox(height: context.getScreenHeight(0.4)),
                               Text(
                                 'Qty: ${item.quantity}',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.4),
+                                  fontSize: context.getScreenWidth(3.0),
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -223,14 +231,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     Text(
                                       "₹${price.toStringAsFixed(0)} × ${item.quantity}",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.6),
+                                        fontSize: context.getScreenWidth(3.2),
                                         color: AppColors.textMuted,
                                       ),
                                     ),
                                     Text(
                                       "₹${itemTotal.toStringAsFixed(0)}",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(4.2),
+                                        fontSize: context.getScreenWidth(3.8),
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.primaryGold,
                                       ),
@@ -248,10 +256,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 if (_isRetailer)
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(context.getScreenWidth(4)),
+                    padding: EdgeInsets.all(context.getScreenWidth(3)),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: const Color(0xFFE7DED2)),
                     ),
                     child: Column(
@@ -261,7 +269,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           "Subtotal",
                           "₹${subtotal.toStringAsFixed(0)}",
                         ),
-                        SizedBox(height: context.getScreenHeight(0.8)),
+                        SizedBox(height: context.getScreenHeight(0.5)),
                         _summaryRow(
                           context,
                           "GST (3%)",
@@ -269,7 +277,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(
-                            vertical: context.getScreenHeight(1),
+                            vertical: context.getScreenHeight(0.6),
                           ),
                           child: Container(
                             height: 1,
@@ -285,7 +293,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
 
-                SizedBox(height: context.getScreenHeight(3)),
+                SizedBox(height: context.getScreenHeight(2)),
               ],
             );
           }),
@@ -297,16 +305,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
         child: Container(
           padding: EdgeInsets.fromLTRB(
             context.getScreenWidth(4),
-            context.getScreenHeight(1),
+            context.getScreenHeight(0.8),
             context.getScreenWidth(4),
-            context.getScreenHeight(1),
+            context.getScreenHeight(0.8),
           ),
 
           decoration: const BoxDecoration(color: Colors.white),
 
           child: SizedBox(
             width: double.infinity,
-            height: context.getScreenHeight(6.5),
+            height: context.getScreenHeight(5),
 
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -317,7 +325,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 foregroundColor: Colors.white,
 
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
 
@@ -361,7 +369,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(height: context.getScreenHeight(2)),
 
                           Text(
-                            "Place Enquiry?",
+                            "Place Booking?",
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
@@ -374,7 +382,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(height: context.getScreenHeight(1)),
 
                           Text(
-                            "Are you sure you want to send this enquiry?\nOnce submitted, our team will contact you shortly.",
+                            "Once submitted, our team will contact you shortly.",
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
@@ -390,7 +398,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             children: [
                               Expanded(
                                 child: SizedBox(
-                                  height: context.getScreenHeight(5.8),
+                                  height: context.getScreenHeight(5),
 
                                   child: OutlinedButton(
                                     style: OutlinedButton.styleFrom(
@@ -399,7 +407,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
 
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
                                     ),
 
@@ -410,7 +418,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     child: Text(
                                       "Cancel",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(4),
+                                        fontSize: context.getScreenWidth(3.8),
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textDark,
                                       ),
@@ -423,7 +431,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                               Expanded(
                                 child: SizedBox(
-                                  height: context.getScreenHeight(5.8),
+                                  height: context.getScreenHeight(5),
 
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -431,7 +439,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       backgroundColor: AppColors.primaryGold,
 
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
                                     ),
 
@@ -440,9 +448,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     },
 
                                     child: Text(
-                                      "Send Enquiry",
+                                      "Book Now",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(4),
+                                        fontSize: context.getScreenWidth(3.8),
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white,
                                       ),
@@ -484,7 +492,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           SizedBox(width: context.getScreenWidth(3)),
 
                           Text(
-                            "Sending...",
+                            "Booking...",
                             style: TextStyle(
                               fontSize: context.getScreenWidth(4.3),
                               fontWeight: FontWeight.w700,
@@ -494,9 +502,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ],
                       )
                     : Text(
-                        "Send Enquiry",
+                        "Book Now",
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(4.5),
+                          fontSize: context.getScreenWidth(4.2),
                           fontWeight: FontWeight.w700,
                         ),
                       );

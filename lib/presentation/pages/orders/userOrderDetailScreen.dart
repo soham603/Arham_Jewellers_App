@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
@@ -71,7 +72,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               _buildAdminMessage(context, order),
             ],
             SizedBox(height: context.getScreenHeight(2)),
-            _buildWhatsAppButton(context, order),
+            _buildActionButtons(context, order),
             SizedBox(height: context.getScreenHeight(4)),
           ],
         ),
@@ -167,7 +168,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1.5)),
           ...List.generate(order.items.length, (index) {
             final item = order.items[index];
-            final imageUrl = controller.getProductImage(item.product.id);
+            final imageUrl = item.product.imageUrl ?? controller.getProductImage(item.product.id);
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
@@ -411,40 +412,220 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Widget _buildWhatsAppButton(BuildContext context, UserOrderModel order) {
-    return GestureDetector(
-      onTap: () async {
-        final orderHashtag = order.orderToken != null
-            ? '#${order.orderToken}'
-            : '#${order.id.substring(0, 8).toUpperCase()}';
-        final message = Uri.encodeComponent('Hello, I need help with my order $orderHashtag');
-        final url = Uri.parse("https://wa.me/${AdminConstants.adminPhone.replaceAll('+', '')}?text=$message");
-        await launchUrl(url);
+  Widget _buildActionButtons(BuildContext context, UserOrderModel order) {
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: context.getScreenHeight(5),
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.primaryGold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () => _downloadOrderPdf(context, order),
+              child: Text(
+                'Enquire',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4),
+                  color: AppColors.primaryGold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: context.getScreenWidth(3)),
+        Expanded(
+          child: SizedBox(
+            height: context.getScreenHeight(5),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: const Color(0xFF25D366),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () async {
+                final orderHashtag = order.orderToken != null
+                    ? '#${order.orderToken}'
+                    : '#${order.id.substring(0, 8).toUpperCase()}';
+                final message = Uri.encodeComponent(
+                    'Hello, I need help with my order $orderHashtag');
+                final url = Uri.parse(
+                    "https://wa.me/${AdminConstants.adminPhone.replaceAll('+', '')}?text=$message");
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              },
+              icon: const FaIcon(FontAwesomeIcons.whatsapp,
+                  color: Colors.white, size: 16),
+              label: Text(
+                'WhatsApp',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _downloadOrderPdf(BuildContext context, UserOrderModel order) async {
+    final ctx = context;
+    _shareWithLoading(
+      ctx,
+      () async {
+        final items = order.items.map((item) => {
+          'name': item.product.name,
+          'imageUrl': item.product.displayImageUrl,
+          'quantity': item.quantity,
+          'price': item.price,
+          'isRejected': item.isRejected,
+        }).toList();
+
+        await ShareService.shareOrderDetailsPdf(
+          orderId: order.id,
+          orderToken: order.orderToken,
+          status: order.status,
+          createdAt: order.createdAt,
+          items: items,
+          totalAmount: order.totalAmount,
+        );
       },
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          vertical: context.getScreenHeight(1.5),
+      'Generating order PDF...',
+      onComplete: () => _showSharePdfHint(ctx, order),
+    );
+  }
+
+  void _shareWithLoading(
+    BuildContext context,
+    Future<void> Function() shareFn,
+    String message, {
+    VoidCallback? onComplete,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.primaryGold,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.5),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE9F9EE),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+      ),
+    );
+
+    final navigator = Navigator.of(context);
+
+    shareFn().whenComplete(() {
+      if (mounted) {
+        navigator.pop();
+        onComplete?.call();
+      }
+    });
+  }
+
+  void _showSharePdfHint(BuildContext context, UserOrderModel order) {
+    final displayId = order.orderToken != null
+        ? '#${order.orderToken}'
+        : '#${order.id.substring(0, 8).toUpperCase()}';
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
           children: [
-            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-            SizedBox(width: context.getScreenWidth(2)),
+            Icon(Icons.check_circle, color: Colors.green, size: 24),
+            SizedBox(width: 8),
             Text(
-              "Need Help? Connect on WhatsApp",
+              'PDF Ready',
               style: TextStyle(
-                color: Colors.green,
+                fontSize: context.getScreenWidth(4.5),
                 fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3.6),
+                color: AppColors.textDark,
               ),
             ),
           ],
         ),
+        content: Text(
+          'Order $displayId PDF has been saved to Downloads. Share it with us on WhatsApp for any queries.',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(3.8),
+            color: AppColors.textMuted,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Later',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF25D366),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              final message = Uri.encodeComponent(
+                'Hi, I would like to enquire about my order $displayId. Please find the attached PDF for details.',
+              );
+              final phone =
+                  AdminConstants.adminPhone.replaceAll('+', '');
+              final uri = Uri.parse(
+                  'https://wa.me/$phone?text=$message');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri,
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+            icon: FaIcon(FontAwesomeIcons.whatsapp, size: 16),
+            label: Text(
+              'Open WhatsApp',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
       ),
     );
   }

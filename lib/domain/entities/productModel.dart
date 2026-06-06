@@ -222,6 +222,48 @@ class ProductModel {
     return null;
   }
 
+  /// Extracts the karat number (e.g. 18, 20, 22) from any available source.
+  int? get karatNumber {
+    if (karat != null) {
+      final match = RegExp(r'(\d+)').firstMatch(karat!);
+      if (match != null) {
+        final n = int.tryParse(match.group(1)!);
+        if (n != null && [9, 14, 18, 20, 22, 24].contains(n)) return n;
+      }
+    }
+    final t = touch;
+    if (t != null) {
+      final match = RegExp(r'\((\d+)\s*K\)').firstMatch(t);
+      if (match != null) return int.tryParse(match.group(1)!);
+    }
+    if (tagNo != null && tagNo!.length >= 2) {
+      final prefix = tagNo!.substring(0, 2);
+      final n = int.tryParse(prefix);
+      if (n != null) {
+        if (n >= 75 && n <= 77) return 18;
+        if (n >= 83 && n <= 85) return 20;
+        if (n >= 91 && n <= 93) return 22;
+      }
+    }
+    if (name.isNotEmpty) {
+      final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(name);
+      if (match != null) {
+        final n = int.tryParse(match.group(1)!);
+        if (n != null && [9, 14, 18, 20, 22, 24].contains(n)) return n;
+      }
+      final purityMatch = RegExp(r'^(\d{2})').firstMatch(name.trim());
+      if (purityMatch != null) {
+        final n = int.tryParse(purityMatch.group(1)!);
+        if (n != null) {
+          if (n >= 75 && n <= 77) return 18;
+          if (n >= 83 && n <= 85) return 20;
+          if (n >= 91 && n <= 93) return 22;
+        }
+      }
+    }
+    return null;
+  }
+
   double? get salesTouch {
     final raw = rawData?['SalesTouch']?.toString().trim() ??
                 rawData?['Touch']?.toString().trim();
@@ -239,6 +281,14 @@ class ProductModel {
 
   double? get fineWeight {
     final value = rawData?['FineWt'];
+
+    if (value == null) return null;
+
+    return double.tryParse(value.toString());
+  }
+
+  double? get netWeight {
+    final value = rawData?['NetWt'];
 
     if (value == null) return null;
 

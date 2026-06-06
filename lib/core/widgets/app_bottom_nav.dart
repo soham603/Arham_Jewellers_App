@@ -67,8 +67,8 @@ class AppBottomNav extends StatelessWidget {
           top: BorderSide(color: AppColors.divider),
         ),
       ),
-      child: SizedBox(
-        height: barHeight,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: barHeight),
         child: Row(
           children: List.generate(
             _navItems.length,

@@ -5,6 +5,11 @@ class ApiUrlConstants {
   static const String UPDATE_FCM_TOKEN = '/api/v1/auth/update-fcm-token';
   static const String REFRESH_TOKEN = '/api/v1/auth/refresh-token';
 
+  static const String LIVE_RATE_CURRENT = '/api/v1/live-rate/current';
+  static const String LIVE_RATE_UPDATE = '/api/v1/live-rate/update';
+  static const String LIVE_RATE_HISTORY = '/api/v1/live-rate/history';
+  static const String LIVE_RATE_STATISTICS = '/api/v1/live-rate/statistics';
+
   static String ancillaryGetPage(String page) => '/api/v1/ancillary/get-page/$page';
   static String ancillaryUpdatePage(String page) => '/api/v1/ancillary/update-page/$page';
 }

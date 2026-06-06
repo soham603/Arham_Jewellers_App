@@ -102,6 +102,12 @@ class AuthController extends GetxController {
         );
         onSuccess?.call();
         return true;
+      } else if (response.statusCode == 202) {
+        _userLoginState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showInfo(
+          context,
+          response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
+        );
       } else {
         _scheduleError(
           context,
@@ -170,6 +176,12 @@ class AuthController extends GetxController {
         );
         onSuccess?.call();
         return true;
+      } else if (response.statusCode == 202) {
+        _adminLoginState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showInfo(
+          context,
+          response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
+        );
       } else {
         _scheduleError(
           context,

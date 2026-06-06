@@ -113,12 +113,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   double? _calculatePrice() {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || widget.product.fineWeight == null) return null;
-
-    final base = widget.product.fineWeight! * (goldRate.rate / 10);
-    final labour = base * 0.10;
-    final subtotal = base + labour;
-    final gst = subtotal * 0.03;
-    return subtotal + gst;
+    return GoldRateController.calculatePrice(
+      fineWeight: widget.product.fineWeight!,
+      ratePer10Gram: goldRate.rate,
+    );
   }
 
   String _formatPrice(double value) {
@@ -188,32 +186,25 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           height: context.getScreenHeight(6.2),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              elevation: 2,
+                              elevation: isInCart ? 0 : 2,
                               shadowColor: AppColors.primaryGold.withOpacity(0.2),
-                              backgroundColor: const Color(0xFFF9F6F0),
-                              foregroundColor: AppColors.primaryGold,
+                              backgroundColor: isInCart ? Colors.grey.shade100 : const Color(0xFFF9F6F0),
+                              foregroundColor: isInCart ? Colors.grey : AppColors.primaryGold,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 side: BorderSide(
-                                  color: AppColors.primaryGold.withOpacity(0.4),
+                                  color: isInCart ? Colors.grey.shade300 : AppColors.primaryGold.withOpacity(0.4),
                                   width: 1.2,
                                 ),
                               ),
                             ),
-                            onPressed: () {
-                              cartController.addToCart(widget.product);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${widget.product.name} added to cart'),
-                                    duration: const Duration(seconds: 2),
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              }
-                            },
+                            onPressed: isInCart
+                                ? null
+                                : () {
+                                    cartController.addToCart(widget.product);
+                                  },
                             child: Text(
-                              isInCart ? 'Add More' : 'Add to Cart',
+                              isInCart ? 'Added to Cart' : 'Add to Cart',
                               style: TextStyle(
                                 fontSize: context.getScreenWidth(4.2),
                                 fontWeight: FontWeight.w700,
@@ -238,14 +229,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               ),
                             ),
                             onPressed: () {
-                              if (!isInCart) {
-                                cartController.addToCart(widget.product);
-                              }
                               Navigator.of(context).pop();
                               Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
                             },
                             child: Text(
-                              'Send Enquiry',
+                              'View Cart',
                               style: TextStyle(
                                 fontSize: context.getScreenWidth(4.2),
                                 fontWeight: FontWeight.w800,

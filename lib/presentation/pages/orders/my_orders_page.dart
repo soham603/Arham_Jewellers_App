@@ -718,7 +718,7 @@ class _OrderImagesStack extends StatelessWidget {
     final size = context.getScreenWidth(20);
     final items = order.items;
     final images = items
-        .map((item) => controller.getProductImage(item.product.id))
+        .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))
         .where((url) => url != null && url.isNotEmpty)
         .toList();
 

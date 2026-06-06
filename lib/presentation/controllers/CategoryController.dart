@@ -60,6 +60,13 @@ class CategoryController extends GetxController {
   final _latestLevel3State = CurrentAppState.INITIAL.obs;
   CurrentAppState get latestLevel3State => _latestLevel3State.value;
 
+  // ── All level-3 categories (for search results) ─────────────────────────
+  final _allLevel3Categories = <CategoryModel>[].obs;
+  List<CategoryModel> get allLevel3Categories => _allLevel3Categories;
+
+  final _level3KaratMap = <String, String>{}.obs;
+  String? getLevel3Karat(String level3Id) => _level3KaratMap[level3Id];
+
   // ── Expansion state ───────────────────────────────────────────────────────
   final _expandedCategoryId = RxnString();
   String? get expandedCategoryId => _expandedCategoryId.value;
@@ -204,12 +211,17 @@ class CategoryController extends GetxController {
 
   void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
     final allLevel3 = <CategoryModel>[];
+    final karatMap = <String, String>{};
+
     for (final karatNode in treeResults) {
+      final karatName = karatNode['name'] as String? ?? '';
       final children = karatNode['children'] as List? ?? [];
       for (final level2 in children) {
         final level3List = level2['children'] as List? ?? [];
         for (final level3 in level3List) {
-          allLevel3.add(CategoryModel.fromJson(level3));
+          final cat = CategoryModel.fromJson(level3);
+          allLevel3.add(cat);
+          karatMap[cat.id] = karatName;
         }
       }
     }
@@ -220,6 +232,8 @@ class CategoryController extends GetxController {
       return bDate.compareTo(aDate);
     });
 
+    _allLevel3Categories.assignAll(allLevel3);
+    _level3KaratMap.assignAll(karatMap);
     _latestLevel3Categories.value = allLevel3.take(7).toList();
     _latestLevel3State.value = CurrentAppState.SUCCESS;
   }

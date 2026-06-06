@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -31,6 +32,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double _weightMax = 500;
   double _priceMin = 0;
   double _priceMax = 5000000;
+  List<String> _selectedSizes = [];
 
   bool get _isCategoryFilter => widget.categoryId != null;
   bool get _hasKarat => widget.karat != null;
@@ -100,6 +102,25 @@ class _ProductListingPageState extends State<ProductListingPage> {
       ),
       body: Column(
         children: [
+          if (_karatPurityLabel != null)
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.gold.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _karatPurityLabel!,
+                  style: GoogleFonts.bodoniModa(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: context.colorPalette.goldDeep,
+                  ),
+                ),
+              ),
+            ),
           _buildSortLayoutBar(context),
           Expanded(
             child: Obx(() {
@@ -361,15 +382,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
   bool get _hasActiveFilter =>
       _stockFilter != 'ready' ||
       _weightMin > 0 ||
-      _weightMax < 500 ||
+      _weightMax < _controller.availableWeightMax ||
       _priceMin > 0 ||
-      _priceMax < 5000000;
+      _priceMax < 5000000 ||
+      _selectedSizes.isNotEmpty;
 
   int get _activeFilterCount {
     var count = 0;
     if (_stockFilter != 'ready') count++;
-    if (_weightMin > 0 || _weightMax < 500) count++;
+    if (_weightMin > 0 || _weightMax < _controller.availableWeightMax) count++;
     if (_priceMin > 0 || _priceMax < 5000000) count++;
+    count += _selectedSizes.length;
     return count;
   }
 
@@ -382,7 +405,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       result = result.where((p) => !p.isActive).toList();
     }
 
-    if (_weightMin > 0 || _weightMax < 500) {
+    if (_weightMin > 0 || _weightMax < _controller.availableWeightMax) {
       result = result.where((p) {
         final gw = p.grossWeight;
         if (gw == null) return true;
@@ -401,16 +424,23 @@ class _ProductListingPageState extends State<ProductListingPage> {
       }
     }
 
+    if (_selectedSizes.isNotEmpty) {
+      result = result.where((p) {
+        final s = p.size;
+        if (s == null) return false;
+        return _selectedSizes.contains(s);
+      }).toList();
+    }
+
     return result;
   }
 
   double? _calculatePrice(ProductModel product, double ratePer10Gram) {
     if (product.fineWeight == null) return null;
-    final base = product.fineWeight! * (ratePer10Gram / 10);
-    final labour = base * 0.10;
-    final subtotal = base + labour;
-    final gst = subtotal * 0.03;
-    return subtotal + gst;
+    return GoldRateController.calculatePrice(
+      fineWeight: product.fineWeight!,
+      ratePer10Gram: ratePer10Gram,
+    );
   }
 
   String _formatPrice(double value) {
@@ -426,49 +456,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   Widget _buildAppBarTitleWidget(BuildContext context) {
     final title = widget.title ?? '${widget.karat} Collection';
-    final karatLabel = widget.karat ?? (widget.karats != null && widget.karats!.isNotEmpty ? widget.karats!.join(', ') : null);
-    final purity = karatLabel != null ? _purityForKarat(karatLabel) : null;
-
-    if (purity != null && karatLabel != null) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              color: context.colorPalette.goldDeep,
-              fontSize: 18,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: context.colorPalette.gold.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              '$karatLabel · $purity%',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: context.colorPalette.goldDeep,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
     return Text(
       title,
-      style: TextStyle(
+      style: GoogleFonts.bodoniModa(
         fontWeight: FontWeight.w700,
         color: context.colorPalette.goldDeep,
         fontSize: 18,
       ),
     );
+  }
+
+  String? get _karatPurityLabel {
+    final karatLabel = widget.karat ?? (widget.karats != null && widget.karats!.isNotEmpty ? widget.karats!.join(', ') : null);
+    if (karatLabel == null) return null;
+    final purity = _purityForKarat(karatLabel);
+    if (purity == null) return null;
+    return '$karatLabel · $purity%';
   }
 
   String? _purityForKarat(String karat) {
@@ -482,19 +485,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
     FilterBottomSheet.show(
       context,
       initialSelectedKarats: const [],
-      initialSelectedCategoryIds: const [],
-      initialSelectedCategoryNames: const [],
       initialStockFilter: _stockFilter,
       initialWeightMin: _weightMin,
       initialWeightMax: _weightMax,
       initialPriceMin: _priceMin,
       initialPriceMax: _priceMax,
       showKaratFilter: false,
-      showCategoryFilter: false,
       showStockFilter: true,
-      showWeightFilter: true,
+      showWeightFilter: _controller.hasWeightData,
       showPriceFilter: true,
-      weightSliderMax: 100,
+      weightSliderMax: _controller.availableWeightMax,
+      products: _controller.allProducts,
       priceSliderMax: 5000000,
       onApply: ({
         required List<String> karats,
@@ -505,6 +506,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         required double wMax,
         required double pMin,
         required double pMax,
+        required List<String> sizes,
       }) {
         setState(() {
           _stockFilter = stockFilter;
@@ -512,6 +514,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           _weightMax = wMax;
           _priceMin = pMin;
           _priceMax = pMax;
+          _selectedSizes = sizes;
         });
       },
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 typedef FilterApplyCallback = void Function({
@@ -13,18 +13,16 @@ typedef FilterApplyCallback = void Function({
   required double wMax,
   required double pMin,
   required double pMax,
+  required List<String> sizes,
 });
 
 class FilterBottomSheet extends StatefulWidget {
   final List<String> initialSelectedKarats;
-  final List<String> initialSelectedCategoryIds;
-  final List<String> initialSelectedCategoryNames;
   final String initialStockFilter;
   final double initialWeightMin;
   final double initialWeightMax;
   final FilterApplyCallback onApply;
   final bool showKaratFilter;
-  final bool showCategoryFilter;
   final bool showStockFilter;
   final bool showWeightFilter;
   final bool showPriceFilter;
@@ -32,45 +30,51 @@ class FilterBottomSheet extends StatefulWidget {
   final double initialPriceMax;
   final double priceSliderMax;
   final double weightSliderMax;
+  final List<ProductModel> products;
+  final bool showCategoryFilter;
+  final List<CategoryModel> categories;
+  final List<String> initialSelectedCategoryIds;
 
   const FilterBottomSheet({
     super.key,
     required this.initialSelectedKarats,
-    required this.initialSelectedCategoryIds,
-    required this.initialSelectedCategoryNames,
     required this.initialStockFilter,
     required this.initialWeightMin,
     required this.initialWeightMax,
     required this.onApply,
     this.showKaratFilter = true,
-    this.showCategoryFilter = true,
     this.showStockFilter = true,
     this.showWeightFilter = true,
     this.showPriceFilter = false,
+    this.showCategoryFilter = false,
     this.initialPriceMin = 0,
     this.initialPriceMax = 5000000,
     this.priceSliderMax = 5000000,
-    this.weightSliderMax = 100,
+    this.weightSliderMax = 200,
+    this.products = const [],
+    this.categories = const [],
+    this.initialSelectedCategoryIds = const [],
   });
 
   static Future<void> show(
     BuildContext context, {
     required List<String> initialSelectedKarats,
-    required List<String> initialSelectedCategoryIds,
-    required List<String> initialSelectedCategoryNames,
     required String initialStockFilter,
     required double initialWeightMin,
     required double initialWeightMax,
     required FilterApplyCallback onApply,
     bool showKaratFilter = true,
-    bool showCategoryFilter = true,
     bool showStockFilter = true,
     bool showWeightFilter = true,
     bool showPriceFilter = false,
+    bool showCategoryFilter = false,
     double initialPriceMin = 0,
     double initialPriceMax = 5000000,
     double priceSliderMax = 5000000,
-    double weightSliderMax = 100,
+    double weightSliderMax = 200,
+    List<ProductModel> products = const [],
+    List<CategoryModel> categories = const [],
+    List<String> initialSelectedCategoryIds = const [],
   }) {
     return showModalBottomSheet(
       context: context,
@@ -78,21 +82,22 @@ class FilterBottomSheet extends StatefulWidget {
       isScrollControlled: true,
       builder: (_) => FilterBottomSheet(
         initialSelectedKarats: initialSelectedKarats,
-        initialSelectedCategoryIds: initialSelectedCategoryIds,
-        initialSelectedCategoryNames: initialSelectedCategoryNames,
         initialStockFilter: initialStockFilter,
         initialWeightMin: initialWeightMin,
         initialWeightMax: initialWeightMax,
         onApply: onApply,
         showKaratFilter: showKaratFilter,
-        showCategoryFilter: showCategoryFilter,
         showStockFilter: showStockFilter,
         showWeightFilter: showWeightFilter,
         showPriceFilter: showPriceFilter,
+        showCategoryFilter: showCategoryFilter,
         initialPriceMin: initialPriceMin,
         initialPriceMax: initialPriceMax,
         priceSliderMax: priceSliderMax,
         weightSliderMax: weightSliderMax,
+        products: products,
+        categories: categories,
+        initialSelectedCategoryIds: initialSelectedCategoryIds,
       ),
     );
   }
@@ -102,71 +107,115 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  final CategoryController _categoryController =
-      Get.isRegistered<CategoryController>()
-          ? Get.find<CategoryController>()
-          : Get.put(CategoryController());
+  static const List<String> _karatOptions = ['18K', '20K', '22K'];
+  static const double _minWeightSliderMax = 1.0;
+  static const double _minPriceSliderMax = 1.0;
 
-  final List<String> _karatOptions = ['18K', '20K', '22K'];
   late List<String> _tempSelectedKarats;
-  late List<String> _tempSelectedCategoryIds;
-  late List<String> _tempSelectedCategoryNames;
   late String _tempStockFilter;
   late double _tempWeightMin;
   late double _tempWeightMax;
   late double _tempPriceMin;
   late double _tempPriceMax;
-  late TextEditingController _weightMaxController;
-  double _editableWeightMax = 100;
-  List<CategoryModel> _allCategories = [];
-  Map<String, List<CategoryModel>> _categoryVariants = {};
+  late double _effectiveWeightSliderMax;
+  late Set<String> _tempSelectedCategoryIds;
+  bool _categoriesExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _tempSelectedKarats = List.from(widget.initialSelectedKarats);
-    _tempSelectedCategoryIds = List.from(widget.initialSelectedCategoryIds);
-    _tempSelectedCategoryNames = List.from(widget.initialSelectedCategoryNames);
+
+    _tempSelectedKarats = List<String>.from(widget.initialSelectedKarats);
+
     _tempStockFilter = widget.initialStockFilter;
-    _tempWeightMin = widget.initialWeightMin.clamp(0.0, widget.weightSliderMax);
-    _tempWeightMax = widget.initialWeightMax.clamp(0.0, widget.weightSliderMax);
-    _tempPriceMin = widget.initialPriceMin.clamp(0.0, widget.priceSliderMax);
-    _tempPriceMax = widget.initialPriceMax.clamp(0.0, widget.priceSliderMax);
-    if (_tempWeightMin > _tempWeightMax) _tempWeightMax = widget.weightSliderMax;
-    if (_tempPriceMin > _tempPriceMax) _tempPriceMax = widget.priceSliderMax;
-    _editableWeightMax = widget.weightSliderMax;
-    _weightMaxController = TextEditingController(text: _editableWeightMax.round().toString());
-    _loadCategories();
-  }
 
-  @override
-  void dispose() {
-    _weightMaxController.dispose();
-    super.dispose();
-  }
+    _tempSelectedCategoryIds = Set<String>.from(widget.initialSelectedCategoryIds);
 
-  Future<void> _loadCategories() async {
-    if (_categoryController.k18Categories.isEmpty &&
-        _categoryController.k20Categories.isEmpty &&
-        _categoryController.k22Categories.isEmpty) {
-      await _categoryController.fetchAllKaratCategories();
+    _effectiveWeightSliderMax =
+        widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
+    _tempWeightMin =
+        widget.initialWeightMin.clamp(0.0, _effectiveWeightSliderMax);
+    _tempWeightMax =
+        widget.initialWeightMax.clamp(0.0, _effectiveWeightSliderMax);
+    if (_tempWeightMin > _tempWeightMax) {
+      _tempWeightMax = _effectiveWeightSliderMax;
     }
+
+    final effectivePriceMax =
+        widget.priceSliderMax.clamp(_minPriceSliderMax, double.infinity);
+    _tempPriceMin = widget.initialPriceMin.clamp(0.0, effectivePriceMax);
+    _tempPriceMax = widget.initialPriceMax.clamp(0.0, effectivePriceMax);
+    if (_tempPriceMin > _tempPriceMax) {
+      _tempPriceMax = effectivePriceMax;
+    }
+  }
+
+  // ──────────────────────── Helpers ────────────────────────
+
+  void _recomputeWeightSliderMax() {
+    final products = widget.products;
+    if (products.isEmpty) {
+      setState(() {
+        _effectiveWeightSliderMax = widget.weightSliderMax
+            .clamp(_minWeightSliderMax, double.infinity);
+        _clampWeightValues();
+      });
+      return;
+    }
+
+    var filtered = products.toList();
+
+    if (_tempSelectedKarats.isNotEmpty) {
+      filtered = filtered.where((p) {
+        final k = p.karat;
+        return k != null && _tempSelectedKarats.contains(k);
+      }).toList();
+    }
+
+    var maxWeight = 0.0;
+    for (final p in filtered) {
+      final gw = p.grossWeight;
+      if (gw != null && gw > maxWeight) maxWeight = gw;
+    }
+
     setState(() {
-      final all = [
-        ..._categoryController.k18Categories,
-        ..._categoryController.k20Categories,
-        ..._categoryController.k22Categories,
-      ];
-      _categoryVariants = {};
-      for (final cat in all) {
-        final key = cat.name.toLowerCase();
-        _categoryVariants.putIfAbsent(key, () => []).add(cat);
-      }
-      _allCategories = _categoryVariants.values
-          .map((variants) => variants.first)
-          .toList();
+      _effectiveWeightSliderMax = maxWeight > 0
+          ? maxWeight.ceilToDouble()
+          : widget.weightSliderMax
+              .clamp(_minWeightSliderMax, double.infinity);
+      _clampWeightValues();
     });
   }
+
+  void _clampWeightValues() {
+    _tempWeightMax = _tempWeightMax.clamp(0.0, _effectiveWeightSliderMax);
+    _tempWeightMin = _tempWeightMin.clamp(0.0, _tempWeightMax);
+  }
+
+  int get _activeFilterCount {
+    var count = 0;
+    if (widget.showKaratFilter && _tempSelectedKarats.isNotEmpty) {
+      count += _tempSelectedKarats.length;
+    }
+    if (widget.showStockFilter && _tempStockFilter != 'ready') {
+      count++;
+    }
+    if (widget.showWeightFilter &&
+        (_tempWeightMin > 0 ||
+            _tempWeightMax < _effectiveWeightSliderMax)) {
+      count++;
+    }
+    if (widget.showPriceFilter &&
+        (_tempPriceMin > 0 || _tempPriceMax < widget.priceSliderMax)) {
+      count++;
+    }
+    if (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty) {
+      count += _tempSelectedCategoryIds.length;
+    }
+    return count;
+  }
+
+  // ──────────────────────── Actions ────────────────────────
 
   void _toggleKarat(String karat) {
     setState(() {
@@ -176,147 +225,151 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _tempSelectedKarats.add(karat);
       }
     });
+    _recomputeWeightSliderMax();
   }
 
   void _clearAll() {
     setState(() {
       if (widget.showKaratFilter) _tempSelectedKarats.clear();
-      if (widget.showCategoryFilter) {
-        _tempSelectedCategoryIds.clear();
-        _tempSelectedCategoryNames.clear();
-      }
       if (widget.showStockFilter) _tempStockFilter = 'ready';
       if (widget.showWeightFilter) {
         _tempWeightMin = 0;
-        _tempWeightMax = _editableWeightMax;
+        _tempWeightMax = _effectiveWeightSliderMax;
       }
       if (widget.showPriceFilter) {
         _tempPriceMin = 0;
         _tempPriceMax = widget.priceSliderMax;
       }
+      if (widget.showCategoryFilter) _tempSelectedCategoryIds.clear();
     });
   }
 
   void _apply() {
+    final selectedIds = _tempSelectedCategoryIds.toList();
+    final selectedNames = widget.categories
+        .where((c) => selectedIds.contains(c.id))
+        .map((c) => c.name
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim())
+        .toList();
     widget.onApply(
-      karats: _tempSelectedKarats,
-      categoryIds: _tempSelectedCategoryIds,
-      categoryNames: _tempSelectedCategoryNames,
+      karats: List<String>.from(_tempSelectedKarats),
+      categoryIds: selectedIds,
+      categoryNames: selectedNames,
       stockFilter: _tempStockFilter,
       wMin: _tempWeightMin,
       wMax: _tempWeightMax,
       pMin: _tempPriceMin,
       pMax: _tempPriceMax,
+      sizes: const [],
     );
     Navigator.pop(context);
   }
 
+  // ──────────────────────── Build ────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    final selectedCount =
-        (widget.showKaratFilter ? _tempSelectedKarats.length : 0) +
-        (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty ? 1 : 0) +
-        (widget.showStockFilter && _tempStockFilter != 'ready' ? 1 : 0) +
-        (widget.showWeightFilter && (_tempWeightMin > 0 || _tempWeightMax < widget.weightSliderMax) ? 1 : 0) +
-        (widget.showPriceFilter && (_tempPriceMin > 0 || _tempPriceMax < widget.priceSliderMax) ? 1 : 0);
+    final filterCount = _activeFilterCount;
 
     return Container(
       height: context.isTablet
-          ? MediaQuery.of(context).size.height * 0.55
-          : MediaQuery.of(context).size.height * 0.7,
+          ? MediaQuery.of(context).size.height * 0.45
+          : MediaQuery.of(context).size.height * 0.55,
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(context.responsiveWidth(20, tabletVal: 24))),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(
+            context.responsiveWidth(14, tabletVal: 16),
+          ),
+        ),
       ),
       child: Column(
         children: [
-          _buildHandle(),
-          _buildHeader(context, selectedCount),
+          _buildHandle(context),
+          _buildHeader(context, filterCount),
           Divider(height: 1, color: context.colorPalette.border),
           Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 20)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (widget.showKaratFilter) ...[
-                      _buildKaratSection(context),
-                      SizedBox(height: context.getScreenHeight(2.5)),
-                    ],
-                    if (widget.showCategoryFilter) ...[
-                      _buildCategorySection(context),
-                      SizedBox(height: context.getScreenHeight(2.5)),
-                    ],
-                    if (widget.showStockFilter) ...[
-                      _buildStockSection(context),
-                      SizedBox(height: context.getScreenHeight(2.5)),
-                    ],
-                    if (widget.showWeightFilter) ...[
-                      _buildWeightSection(context),
-                      SizedBox(height: context.getScreenHeight(2.5)),
-                    ],
-                    if (widget.showPriceFilter) _buildPriceSection(context),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(
+                context.responsiveWidth(10, tabletVal: 12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.showKaratFilter) ...[
+                    _buildKaratSection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showCategoryFilter &&
+                      widget.categories.isNotEmpty) ...[
+                    _buildCategorySection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showStockFilter) ...[
+                    _buildStockSection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showWeightFilter) ...[
+                    _buildWeightSection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showPriceFilter) _buildPriceSection(context),
                 ],
               ),
             ),
           ),
           Divider(height: 1, color: context.colorPalette.border),
-          _buildActions(context, selectedCount),
+          _buildActions(context, filterCount),
         ],
       ),
     );
   }
 
-  Widget _buildHandle() {
-    final handleWidth = context.responsiveWidth(40, tabletVal: 48);
-    final handleHeight = context.responsiveWidth(4, tabletVal: 5);
+  Widget _buildHandle(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
-      width: handleWidth,
-      height: handleHeight,
+      margin: const EdgeInsets.only(top: 6),
+      width: 32,
+      height: 3,
       decoration: BoxDecoration(
         color: context.colorPalette.goldDark.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(handleHeight * 0.5),
+        borderRadius: BorderRadius.circular(1.5),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context, int count) {
-    final hPad = context.responsiveWidth(20, tabletVal: 24);
-    final vPad = context.responsiveWidth(12, tabletVal: 14);
     return Padding(
-      padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, vPad),
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
       child: Row(
         children: [
           Icon(
             Icons.tune_rounded,
-            size: context.responsiveWidth(20, tabletVal: 24),
+            size: 16,
             color: context.colorPalette.goldDark,
           ),
-          SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
+          const SizedBox(width: 6),
           Text(
             'Filter Products',
             style: TextStyle(
-              fontSize: context.responsiveWidth(18, tabletVal: 22),
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: context.colorPalette.goldDeep,
             ),
           ),
           if (count > 0) ...[
-            SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
+            const SizedBox(width: 6),
             Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: context.responsiveWidth(8, tabletVal: 10),
-                vertical: context.responsiveWidth(2, tabletVal: 3),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
               decoration: BoxDecoration(
                 color: context.colorPalette.gold,
-                borderRadius: BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '$count',
-                style: TextStyle(
-                  fontSize: context.responsiveWidth(12, tabletVal: 14),
+                style: const TextStyle(
+                  fontSize: 10,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -335,46 +388,41 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Text(
           'Karat',
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
             color: context.colorPalette.goldDeep,
           ),
         ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+        const SizedBox(height: 3),
         Row(
           children: _karatOptions.map((karat) {
             final isSelected = _tempSelectedKarats.contains(karat);
             return Padding(
-              padding: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.only(right: 6),
               child: GestureDetector(
                 onTap: () => _toggleKarat(karat),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? context.colorPalette.gold
                         : context.colorPalette.cardBg,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: isSelected
                           ? context.colorPalette.gold
                           : context.colorPalette.border,
-                      width: 2,
+                      width: 1.5,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Text(
                     karat,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: isSelected
                           ? Colors.white
@@ -391,224 +439,130 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget _buildCategorySection(BuildContext context) {
+    const collapsedCount = 10;
+    final allCategories = widget.categories;
+    final showExpand = allCategories.length > collapsedCount;
+    final visibleCategories =
+        _categoriesExpanded || !showExpand
+            ? allCategories
+            : allCategories.sublist(0, collapsedCount);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Category',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: context.colorPalette.goldDeep,
-          ),
-        ),
-        SizedBox(height: context.getScreenHeight(0.5)),
-        GestureDetector(
-          onTap: () => _showCategoryPicker(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: context.colorPalette.cardBg,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: context.colorPalette.border),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Category',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.goldDeep,
+              ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Icon(
-                    Icons.grid_view_rounded,
-                    size: 18,
+            if (_tempSelectedCategoryIds.isNotEmpty)
+              GestureDetector(
+                onTap: () => setState(() => _tempSelectedCategoryIds.clear()),
+                child: Text(
+                  'Clear',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDark,
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _tempSelectedCategoryNames.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            'All Categories',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: context.colorPalette.goldDark,
-                            ),
-                          ),
-                        )
-                      : Wrap(
-                          spacing: 4,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            ..._buildCategoryDisplayItems(context),
-                            GestureDetector(
-                              onTap: () => _showCategoryPicker(context),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: context.colorPalette.gold,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.add,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: visibleCategories.map((cat) {
+            final isSelected = _tempSelectedCategoryIds.contains(cat.id);
+            final cleanedName = cat.name
+                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                .trim();
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _tempSelectedCategoryIds.remove(cat.id);
+                  } else {
+                    _tempSelectedCategoryIds.add(cat.id);
+                  }
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? context.colorPalette.gold
+                      : context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.border,
+                    width: 1.5,
+                  ),
                 ),
-                const SizedBox(width: 4),
-                if (_tempSelectedCategoryIds.isNotEmpty)
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _tempSelectedCategoryIds.clear();
-                        _tempSelectedCategoryNames.clear();
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(
-                        Icons.close,
-                        size: 18,
-                        color: context.colorPalette.goldDark,
-                      ),
-                    ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Icon(
-                      Icons.keyboard_arrow_down,
+                child: Text(
+                  cleanedName,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : context.colorPalette.goldDeep,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        if (showExpand) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => setState(() => _categoriesExpanded = !_categoriesExpanded),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: context.colorPalette.cardBg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: context.colorPalette.border, width: 1),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _categoriesExpanded
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: context.colorPalette.goldDark,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _categoriesExpanded
+                        ? 'Show less'
+                        : 'Show all ${allCategories.length} collections',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
                       color: context.colorPalette.goldDark,
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ],
-    );
-  }
-
-  List<Widget> _buildCategoryDisplayItems(BuildContext context) {
-    final items = <Widget>[];
-
-    for (final cat in _allCategories) {
-      final variants = _categoryVariants[cat.name.toLowerCase()] ?? [cat];
-      final allChildren = <CategoryModel>[];
-      for (final variant in variants) {
-        final children = _categoryController.level3Cache[variant.id] ?? [];
-        allChildren.addAll(children);
-      }
-      if (allChildren.isEmpty) continue;
-
-      final allSelected = allChildren.every((child) {
-        final cleanedName = child.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim();
-        return _tempSelectedCategoryIds.contains(child.id) ||
-            _tempSelectedCategoryNames.contains(cleanedName);
-      });
-
-      if (allSelected) {
-        final cleanedName = cat.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim();
-        items.add(_buildCategoryChip(
-          context,
-          name: cleanedName,
-          onRemove: () {
-            setState(() {
-              for (final child in allChildren) {
-                final ci = _tempSelectedCategoryIds.indexOf(child.id);
-                if (ci != -1) {
-                  _tempSelectedCategoryIds.removeAt(ci);
-                  final childCleaned = child.name
-                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                      .trim();
-                  _tempSelectedCategoryNames.removeWhere((n) => n == childCleaned);
-                }
-              }
-            });
-          },
-        ));
-      }
-    }
-
-    final accountedIds = <String>{};
-    for (final cat in _allCategories) {
-      final variants = _categoryVariants[cat.name.toLowerCase()] ?? [cat];
-      for (final variant in variants) {
-        final children = _categoryController.level3Cache[variant.id] ?? [];
-        for (final child in children) {
-          accountedIds.add(child.id);
-        }
-      }
-    }
-
-    for (var i = 0; i < _tempSelectedCategoryIds.length; i++) {
-      final id = _tempSelectedCategoryIds[i];
-      if (!accountedIds.contains(id)) {
-        final name = _tempSelectedCategoryNames[i];
-        items.add(_buildCategoryChip(
-          context,
-          name: name,
-          onRemove: () {
-            setState(() {
-              final idx = _tempSelectedCategoryIds.indexOf(id);
-              if (idx != -1) {
-                _tempSelectedCategoryIds.removeAt(idx);
-                _tempSelectedCategoryNames.removeAt(idx);
-              }
-            });
-          },
-        ));
-      }
-    }
-
-    return items;
-  }
-
-  Widget _buildCategoryChip(
-    BuildContext context, {
-    required String name,
-    required VoidCallback onRemove,
-  }) {
-    return GestureDetector(
-      onTap: onRemove,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: context.colorPalette.gold,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          name,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ),
     );
   }
 
@@ -619,28 +573,28 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Text(
           'Stock Status',
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
             color: context.colorPalette.goldDeep,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(0.5)),
+        const SizedBox(height: 3),
         Row(
           children: [
             _buildStockOption(
               context,
-              label: 'Ready Stock',
+              label: 'Ready',
               isSelected: _tempStockFilter == 'ready',
               onTap: () => setState(() => _tempStockFilter = 'ready'),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 5),
             _buildStockOption(
               context,
-              label: 'Out of Stock',
+              label: 'Out',
               isSelected: _tempStockFilter == 'out',
               onTap: () => setState(() => _tempStockFilter = 'out'),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 5),
             _buildStockOption(
               context,
               label: 'All',
@@ -664,24 +618,24 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 3),
           decoration: BoxDecoration(
             color: isSelected
                 ? context.colorPalette.gold
                 : context.colorPalette.cardBg,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isSelected
                   ? context.colorPalette.gold
                   : context.colorPalette.border,
-              width: 1.5,
+              width: 1,
             ),
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white
@@ -695,6 +649,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget _buildWeightSection(BuildContext context) {
+    final sliderMax = _effectiveWeightSliderMax;
+    final divisions = sliderMax.round().clamp(1, 10000);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -704,103 +661,55 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Weight Range (g)',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
             ),
-            Row(
-              children: [
-                Text(
-                  '${_tempWeightMin.round()}g \u2013 ',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: context.colorPalette.goldDark,
-                  ),
-                ),
-                SizedBox(
-                  width: 48,
-                  height: 28,
-                  child: TextField(
-                    controller: _weightMaxController,
-                    keyboardType: TextInputType.number,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: context.colorPalette.goldDeep,
-                    ),
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: context.colorPalette.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: context.colorPalette.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                        borderSide: BorderSide(color: context.colorPalette.gold, width: 1.5),
-                      ),
-                    ),
-                    onSubmitted: (value) {
-                      final parsed = double.tryParse(value);
-                      if (parsed != null && parsed > 0) {
-                        setState(() {
-                          _editableWeightMax = parsed;
-                          if (_tempWeightMax > _editableWeightMax) {
-                            _tempWeightMax = _editableWeightMax;
-                          }
-                          if (_tempWeightMin > _tempWeightMax) {
-                            _tempWeightMin = 0;
-                          }
-                        });
-                      } else {
-                        _weightMaxController.text = _editableWeightMax.round().toString();
-                      }
-                    },
-                  ),
-                ),
-                Text(
-                  'g',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: context.colorPalette.goldDark,
-                  ),
-                ),
-              ],
+            Text(
+              '${_tempWeightMin.round()}g – ${_tempWeightMax.round()}g',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: context.colorPalette.goldDark,
+              ),
             ),
           ],
         ),
-        SizedBox(height: context.getScreenHeight(0.5)),
-        RangeSlider(
-          values: RangeValues(_tempWeightMin, _tempWeightMax),
-          min: 0,
-          max: _editableWeightMax,
-          divisions: _editableWeightMax.round(),
-          activeColor: context.colorPalette.gold,
-          inactiveColor: context.colorPalette.border,
-          labels: RangeLabels(
-            '${_tempWeightMin.round()}g',
-            '${_tempWeightMax.round()}g',
+        const SizedBox(height: 2),
+        SizedBox(
+          height: 32,
+          child: RangeSlider(
+            values: RangeValues(
+              _tempWeightMin.clamp(0, sliderMax),
+              _tempWeightMax.clamp(0, sliderMax),
+            ),
+            min: 0,
+            max: sliderMax,
+            divisions: divisions,
+            activeColor: context.colorPalette.gold,
+            inactiveColor: context.colorPalette.border,
+            labels: RangeLabels(
+              '${_tempWeightMin.round()}g',
+              '${_tempWeightMax.round()}g',
+            ),
+            onChanged: (values) {
+              setState(() {
+                _tempWeightMin = values.start;
+                _tempWeightMax = values.end;
+              });
+            },
           ),
-          onChanged: (values) {
-            setState(() {
-              _tempWeightMin = values.start;
-              _tempWeightMax = values.end;
-            });
-          },
         ),
       ],
     );
   }
 
   Widget _buildPriceSection(BuildContext context) {
+    final sliderMax =
+        widget.priceSliderMax.clamp(_minPriceSliderMax, double.infinity);
+    final divisions = (sliderMax / 100000).round().clamp(1, 1000);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -810,7 +719,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Price Range (\u20B9)',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
@@ -818,31 +727,37 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               '${_formatPriceLabel(_tempPriceMin)} \u2013 ${_formatPriceLabel(_tempPriceMax)}',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: FontWeight.w500,
                 color: context.colorPalette.goldDark,
               ),
             ),
           ],
         ),
-        SizedBox(height: context.getScreenHeight(0.5)),
-        RangeSlider(
-          values: RangeValues(_tempPriceMin, _tempPriceMax),
-          min: 0,
-          max: widget.priceSliderMax,
-          divisions: 50,
-          activeColor: context.colorPalette.gold,
-          inactiveColor: context.colorPalette.border,
-          labels: RangeLabels(
-            _formatPriceLabel(_tempPriceMin),
-            _formatPriceLabel(_tempPriceMax),
+        const SizedBox(height: 2),
+        SizedBox(
+          height: 32,
+          child: RangeSlider(
+            values: RangeValues(
+              _tempPriceMin.clamp(0, sliderMax),
+              _tempPriceMax.clamp(0, sliderMax),
+            ),
+            min: 0,
+            max: sliderMax,
+            divisions: divisions,
+            activeColor: context.colorPalette.gold,
+            inactiveColor: context.colorPalette.border,
+            labels: RangeLabels(
+              _formatPriceLabel(_tempPriceMin),
+              _formatPriceLabel(_tempPriceMax),
+            ),
+            onChanged: (values) {
+              setState(() {
+                _tempPriceMin = values.start;
+                _tempPriceMax = values.end;
+              });
+            },
           ),
-          onChanged: (values) {
-            setState(() {
-              _tempPriceMin = values.start;
-              _tempPriceMax = values.end;
-            });
-          },
         ),
       ],
     );
@@ -859,55 +774,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     return '\u20B9${value.round()}';
   }
 
-  void _showCategoryPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (_) => _CategoryPickerSheet(
-        categories: _allCategories,
-        categoryVariants: _categoryVariants,
-        level3Cache: _categoryController.level3Cache,
-        selectedIds: _tempSelectedCategoryIds,
-        selectedNames: _tempSelectedCategoryNames,
-        onToggle: (cat) {
-          setState(() {
-            final idx = _tempSelectedCategoryIds.indexOf(cat.id);
-            if (idx != -1) {
-              _tempSelectedCategoryIds.removeAt(idx);
-              final cleanedName = cat.name
-                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                  .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                  .trim();
-              _tempSelectedCategoryNames.removeWhere((n) => n == cleanedName);
-            } else {
-              _tempSelectedCategoryIds.add(cat.id);
-              final cleanedName = cat.name
-                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                  .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                  .trim();
-              _tempSelectedCategoryNames.add(cleanedName);
-            }
-          });
-        },
-        onClear: () {
-          setState(() {
-            _tempSelectedCategoryIds.clear();
-            _tempSelectedCategoryNames.clear();
-          });
-          Navigator.pop(context);
-        },
-      ),
-    );
-  }
-
   Widget _buildActions(BuildContext context, int count) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
         10,
-        16,
-        10 + MediaQuery.of(context).padding.bottom,
+        6,
+        10,
+        6 + MediaQuery.of(context).padding.bottom,
       ),
       child: Row(
         children: [
@@ -915,39 +788,39 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: OutlinedButton(
               onPressed: _clearAll,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 6),
                 side: BorderSide(color: context.colorPalette.gold),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
               child: Text(
                 'Clear',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.goldDark,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 8),
           Expanded(
             flex: 2,
             child: ElevatedButton(
               onPressed: _apply,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 6),
                 backgroundColor: context.colorPalette.gold,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 0,
               ),
               child: Text(
                 'Apply${count > 0 ? ' ($count)' : ''}',
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -960,467 +833,3 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 }
 
-class _CategoryPickerSheet extends StatefulWidget {
-  final List<CategoryModel> categories;
-  final Map<String, List<CategoryModel>> categoryVariants;
-  final Map<String, List<CategoryModel>> level3Cache;
-  final List<String> selectedIds;
-  final List<String> selectedNames;
-  final ValueChanged<CategoryModel> onToggle;
-  final VoidCallback onClear;
-
-  const _CategoryPickerSheet({
-    required this.categories,
-    required this.categoryVariants,
-    required this.level3Cache,
-    required this.selectedIds,
-    required this.selectedNames,
-    required this.onToggle,
-    required this.onClear,
-  });
-
-  @override
-  State<_CategoryPickerSheet> createState() => _CategoryPickerSheetState();
-}
-
-class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
-  late List<String> _localIds;
-  late List<String> _localNames;
-
-  @override
-  void initState() {
-    super.initState();
-    _localIds = List.from(widget.selectedIds);
-    _localNames = List.from(widget.selectedNames);
-  }
-
-  List<CategoryModel> _mergedLevel3(CategoryModel cat) {
-    final variants = widget.categoryVariants[cat.name.toLowerCase()] ?? [cat];
-    final seen = <String>{};
-    final merged = <CategoryModel>[];
-    for (final variant in variants) {
-      final children = widget.level3Cache[variant.id] ?? [];
-      for (final child in children) {
-        if (seen.add(child.id)) {
-          merged.add(child);
-        }
-      }
-    }
-    return merged;
-  }
-
-  List<CategoryModel> _allVariantLevel3(CategoryModel cat) {
-    final variants = widget.categoryVariants[cat.name.toLowerCase()] ?? [cat];
-    final result = <CategoryModel>[];
-    for (final variant in variants) {
-      result.addAll(widget.level3Cache[variant.id] ?? []);
-    }
-    return result;
-  }
-
-  String _cleanName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
-  bool _isSubSelected(CategoryModel sub) {
-    final cleanedName = _cleanName(sub.name);
-    return _localIds.contains(sub.id) || _localNames.contains(cleanedName);
-  }
-
-  void _toggle(CategoryModel cat) {
-    final cleanedName = _cleanName(cat.name);
-    setState(() {
-      final idx = _localIds.indexOf(cat.id);
-      if (idx != -1) {
-        _localIds.removeAt(idx);
-        _localNames.removeWhere((n) => n == cleanedName);
-      } else {
-        _localIds.add(cat.id);
-        _localNames.add(cleanedName);
-      }
-    });
-    widget.onToggle(cat);
-  }
-
-  void _toggleAllForParent(CategoryModel parent) {
-    final allChildren = _allVariantLevel3(parent);
-    final allSelected = allChildren.every((sub) => _isSubSelected(sub));
-    setState(() {
-      for (final sub in allChildren) {
-        final subCleaned = _cleanName(sub.name);
-        if (allSelected) {
-          final idx = _localIds.indexOf(sub.id);
-          if (idx != -1) {
-            _localIds.removeAt(idx);
-            _localNames.removeWhere((n) => n == subCleaned);
-          }
-        } else {
-          if (!_localIds.contains(sub.id) && !_localNames.contains(subCleaned)) {
-            _localIds.add(sub.id);
-            _localNames.add(subCleaned);
-          }
-        }
-      }
-    });
-    for (final sub in allChildren) {
-      widget.onToggle(sub);
-    }
-  }
-
-  Widget _selectedCountBadge(
-    BuildContext context, {
-    required int selected,
-    required int total,
-  }) {
-    if (selected == 0) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(
-          color: context.colorPalette.gold,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          '$selected',
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: context.isTablet
-          ? MediaQuery.of(context).size.height * 0.5
-          : MediaQuery.of(context).size.height * 0.6,
-      decoration: BoxDecoration(
-        color: context.colorPalette.cream,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(context.responsiveWidth(20, tabletVal: 24))),
-      ),
-      child: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
-            width: context.responsiveWidth(40, tabletVal: 48),
-            height: context.responsiveWidth(4, tabletVal: 5),
-            decoration: BoxDecoration(
-              color: context.colorPalette.goldDark.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-      padding: EdgeInsets.fromLTRB(
-        context.responsiveWidth(16, tabletVal: 20),
-        context.responsiveWidth(10, tabletVal: 12),
-        context.responsiveWidth(16, tabletVal: 20),
-        context.responsiveWidth(10, tabletVal: 12),
-      ),
-      child: Row(
-              children: [
-                Icon(
-                  Icons.grid_view_rounded,
-                  size: context.responsiveWidth(20, tabletVal: 24),
-                  color: context.colorPalette.goldDark,
-                ),
-                SizedBox(width: context.responsiveWidth(8, tabletVal: 10)),
-                Expanded(
-                  child: Text(
-                    'Select Categories',
-                    style: TextStyle(
-                      fontSize: context.responsiveWidth(18, tabletVal: 22),
-                      fontWeight: FontWeight.w700,
-                      color: context.colorPalette.goldDeep,
-                    ),
-                  ),
-                ),
-                if (_localIds.isNotEmpty)
-                  TextButton(
-                    onPressed: widget.onClear,
-                    child: Text(
-                      'Clear',
-                      style: TextStyle(
-                        fontSize: context.responsiveWidth(14, tabletVal: 16),
-                        color: context.colorPalette.goldDark,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Divider(height: 1, color: context.colorPalette.border),
-          Expanded(
-            child: widget.categories.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.category_outlined,
-                          size: context.responsiveWidth(48, tabletVal: 56),
-                          color: context.colorPalette.goldDark,
-                        ),
-                        SizedBox(height: context.responsiveWidth(12, tabletVal: 14)),
-                        Text(
-                          'No categories found',
-                          style: TextStyle(
-                            fontSize: context.responsiveWidth(14, tabletVal: 16),
-                            color: context.colorPalette.goldDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Obx(() {
-                    final categoryController = Get.isRegistered<CategoryController>()
-                        ? Get.find<CategoryController>()
-                        : Get.put(CategoryController());
-                    final expandedId = categoryController.expandedCategoryId;
-                    return ListView.builder(
-                      padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 20)),
-                      itemCount: widget.categories.length,
-                      itemBuilder: (_, index) {
-                        final cat = widget.categories[index];
-                        final isExpanded = expandedId == cat.id;
-                        final level3 = _mergedLevel3(cat);
-                        final isLoading = categoryController.isLevel3Loading(cat.id);
-
-                        return Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () =>
-                                  categoryController.toggleExpand(cat),
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 4),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: context.colorPalette.cardBg,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isExpanded
-                                        ? context.colorPalette.gold
-                                        : context.colorPalette.border,
-                                    width: isExpanded ? 2 : 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (cat.imageUrl.isNotEmpty) ...[
-                                      ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(context.responsiveWidth(8, tabletVal: 10)),
-                                        child: Image.network(
-                                          cat.imageUrl,
-                                          width: context.responsiveWidth(36, tabletVal: 44),
-                                          height: context.responsiveWidth(36, tabletVal: 44),
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (ctx, err, stack) =>
-                                                  Container(
-                                            width: context.responsiveWidth(36, tabletVal: 44),
-                                            height: context.responsiveWidth(36, tabletVal: 44),
-                                            decoration: BoxDecoration(
-                                              color: context
-                                                  .colorPalette.goldLight,
-                                              borderRadius:
-                                                  BorderRadius.circular(context.responsiveWidth(8, tabletVal: 10)),
-                                            ),
-                                            child: Icon(
-                                              Icons.diamond_outlined,
-                                              color: context
-                                                  .colorPalette.goldDark,
-                                              size: context.responsiveWidth(18, tabletVal: 22),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: context.responsiveWidth(12, tabletVal: 14)),
-                                    ],
-                                    Expanded(
-                                      child: Text(
-                                        cat.name
-                                            .replaceAll(
-                                                RegExp(r'[^a-zA-Z\s]'),
-                                                '')
-                                            .replaceAll(
-                                              RegExp(r'collection',
-                                                  caseSensitive: false),
-                                              '',
-                                            )
-                                            .trim(),
-                                        style: TextStyle(
-                                          fontSize: context.responsiveWidth(14, tabletVal: 16),
-                                          fontWeight: FontWeight.w600,
-                                          color: context
-                                              .colorPalette.goldDeep,
-                                        ),
-                                      ),
-                                    ),
-                                    if (level3.isNotEmpty)
-                                      _selectedCountBadge(
-                                        context,
-                                        selected: level3
-                                            .where((sub) =>
-                                                _isSubSelected(sub))
-                                            .length,
-                                        total: level3.length,
-                                      ),
-                                    if (isLoading)
-                                      SizedBox(
-                                        width: context.responsiveWidth(18, tabletVal: 22),
-                                        height: context.responsiveWidth(18, tabletVal: 22),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color:
-                                              context.colorPalette.gold,
-                                        ),
-                                      )
-                                    else
-                                      AnimatedRotation(
-                                        turns: isExpanded ? 0.5 : 0,
-                                        duration: const Duration(
-                                            milliseconds: 200),
-                                        child: Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: context
-                                              .colorPalette.goldDark,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (isExpanded && level3.isNotEmpty) ...[
-                              GestureDetector(
-                                onTap: () => _toggleAllForParent(cat),
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: context.responsiveWidth(24, tabletVal: 28),
-                                      top: context.responsiveWidth(4, tabletVal: 5),
-                                      bottom: context.responsiveWidth(4, tabletVal: 5)),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: context.responsiveWidth(12, tabletVal: 14),
-                                    vertical: context.responsiveWidth(6, tabletVal: 8),
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: context.colorPalette.cardBg,
-                                    borderRadius: BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
-                                    border: Border.all(
-                                      color: context.colorPalette.border,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'All',
-                                          style: TextStyle(
-                                            fontSize: context.responsiveWidth(12, tabletVal: 14),
-                                            fontWeight: FontWeight.w700,
-                                            color: context
-                                                .colorPalette.goldDeep,
-                                          ),
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.select_all_rounded,
-                                        size: context.responsiveWidth(16, tabletVal: 20),
-                                        color:
-                                            context.colorPalette.goldDark,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              ...level3.map((sub) {
-                                final isSubSelected =
-                                    _isSubSelected(sub);
-                                final cleanedName = _cleanName(sub.name);
-                                return GestureDetector(
-                                  onTap: () => _toggle(sub),
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        left: context.responsiveWidth(24, tabletVal: 28),
-                                        top: context.responsiveWidth(4, tabletVal: 5),
-                                        bottom: context.responsiveWidth(4, tabletVal: 5)),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: context.responsiveWidth(14, tabletVal: 18),
-                                      vertical: context.responsiveWidth(10, tabletVal: 12),
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isSubSelected
-                                          ? context.colorPalette.goldLight
-                                          : context
-                                              .colorPalette.backgroundColor,
-                                      borderRadius:
-                                          BorderRadius.circular(context.responsiveWidth(10, tabletVal: 12)),
-                                      border: Border.all(
-                                        color: isSubSelected
-                                            ? context.colorPalette.gold
-                                            : context
-                                                .colorPalette.border,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            cleanedName,
-                                            style: TextStyle(
-                                              fontSize: context.responsiveWidth(13, tabletVal: 15),
-                                              fontWeight: isSubSelected
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
-                                              color: isSubSelected
-                                                  ? context.colorPalette
-                                                      .goldDeep
-                                                  : context.colorPalette
-                                                      .textColor,
-                                            ),
-                                          ),
-                                        ),
-                                        if (isSubSelected)
-                                          Container(
-                                            width: context.responsiveWidth(20, tabletVal: 24),
-                                            height: context.responsiveWidth(20, tabletVal: 24),
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: context
-                                                  .colorPalette.gold,
-                                            ),
-                                            child: Icon(
-                                              Icons.check,
-                                              size: context.responsiveWidth(12, tabletVal: 14),
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ],
-                          ],
-                        );
-                      },
-                    );
-                  }),
-          ),
-        ],
-      ),
-    );
-  }
-}

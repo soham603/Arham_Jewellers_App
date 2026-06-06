@@ -118,6 +118,9 @@ class SearchProductController extends GetxController {
   final _priceMax = 5000000.0.obs;
   double get priceMax => _priceMax.value;
 
+  final _selectedSizes = <String>[].obs;
+  List<String> get selectedSizes => _selectedSizes;
+
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
       _selectedCategoryIds.isNotEmpty ||
@@ -125,7 +128,8 @@ class SearchProductController extends GetxController {
       _weightMin.value > 0 ||
       _weightMax.value < 500 ||
       _priceMin.value > 0 ||
-      _priceMax.value < 5000000;
+      _priceMax.value < 5000000 ||
+      _selectedSizes.isNotEmpty;
 
   int get activeFilterCount {
     var count = _selectedKarats.length;
@@ -133,7 +137,34 @@ class SearchProductController extends GetxController {
     if (_stockFilter.value != 'ready') count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
     if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
+    count += _selectedSizes.length;
     return count;
+  }
+
+  List<String> get availableSizes {
+    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    final sizes = <String>{};
+    for (final p in source) {
+      final s = p.size;
+      if (s != null && s.isNotEmpty) sizes.add(s);
+    }
+    final sorted = sizes.toList()..sort();
+    return sorted;
+  }
+
+  bool get hasWeightData {
+    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    return source.any((p) => p.grossWeight != null);
+  }
+
+  double get availableWeightMax {
+    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    double max = 0;
+    for (final p in source) {
+      final gw = p.grossWeight;
+      if (gw != null && gw > max) max = gw;
+    }
+    return max > 0 ? max.ceilToDouble() : 100;
   }
 
   // ── Filtered initial products (when filters active, no text search) ──────
@@ -286,6 +317,19 @@ class SearchProductController extends GetxController {
       final seen = <String>{};
       allFetched = allFetched.where((p) => seen.add(p.id)).toList();
 
+      if (_selectedKarats.isNotEmpty) {
+        final filterKaratNums = _selectedKarats.map((k) {
+          final m = RegExp(r'(\d+)').firstMatch(k);
+          return m != null ? int.tryParse(m.group(1)!) : null;
+        }).whereType<int>().toSet();
+        if (filterKaratNums.isNotEmpty) {
+          allFetched = allFetched.where((p) {
+            final pk = p.karatNumber;
+            return pk != null && filterKaratNums.contains(pk);
+          }).toList();
+        }
+      }
+
       if (_weightMin.value > 0 || _weightMax.value < 500) {
         allFetched = allFetched.where((p) {
           final gw = p.grossWeight;
@@ -299,6 +343,14 @@ class SearchProductController extends GetxController {
           final price = _calculatePrice(p);
           if (price == null) return true;
           return price >= _priceMin.value && price <= _priceMax.value;
+        }).toList();
+      }
+
+      if (_selectedSizes.isNotEmpty) {
+        allFetched = allFetched.where((p) {
+          final s = p.size;
+          if (s == null) return false;
+          return _selectedSizes.contains(s);
         }).toList();
       }
 
@@ -383,13 +435,16 @@ class SearchProductController extends GetxController {
       }
 
       if (_selectedKarats.isNotEmpty) {
-        allFetched = allFetched.where((p) {
-          final productKarat = (p.karat ?? '').replaceAll(RegExp(r'[^0-9]'), '');
-          return _selectedKarats.any((k) {
-            final filterKarat = k.replaceAll(RegExp(r'[^0-9]'), '');
-            return productKarat.contains(filterKarat) || filterKarat.contains(productKarat);
-          });
-        }).toList();
+        final filterKaratNums = _selectedKarats.map((k) {
+          final m = RegExp(r'(\d+)').firstMatch(k);
+          return m != null ? int.tryParse(m.group(1)!) : null;
+        }).whereType<int>().toSet();
+        if (filterKaratNums.isNotEmpty) {
+          allFetched = allFetched.where((p) {
+            final pk = p.karatNumber;
+            return pk != null && filterKaratNums.contains(pk);
+          }).toList();
+        }
       }
 
       if (_selectedCategoryIds.isNotEmpty) {
@@ -416,6 +471,14 @@ class SearchProductController extends GetxController {
         }).toList();
       }
 
+      if (_selectedSizes.isNotEmpty) {
+        allFetched = allFetched.where((p) {
+          final s = p.size;
+          if (s == null) return false;
+          return _selectedSizes.contains(s);
+        }).toList();
+      }
+
       if (isPagination) {
         _searchResults.addAll(allFetched);
       } else {
@@ -438,6 +501,14 @@ class SearchProductController extends GetxController {
   // ── Karat-filtered products (for "See all" on home page) ───────────────
   final _karatProducts = <ProductModel>[].obs;
   List<ProductModel> get karatProducts => _karatProducts;
+
+  List<ProductModel> get allProducts {
+    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    if (source.isNotEmpty) return source;
+    if (_karatProducts.isNotEmpty) return _karatProducts;
+    if (_categoryProducts.isNotEmpty) return _categoryProducts;
+    return _initialProducts;
+  }
 
   final _karatState = CurrentAppState.INITIAL.obs;
   CurrentAppState get karatState => _karatState.value;
@@ -672,6 +743,7 @@ class SearchProductController extends GetxController {
     _weightMax.value = 500;
     _priceMin.value = 0;
     _priceMax.value = 5000000;
+    _selectedSizes.clear();
     _filteredInitialProducts.clear();
     _filteredInitialState.value = CurrentAppState.INITIAL;
     _filteredInitialPage = 1;
@@ -687,16 +759,22 @@ class SearchProductController extends GetxController {
     required double wMax,
     required double pMin,
     required double pMax,
+    required List<String> sizes,
   }) {
+    final karatsCopy = List<String>.from(karats);
+    final categoryIdsCopy = List<String>.from(categoryIds);
+    final categoryNamesCopy = List<String>.from(categoryNames);
+    final sizesCopy = List<String>.from(sizes);
+
     _selectedKarats
       ..clear()
-      ..addAll(karats);
+      ..addAll(karatsCopy);
     _selectedCategoryIds
       ..clear()
-      ..addAll(categoryIds);
+      ..addAll(categoryIdsCopy);
     _selectedCategoryNames
       ..clear()
-      ..addAll(categoryNames);
+      ..addAll(categoryNamesCopy);
     _selectedCategoryId.value = null;
     _selectedCategoryName.value = '';
     _stockFilter.value = stockFilter;
@@ -704,9 +782,22 @@ class SearchProductController extends GetxController {
     _weightMax.value = wMax;
     _priceMin.value = pMin;
     _priceMax.value = pMax;
+    _selectedSizes
+      ..clear()
+      ..addAll(sizesCopy);
     if (isSearching) {
       _runSearch(_searchQuery.value.trim(), isPagination: false);
     } else {
+      loadFilteredProducts();
+    }
+  }
+
+  void setStockFilter(String value) {
+    if (_stockFilter.value == value) return;
+    _stockFilter.value = value;
+    if (isSearching) {
+      _runSearch(_searchQuery.value.trim(), isPagination: false);
+    } else if (hasActiveFilters) {
       loadFilteredProducts();
     }
   }
@@ -760,12 +851,10 @@ class SearchProductController extends GetxController {
   double? _calculatePrice(ProductModel product) {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || product.fineWeight == null) return null;
-
-    final base = product.fineWeight! * (goldRate.rate / 10);
-    final labour = base * 0.10;
-    final subtotal = base + labour;
-    final gst = subtotal * 0.03;
-    return subtotal + gst;
+    return GoldRateController.calculatePrice(
+      fineWeight: product.fineWeight!,
+      ratePer10Gram: goldRate.rate,
+    );
   }
 
   // ── Recent searches (SharedPrefs) ────────────────────────────────────────
