@@ -2,8 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/core/widgets/category_picker_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
-import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -19,8 +19,15 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class SearchPage extends StatefulWidget {
   final String? initialQuery;
+  final String? initialCategoryId;
+  final String? initialCategoryName;
 
-  const SearchPage({super.key, this.initialQuery});
+  const SearchPage({
+    super.key,
+    this.initialQuery,
+    this.initialCategoryId,
+    this.initialCategoryName,
+  });
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -35,6 +42,10 @@ class _SearchPageState extends State<SearchPage> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
+  Set<SelectedCategory> _tempSelectedCategories = {};
+  List<CategoryModel> _allCategories = [];
+  Map<String, List<CategoryModel>> _categoryVariants = {};
+
   @override
   void initState() {
     super.initState();
@@ -42,10 +53,31 @@ class _SearchPageState extends State<SearchPage> {
     if (categoryController.k18Categories.isEmpty &&
         categoryController.k20Categories.isEmpty &&
         categoryController.k22Categories.isEmpty) {
-      categoryController.fetchAllKaratCategories();
+      categoryController.fetchAllKaratCategories().then((_) => _loadCategories());
+    } else {
+      _loadCategories();
     }
     categoryController.fetchLatestLevel3Categories();
-    if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
+    if (widget.initialCategoryId != null &&
+        widget.initialCategoryId!.isNotEmpty &&
+        widget.initialCategoryName != null &&
+        widget.initialCategoryName!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          controller.applyFilters(
+            karats: controller.selectedKarats,
+            categoryIds: [widget.initialCategoryId!],
+            categoryNames: [widget.initialCategoryName!],
+            stockFilter: controller.stockFilter,
+            wMin: controller.weightMin,
+            wMax: controller.weightMax,
+            pMin: controller.priceMin,
+            pMax: controller.priceMax,
+            sizes: controller.selectedSizes,
+          );
+        }
+      });
+    } else if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _textController.text = widget.initialQuery!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) controller.onSearchSubmitted(widget.initialQuery!);
@@ -65,6 +97,71 @@ class _SearchPageState extends State<SearchPage> {
       } else if (controller.hasActiveFilters) {
         controller.loadFilteredProducts(isPagination: true);
       }
+    }
+  }
+
+  void _loadCategories() {
+    final all = <CategoryModel>[
+      ...categoryController.k18Categories,
+      ...categoryController.k20Categories,
+      ...categoryController.k22Categories,
+    ];
+
+    final variants = <String, List<CategoryModel>>{};
+    for (final cat in all) {
+      final key = cat.name.toLowerCase().trim();
+      variants.putIfAbsent(key, () => []).add(cat);
+    }
+
+    setState(() {
+      _categoryVariants = variants;
+      _allCategories = variants.values.map((list) => list.first).toList();
+    });
+  }
+
+  String _cleanCategoryName(String name) {
+    return name
+        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+        .trim();
+  }
+
+  Set<String> _expandCategoryIds(List<String> selectedIds) {
+    final cleanedSelected = <String>{};
+    for (final id in selectedIds) {
+      for (final entry in _categoryVariants.entries) {
+        if (entry.value.any((c) => c.id == id)) {
+          cleanedSelected.add(_cleanCategoryName(entry.key).toLowerCase());
+          break;
+        }
+      }
+    }
+    if (cleanedSelected.isEmpty) return selectedIds.toSet();
+    final expanded = <String>{};
+    for (final entry in _categoryVariants.entries) {
+      final cleanedKey = _cleanCategoryName(entry.key).toLowerCase();
+      if (cleanedSelected.contains(cleanedKey)) {
+        for (final cat in entry.value) {
+          expanded.add(cat.id);
+        }
+      }
+    }
+    return expanded;
+  }
+
+  String? _getCategoryKarat(CategoryModel cat) {
+    if (categoryController.k18Categories.any((c) => c.id == cat.id)) return '18K';
+    if (categoryController.k20Categories.any((c) => c.id == cat.id)) return '20K';
+    if (categoryController.k22Categories.any((c) => c.id == cat.id)) return '22K';
+    return null;
+  }
+
+  String _getKaratPurity(String? karat) {
+    switch (karat) {
+      case '18K': return '76%';
+      case '20K': return '84%';
+      case '22K': return '92%';
+      default: return '';
     }
   }
 
@@ -125,16 +222,20 @@ class _SearchPageState extends State<SearchPage> {
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
-                  initialSelectedCategoryIds: controller.selectedCategoryIds,
-                  initialSelectedCategoryNames: controller.selectedCategoryNames,
                   initialStockFilter: controller.stockFilter,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
                   initialPriceMin: controller.priceMin,
                   initialPriceMax: controller.priceMax,
                   showKaratFilter: false,
+                  showStockFilter: false,
+                  showCategoryFilter: true,
                   showPriceFilter: showPrice,
-                  weightSliderMax: 100,
+                  showWeightFilter: controller.hasWeightData,
+                  weightSliderMax: controller.availableWeightMax,
+                  products: controller.allProducts,
+                  categories: _allCategories,
+                  initialSelectedCategoryIds: controller.selectedCategoryIds,
                   priceSliderMax: 5000000,
                   onApply: controller.applyFilters,
                 ).then((_) => setState(() {}));
@@ -165,11 +266,57 @@ class _SearchPageState extends State<SearchPage> {
               filterActiveCount: controller.activeFilterCount,
             ),
             _buildKaratRow(context),
+            Obx(() {
+              final categoryIds = controller.selectedCategoryIds;
+              final categoryNames = controller.selectedCategoryNames;
+              if (categoryIds.isEmpty) return const SizedBox.shrink();
+              return Container(
+                padding: EdgeInsets.fromLTRB(
+                  context.getScreenWidth(4),
+                  context.getScreenHeight(0.4),
+                  context.getScreenWidth(4),
+                  0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (int i = 0; i < categoryNames.length; i++)
+                          _activeFilterChip(
+                            context,
+                            label: categoryNames[i],
+                            onRemove: () {
+                              final newIds = List<String>.from(categoryIds);
+                              final newNames = List<String>.from(categoryNames);
+                              newIds.removeAt(i);
+                              newNames.removeAt(i);
+                              controller.applyFilters(
+                                karats: controller.selectedKarats,
+                                categoryIds: newIds,
+                                categoryNames: newNames,
+                                stockFilter: controller.stockFilter,
+                                wMin: controller.weightMin,
+                                wMax: controller.weightMax,
+                                pMin: controller.priceMin,
+                                pMax: controller.priceMax,
+                                sizes: controller.selectedSizes,
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
             SizedBox(height: context.getScreenHeight(0.6)),
-            _buildFilterBar(context),
             Expanded(
               child: Obx(() {
                 final isSearching = controller.isSearching;
+                controller.sortByObs.value;
 
                 return CustomScrollView(
                   controller: _scrollController,
@@ -198,45 +345,77 @@ class _SearchPageState extends State<SearchPage> {
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
                             context.getScreenWidth(4),
-                            context.getScreenHeight(1.5),
+                            context.getScreenHeight(0.4),
                             context.getScreenWidth(4),
                             context.getScreenHeight(0.8),
                           ),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                isSearching ? 'Results' : 'Filtered Results',
-                                style: TextStyle(
-                                  fontSize: context.getScreenWidth(4.2),
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF675F55),
-                                ),
-                              ),
-                              if (controller.selectedKarats.isNotEmpty) ...[
-                                SizedBox(width: context.getScreenWidth(2)),
-                                Text(
-                                  '— ${controller.selectedKarats.join(", ")}',
-                                  style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.5),
-                                    fontWeight: FontWeight.w600,
-                                    color: context.colorPalette.goldDark,
+                              Row(
+                                children: [
+                                  Text(
+                                    'Results (${_filteredCategoryCount})',
+                                    style: TextStyle(
+                                      fontSize: context.getScreenWidth(4.2),
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF675F55),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  if (controller.selectedKarats.isNotEmpty) ...[
+                                    SizedBox(width: context.getScreenWidth(2)),
+                                    Text(
+                                      '— ${controller.selectedKarats.join(", ")}',
+                                      style: TextStyle(
+                                        fontSize: context.getScreenWidth(3.5),
+                                        fontWeight: FontWeight.w600,
+                                        color: context.colorPalette.goldDark,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              Obx(() {
+                                final currentSort = controller.sortBy;
+                                return GestureDetector(
+                                  onTap: () => _showSortSheet(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: context.colorPalette.border),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.sort_rounded,
+                                          size: 18,
+                                          color: context.colorPalette.goldDark,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          currentSort.label,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: context.colorPalette.goldDark,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
                             ],
                           ),
                         ),
                       ),
 
-                    // ── Content ──────────────────────────────────────────
-                    if (isSearching)
-                      _searchResultsSliver(context)
-                    else if (controller.hasActiveFilters)
-                      _filteredInitialProductsSliver(context),
-
-                    // ── Load More Indicator ──────────────────────────────
+                    // ── Category Results ─────────────────────────────────
                     if (isSearching || controller.hasActiveFilters)
-                      _loadMoreSliver(context),
+                      _level3CategoryResultsSliver(context),
 
                     SliverToBoxAdapter(
                       child: SizedBox(height: context.getScreenHeight(2)),
@@ -264,255 +443,264 @@ class _SearchPageState extends State<SearchPage> {
         context.getScreenWidth(4),
         0,
       ),
-      child: Row(
-        children: karatOptions.map((option) {
-          final karat = option['label']!;
-          final percent = option['percent']!;
-          final isSelected = controller.selectedKarats.contains(karat);
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () {
-                controller.toggleKaratFilter(karat);
-                if (controller.isSearching) {
-                  controller.applyFilters(
-                    karats: controller.selectedKarats,
-                    categoryIds: controller.selectedCategoryIds,
-                    categoryNames: controller.selectedCategoryNames,
-                    stockFilter: controller.stockFilter,
-                    wMin: controller.weightMin,
-                    wMax: controller.weightMax,
-                    pMin: controller.priceMin,
-                    pMax: controller.priceMax,
-                  );
-                } else if (controller.hasActiveFilters) {
-                  controller.loadFilteredProducts();
-                }
-                setState(() {});
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? context.colorPalette.gold
-                      : context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected
-                        ? context.colorPalette.gold
-                        : context.colorPalette.border,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  '$karat ($percent)',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected
-                        ? Colors.white
-                        : context.colorPalette.goldDeep,
+      child: Obx(() {
+        return Row(
+          children: karatOptions.map((option) {
+            final karat = option['label']!;
+            final percent = option['percent']!;
+            final isSelected = controller.selectedKarats.contains(karat);
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: karatOptions.last != option ? context.getScreenWidth(2) : 0),
+                child: GestureDetector(
+                  onTap: () {
+                    controller.toggleKaratFilter(karat);
+                    if (controller.isSearching) {
+                      controller.applyFilters(
+                        karats: controller.selectedKarats,
+                        categoryIds: controller.selectedCategoryIds,
+                        categoryNames: controller.selectedCategoryNames,
+                        stockFilter: controller.stockFilter,
+                        wMin: controller.weightMin,
+                        wMax: controller.weightMax,
+                        pMin: controller.priceMin,
+                        pMax: controller.priceMax,
+                        sizes: controller.selectedSizes,
+                      );
+                    } else if (controller.hasActiveFilters) {
+                      controller.loadFilteredProducts();
+                    }
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getScreenWidth(2),
+                      vertical: context.getScreenHeight(0.8),
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.colorPalette.gold
+                          : context.colorPalette.cardBg,
+                      borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
+                      border: Border.all(
+                        color: isSelected
+                            ? context.colorPalette.gold
+                            : context.colorPalette.border,
+                        width: 2,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: context.colorPalette.gold.withOpacity(0.4),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : [],
+                    ),
+                    child: Text(
+                      '$karat ($percent)',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.2),
+                        fontWeight: FontWeight.w700,
+                        color: isSelected
+                            ? Colors.white
+                            : context.colorPalette.goldDeep,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
-      ),
+            );
+          }).toList(),
+        );
+      }),
     );
   }
 
-  Widget _buildFilterBar(BuildContext context) {
+  Widget _buildCategoriesFilter(BuildContext context) {
     return Obx(() {
-      if (!controller.hasActiveFilters) return const SizedBox.shrink();
-
-      final karats = controller.selectedKarats;
       final categoryIds = controller.selectedCategoryIds;
       final categoryNames = controller.selectedCategoryNames;
-      final stockFilter = controller.stockFilter;
-      final weightMin = controller.weightMin;
-      final weightMax = controller.weightMax;
-      final weightActive = weightMin > 0 || weightMax < 500;
-      final priceMin = controller.priceMin;
-      final priceMax = controller.priceMax;
-      final priceActive = priceMin > 0 || priceMax < 5000000;
-
-      void removeKarat(String karat) {
-        final newKarats = List<String>.from(karats)..remove(karat);
-        controller.applyFilters(
-          karats: newKarats,
-          categoryIds: categoryIds,
-          categoryNames: categoryNames,
-          stockFilter: stockFilter,
-          wMin: weightMin,
-          wMax: weightMax,
-          pMin: priceMin,
-          pMax: priceMax,
-        );
-        setState(() {});
-      }
-
-      void removeCategory(String name) {
-        final idx = categoryNames.indexOf(name);
-        final newIds = List<String>.from(categoryIds);
-        final newNames = List<String>.from(categoryNames);
-        if (idx != -1) {
-          newIds.removeAt(idx);
-          newNames.removeAt(idx);
-        }
-        controller.applyFilters(
-          karats: karats,
-          categoryIds: newIds,
-          categoryNames: newNames,
-          stockFilter: stockFilter,
-          wMin: weightMin,
-          wMax: weightMax,
-          pMin: priceMin,
-          pMax: priceMax,
-        );
-        setState(() {});
-      }
+      final hasCategories = categoryIds.isNotEmpty;
 
       return Container(
         padding: EdgeInsets.fromLTRB(
           context.getScreenWidth(4),
           0,
           context.getScreenWidth(4),
-          context.getScreenHeight(0.5),
+          0,
         ),
         child: Column(
           children: [
             Row(
               children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        for (final karat in karats)
-                          _activeFilterChip(
-                            context,
-                            label: karat,
-                            onRemove: () => removeKarat(karat),
-                          ),
-                        for (final name in categoryNames)
-                          _activeFilterChip(
-                            context,
-                            label: name,
-                            onRemove: () => removeCategory(name),
-                          ),
-                        if (stockFilter != 'ready')
-                          _activeFilterChip(
-                            context,
-                            label: stockFilter == 'all' ? 'All Stock' : 'Out of Stock',
-                            onRemove: () {
-                              controller.applyFilters(
-                                karats: karats,
-                                categoryIds: categoryIds,
-                                categoryNames: categoryNames,
-                                stockFilter: 'ready',
-                                wMin: weightMin,
-                                wMax: weightMax,
-                                pMin: priceMin,
-                                pMax: priceMax,
-                              );
-                              setState(() {});
-                            },
-                          ),
-                        if (weightActive)
-                          _activeFilterChip(
-                            context,
-                            label: '${weightMin.round()}g - ${weightMax.round()}g',
-                            onRemove: () {
-                              controller.applyFilters(
-                                karats: karats,
-                                categoryIds: categoryIds,
-                                categoryNames: categoryNames,
-                                stockFilter: stockFilter,
-                                wMin: 0,
-                                wMax: 500,
-                                pMin: priceMin,
-                                pMax: priceMax,
-                              );
-                              setState(() {});
-                            },
-                          ),
-                        if (priceActive)
-                          _activeFilterChip(
-                            context,
-                            label: _formatPriceChip(priceMin, priceMax),
-                            onRemove: () {
-                              controller.applyFilters(
-                                karats: karats,
-                                categoryIds: categoryIds,
-                                categoryNames: categoryNames,
-                                stockFilter: stockFilter,
-                                wMin: weightMin,
-                                wMax: weightMax,
-                                pMin: 0,
-                                pMax: 5000000,
-                              );
-                              setState(() {});
-                            },
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () {
-                    controller.clearAllFilters();
-                    controller.loadInitialProducts();
+                    _focusNode.unfocus();
+                    CategoryPickerSheet.show(
+                      context,
+                      categories: _allCategories,
+                      categoryVariants: _categoryVariants,
+                      categoryController: categoryController,
+                      selectedCategories: _tempSelectedCategories,
+                      cleanName: _cleanCategoryName,
+                      onSelectionChanged: (updated) {
+                        setState(() {
+                          _tempSelectedCategories = updated;
+                        });
+                      },
+                      onClear: () {
+                        setState(() {
+                          _tempSelectedCategories.clear();
+                        });
+                        Navigator.pop(context);
+                      },
+                    ).then((_) {
+                      final newIds = _tempSelectedCategories.map((c) => c.id).toList();
+                      final newNames = _tempSelectedCategories.map((c) => c.displayName).toList();
+                      controller.applyFilters(
+                        karats: controller.selectedKarats,
+                        categoryIds: newIds,
+                        categoryNames: newNames,
+                        stockFilter: controller.stockFilter,
+                        wMin: controller.weightMin,
+                        wMax: controller.weightMax,
+                        pMin: controller.priceMin,
+                        pMax: controller.priceMax,
+                        sizes: controller.selectedSizes,
+                      );
+                      setState(() {});
+                    });
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: context.colorPalette.border),
+                      color: hasCategories
+                          ? context.colorPalette.gold
+                          : context.colorPalette.cardBg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: hasCategories
+                            ? context.colorPalette.gold
+                            : context.colorPalette.border,
+                        width: 1.5,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.close,
-                          size: context.getScreenWidth(3),
-                          color: context.colorPalette.goldDark,
+                          Icons.add,
+                          size: 14,
+                          color: hasCategories
+                              ? Colors.white
+                              : context.colorPalette.goldDark,
                         ),
-                        SizedBox(width: context.getScreenWidth(0.8)),
+                        const SizedBox(width: 4),
                         Text(
-                          'Clear',
+                          hasCategories
+                              ? '${categoryNames.length} Categories'
+                              : 'Categories',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(2.8),
-                            fontWeight: FontWeight.w500,
-                            color: context.colorPalette.goldDark,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: hasCategories
+                                ? Colors.white
+                                : context.colorPalette.goldDeep,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+                if (hasCategories) ...[
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final name in categoryNames)
+                            _activeFilterChip(
+                              context,
+                              label: name,
+                              onRemove: () {
+                                final idx = categoryNames.indexOf(name);
+                                final newIds = List<String>.from(categoryIds);
+                                final newNames = List<String>.from(categoryNames);
+                                if (idx != -1) {
+                                  newIds.removeAt(idx);
+                                  newNames.removeAt(idx);
+                                }
+                                controller.applyFilters(
+                                  karats: controller.selectedKarats,
+                                  categoryIds: newIds,
+                                  categoryNames: newNames,
+                                  stockFilter: controller.stockFilter,
+                                  wMin: controller.weightMin,
+                                  wMax: controller.weightMax,
+                                  pMin: controller.priceMin,
+                                  pMax: controller.priceMax,
+                                  sizes: controller.selectedSizes,
+                                );
+                                setState(() {
+                                  _tempSelectedCategories.removeWhere((c) => c.id == categoryIds[idx]);
+                                });
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      controller.clearAllFilters();
+                      controller.loadInitialProducts();
+                      setState(() {
+                        _tempSelectedCategories.clear();
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.cardBg,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: context.colorPalette.border),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.close,
+                            size: context.getScreenWidth(3),
+                            color: context.colorPalette.goldDark,
+                          ),
+                          SizedBox(width: context.getScreenWidth(0.8)),
+                          Text(
+                            'Clear',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(2.8),
+                              fontWeight: FontWeight.w500,
+                              color: context.colorPalette.goldDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ],
         ),
       );
     });
-  }
-
-  String _formatPriceChip(double min, double max) {
-    String fmt(double v) {
-      if (v >= 10000000) return '\u20B9${(v / 10000000).toStringAsFixed(1)}Cr';
-      if (v >= 100000) return '\u20B9${(v / 100000).toStringAsFixed(1)}L';
-      if (v >= 1000) return '\u20B9${(v / 1000).toStringAsFixed(1)}K';
-      return '\u20B9${v.round()}';
-    }
-    return '${fmt(min)} – ${fmt(max)}';
   }
 
   Widget _activeFilterChip(
@@ -544,6 +732,101 @@ class _SearchPageState extends State<SearchPage> {
             child: const Icon(Icons.close, size: 12, color: Colors.white),
           ),
         ],
+      ),
+    );
+  }
+
+
+
+  void _showSortSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          20 + MediaQuery.of(ctx).padding.bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Sort By',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: context.colorPalette.textColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...[SortOption.nameAsc, SortOption.newest, SortOption.oldest]
+                .map((option) {
+              final isSelected = controller.sortBy == option;
+              return GestureDetector(
+                onTap: () {
+                  controller.setSortOption(option);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? context.colorPalette.gold.withOpacity(0.08)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        size: 20,
+                        color: isSelected
+                            ? context.colorPalette.gold
+                            : context.colorPalette.subTitleColor,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        option.label,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                          color: isSelected
+                              ? context.colorPalette.gold
+                              : context.colorPalette.textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }
@@ -616,10 +899,19 @@ class _SearchPageState extends State<SearchPage> {
                       .trim();
                   return GestureDetector(
                     onTap: () {
-                      _textController.text = cleanedName;
-                      setState(() {});
-                      controller.onSearchSubmitted(cleanedName);
                       _focusNode.unfocus();
+                      controller.applyFilters(
+                        karats: controller.selectedKarats,
+                        categoryIds: [cat.id],
+                        categoryNames: [cleanedName],
+                        stockFilter: controller.stockFilter,
+                        wMin: controller.weightMin,
+                        wMax: controller.weightMax,
+                        pMin: controller.priceMin,
+                        pMax: controller.priceMax,
+                        sizes: controller.selectedSizes,
+                      );
+                      setState(() {});
                     },
                     child: Column(
                       children: [
@@ -642,16 +934,32 @@ class _SearchPageState extends State<SearchPage> {
                         const SizedBox(height: 5),
                         SizedBox(
                           width: context.getScreenWidth(20),
-                          child: Text(
-                            cleanedName,
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(2.4),
-                              fontWeight: FontWeight.w700,
-                              color: context.colorPalette.goldDeep,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                          child: Column(
+                            children: [
+                              Text(
+                                cleanedName,
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(2.4),
+                                  fontWeight: FontWeight.w700,
+                                  color: context.colorPalette.goldDeep,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (_getCategoryKarat(cat) != null) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${_getCategoryKarat(cat)} (${_getKaratPurity(_getCategoryKarat(cat))})',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2),
+                                    fontWeight: FontWeight.w500,
+                                    color: context.colorPalette.goldDark,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ],
@@ -902,176 +1210,216 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Initial Products Sliver ───────────────────────────────────────────────
-  Widget _initialProductsSliver(BuildContext context) {
-    final state = controller.initialState;
-    final list = controller.initialProducts;
+  // ── Level-3 Category Results Sliver ──────────────────────────────────────
+  Widget _level3CategoryResultsSliver(BuildContext context) {
+    final allCategories = categoryController.allLevel3Categories;
+    final searchQuery = controller.searchQuery.toLowerCase().trim();
+    final selectedKarats = controller.selectedKarats;
 
-    if (state == CurrentAppState.LOADING && list.isEmpty) {
+    var filtered = allCategories;
+
+    if (searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where((cat) => cat.name.toLowerCase().contains(searchQuery))
+          .toList();
+    }
+
+    if (selectedKarats.isNotEmpty) {
+      filtered = filtered.where((cat) {
+        final karat = categoryController.getLevel3Karat(cat.id);
+        return karat != null && selectedKarats.contains(karat);
+      }).toList();
+    }
+
+    if (controller.selectedCategoryIds.isNotEmpty) {
+      final expandedIds = _expandCategoryIds(controller.selectedCategoryIds);
+      filtered = filtered.where((cat) {
+        return cat.parentId != null && expandedIds.contains(cat.parentId);
+      }).toList();
+    }
+
+    if (categoryController.latestLevel3State == CurrentAppState.LOADING &&
+        allCategories.isEmpty) {
       return SliverToBoxAdapter(child: _gridShimmer(context));
     }
 
-    if (state == CurrentAppState.ERROR && list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: _errorWidget(context, onRetry: controller.loadInitialProducts),
-      );
-    }
-
-    if (state == CurrentAppState.SUCCESS && list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: _emptyWidget(context, 'No products available'),
-      );
-    }
-
-    return _productGrid(context, list);
-  }
-
-  // ── Filtered Initial Products Sliver ───────────────────────────────────────
-  Widget _filteredInitialProductsSliver(BuildContext context) {
-    final state = controller.filteredInitialState;
-    final list = controller.filteredInitialProducts;
-
-    if (state == CurrentAppState.LOADING && list.isEmpty) {
-      return SliverToBoxAdapter(child: _gridShimmer(context));
-    }
-
-    if (state == CurrentAppState.ERROR && list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: _errorWidget(context, onRetry: controller.loadFilteredProducts),
-      );
-    }
-
-    if (state == CurrentAppState.SUCCESS && list.isEmpty) {
+    if (filtered.isEmpty) {
       return SliverToBoxAdapter(
         child: _emptyWidget(
           context,
-          'No products match your filters',
+          searchQuery.isNotEmpty
+              ? 'No categories match "$searchQuery"'
+              : 'No categories found',
         ),
       );
     }
 
-    return _productGrid(context, list);
-  }
+    final sorted = _sortCategories(filtered, controller.sortBy);
 
-  // ── Search Results Sliver ─────────────────────────────────────────────────
-  Widget _searchResultsSliver(BuildContext context) {
-    final state = controller.searchState;
-    final list = controller.searchResults;
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+      sliver: SliverGrid(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final cat = sorted[index];
+            final cleanedName = cat.name
+                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+                .trim();
+            final karatName = categoryController.getLevel3Karat(cat.id);
 
-    if (state == CurrentAppState.LOADING && list.isEmpty) {
-      return SliverToBoxAdapter(child: _gridShimmer(context));
-    }
-
-    if (state == CurrentAppState.ERROR && list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: _errorWidget(
-          context,
-          onRetry: () => controller.onSearchSubmitted(controller.searchQuery),
-        ),
-      );
-    }
-
-    if (state == CurrentAppState.SUCCESS && list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: _emptyWidget(
-          context,
-          'No results for "${controller.searchQuery}"',
-        ),
-      );
-    }
-
-    return _productGrid(context, list);
-  }
-
-  // ── Load More Sliver ──────────────────────────────────────────────────────
-  SliverToBoxAdapter _loadMoreSliver(BuildContext context) {
-    final isSearching = controller.isSearching;
-    final hasFilters = controller.hasActiveFilters;
-    final state = isSearching
-        ? controller.searchState
-        : hasFilters
-            ? controller.filteredInitialState
-            : controller.initialState;
-    final hasMore = isSearching
-        ? controller.searchHasMore
-        : hasFilters
-            ? controller.filteredInitialHasMore
-            : controller.initialHasMore;
-    final list = isSearching
-        ? controller.searchResults
-        : hasFilters
-            ? controller.filteredInitialProducts
-            : controller.initialProducts;
-
-    if (list.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
-
-    // pagination spinner while loading more
-    if (state == CurrentAppState.LOADING && list.isNotEmpty) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
-          child: Center(
-            child: SizedBox(
-              width: context.getScreenWidth(6),
-              height: context.getScreenWidth(6),
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: context.colorPalette.primaryColor,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (!hasMore) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
-          child: Center(
-            child: Text(
-              'You\'ve seen it all',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.2),
-                color: context.colorPalette.subTitleColor,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const SliverToBoxAdapter(child: SizedBox.shrink());
-  }
-
-  // ── Product Grid (SliverGrid) ─────────────────────────────────────────────
-  SliverGrid _productGrid(BuildContext context, List list) {
-    return SliverGrid(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => Padding(
-          padding: EdgeInsets.all(context.getScreenWidth(1)),
-          child: ProductCard(
-            product: list[index],
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ProductDetailsPage(product: list[index]),
+            return TweenAnimationBuilder<double>(
+              duration: Duration(milliseconds: 350 + (index.clamp(0, 9) * 70)),
+              curve: Curves.easeOutCubic,
+              tween: Tween<double>(begin: 0.0, end: 1.0),
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(
+                    offset: Offset(0, 24 * (1 - value)),
+                    child: child,
+                  ),
+                );
+              },
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductListingPage(
+                        categoryId: cat.id,
+                        karat: karatName,
+                        title: cleanedName,
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: context.colorPalette.cardBg,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: context.colorPalette.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(14),
+                          ),
+                          child: cat.imageUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: cat.imageUrl,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (_, __, ___) =>
+                                      RatneshFallback.m(),
+                                )
+                              : RatneshFallback.m(),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getScreenWidth(2),
+                            vertical: context.getScreenHeight(0.3),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                cleanedName,
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(2.8),
+                                  fontWeight: FontWeight.w600,
+                                  color: context.colorPalette.textColor,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (karatName != null) ...[
+                                SizedBox(height: context.getScreenHeight(0.1)),
+                                Text(
+                                  karatName,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.2),
+                                    fontWeight: FontWeight.w500,
+                                    color: context.colorPalette.goldDark,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+          childCount: sorted.length,
         ),
-        childCount: list.length,
-      ),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-        mainAxisSpacing: context.getScreenWidth(2),
-        crossAxisSpacing: context.getScreenWidth(2),
-        childAspectRatio: context.isTablet ? 0.72 : 0.66,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
+          mainAxisSpacing: context.getScreenWidth(2),
+          crossAxisSpacing: context.getScreenWidth(2),
+          childAspectRatio: 0.75,
+        ),
       ),
     );
+  }
+
+  int get _filteredCategoryCount {
+    var filtered = categoryController.allLevel3Categories;
+    final searchQuery = controller.searchQuery.toLowerCase().trim();
+    final selectedKarats = controller.selectedKarats;
+
+    if (searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where((cat) => cat.name.toLowerCase().contains(searchQuery))
+          .toList();
+    }
+
+    if (selectedKarats.isNotEmpty) {
+      filtered = filtered.where((cat) {
+        final karat = categoryController.getLevel3Karat(cat.id);
+        return karat != null && selectedKarats.contains(karat);
+      }).toList();
+    }
+
+    if (controller.selectedCategoryIds.isNotEmpty) {
+      final expandedIds = _expandCategoryIds(controller.selectedCategoryIds);
+      filtered = filtered.where((cat) {
+        return cat.parentId != null && expandedIds.contains(cat.parentId);
+      }).toList();
+    }
+
+    return filtered.length;
+  }
+
+  List<CategoryModel> _sortCategories(
+      List<CategoryModel> categories, SortOption sort) {
+    final sorted = List<CategoryModel>.from(categories);
+    switch (sort) {
+      case SortOption.nameAsc:
+        sorted.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case SortOption.newest:
+        sorted.sort((a, b) =>
+            (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
+        break;
+      case SortOption.oldest:
+        sorted.sort((a, b) =>
+            (a.createdAt ?? DateTime(0)).compareTo(b.createdAt ?? DateTime(0)));
+        break;
+      default:
+        sorted.sort((a, b) =>
+            (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
+    }
+    return sorted;
   }
 
   // ── Shimmer Placeholder ───────────────────────────────────────────────────
@@ -1137,62 +1485,6 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Error Widget ──────────────────────────────────────────────────────────
-  Widget _errorWidget(BuildContext context, {required VoidCallback onRetry}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(6)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.wifi_off_rounded,
-            size: context.getScreenWidth(12),
-            color: const Color(0xFF8D847A),
-          ),
-          SizedBox(height: context.getScreenHeight(1.5)),
-          Text(
-            'Something went wrong',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(4),
-              color: context.colorPalette.textColor,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: context.getScreenHeight(0.5)),
-          Text(
-            'Check your connection and try again',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(3.2),
-              color: context.colorPalette.subTitleColor,
-            ),
-          ),
-          SizedBox(height: context.getScreenHeight(2)),
-          ElevatedButton(
-            onPressed: onRetry,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.colorPalette.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(8),
-                vertical: context.getScreenHeight(1.2),
-              ),
-            ),
-            child: Text(
-              'Retry',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),

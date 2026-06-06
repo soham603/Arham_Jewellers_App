@@ -61,7 +61,7 @@ class AccessRequestModel {
       user: json['user'] != null
           ? AccessRequestUser.fromJson(json['user'])
           : null,
-      isRetailer: json['isRetailer'] ?? false,
+      isRetailer: json['retailUser'] ?? false,
     );
   }
 

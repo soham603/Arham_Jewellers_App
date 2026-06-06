@@ -14,7 +14,7 @@ class GoldRateScreen extends StatefulWidget {
 }
 
 class _GoldRateScreenState extends State<GoldRateScreen> {
-  final GoldRateController controller = Get.put(GoldRateController());
+  final GoldRateController controller = Get.find<GoldRateController>();
   final TextEditingController _rateController = TextEditingController();
 
   @override
@@ -78,13 +78,13 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
   Widget _currentRateCard(BuildContext context) {
     return Obx(() {
       final rate = controller.currentRate;
-      final state = controller.state;
+      final rateState = controller.currentRateState;
 
-      if (state == CurrentAppState.LOADING && rate == null) {
+      if (rateState == CurrentAppState.LOADING && rate == null) {
         return _shimmerCard(context);
       }
 
-      if (state == CurrentAppState.ERROR && rate == null) {
+      if (rateState == CurrentAppState.ERROR && rate == null) {
         return Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.getScreenWidth(5)),
@@ -127,9 +127,12 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
 
       return Container(
         width: double.infinity,
-        padding: EdgeInsets.all(context.getScreenWidth(5)),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(1.5),
+        ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
           gradient: const LinearGradient(
             colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
             begin: Alignment.topLeft,
@@ -143,71 +146,71 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: context.getScreenWidth(12),
-                  height: context.getScreenWidth(12),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryGold,
-                  ),
-                  child: Icon(
-                    Icons.monetization_on_rounded,
-                    color: Colors.white,
-                    size: context.getScreenWidth(6),
-                  ),
-                ),
-                SizedBox(width: context.getScreenWidth(3)),
-                Text(
-                  'Current Rate',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: context.getScreenWidth(3.8),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: context.getScreenHeight(2)),
-            Text(
-              rate != null ? '₹${rate.rate.toStringAsFixed(0)}' : '—',
-              style: TextStyle(
+            Container(
+              width: context.getScreenWidth(10),
+              height: context.getScreenWidth(10),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryGold,
+              ),
+              child: Icon(
+                Icons.monetization_on_rounded,
                 color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(12),
-                height: 1.1,
+                size: context.getScreenWidth(5),
               ),
             ),
-            Text(
-              'per 10 g',
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: context.getScreenWidth(3.5),
-              ),
-            ),
-            if (rate?.source != null) ...[
-              SizedBox(height: context.getScreenHeight(1.5)),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
-                  vertical: context.getScreenHeight(0.5),
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  'Set by ${rate!.source} • ${DateFormat('dd MMM yyyy, hh:mm a').format(rate.timestamp.toLocal())}',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: context.getScreenWidth(2.8),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Current Rate',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: context.getScreenWidth(3.2),
+                    ),
                   ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    rate != null ? '₹${rate.rate.toStringAsFixed(0)}/10g' : '—',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(7),
+                      height: 1.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (rate?.source != null)
+              Expanded(
+                flex: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      rate!.source!,
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: context.getScreenWidth(2.2),
+                      ),
+                    ),
+                    Text(
+                      DateFormat('dd MMM, hh:mm a').format(rate.timestamp.toLocal()),
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: context.getScreenWidth(2),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
           ],
         ),
       );
@@ -339,7 +342,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGold,
                   ),
-                  hintText: 'e.g. 72000',
+                  hintText: 'e.g. 7200',
                   hintStyle: TextStyle(
                     color: context.colorPalette.subTitleColor.withOpacity(0.4),
                   ),
@@ -366,10 +369,10 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   onTap: isLoading
                       ? null
                       : () async {
-                          final text = _rateController.text.trim();
+                          final text = _rateController.text.trim().replaceAll(',', '');
                           final rate = double.tryParse(text);
-                          if (rate == null || rate <= 0) {
-                            Get.snackbar('Invalid', 'Please enter a valid rate');
+if (rate == null || rate < 0.1 || rate > 1000000) {
+  Get.snackbar('Invalid', 'Enter a rate between ₹0.10 and ₹10,00,000');
                             return;
                           }
                           Get.back();
@@ -414,10 +417,10 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
 
   Widget _historyList(BuildContext context) {
     return Obx(() {
-      final state = controller.state;
+      final histState = controller.historyState;
       final history = controller.history;
 
-      if (state == CurrentAppState.LOADING && history.isEmpty) {
+      if (histState == CurrentAppState.LOADING && history.isEmpty) {
         return Column(
           children: List.generate(
             5,
@@ -429,7 +432,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         );
       }
 
-      if (state == CurrentAppState.ERROR && history.isEmpty) {
+      if (histState == CurrentAppState.ERROR && history.isEmpty) {
         return Center(
           child: Text(
             controller.error.isNotEmpty ? controller.error : 'No history available',
@@ -471,7 +474,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           ...List.generate(history.length, (index) {
             final rate = history[index];
             final isFirst = index == 0;
-            final prevRate = index > 0 ? history[index - 1].rate : null;
+            final prevRate = index < history.length - 1 ? history[index + 1].rate : null;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),

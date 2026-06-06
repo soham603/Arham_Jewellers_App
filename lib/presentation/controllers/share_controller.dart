@@ -64,6 +64,9 @@ class ShareController extends GetxController {
   final _priceMax = 5000000.0.obs;
   double get priceMax => _priceMax.value;
 
+  final _selectedSizes = <String>[].obs;
+  List<String> get selectedSizes => _selectedSizes;
+
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
       _selectedCategoryIds.isNotEmpty ||
@@ -71,7 +74,8 @@ class ShareController extends GetxController {
       _weightMin.value > 0 ||
       _weightMax.value < 500 ||
       _priceMin.value > 0 ||
-      _priceMax.value < 5000000;
+      _priceMax.value < 5000000 ||
+      _selectedSizes.isNotEmpty;
 
   int get activeFilterCount {
     var count = _selectedKarats.length;
@@ -79,7 +83,31 @@ class ShareController extends GetxController {
     if (_stockFilter.value != 'ready') count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
     if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
+    count += _selectedSizes.length;
     return count;
+  }
+
+  List<String> get availableSizes {
+    final sizes = <String>{};
+    for (final p in _products) {
+      final s = p.size;
+      if (s != null && s.isNotEmpty) sizes.add(s);
+    }
+    final sorted = sizes.toList()..sort();
+    return sorted;
+  }
+
+  bool get hasWeightData {
+    return _products.any((p) => p.grossWeight != null);
+  }
+
+  double get availableWeightMax {
+    double max = 0;
+    for (final p in _products) {
+      final gw = p.grossWeight;
+      if (gw != null && gw > max) max = gw;
+    }
+    return max > 0 ? max.ceilToDouble() : 100;
   }
 
   // ── Multi-select ─────────────────────────────────────────────
@@ -134,6 +162,14 @@ class ShareController extends GetxController {
         final price = _calculatePrice(p);
         if (price == null) return true;
         return price >= _priceMin.value && price <= _priceMax.value;
+      }).toList();
+    }
+
+    if (_selectedSizes.isNotEmpty) {
+      list = list.where((p) {
+        final s = p.size;
+        if (s == null) return false;
+        return _selectedSizes.contains(s);
       }).toList();
     }
 
@@ -213,48 +249,61 @@ class ShareController extends GetxController {
 
       List<ProductModel> allFetched = [];
 
-      if (hasTextQuery || hasKaratFilter || hasCategoryFilter) {
-        final List<String> searchQueries = [];
+      if (hasTextQuery) {
+        // ── Text search (with optional client-side karat/category filter) ──
+        final response = await httpClient.get(
+          "/api/v1/products/search",
+          queryParameters: {
+            "search": _searchQuery.value.trim(),
+            "page": _page,
+            "limit": _limit,
+            if (_stockFilter.value != 'ready') "showAll": true,
+          },
+        );
 
-        if (hasCategoryFilter && _selectedCategoryNames.isNotEmpty) {
-          final cleanedNames = _selectedCategoryNames
-              .map((n) => n
-                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                  .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                  .trim())
-              .where((n) => n.isNotEmpty)
-              .toList();
-
-          if (hasKaratFilter) {
-            for (final karat in _selectedKarats) {
-              for (final name in cleanedNames) {
-                searchQueries.add("${_karatToSearchValue(karat)} $name");
-              }
-            }
-          } else if (hasTextQuery) {
-            for (final name in cleanedNames) {
-              searchQueries.add("${_searchQuery.value.trim()} $name");
-            }
-          } else {
-            searchQueries.addAll(cleanedNames);
-          }
-        } else if (hasKaratFilter) {
-          for (final karat in _selectedKarats) {
-            if (hasTextQuery) {
-              searchQueries.add("${_searchQuery.value.trim()} ${_karatToSearchValue(karat)}");
-            } else {
-              searchQueries.add(_karatToSearchValue(karat));
-            }
-          }
-        } else if (hasTextQuery) {
-          searchQueries.add(_searchQuery.value.trim());
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final data = response.data['data'];
+          final List raw = data['data'] is List ? data['data'] : [];
+          allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
         }
 
-        for (final q in searchQueries) {
+        if (hasKaratFilter) {
+          allFetched = _filterByKarat(allFetched);
+        }
+        if (hasCategoryFilter) {
+          allFetched = _filterByCategoryId(allFetched);
+        }
+      } else if (hasCategoryFilter) {
+        // ── Category filter via /get-all?categoryId=<ID> ──
+        for (final categoryId in _selectedCategoryIds) {
+          final response = await httpClient.get(
+            "/api/v1/products/get-all",
+            queryParameters: {
+              "categoryId": categoryId,
+              "page": _page,
+              "limit": _limit,
+              "showReverse": true,
+              if (_stockFilter.value != 'ready') "showAll": true,
+            },
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
+          }
+        }
+
+        if (hasKaratFilter) {
+          allFetched = _filterByKarat(allFetched);
+        }
+      } else if (hasKaratFilter) {
+        // ── Karat-only via search endpoint ──
+        for (final karat in _selectedKarats) {
           final response = await httpClient.get(
             "/api/v1/products/search",
             queryParameters: {
-              "search": q,
+              "search": _karatToSearchValue(karat),
               "page": _page,
               "limit": _limit,
               if (_stockFilter.value != 'ready') "showAll": true,
@@ -264,13 +313,11 @@ class ShareController extends GetxController {
           if (response.statusCode == 200 || response.statusCode == 201) {
             final data = response.data['data'];
             final List raw = data['data'] is List ? data['data'] : [];
-            allFetched.addAll(
-              raw.map((e) => ProductModel.fromJson(e)).toList(),
-            );
+            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
           }
         }
       } else {
-        // No filters — use get-all
+        // ── No filters — use get-all ──
         final response = await httpClient.get(
           "/api/v1/products/get-all",
           queryParameters: {
@@ -288,13 +335,26 @@ class ShareController extends GetxController {
         }
       }
 
+      // Deduplicate by product ID
+      final seen = <String>{};
+      allFetched = allFetched.where((p) => seen.add(p.id)).toList();
+
       if (isPagination) {
         _products.addAll(allFetched);
       } else {
         _products.value = allFetched;
       }
 
-      final expected = hasKaratFilter ? _limit * _selectedKarats.length : _limit;
+      // Determine expected count for pagination
+      int expected;
+      if (hasCategoryFilter) {
+        expected = _limit * _selectedCategoryIds.length;
+      } else if (hasKaratFilter) {
+        expected = _limit * _selectedKarats.length;
+      } else {
+        expected = _limit;
+      }
+
       if (allFetched.length < expected) {
         _hasMore = false;
       } else {
@@ -306,6 +366,26 @@ class ShareController extends GetxController {
       _state.value = CurrentAppState.ERROR;
       Logger.error("ShareController", "loadProducts error: $e\n$st");
     }
+  }
+
+  List<ProductModel> _filterByKarat(List<ProductModel> products) {
+    final filterKaratNums = _selectedKarats.map((k) {
+      final m = RegExp(r'(\d+)').firstMatch(k);
+      return m != null ? int.tryParse(m.group(1)!) : null;
+    }).whereType<int>().toSet();
+    if (filterKaratNums.isEmpty) return products;
+    return products.where((p) {
+      final pk = p.karatNumber;
+      return pk != null && filterKaratNums.contains(pk);
+    }).toList();
+  }
+
+  List<ProductModel> _filterByCategoryId(List<ProductModel> products) {
+    return products.where((p) {
+      final catId = p.category?.id;
+      if (catId == null) return false;
+      return _selectedCategoryIds.contains(catId);
+    }).toList();
   }
 
   Future<void> loadMore() async {
@@ -367,6 +447,7 @@ class ShareController extends GetxController {
     _weightMax.value = 500;
     _priceMin.value = 0;
     _priceMax.value = 5000000;
+    _selectedSizes.clear();
   }
 
   void applyFilters({
@@ -378,6 +459,7 @@ class ShareController extends GetxController {
     required double wMax,
     required double pMin,
     required double pMax,
+    required List<String> sizes,
   }) {
     _selectedKarats
       ..clear()
@@ -393,6 +475,9 @@ class ShareController extends GetxController {
     _weightMax.value = wMax;
     _priceMin.value = pMin;
     _priceMax.value = pMax;
+    _selectedSizes
+      ..clear()
+      ..addAll(sizes);
     loadProducts();
   }
 
@@ -400,12 +485,10 @@ class ShareController extends GetxController {
   double? _calculatePrice(ProductModel product) {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || product.fineWeight == null) return null;
-
-    final base = product.fineWeight! * (goldRate.rate / 10);
-    final labour = base * 0.10;
-    final subtotal = base + labour;
-    final gst = subtotal * 0.03;
-    return subtotal + gst;
+    return GoldRateController.calculatePrice(
+      fineWeight: product.fineWeight!,
+      ratePer10Gram: goldRate.rate,
+    );
   }
 
   // ── Share methods ───────────────────────────────────────────

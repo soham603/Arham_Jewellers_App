@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -139,7 +140,7 @@ class AdminOrderController extends GetxController {
           queryParameters: {
             "search": entry.value,
             "page": 1,
-            "limit": 5,
+            "limit": 10,
             "showAll": true,
           },
         );
@@ -152,7 +153,8 @@ class AdminOrderController extends GetxController {
               );
 
           if (match != null) {
-            _productImageCache[entry.key] = match['imageUrl'];
+            final product = ProductModel.fromJson(match);
+            _productImageCache[entry.key] = product.displayImageUrl;
           }
         }
       } catch (e) {

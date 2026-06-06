@@ -245,7 +245,7 @@ class AdminUserController extends GetxController {
         'requestId': requestId,
         'action': 'APPROVED',
         'approvedTillDate': approvedTillDate.toIso8601String(),
-        'isRetailer': isRetailer,
+        'retailUser': isRetailer,
       },
       onSuccess: (req) => req.copyWith(
         status: 'APPROVED', 
@@ -264,6 +264,71 @@ class AdminUserController extends GetxController {
         clearApprovedTill: true,
       ),
     );
+  }
+
+  Future<bool> updateRetailer({
+    required String requestId,
+    required bool isRetailer,
+    required DateTime currentApprovedTill,
+  }) async {
+    try {
+      _actionState.value = CurrentAppState.LOADING;
+      _actioningId.value = requestId;
+      _error.value = '';
+
+      final response = await httpClient.post(
+        '/api/v1/admin-access/handle-access',
+        data: {
+          'requestId': requestId,
+          'action': 'APPROVED',
+          'approvedTillDate': currentApprovedTill.add(const Duration(days: 1)).toIso8601String(),
+          'retailUser': isRetailer,
+        },
+        options: Options(extra: {'requiresAuth': true}),
+      );
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['success'] != false) {
+        final index = _requests.indexWhere((r) => r.id == requestId);
+        if (index != -1) {
+          _requests[index] = _requests[index].copyWith(isRetailer: isRetailer);
+        }
+
+        _actionState.value = CurrentAppState.SUCCESS;
+        _actioningId.value = '';
+        Get.snackbar("Success", response.data["message"] ?? "Retailer updated");
+        return true;
+      }
+
+      final message = response.data?["error"]?["message"] ??
+          response.data?["message"] ??
+          "Action failed";
+
+      _actionState.value = CurrentAppState.ERROR;
+      _error.value = message;
+      Get.snackbar("Failed", message);
+      return false;
+    } on DioException catch (e, st) {
+      Logger.error('AdminUserController', 'updateRetailer Dio: $e\n$st');
+
+      String message = e.response?.data?["error"]?["message"] ??
+          e.response?.data?["message"] ??
+          e.message ??
+          "Something went wrong";
+
+      _actionState.value = CurrentAppState.ERROR;
+      _error.value = message;
+      Get.snackbar("Failed", message, snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } catch (e, st) {
+      Logger.error('AdminUserController', 'updateRetailer: $e\n$st');
+      _actionState.value = CurrentAppState.ERROR;
+      _error.value = e.toString();
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      return false;
+    } finally {
+      _actioningId.value = '';
+    }
   }
 
   Future<bool> _handleAction({

@@ -108,7 +108,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                         SizedBox(height: context.getScreenHeight(2.5)),
 
                         Text(
-                          'Enquiry Sent!',
+                          'Booking Confirmed!',
                           style: TextStyle(
                             fontSize: context.getScreenWidth(6),
                             fontWeight: FontWeight.w800,
@@ -123,7 +123,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                         Text(
                           message.isNotEmpty
                               ? message
-                              : 'Your enquiry has been received.\nOur team will contact you shortly.',
+                              : 'Your booking has been received.\nOur team will contact you shortly.',
                           style: TextStyle(
                             fontSize: context.getScreenWidth(3.8),
                             color: AppColors.textMuted,
@@ -306,7 +306,7 @@ class _OrderDetailCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Enquiry Received',
+                      'Booking Received',
                       style: TextStyle(
                         fontSize: context.getScreenWidth(4.8),
                         fontWeight: FontWeight.w700,
@@ -315,7 +315,7 @@ class _OrderDetailCard extends StatelessWidget {
                     ),
                     SizedBox(height: context.getScreenHeight(0.5)),
                     Text(
-                      'Your enquiry has been received',
+                      'Your booking has been received',
                       style: TextStyle(
                         fontSize: context.getScreenWidth(3.4),
                         color: AppColors.textMuted,
@@ -660,7 +660,7 @@ class _NextStepsCard extends StatelessWidget {
     final steps = [
       (Icons.phone_in_talk_rounded, 'Team will call you',
           'Our team will contact you within 24 hours'),
-      (Icons.verified_outlined, 'Enquiry verification',
+      (Icons.verified_outlined, 'Booking verification',
           'We confirm stock availability and pricing'),
       (Icons.store_outlined, 'Visit Showroom',
           'Visit our showroom to complete your purchase'),

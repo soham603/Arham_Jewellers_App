@@ -64,7 +64,7 @@ class UserModel {
       role: json['role'],
       userActivationStatus: json['userActivationStatus'],
       completedProfile: json['completedProfile'],
-      isRetailer: json['isRetailer'],
+      isRetailer: json['retailUser'],
     );
   }
 
@@ -89,7 +89,7 @@ class UserModel {
       'role': role,
       'userActivationStatus': userActivationStatus,
       'completedProfile': completedProfile,
-      'isRetailer': isRetailer,
+      'retailUser': isRetailer,
     };
   }
 }

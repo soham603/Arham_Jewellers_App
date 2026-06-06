@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/date_range_picker_sheet.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -16,7 +17,7 @@ class GoldRateDetailScreen extends StatefulWidget {
 }
 
 class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
-  final GoldRateController controller = Get.put(GoldRateController());
+  final GoldRateController controller = Get.find<GoldRateController>();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +52,8 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             children: [
               _currentRateCard(context),
               SizedBox(height: context.getScreenHeight(2.5)),
+              _statisticsSummary(context),
+              SizedBox(height: context.getScreenHeight(2.5)),
               _graphPlaceholder(context),
               SizedBox(height: context.getScreenHeight(3)),
               _periodFilter(context),
@@ -66,13 +69,13 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   Widget _currentRateCard(BuildContext context) {
     return Obx(() {
       final rate = controller.currentRate;
-      final state = controller.state;
+      final rateState = controller.currentRateState;
 
-      if (state == CurrentAppState.LOADING && rate == null) {
+      if (rateState == CurrentAppState.LOADING && rate == null) {
         return _shimmerCard(context);
       }
 
-      if (state == CurrentAppState.ERROR && rate == null) {
+      if (rateState == CurrentAppState.ERROR && rate == null) {
         return Container(
           width: double.infinity,
           padding: EdgeInsets.all(context.getScreenWidth(5)),
@@ -115,9 +118,12 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
 
       return Container(
         width: double.infinity,
-        padding: EdgeInsets.all(context.getScreenWidth(5)),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(1.5),
+        ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(18),
           gradient: const LinearGradient(
             colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
             begin: Alignment.topLeft,
@@ -131,71 +137,65 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: context.getScreenWidth(12),
-                  height: context.getScreenWidth(12),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryGold,
-                  ),
-                  child: Icon(
-                    Icons.monetization_on_rounded,
-                    color: Colors.white,
-                    size: context.getScreenWidth(6),
-                  ),
-                ),
-                SizedBox(width: context.getScreenWidth(3)),
-                Text(
-                  'Today\'s Gold Rate',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: context.getScreenWidth(3.8),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: context.getScreenHeight(2)),
-            Text(
-              rate != null ? '₹${rate.rate.toStringAsFixed(0)}' : '—',
-              style: TextStyle(
+            Container(
+              width: context.getScreenWidth(10),
+              height: context.getScreenWidth(10),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryGold,
+              ),
+              child: Icon(
+                Icons.monetization_on_rounded,
                 color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(12),
-                height: 1.1,
+                size: context.getScreenWidth(5),
               ),
             ),
-            Text(
-              'per 10 g',
-              style: TextStyle(
-                color: Colors.white60,
-                fontSize: context.getScreenWidth(3.5),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Today\'s Gold Rate',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: context.getScreenWidth(3.2),
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    rate != null ? '₹${rate.rate.toStringAsFixed(0)}/10g' : '—',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(7),
+                      height: 1.1,
+                    ),
+                  ),
+                ],
               ),
             ),
-            if (rate != null) ...[
-              SizedBox(height: context.getScreenHeight(1.5)),
+            if (rate != null)
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
-                  vertical: context.getScreenHeight(0.5),
+                  horizontal: context.getScreenWidth(2),
+                  vertical: context.getScreenHeight(0.3),
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Updated ${_timeAgo(rate.timestamp)}',
+                  _timeAgo(rate.timestamp),
                   style: TextStyle(
                     color: Colors.white54,
-                    fontSize: context.getScreenWidth(2.8),
+                    fontSize: context.getScreenWidth(2.2),
                   ),
                 ),
               ),
-            ],
           ],
         ),
       );
@@ -205,9 +205,9 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   Widget _graphPlaceholder(BuildContext context) {
     return Obx(() {
       final history = controller.history;
-      final state = controller.state;
+      final histState = controller.historyState;
 
-      if (state == CurrentAppState.LOADING && history.isEmpty) {
+      if (histState == CurrentAppState.LOADING && history.isEmpty) {
         return Container(
           width: double.infinity,
           height: context.getScreenHeight(22),
@@ -446,55 +446,290 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   }
 
   Widget _periodFilter(BuildContext context) {
-    final periods = ['week', 'month', 'year'];
-    return Obx(() {
-      return Row(
-        children: periods.map((p) {
-          final isSelected = controller.selectedPeriod == p;
-          return Padding(
-            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
-            child: GestureDetector(
-              onTap: () => controller.fetchHistory(period: p),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
-                  vertical: context.getScreenHeight(0.8),
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primaryGold
-                      : context.colorPalette.boxColor,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected
+    final periods = ['day', 'week', 'month', 'year'];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            ...periods.map((p) {
+              return Obx(() {
+                final isSelected = controller.activeFilterType == 'period' &&
+                    controller.selectedPeriod == p;
+                return Padding(
+                  padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+                  child: GestureDetector(
+                    onTap: () => controller.selectPeriod(p),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(3),
+                        vertical: context.getScreenHeight(0.8),
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primaryGold
+                            : context.colorPalette.boxColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.primaryGold
+                              : context.colorPalette.subTitleColor.withOpacity(0.15),
+                        ),
+                      ),
+                      child: Text(
+                        p[0].toUpperCase() + p.substring(1),
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(3.2),
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? Colors.white
+                              : context.colorPalette.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              });
+            }),
+            // Custom Range Chip
+            Obx(() {
+              final isCustom = controller.activeFilterType == 'custom';
+              return GestureDetector(
+                onTap: () async {
+                  final result = await DateRangePickerSheet.show(
+                    context,
+                    initialStartDate: controller.selectedDateRange?.start,
+                    initialEndDate: controller.selectedDateRange?.end,
+                  );
+                  if (result != null) {
+                    controller.applyDateRange(
+                      result.startDate,
+                      result.endDate,
+                      result.label,
+                    );
+                  }
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getScreenWidth(3),
+                    vertical: context.getScreenHeight(0.8),
+                  ),
+                  decoration: BoxDecoration(
+                    color: isCustom
                         ? AppColors.primaryGold
-                        : context.colorPalette.subTitleColor.withOpacity(0.15),
+                        : context.colorPalette.boxColor,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isCustom
+                          ? AppColors.primaryGold
+                          : context.colorPalette.subTitleColor.withOpacity(0.15),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.date_range_rounded,
+                        size: context.getScreenWidth(3),
+                        color: isCustom
+                            ? Colors.white
+                            : context.colorPalette.textColor,
+                      ),
+                      SizedBox(width: context.getScreenWidth(1)),
+                      Text(
+                        'Custom',
+                        style: TextStyle(
+                          fontSize: context.getScreenWidth(3.2),
+                          fontWeight: FontWeight.w600,
+                          color: isCustom
+                              ? Colors.white
+                              : context.colorPalette.textColor,
+                        ),
+                      ),
+                      if (isCustom) ...[
+                        SizedBox(width: context.getScreenWidth(1)),
+                        GestureDetector(
+                          onTap: controller.clearDateRange,
+                          child: Icon(
+                            Icons.close_rounded,
+                            size: context.getScreenWidth(2.8),
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                child: Text(
-                  p[0].toUpperCase() + p.substring(1),
-                  style: TextStyle(
-                    fontSize: context.getScreenWidth(3.2),
-                    fontWeight: FontWeight.w600,
-                    color: isSelected
-                        ? Colors.white
-                        : context.colorPalette.textColor,
-                  ),
+              );
+            }),
+          ],
+        ),
+        // Date Range Label
+        Obx(() {
+          if (controller.activeFilterType != 'custom' ||
+              controller.dateRangeLabel.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return Padding(
+            padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getScreenWidth(3),
+                vertical: context.getScreenHeight(0.6),
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGold.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: AppColors.primaryGold.withOpacity(0.2),
                 ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: context.getScreenWidth(3),
+                    color: AppColors.primaryGold,
+                  ),
+                  SizedBox(width: context.getScreenWidth(1.5)),
+                  Expanded(
+                    child: Text(
+                      'Showing: ${controller.dateRangeLabel}',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(2.8),
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryGoldDark,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
-        }).toList(),
+        }),
+      ],
+    );
+  }
+
+  Widget _statisticsSummary(BuildContext context) {
+    return Obx(() {
+      final stats = controller.statistics;
+      final statsState = controller.statisticsState;
+
+      if (statsState == CurrentAppState.LOADING) {
+        return Container(
+          width: double.infinity,
+          height: context.getScreenHeight(8),
+          decoration: BoxDecoration(
+            color: context.colorPalette.shimmerBaseColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      }
+
+      if (stats == null) return const SizedBox.shrink();
+
+      final isUp = stats.change >= 0;
+
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: context.colorPalette.subTitleColor.withOpacity(0.1),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  isUp ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                  size: context.getScreenWidth(4.5),
+                  color: isUp ? Colors.green : Colors.red,
+                ),
+                SizedBox(width: context.getScreenWidth(2)),
+                Text(
+                  stats.overallTrend,
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.2),
+                    fontWeight: FontWeight.w700,
+                    color: isUp ? Colors.green : Colors.red,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getScreenWidth(2),
+                    vertical: context.getScreenHeight(0.3),
+                  ),
+                  decoration: BoxDecoration(
+                    color: isUp
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${isUp ? '+' : ''}${stats.changePercent.toStringAsFixed(2)}%',
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(2.8),
+                      fontWeight: FontWeight.w600,
+                      color: isUp ? Colors.green : Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.getScreenHeight(1.5)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statItem(context, 'Low', '₹${stats.min.toStringAsFixed(0)}'),
+                _statItem(context, 'Avg', '₹${stats.avg.toStringAsFixed(0)}'),
+                _statItem(context, 'High', '₹${stats.max.toStringAsFixed(0)}'),
+              ],
+            ),
+          ],
+        ),
       );
     });
   }
 
+  Widget _statItem(BuildContext context, String label, String value) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: context.getScreenWidth(2.5),
+            color: context.colorPalette.subTitleColor,
+          ),
+        ),
+        SizedBox(height: context.getScreenHeight(0.3)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: context.getScreenWidth(3.5),
+            fontWeight: FontWeight.w700,
+            color: context.colorPalette.textColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _historyList(BuildContext context) {
     return Obx(() {
-      final state = controller.state;
+      final histState = controller.historyState;
       final history = controller.history;
 
-      if (state == CurrentAppState.LOADING && history.isEmpty) {
+      if (histState == CurrentAppState.LOADING && history.isEmpty) {
         return Column(
           children: List.generate(
             5,
@@ -506,7 +741,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         );
       }
 
-      if (state == CurrentAppState.ERROR && history.isEmpty) {
+      if (histState == CurrentAppState.ERROR && history.isEmpty) {
         return Center(
           child: Text(
             controller.error.isNotEmpty ? controller.error : 'No history available',
@@ -548,7 +783,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           ...List.generate(history.length, (index) {
             final rate = history[index];
             final isFirst = index == 0;
-            final prevRate = index > 0 ? history[index - 1].rate : null;
+            final prevRate = index < history.length - 1 ? history[index + 1].rate : null;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
@@ -697,6 +932,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
 
   String _timeAgo(DateTime dateTime) {
     final diff = DateTime.now().difference(dateTime);
+    if (diff.isNegative) return 'just now';
     if (diff.inMinutes < 1) return 'just now';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';

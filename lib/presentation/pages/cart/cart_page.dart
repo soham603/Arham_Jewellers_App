@@ -1,13 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
+import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -98,14 +103,14 @@ class _CartPageState extends State<CartPage> {
                           },
                           background: Container(
                             margin: EdgeInsets.only(
-                              bottom: context.getScreenHeight(1.2),
+                              bottom: context.getScreenHeight(0.8),
                             ),
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getScreenWidth(5),
                             ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFE85D4F),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             alignment: Alignment.centerRight,
                             child: Icon(
@@ -123,14 +128,14 @@ class _CartPageState extends State<CartPage> {
                             },
                             child: Container(
                               margin: EdgeInsets.only(
-                                bottom: context.getScreenHeight(1.2),
+                                bottom: context.getScreenHeight(0.8),
                               ),
                               padding: EdgeInsets.all(
-                                context.getScreenWidth(3.5),
+                                context.getScreenWidth(2.5),
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: const Color(0xFFE9E2D8),
                                 ),
@@ -139,10 +144,10 @@ class _CartPageState extends State<CartPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                     child: Container(
-                                      width: context.getScreenWidth(26),
-                                      height: context.getScreenWidth(26),
+                                      width: context.getScreenWidth(20),
+                                      height: context.getScreenWidth(20),
                                       color: const Color(0xFFF7F3EC),
                                       child: imageURL != null &&
                                               imageURL.trim().isNotEmpty &&
@@ -172,7 +177,7 @@ class _CartPageState extends State<CartPage> {
                                                         Colors.grey.shade500,
                                                     size:
                                                         context.getScreenWidth(
-                                                            7),
+                                                            6),
                                                   ),
                                                 );
                                               },
@@ -183,12 +188,12 @@ class _CartPageState extends State<CartPage> {
                                                 color:
                                                     const Color(0xFF8C7E68),
                                                 size:
-                                                    context.getScreenWidth(7),
+                                                    context.getScreenWidth(6),
                                               ),
                                             ),
                                     ),
                                   ),
-                                  SizedBox(width: context.getScreenWidth(3.5)),
+                                  SizedBox(width: context.getScreenWidth(2.5)),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -200,7 +205,7 @@ class _CartPageState extends State<CartPage> {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize:
-                                                context.getScreenWidth(4.2),
+                                                context.getScreenWidth(3.8),
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.textDark,
                                             height: 1.2,
@@ -209,12 +214,12 @@ class _CartPageState extends State<CartPage> {
                                         if (item.product.touch != null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.4)),
+                                                  context.getScreenHeight(0.2)),
                                           Text(
                                             item.product.touch!,
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.4),
+                                                  context.getScreenWidth(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -223,26 +228,27 @@ class _CartPageState extends State<CartPage> {
                                             null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.4)),
+                                                  context.getScreenHeight(0.2)),
                                           Text(
                                             'Gross Wt: ${item.product.grossWeight}g',
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.4),
+                                                  context.getScreenWidth(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
                                         ],
-                                        if (item.product.fineWeight !=
-                                            null) ...[
+                                        if ((item.product.netWeight ??
+                                            item.product.fineWeight) !=
+                                                null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.4)),
+                                                  context.getScreenHeight(0.2)),
                                           Text(
-                                            'Fine Wt: ${item.product.fineWeight}g',
+                                            'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.4),
+                                                  context.getScreenWidth(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -250,48 +256,47 @@ class _CartPageState extends State<CartPage> {
                                         if (item.product.size != null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.4)),
+                                                  context.getScreenHeight(0.2)),
                                           Text(
                                             item.product.size!,
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.4),
+                                                  context.getScreenWidth(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
                                         ],
-                                        SizedBox(
-                                            height:
-                                                context.getScreenHeight(0.8)),
-                                        if (_isRetailer)
+                                        if (_isRetailer) ...[
+                                          SizedBox(
+                                              height:
+                                                  context.getScreenHeight(0.5)),
                                           Text(
                                             "₹${_formatPrice(price)}",
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(4.8),
+                                                  context.getScreenWidth(4.2),
                                               color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
-                                        SizedBox(
-                                            height:
-                                                context.getScreenHeight(1)),
-                                        _quantityControls(
-                                          context,
-                                          quantity: item.quantity,
-                                          onDecrement: () {
-                                            cartController.decrementQuantity(
-                                              item.product.id,
-                                            );
-                                          },
-                                          onIncrement: () {
-                                            cartController.incrementQuantity(
-                                              item.product.id,
-                                            );
-                                          },
-                                        ),
+                                        ],
                                       ],
                                     ),
+                                  ),
+                                  SizedBox(width: context.getScreenWidth(2)),
+                                  _quantityControls(
+                                    context,
+                                    quantity: item.quantity,
+                                    onDecrement: () {
+                                      cartController.decrementQuantity(
+                                        item.product.id,
+                                      );
+                                    },
+                                    onIncrement: () {
+                                      cartController.incrementQuantity(
+                                        item.product.id,
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -326,11 +331,11 @@ class _CartPageState extends State<CartPage> {
     required VoidCallback onIncrement,
   }) {
     return Container(
-      width: context.getScreenWidth(34),
-      height: context.getScreenHeight(4.7),
+      width: context.getScreenWidth(28),
+      height: context.getScreenHeight(3.8),
       decoration: BoxDecoration(
         color: const Color(0xFFF3EEDF),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -343,7 +348,7 @@ class _CartPageState extends State<CartPage> {
           Text(
             '$quantity',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.3),
+              fontSize: context.getScreenWidth(3.8),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
@@ -366,15 +371,15 @@ class _CartPageState extends State<CartPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: context.getScreenWidth(7),
-        height: context.getScreenWidth(7),
+        width: context.getScreenWidth(6),
+        height: context.getScreenWidth(6),
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          size: context.getScreenWidth(3.8),
+          size: context.getScreenWidth(3.2),
           color: AppColors.textDark,
         ),
       ),
@@ -440,35 +445,216 @@ class _CartPageState extends State<CartPage> {
     return Obx(() {
       final hasItems = cartController.items.isNotEmpty;
 
-      return SizedBox(
-        width: double.infinity,
-        height: context.getScreenHeight(6.5),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: AppColors.primaryGold,
-            disabledBackgroundColor:
-                AppColors.primaryGold.withOpacity(0.45),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+      return Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: context.getScreenHeight(5),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primaryGold),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: hasItems
+                    ? () {
+                        final products = cartController.items
+                            .map((e) => e.product)
+                            .toList();
+                        final quantities = cartController.items
+                            .map((e) => e.quantity)
+                            .toList();
+                        _downloadPdf(context, products, quantities);
+                      }
+                    : null,
+                child: Text(
+                  'Enquire',
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(4),
+                    color: hasItems
+                        ? AppColors.primaryGold
+                        : AppColors.primaryGold.withOpacity(0.45),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
-          onPressed: hasItems
-              ? () {
-                  Get.toNamed(AppRoutes.checkout);
-                }
-              : null,
-          child: Text(
-            'Proceed to Enquiry',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(5),
+          SizedBox(width: context.getScreenWidth(3)),
+          Expanded(
+            child: SizedBox(
+              height: context.getScreenHeight(5),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: AppColors.primaryGold,
+                  disabledBackgroundColor:
+                      AppColors.primaryGold.withOpacity(0.45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: hasItems
+                    ? () {
+                        Get.toNamed(AppRoutes.checkout);
+                      }
+                    : null,
+                child: Text(
+                  'Checkout',
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(4),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  void _shareWithLoading(
+    BuildContext context,
+    Future<void> Function() shareFn,
+    String message, {
+    VoidCallback? onComplete,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            decoration: BoxDecoration(
               color: Colors.white,
-              fontWeight: FontWeight.w700,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.primaryGold,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.5),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      );
+      ),
+    );
+
+    final navigator = Navigator.of(context);
+
+    shareFn().whenComplete(() {
+      if (mounted) {
+        navigator.pop();
+        onComplete?.call();
+      }
     });
+  }
+
+  Future<void> _downloadPdf(
+    BuildContext context,
+    List<ProductModel> products,
+    List<int> quantities,
+  ) async {
+    _shareWithLoading(
+      context,
+      () async {
+        await ShareService.shareCartEnquiryPdf(
+          products: products,
+          quantities: quantities,
+        );
+      },
+      'Generating enquiry PDF...',
+      onComplete: () => _showSharePdfHint(context),
+    );
+  }
+
+  void _showSharePdfHint(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 24),
+            SizedBox(width: 8),
+            Text(
+              'PDF Ready',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(4.5),
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Your enquiry PDF has been saved to Downloads. Share it with us on WhatsApp so we can assist you with pricing and availability.',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(3.8),
+            color: AppColors.textMuted,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Later',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xFF25D366),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              final message = Uri.encodeComponent(
+                'Hi, I would like to enquire about the following items from my cart. Please find the attached PDF for details.',
+              );
+              final phone =
+                  AdminConstants.adminPhone.replaceAll('+', '');
+              final uri = Uri.parse(
+                  'https://wa.me/$phone?text=$message');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri,
+                    mode: LaunchMode.externalApplication);
+              }
+            },
+            icon: FaIcon(FontAwesomeIcons.whatsapp, size: 16),
+            label: Text(
+              'Open WhatsApp',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _emptyCart(BuildContext context) {

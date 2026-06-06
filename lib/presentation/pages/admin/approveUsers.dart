@@ -131,7 +131,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       key: ValueKey(list[index].id),
                       request: list[index],
                       controller: controller,
-                      onApprove: () => _showDatePicker(context, list[index]),
+                      onApprove: (isRetailer) => _showDatePicker(context, list[index], isRetailer),
                       onReject: () => _confirmReject(context, list[index]),
                     );
                   },
@@ -442,6 +442,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   Future<void> _showDatePicker(
     BuildContext context,
     AccessRequestModel req,
+    bool isRetailer,
   ) async {
     final initialDate = req.approvedTill != null && req.status == 'APPROVED'
         ? req.approvedTill!
@@ -452,6 +453,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       initialDate: initialDate,
       firstDate: DateTime.now().add(const Duration(days: 1)),
       lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+      helpText: req.status == 'APPROVED' ? 'EXTEND ACCESS UNTIL' : 'GRANT ACCESS UNTIL',
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
           colorScheme: ColorScheme.light(
@@ -460,6 +462,13 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             surface: context.colorPalette.backgroundColor,
             onSurface: context.colorPalette.textColor,
           ),
+          datePickerTheme: DatePickerThemeData(
+            headerHeadlineStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+            headerHelpStyle: const TextStyle(fontSize: 13),
+            dayStyle: const TextStyle(fontSize: 14),
+            weekdayStyle: const TextStyle(fontSize: 12),
+            dayShape: WidgetStateProperty.all(const CircleBorder()),
+          ),
         ),
         child: child!,
       ),
@@ -467,15 +476,16 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
     if (picked == null || !context.mounted) return;
 
-    _showApproveConfirm(context, req, picked);
+    _showApproveConfirm(context, req, picked, isRetailer);
   }
 
   void _showApproveConfirm(
     BuildContext context,
     AccessRequestModel req,
     DateTime date,
+    bool initialRetailer,
   ) {
-    bool isRetailer = false;
+    bool isRetailer = initialRetailer;
 
     showDialog(
       context: context,
@@ -483,25 +493,43 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.colorPalette.backgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          contentPadding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(5),
+            context.getScreenWidth(4),
+            context.getScreenWidth(5),
+            0,
+          ),
+          actionsPadding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(2),
+            0,
+            context.getScreenWidth(3),
+            context.getScreenHeight(1),
+          ),
+          titlePadding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(5),
+            context.getScreenWidth(4),
+            context.getScreenWidth(5),
+            context.getScreenHeight(1),
+          ),
           title: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Icon(
                   Icons.check_circle_rounded,
                   color: AppColors.primaryGold,
-                  size: 20,
+                  size: 16,
                 ),
               ),
               SizedBox(width: context.getScreenWidth(2)),
               Text(
                 req.status == 'APPROVED' ? 'Extend Access' : 'Approve Access',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4.5),
+                  fontSize: context.getScreenWidth(4),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -517,16 +545,19 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     ? 'Extend access for ${req.user?.name ?? 'this user'} until:'
                     : 'Grant access to ${req.user?.name ?? 'this user'} until:',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.8),
+                  fontSize: context.getScreenWidth(3.4),
                   color: context.colorPalette.textColor,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(1)),
+              SizedBox(height: context.getScreenHeight(0.6)),
               Container(
-                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(2.5),
+                  vertical: context.getScreenHeight(0.5),
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.primaryGold.withOpacity(0.2)),
                 ),
                 child: Row(
@@ -534,13 +565,13 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     const Icon(
                       Icons.calendar_today_rounded,
                       color: AppColors.primaryGold,
-                      size: 16,
+                      size: 13,
                     ),
-                    SizedBox(width: context.getScreenWidth(2)),
+                    SizedBox(width: context.getScreenWidth(1.5)),
                     Text(
                       DateFormat('dd MMM yyyy').format(date),
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3.5),
+                        fontSize: context.getScreenWidth(3),
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryGold,
                       ),
@@ -550,79 +581,33 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               ),
               if (req.approvedTill != null && req.status == 'APPROVED')
                 Padding(
-                  padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+                  padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
                   child: Text(
                     'Current access until: ${DateFormat('dd MMM yyyy').format(req.approvedTill!.toLocal())}',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3),
+                      fontSize: context.getScreenWidth(2.6),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
                 ),
-              SizedBox(height: context.getScreenHeight(1.5)),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
-                  vertical: context.getScreenHeight(0.5),
-                ),
-                decoration: BoxDecoration(
-                  color: isRetailer
-                      ? const Color(0xFFD4AF37).withOpacity(0.1)
-                      : context.colorPalette.boxColor,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isRetailer
-                        ? const Color(0xFFD4AF37).withOpacity(0.4)
-                        : context.colorPalette.subTitleColor.withOpacity(0.2),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.store_rounded,
-                      color: isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
-                      size: context.getScreenWidth(5),
-                    ),
-                    SizedBox(width: context.getScreenWidth(3)),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Mark as Retailer',
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(3.5),
-                              fontWeight: FontWeight.w600,
-                              color: context.colorPalette.textColor,
-                            ),
-                          ),
-                          Text(
-                            'Grant retailer privileges',
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(2.8),
-                              color: context.colorPalette.subTitleColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch(
-                      value: isRetailer,
-                      onChanged: (val) => setDialogState(() => isRetailer = val),
-                      activeColor: const Color(0xFFD4AF37),
-                      activeTrackColor: const Color(0xFFD4AF37).withOpacity(0.3),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(3),
+                  vertical: context.getScreenHeight(0.6),
+                ),
+              ),
               child: Text(
                 'Cancel',
-                style: TextStyle(color: context.colorPalette.subTitleColor),
+                style: TextStyle(
+                  color: context.colorPalette.subTitleColor,
+                  fontSize: context.getScreenWidth(3.2),
+                ),
               ),
             ),
             Obx(
@@ -646,14 +631,19 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGold,
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getScreenWidth(3),
+                    vertical: context.getScreenHeight(0.6),
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
                 child: controller.actionState == CurrentAppState.LOADING
                     ? const SizedBox(
-                        width: 16,
-                        height: 16,
+                        width: 14,
+                        height: 14,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: Colors.white,
@@ -661,9 +651,10 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       )
                     : Text(
                         req.status == 'APPROVED' ? 'Extend' : 'Approve',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
+                          fontSize: context.getScreenWidth(3.2),
                         ),
                       ),
               ),
@@ -987,7 +978,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 class _RequestCard extends StatefulWidget {
   final AccessRequestModel request;
   final AdminUserController controller;
-  final VoidCallback onApprove;
+  final ValueChanged<bool> onApprove;
   final VoidCallback onReject;
 
   const _RequestCard({
@@ -1004,6 +995,13 @@ class _RequestCard extends StatefulWidget {
 
 class _RequestCardState extends State<_RequestCard> {
   bool _expanded = false;
+  late bool _isRetailer;
+
+  @override
+  void initState() {
+    super.initState();
+    _isRetailer = widget.request.isRetailer;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1087,24 +1085,43 @@ class _RequestCardState extends State<_RequestCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(2.5),
-                          vertical: context.getScreenHeight(0.4),
-                        ),
-                        decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          req.status,
-                          style: TextStyle(
-                            color: statusColor,
-                            fontSize: context.getScreenWidth(2.8),
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (req.isRetailer)
+                            Container(
+                              margin: EdgeInsets.only(right: context.getScreenWidth(1.5)),
+                              padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD4AF37).withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.store_rounded,
+                                color: const Color(0xFFD4AF37),
+                                size: context.getScreenWidth(3.2),
+                              ),
+                            ),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getScreenWidth(2.5),
+                              vertical: context.getScreenHeight(0.4),
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              req.status,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontSize: context.getScreenWidth(2.8),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                       SizedBox(height: context.getScreenHeight(0.5)),
                       Icon(
@@ -1224,44 +1241,76 @@ class _RequestCardState extends State<_RequestCard> {
                     ),
                   ],
 
-                  // Retailer badge
-                  if (req.isRetailer)
-                    Padding(
-                      padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(3),
-                          vertical: context.getScreenHeight(0.8),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+
+                  if (req.status == 'PENDING' || req.status == 'APPROVED')
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getScreenWidth(3),
+                        vertical: context.getScreenHeight(0.5),
+                      ),
+                      decoration: BoxDecoration(
+                        color: _isRetailer
+                            ? const Color(0xFFD4AF37).withOpacity(0.1)
+                            : context.colorPalette.boxColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _isRetailer
+                              ? const Color(0xFFD4AF37).withOpacity(0.4)
+                              : context.colorPalette.subTitleColor.withOpacity(0.2),
                         ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD4AF37).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: const Color(0xFFD4AF37).withOpacity(0.3),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.store_rounded,
+                            color: _isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
+                            size: context.getScreenWidth(5),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.store_rounded,
-                              color: Color(0xFFD4AF37),
-                              size: 18,
+                          SizedBox(width: context.getScreenWidth(3)),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Mark as Retailer',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.5),
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.textColor,
+                                  ),
+                                ),
+                                Text(
+                                  'Grant retailer privileges',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(2.8),
+                                    color: context.colorPalette.subTitleColor,
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: context.getScreenWidth(2)),
-                            Text(
-                              'Retailer',
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(3.5),
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFFD4AF37),
-                              ),
+                          ),
+                          Transform.scale(
+                            scale: 0.7,
+                            child: Switch(
+                              value: _isRetailer,
+                              onChanged: (val) {
+                                if (req.status == 'APPROVED') {
+                                  _confirmRetailerToggle(context, req, val);
+                                } else {
+                                  setState(() => _isRetailer = val);
+                                }
+                              },
+                              activeColor: const Color(0xFFD4AF37),
+                              activeTrackColor: const Color(0xFFD4AF37).withOpacity(0.3),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
 
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  if (req.status == 'PENDING' || req.status == 'APPROVED')
+                    SizedBox(height: context.getScreenHeight(1.5)),
 
                   Obx(() {
                     final isLoading = widget.controller.actionState == CurrentAppState.LOADING && 
@@ -1277,7 +1326,7 @@ class _RequestCardState extends State<_RequestCard> {
                               icon: Icons.check_circle_rounded,
                               color: AppColors.primaryGold,
                               isLoading: isLoading,
-                              onTap: widget.onApprove,
+                              onTap: () => widget.onApprove(_isRetailer),
                             ),
                           ),
                           SizedBox(width: context.getScreenWidth(3)),
@@ -1305,7 +1354,7 @@ class _RequestCardState extends State<_RequestCard> {
                           icon: Icons.date_range_rounded,
                           color: context.colorPalette.primaryColor,
                           isLoading: isLoading,
-                          onTap: widget.onApprove,
+                          onTap: () => widget.onApprove(req.isRetailer),
                         ),
                       );
                     }
@@ -1319,7 +1368,7 @@ class _RequestCardState extends State<_RequestCard> {
                           icon: Icons.check_circle_rounded,
                           color: AppColors.primaryGold,
                           isLoading: isLoading,
-                          onTap: widget.onApprove,
+                          onTap: () => widget.onApprove(req.isRetailer),
                         ),
                       );
                     }
@@ -1428,6 +1477,116 @@ class _RequestCardState extends State<_RequestCard> {
       default:
         return AppColors.primaryGold;
     }
+  }
+
+  void _confirmRetailerToggle(BuildContext context, AccessRequestModel req, bool newValue) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: context.colorPalette.backgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD4AF37).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(
+                Icons.store_rounded,
+                color: Color(0xFFD4AF37),
+                size: 16,
+              ),
+            ),
+            SizedBox(width: context.getScreenWidth(2)),
+            Text(
+              newValue ? 'Enable Retailer' : 'Disable Retailer',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(4),
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          newValue
+              ? 'Grant retailer privileges to ${req.user?.name ?? 'this user'}?'
+              : 'Remove retailer privileges from ${req.user?.name ?? 'this user'}?',
+          style: TextStyle(
+            fontSize: context.getScreenWidth(3.4),
+            color: context.colorPalette.textColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getScreenWidth(3),
+                vertical: context.getScreenHeight(0.6),
+              ),
+            ),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: context.colorPalette.subTitleColor,
+                fontSize: context.getScreenWidth(3.2),
+              ),
+            ),
+          ),
+          Obx(() {
+            final isLoading = widget.controller.actionState == CurrentAppState.LOADING &&
+                              widget.controller.actioningId == req.id;
+            return ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      Get.back();
+                      final ok = await widget.controller.updateRetailer(
+                        requestId: req.id,
+                        isRetailer: newValue,
+                        currentApprovedTill: req.approvedTill!,
+                      );
+                      if (ok) {
+                        setState(() => _isRetailer = newValue);
+                      }
+                    },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD4AF37),
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getScreenWidth(3),
+                vertical: context.getScreenHeight(0.6),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: widget.controller.actionState == CurrentAppState.LOADING
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    'Confirm',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: context.getScreenWidth(3.2),
+                    ),
+                  ),
+            );
+          }),
+        ],
+      ),
+    );
   }
 }
 

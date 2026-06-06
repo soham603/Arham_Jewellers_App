@@ -1,5 +1,0 @@
-// Barcode Scan and Search API call
-
-curl -H "Authorization: Bearer <TOKEN>" \
-  -H "Content-Type: application/json" \
-  "https://arham-jewellers-backend.onrender.com/api/v1/products/search?barcode=1119671256375"

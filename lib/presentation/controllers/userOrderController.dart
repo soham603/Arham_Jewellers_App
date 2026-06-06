@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
@@ -298,7 +299,7 @@ class UserOrderController extends GetxController {
           queryParameters: {
             "search": entry.value,
             "page": 1,
-            "limit": 5,
+            "limit": 10,
             "showAll": true,
           },
         );
@@ -312,7 +313,8 @@ class UserOrderController extends GetxController {
               );
 
           if (match != null) {
-            _productImageCache[entry.key] = match['imageUrl'];
+            final product = ProductModel.fromJson(match);
+            _productImageCache[entry.key] = product.displayImageUrl;
           }
         }
       } catch (e) {

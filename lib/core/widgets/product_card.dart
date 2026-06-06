@@ -553,11 +553,10 @@ class _RetailerPrice extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final base = product.fineWeight! * (goldRate.rate / 10);
-    final labour = base * 0.10;
-    final subtotal = base + labour;
-    final gst = subtotal * 0.03;
-    final total = subtotal + gst;
+    final total = GoldRateController.calculatePrice(
+      fineWeight: product.fineWeight!,
+      ratePer10Gram: goldRate.rate,
+    )!;
 
     final formatted = _formatPrice(total);
 

@@ -52,10 +52,14 @@ class _HomePageState extends State<HomePage> {
 
   int currentCarouselIndex = 0;
   Timer? _carouselTimer;
+  bool _showCollectionShimmer = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _showCollectionShimmer = false);
+    });
     if (carouselController.list.isEmpty) {
       carouselController.getAllCarousels();
     }
@@ -237,78 +241,109 @@ GestureDetector(
 
                               const SizedBox(height: 24),
 
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () =>
-                                            _navigateToCategoryListing([Karat.k18, Karat.k20], title: '18K & 20K Collection'),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.08,
+                              _showCollectionShimmer
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      child: Shimmer.fromColors(
+                                        baseColor: context.colorPalette.shimmerBaseColor,
+                                        highlightColor: context.colorPalette.shimmerHighLightColor,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                height: context.getScreenWidth(44),
+                                                decoration: BoxDecoration(
+                                                  color: context.colorPalette.shimmerBaseColor,
+                                                  borderRadius: BorderRadius.circular(12),
                                                 ),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 3),
                                               ),
-                                            ],
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
                                             ),
-                                            child: Image.asset(
-                                              'assets/images/ratnesh-collection.jpg',
-                                              fit: BoxFit.cover,
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Container(
+                                                height: context.getScreenWidth(44),
+                                                decoration: BoxDecoration(
+                                                  color: context.colorPalette.shimmerBaseColor,
+                                                  borderRadius: BorderRadius.circular(12),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                          child: GestureDetector(
-                                        onTap: () =>
-                                            _navigateToCategoryListing([Karat.k22]),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.08,
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _navigateToCategoryListing([Karat.k18, Karat.k20], title: '18K & 20K Collection'),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(
+                                                    12,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(
+                                                        0.08,
+                                                      ),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
                                                 ),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 3),
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(
+                                                    12,
+                                                  ),
+                                                  child: Image.asset(
+                                                    'assets/images/ratnesh-collection.jpg',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
                                               ),
-                                            ],
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                            child: Image.asset(
-                                              'assets/images/arham-collection.jpg',
-                                              fit: BoxFit.cover,
                                             ),
                                           ),
-                                        ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  _navigateToCategoryListing([Karat.k22]),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(
+                                                    12,
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black.withOpacity(
+                                                        0.08,
+                                                      ),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(0, 3),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(
+                                                    12,
+                                                  ),
+                                                  child: Image.asset(
+                                                    'assets/images/arham-collection.jpg',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
 
                               const SizedBox(height: 12),
                               const CategoryDivider(vertical: 8),
@@ -1768,11 +1803,14 @@ class _CategoryQuickAccess extends StatelessWidget {
             final cat = unique[index];
             return GestureDetector(
               onTap: () {
-                final query = cat.name
+                final cleanedName = cat.name
                     .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                     .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                     .trim();
-                Get.to(() => SearchPage(initialQuery: query));
+                Get.to(() => SearchPage(
+                  initialCategoryId: cat.id,
+                  initialCategoryName: cleanedName,
+                ));
               },
               child: Column(
                 children: [

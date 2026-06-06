@@ -78,15 +78,15 @@ class _SharePageState extends State<SharePage> {
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
-                  initialSelectedCategoryIds: controller.selectedCategoryIds,
-                  initialSelectedCategoryNames: controller.selectedCategoryNames,
                   initialStockFilter: controller.stockFilter,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
                   initialPriceMin: controller.priceMin,
                   initialPriceMax: controller.priceMax,
                   showPriceFilter: showPrice,
-                  weightSliderMax: 100,
+                  showWeightFilter: controller.hasWeightData,
+                  weightSliderMax: controller.availableWeightMax,
+                  products: controller.products,
                   priceSliderMax: 5000000,
                   onApply: controller.applyFilters,
                 );

@@ -226,7 +226,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     // =====================================================
                     Container(
                       width: double.infinity,
-                      height: context.getScreenHeight(30),
 
                       padding: EdgeInsets.all(context.getScreenWidth(5)),
 
@@ -306,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
 
-                          const Spacer(),
+                          SizedBox(height: context.getScreenHeight(2.5)),
 
                           Row(
                             children: [
@@ -885,7 +884,7 @@ class _OrderImagesStack extends StatelessWidget {
     final size = context.getScreenWidth(20);
     final items = order.items;
     final images = items
-        .map((item) => controller.getProductImage(item.product.id))
+        .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))
         .where((url) => url != null && url.isNotEmpty)
         .toList();
 
