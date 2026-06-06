@@ -175,8 +175,6 @@ class ShareController extends GetxController {
 
     list.sort((a, b) {
       switch (_sortBy.value) {
-        case SortOption.nameAsc:
-          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
         case SortOption.weightAsc:
           return (a.grossWeight ?? 0).compareTo(b.grossWeight ?? 0);
         case SortOption.weightDesc:

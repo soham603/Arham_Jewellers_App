@@ -6,7 +6,6 @@ enum CurrentAppState {
 }
 
 enum SortOption {
-  nameAsc,
   weightAsc,
   weightDesc,
   newest,
@@ -18,8 +17,6 @@ enum SortOption {
 extension SortOptionLabel on SortOption {
   String get label {
     switch (this) {
-      case SortOption.nameAsc:
-        return 'Name A–Z';
       case SortOption.weightAsc:
         return 'Weight Low→High';
       case SortOption.weightDesc:
