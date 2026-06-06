@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/notification_controlle
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/chain_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
@@ -180,30 +181,30 @@ class _HomePageState extends State<HomePage> {
                                 child: HomeSearchBar(onScannerTap: _openScanner),
                               ),
                               const SizedBox(width: 10),
-                              GestureDetector(
-                                onTap: () => Get.to(() => const GoldRateDetailScreen()),
-                                child: Container(
-                                  height: context.responsiveWidth(34, tabletVal: 42),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF5F1EC),
-                                    borderRadius: BorderRadius.circular(50),
-                                    border: Border.all(
-                                      color: context.colorPalette.gold.withOpacity(0.2),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Image.asset(
-                                      'assets/images/gold-price-graph-icon-vector-Photoroom.png',
-                                      width: 24,
-                                      height: 24,
-                                      color: context.colorPalette.goldDark,
-                                      colorBlendMode: BlendMode.srcIn,
-                                    ),
-                                  ),
-                                ),
-                              ),
+GestureDetector(
+  onTap: () => Get.to(() => const GoldRateDetailScreen()),
+  child: Container(
+    width: context.responsiveWidth(34, tabletVal: 42),
+    height: context.responsiveWidth(34, tabletVal: 42),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF5F1EC),
+      shape: BoxShape.circle,
+      border: Border.all(
+        color: context.colorPalette.gold.withOpacity(0.2),
+        width: 1,
+      ),
+    ),
+    child: Center(
+      child: Image.asset(
+        'assets/images/gold-price-icon.png',
+        width: 24,
+        height: 24,
+        color: context.colorPalette.goldDark,
+        colorBlendMode: BlendMode.srcIn,
+      ),
+    ),
+  ),
+),
                             ],
                           ),
                         ),
@@ -319,7 +320,12 @@ class _HomePageState extends State<HomePage> {
                                 child: AspectRatio(
                                   aspectRatio: 16 / 9,
                                 child: GestureDetector(
-                                  onTap: () => Get.to(() => const SearchPage(initialQuery: 'Chain')),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ChainListingPage()),
+                                  ),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),

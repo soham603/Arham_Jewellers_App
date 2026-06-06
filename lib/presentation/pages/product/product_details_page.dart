@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
@@ -109,14 +110,39 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return null;
   }
 
+  double? _calculatePrice() {
+    final goldRate = Get.find<GoldRateController>().currentRate;
+    if (goldRate == null || widget.product.fineWeight == null) return null;
+
+    final base = widget.product.fineWeight! * (goldRate.rate / 10);
+    final labour = base * 0.10;
+    final subtotal = base + labour;
+    final gst = subtotal * 0.03;
+    return subtotal + gst;
+  }
+
+  String _formatPrice(double value) {
+    if (value >= 10000000) {
+      return '\u20B9${(value / 10000000).toStringAsFixed(2)} Cr';
+    } else if (value >= 100000) {
+      return '\u20B9${(value / 100000).toStringAsFixed(2)} L';
+    } else if (value >= 1000) {
+      return '\u20B9${(value / 1000).toStringAsFixed(2)} K';
+    }
+    return '\u20B9${value.toStringAsFixed(0)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final rawData = widget.product.rawData ?? {};
     final netWeight = rawData["FineWt"]?.toString();
     final grossWeight = rawData["GrossWt"]?.toString();
+    final displayGrossWeight = grossWeight ?? netWeight;
     final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo, name: widget.product.name);
     final pieces = rawData["Pieces"]?.toString() ?? "1";
-    final designName = rawData["DesignName"]?.toString() ?? "Standard";
+    final collectionName = widget.product.category?.name ?? "—";
+    final size = widget.product.size?.toString();
+    final price = _calculatePrice();
 
     // Dynamic Stock Logic
     final bool inStock = widget.product.isActive;
@@ -463,6 +489,64 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
+                      SizedBox(height: context.getScreenHeight(1.5)),
+
+                      // Price
+                      if (price != null && (Get.find<AuthController>().user?.isRetailer == true || Get.find<AuthController>().isAdmin))
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getScreenWidth(4),
+                            vertical: context.getScreenHeight(1.2),
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.primaryGold.withOpacity(0.1),
+                                AppColors.primaryGold.withOpacity(0.05),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.primaryGold.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.currency_rupee,
+                                color: AppColors.primaryGold,
+                                size: context.getScreenWidth(6),
+                              ),
+                              SizedBox(width: context.getScreenWidth(2)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "PRICE",
+                                    style: TextStyle(
+                                      fontSize: context.getScreenWidth(2.6),
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  Text(
+                                    _formatPrice(price),
+                                    style: TextStyle(
+                                      fontSize: context.getScreenWidth(6),
+                                      color: AppColors.primaryGold,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
                       SizedBox(height: context.getScreenHeight(2.5)),
 
                       // Specifications Header & Customize Button
@@ -531,15 +615,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                   "$netWeight g",
                                 ),
                               ),
-                            if (netWeight != null && grossWeight != null)
+                            if (netWeight != null && displayGrossWeight != null)
                               SizedBox(width: context.getScreenWidth(3)),
-                            if (grossWeight != null)
+                            if (displayGrossWeight != null)
                               Expanded(
                                 child: _buildSpecBox(
                                   context,
                                   Icons.work_outline,
                                   "GROSS WEIGHT",
-                                  "$grossWeight g",
+                                  "$displayGrossWeight g",
                                 ),
                               ),
                           ],
@@ -556,9 +640,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                   purity,
                                 ),
                               ),
-                            if (netWeight != null && grossWeight != null)
+                            if (netWeight != null && displayGrossWeight != null)
                               SizedBox(width: context.getScreenWidth(3)),
-                            if (grossWeight != null)
+                            if (displayGrossWeight != null)
                               Expanded(
                                 child: _buildSpecBox(
                                   context,
@@ -596,14 +680,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                       SizedBox(height: context.getScreenHeight(1.5)),
 
-                      // 5th Specification (Full Width Design Name)
+                      // Size (Full Width)
+                      if (size != null) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          child: _buildSpecBox(
+                            context,
+                            Icons.straighten,
+                            "SIZE",
+                            size,
+                          ),
+                        ),
+                        SizedBox(height: context.getScreenHeight(1.5)),
+                      ],
+
+                      // 5th Specification (Full Width Collection Name)
                       SizedBox(
                         width: double.infinity,
                         child: _buildSpecBox(
                           context,
-                          Icons.brush_outlined,
-                          "DESIGN NAME",
-                          designName,
+                          Icons.category_outlined,
+                          "COLLECTION NAME",
+                          collectionName,
                         ),
                       ),
 

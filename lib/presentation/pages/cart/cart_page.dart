@@ -247,6 +247,19 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ],
+                                        if (item.product.size != null) ...[
+                                          SizedBox(
+                                              height:
+                                                  context.getScreenHeight(0.4)),
+                                          Text(
+                                            item.product.size!,
+                                            style: TextStyle(
+                                              fontSize:
+                                                  context.getScreenWidth(3.4),
+                                              color: AppColors.textMuted,
+                                            ),
+                                          ),
+                                        ],
                                         SizedBox(
                                             height:
                                                 context.getScreenHeight(0.8)),

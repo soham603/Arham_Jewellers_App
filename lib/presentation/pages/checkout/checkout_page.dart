@@ -199,6 +199,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     color: AppColors.textMuted,
                                   ),
                                 ),
+                              if (item.product.size != null)
+                                Text(
+                                  item.product.size!,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.4),
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
                               SizedBox(height: context.getScreenHeight(0.8)),
                               Text(
                                 'Qty: ${item.quantity}',

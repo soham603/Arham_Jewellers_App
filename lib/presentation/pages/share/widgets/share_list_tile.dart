@@ -69,9 +69,9 @@ class ShareListTile extends StatelessWidget {
                           ),
                         ),
                         errorWidget: (context, url, error) =>
-                            const RatneshFallback.m(),
+                            const RatneshFallback.s(),
                       )
-                    : const RatneshFallback.m(),
+                    : const RatneshFallback.s(),
               ),
             ),
             const SizedBox(width: 12),
@@ -115,18 +115,16 @@ class ShareListTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
                     children: [
                       if (grossWeight != null)
                         _InfoChip(label: 'Wt: ${grossWeight}g'),
-                      if (fineWeight != null && fineWeight != grossWeight) ...[
-                        const SizedBox(width: 6),
+                      if (fineWeight != null && fineWeight != grossWeight)
                         _InfoChip(label: 'Fine: ${fineWeight}g'),
-                      ],
-                      if (touchData != null) ...[
-                        const SizedBox(width: 6),
+                      if (touchData != null)
                         _InfoChip(label: touchData),
-                      ],
                     ],
                   ),
                 ],

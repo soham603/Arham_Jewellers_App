@@ -12,7 +12,7 @@ class ColorPalette {
       isDarkMode ? const Color(0xFF8B6914) : const Color(0xFF8B6914);
 
   Color get boxColor =>
-      isDarkMode ? const Color(0xffF2F7FE) : const Color(0xffF2F7FE);
+      isDarkMode ? const Color(0xFFFAF6F0) : const Color(0xFFFAF6F0);
 
   Color get onlyAccentColor => const Color(0xffFFFDD00);
 

@@ -14,6 +14,7 @@ import '../../presentation/pages/product/product_details_page.dart';
 import '../../presentation/pages/ancillary/ancillary_page_screen.dart';
 import '../../presentation/pages/share/share_page.dart';
 import '../../presentation/pages/splash/splash_page.dart';
+import '../../presentation/pages/chat/chat_screen.dart';
 import 'app_routes.dart';
 
 class _MainShellBinding extends Bindings {
@@ -45,5 +46,6 @@ abstract class AppPages {
     GetPage(name: AppRoutes.handsetRequests, page: HandsetChangeScreen.new),
     GetPage(name: AppRoutes.share, page: SharePage.new),
     GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),
+    GetPage(name: AppRoutes.chat, page: ChatScreen.new),
   ];
 }

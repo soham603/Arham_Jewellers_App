@@ -135,6 +135,10 @@ class CategoryController extends GetxController {
     _k20State.value = CurrentAppState.LOADING;
     _k22State.value = CurrentAppState.LOADING;
 
+    _k18Categories.clear();
+    _k20Categories.clear();
+    _k22Categories.clear();
+
     _treeFetchFuture = _doFetchCategoryTree(full: full);
     await _treeFetchFuture;
     _treeFetchFuture = null;
@@ -172,7 +176,7 @@ class CategoryController extends GetxController {
               }
             }
 
-            _listForKarat(karat).value = level2List;
+            _listForKarat(karat).addAll(level2List);
             _stateForKarat(karat).value = CurrentAppState.SUCCESS;
           }
 

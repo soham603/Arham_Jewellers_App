@@ -8,7 +8,7 @@ typedef FilterApplyCallback = void Function({
   required List<String> karats,
   required List<String> categoryIds,
   required List<String> categoryNames,
-  required bool showAll,
+  required String stockFilter,
   required double wMin,
   required double wMax,
   required double pMin,
@@ -19,7 +19,7 @@ class FilterBottomSheet extends StatefulWidget {
   final List<String> initialSelectedKarats;
   final List<String> initialSelectedCategoryIds;
   final List<String> initialSelectedCategoryNames;
-  final bool initialShowAllStock;
+  final String initialStockFilter;
   final double initialWeightMin;
   final double initialWeightMax;
   final FilterApplyCallback onApply;
@@ -31,13 +31,14 @@ class FilterBottomSheet extends StatefulWidget {
   final double initialPriceMin;
   final double initialPriceMax;
   final double priceSliderMax;
+  final double weightSliderMax;
 
   const FilterBottomSheet({
     super.key,
     required this.initialSelectedKarats,
     required this.initialSelectedCategoryIds,
     required this.initialSelectedCategoryNames,
-    required this.initialShowAllStock,
+    required this.initialStockFilter,
     required this.initialWeightMin,
     required this.initialWeightMax,
     required this.onApply,
@@ -49,6 +50,7 @@ class FilterBottomSheet extends StatefulWidget {
     this.initialPriceMin = 0,
     this.initialPriceMax = 5000000,
     this.priceSliderMax = 5000000,
+    this.weightSliderMax = 100,
   });
 
   static Future<void> show(
@@ -56,7 +58,7 @@ class FilterBottomSheet extends StatefulWidget {
     required List<String> initialSelectedKarats,
     required List<String> initialSelectedCategoryIds,
     required List<String> initialSelectedCategoryNames,
-    required bool initialShowAllStock,
+    required String initialStockFilter,
     required double initialWeightMin,
     required double initialWeightMax,
     required FilterApplyCallback onApply,
@@ -68,6 +70,7 @@ class FilterBottomSheet extends StatefulWidget {
     double initialPriceMin = 0,
     double initialPriceMax = 5000000,
     double priceSliderMax = 5000000,
+    double weightSliderMax = 100,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -77,7 +80,7 @@ class FilterBottomSheet extends StatefulWidget {
         initialSelectedKarats: initialSelectedKarats,
         initialSelectedCategoryIds: initialSelectedCategoryIds,
         initialSelectedCategoryNames: initialSelectedCategoryNames,
-        initialShowAllStock: initialShowAllStock,
+        initialStockFilter: initialStockFilter,
         initialWeightMin: initialWeightMin,
         initialWeightMax: initialWeightMax,
         onApply: onApply,
@@ -89,6 +92,7 @@ class FilterBottomSheet extends StatefulWidget {
         initialPriceMin: initialPriceMin,
         initialPriceMax: initialPriceMax,
         priceSliderMax: priceSliderMax,
+        weightSliderMax: weightSliderMax,
       ),
     );
   }
@@ -107,11 +111,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late List<String> _tempSelectedKarats;
   late List<String> _tempSelectedCategoryIds;
   late List<String> _tempSelectedCategoryNames;
-  late bool _tempShowAll;
+  late String _tempStockFilter;
   late double _tempWeightMin;
   late double _tempWeightMax;
   late double _tempPriceMin;
   late double _tempPriceMax;
+  late TextEditingController _weightMaxController;
+  double _editableWeightMax = 100;
   List<CategoryModel> _allCategories = [];
   Map<String, List<CategoryModel>> _categoryVariants = {};
 
@@ -121,12 +127,22 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     _tempSelectedKarats = List.from(widget.initialSelectedKarats);
     _tempSelectedCategoryIds = List.from(widget.initialSelectedCategoryIds);
     _tempSelectedCategoryNames = List.from(widget.initialSelectedCategoryNames);
-    _tempShowAll = widget.initialShowAllStock;
-    _tempWeightMin = widget.initialWeightMin;
-    _tempWeightMax = widget.initialWeightMax;
-    _tempPriceMin = widget.initialPriceMin;
-    _tempPriceMax = widget.initialPriceMax;
+    _tempStockFilter = widget.initialStockFilter;
+    _tempWeightMin = widget.initialWeightMin.clamp(0.0, widget.weightSliderMax);
+    _tempWeightMax = widget.initialWeightMax.clamp(0.0, widget.weightSliderMax);
+    _tempPriceMin = widget.initialPriceMin.clamp(0.0, widget.priceSliderMax);
+    _tempPriceMax = widget.initialPriceMax.clamp(0.0, widget.priceSliderMax);
+    if (_tempWeightMin > _tempWeightMax) _tempWeightMax = widget.weightSliderMax;
+    if (_tempPriceMin > _tempPriceMax) _tempPriceMax = widget.priceSliderMax;
+    _editableWeightMax = widget.weightSliderMax;
+    _weightMaxController = TextEditingController(text: _editableWeightMax.round().toString());
     _loadCategories();
+  }
+
+  @override
+  void dispose() {
+    _weightMaxController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCategories() async {
@@ -169,10 +185,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _tempSelectedCategoryIds.clear();
         _tempSelectedCategoryNames.clear();
       }
-      if (widget.showStockFilter) _tempShowAll = false;
+      if (widget.showStockFilter) _tempStockFilter = 'ready';
       if (widget.showWeightFilter) {
         _tempWeightMin = 0;
-        _tempWeightMax = 500;
+        _tempWeightMax = _editableWeightMax;
       }
       if (widget.showPriceFilter) {
         _tempPriceMin = 0;
@@ -186,7 +202,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       karats: _tempSelectedKarats,
       categoryIds: _tempSelectedCategoryIds,
       categoryNames: _tempSelectedCategoryNames,
-      showAll: _tempShowAll,
+      stockFilter: _tempStockFilter,
       wMin: _tempWeightMin,
       wMax: _tempWeightMax,
       pMin: _tempPriceMin,
@@ -200,8 +216,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final selectedCount =
         (widget.showKaratFilter ? _tempSelectedKarats.length : 0) +
         (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty ? 1 : 0) +
-        (widget.showStockFilter && _tempShowAll ? 1 : 0) +
-        (widget.showWeightFilter && (_tempWeightMin > 0 || _tempWeightMax < 500) ? 1 : 0) +
+        (widget.showStockFilter && _tempStockFilter != 'ready' ? 1 : 0) +
+        (widget.showWeightFilter && (_tempWeightMin > 0 || _tempWeightMax < widget.weightSliderMax) ? 1 : 0) +
         (widget.showPriceFilter && (_tempPriceMin > 0 || _tempPriceMax < widget.priceSliderMax) ? 1 : 0);
 
     return Container(
@@ -613,16 +629,23 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           children: [
             _buildStockOption(
               context,
-              label: 'Active Only',
-              isSelected: !_tempShowAll,
-              onTap: () => setState(() => _tempShowAll = false),
+              label: 'Ready Stock',
+              isSelected: _tempStockFilter == 'ready',
+              onTap: () => setState(() => _tempStockFilter = 'ready'),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             _buildStockOption(
               context,
-              label: 'Show All',
-              isSelected: _tempShowAll,
-              onTap: () => setState(() => _tempShowAll = true),
+              label: 'Out of Stock',
+              isSelected: _tempStockFilter == 'out',
+              onTap: () => setState(() => _tempStockFilter = 'out'),
+            ),
+            const SizedBox(width: 8),
+            _buildStockOption(
+              context,
+              label: 'All',
+              isSelected: _tempStockFilter == 'all',
+              onTap: () => setState(() => _tempStockFilter = 'all'),
             ),
           ],
         ),
@@ -641,24 +664,24 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: isSelected
                 ? context.colorPalette.gold
                 : context.colorPalette.cardBg,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isSelected
                   ? context.colorPalette.gold
                   : context.colorPalette.border,
-              width: 2,
+              width: 1.5,
             ),
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white
@@ -686,13 +709,71 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 color: context.colorPalette.goldDeep,
               ),
             ),
-            Text(
-              '${_tempWeightMin.round()}g \u2013 ${_tempWeightMax.round()}g',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: context.colorPalette.goldDark,
-              ),
+            Row(
+              children: [
+                Text(
+                  '${_tempWeightMin.round()}g \u2013 ',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+                SizedBox(
+                  width: 48,
+                  height: 28,
+                  child: TextField(
+                    controller: _weightMaxController,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: context.colorPalette.goldDeep,
+                    ),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide(color: context.colorPalette.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide(color: context.colorPalette.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6),
+                        borderSide: BorderSide(color: context.colorPalette.gold, width: 1.5),
+                      ),
+                    ),
+                    onSubmitted: (value) {
+                      final parsed = double.tryParse(value);
+                      if (parsed != null && parsed > 0) {
+                        setState(() {
+                          _editableWeightMax = parsed;
+                          if (_tempWeightMax > _editableWeightMax) {
+                            _tempWeightMax = _editableWeightMax;
+                          }
+                          if (_tempWeightMin > _tempWeightMax) {
+                            _tempWeightMin = 0;
+                          }
+                        });
+                      } else {
+                        _weightMaxController.text = _editableWeightMax.round().toString();
+                      }
+                    },
+                  ),
+                ),
+                Text(
+                  'g',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -700,8 +781,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         RangeSlider(
           values: RangeValues(_tempWeightMin, _tempWeightMax),
           min: 0,
-          max: 500,
-          divisions: 50,
+          max: _editableWeightMax,
+          divisions: _editableWeightMax.round(),
           activeColor: context.colorPalette.gold,
           inactiveColor: context.colorPalette.border,
           labels: RangeLabels(
@@ -1230,8 +1311,8 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                       top: context.responsiveWidth(4, tabletVal: 5),
                                       bottom: context.responsiveWidth(4, tabletVal: 5)),
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: context.responsiveWidth(14, tabletVal: 18),
-                                    vertical: context.responsiveWidth(10, tabletVal: 12),
+                                    horizontal: context.responsiveWidth(12, tabletVal: 14),
+                                    vertical: context.responsiveWidth(6, tabletVal: 8),
                                   ),
                                   decoration: BoxDecoration(
                                     color: context.colorPalette.cardBg,
@@ -1246,7 +1327,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                         child: Text(
                                           'All',
                                           style: TextStyle(
-                                            fontSize: context.responsiveWidth(13, tabletVal: 15),
+                                            fontSize: context.responsiveWidth(12, tabletVal: 14),
                                             fontWeight: FontWeight.w700,
                                             color: context
                                                 .colorPalette.goldDeep,
@@ -1255,7 +1336,7 @@ class _CategoryPickerSheetState extends State<_CategoryPickerSheet> {
                                       ),
                                       Icon(
                                         Icons.select_all_rounded,
-                                        size: context.responsiveWidth(18, tabletVal: 22),
+                                        size: context.responsiveWidth(16, tabletVal: 20),
                                         color:
                                             context.colorPalette.goldDark,
                                       ),

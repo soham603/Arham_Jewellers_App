@@ -103,8 +103,8 @@ class SearchProductController extends GetxController {
   final _selectedCategoryNames = <String>[].obs;
   List<String> get selectedCategoryNames => _selectedCategoryNames;
 
-  final _showAllStock = false.obs;
-  bool get showAllStock => _showAllStock.value;
+  final _stockFilter = 'ready'.obs;
+  String get stockFilter => _stockFilter.value;
 
   final _weightMin = 0.0.obs;
   double get weightMin => _weightMin.value;
@@ -121,7 +121,7 @@ class SearchProductController extends GetxController {
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
       _selectedCategoryIds.isNotEmpty ||
-      _showAllStock.value ||
+      _stockFilter.value != 'ready' ||
       _weightMin.value > 0 ||
       _weightMax.value < 500 ||
       _priceMin.value > 0 ||
@@ -130,7 +130,7 @@ class SearchProductController extends GetxController {
   int get activeFilterCount {
     var count = _selectedKarats.length;
     if (_selectedCategoryIds.isNotEmpty) count++;
-    if (_showAllStock.value) count++;
+    if (_stockFilter.value != 'ready') count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
     if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
     return count;
@@ -180,6 +180,7 @@ class SearchProductController extends GetxController {
         queryParameters: {
           "page": _initialPage,
           "limit": _pageLimit,
+          "showReverse": true,
         },
       );
 
@@ -232,7 +233,8 @@ class SearchProductController extends GetxController {
               "categoryId": categoryId,
               "page": _filteredInitialPage,
               "limit": _pageLimit,
-              if (_showAllStock.value) "showAll": true,
+              "showReverse": true,
+              if (_stockFilter.value != 'ready') "showAll": true,
             },
           );
 
@@ -251,7 +253,7 @@ class SearchProductController extends GetxController {
               "search": _karatToSearchValue(karat),
               "page": _filteredInitialPage,
               "limit": _pageLimit,
-              if (_showAllStock.value) "showAll": true,
+              if (_stockFilter.value != 'ready') "showAll": true,
             },
           );
 
@@ -268,7 +270,8 @@ class SearchProductController extends GetxController {
           queryParameters: {
             "page": _filteredInitialPage,
             "limit": _pageLimit,
-            if (_showAllStock.value) "showAll": true,
+            "showReverse": true,
+            if (_stockFilter.value != 'ready') "showAll": true,
           },
         );
 
@@ -361,45 +364,56 @@ class SearchProductController extends GetxController {
     }
 
     try {
+      final response = await httpClient.get(
+        "/api/v1/products/search",
+        queryParameters: {
+          "search": query,
+          "page": _searchPage,
+          "limit": _pageLimit,
+          if (_stockFilter.value != 'ready') "showAll": true,
+        },
+      );
+
       List<ProductModel> allFetched = [];
 
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final List raw = data['data'] is List ? data['data'] : [];
+        allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      }
+
       if (_selectedKarats.isNotEmpty) {
-        for (final karat in _selectedKarats) {
-          final searchValue = _karatToSearchValue(karat);
-          final response = await httpClient.get(
-            "/api/v1/products/search",
-            queryParameters: {
-              "search": "$query $searchValue",
-              "page": _searchPage,
-              "limit": _pageLimit,
-              if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
-              if (_showAllStock.value) "showAll": true,
-            },
-          );
+        allFetched = allFetched.where((p) {
+          final productKarat = (p.karat ?? '').replaceAll(RegExp(r'[^0-9]'), '');
+          return _selectedKarats.any((k) {
+            final filterKarat = k.replaceAll(RegExp(r'[^0-9]'), '');
+            return productKarat.contains(filterKarat) || filterKarat.contains(productKarat);
+          });
+        }).toList();
+      }
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final data = response.data['data'];
-            final List raw = data['data'] is List ? data['data'] : [];
-            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
-          }
-        }
-      } else {
-        final response = await httpClient.get(
-          "/api/v1/products/search",
-          queryParameters: {
-            "search": query,
-            "page": _searchPage,
-            "limit": _pageLimit,
-            if (_selectedCategoryId.value != null) "categoryId": _selectedCategoryId.value,
-            if (_showAllStock.value) "showAll": true,
-          },
-        );
+      if (_selectedCategoryIds.isNotEmpty) {
+        allFetched = allFetched.where((p) {
+          final catId = p.category?.id;
+          if (catId == null) return false;
+          return _selectedCategoryIds.contains(catId);
+        }).toList();
+      }
 
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final data = response.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-        }
+      if (_weightMin.value > 0 || _weightMax.value < 500) {
+        allFetched = allFetched.where((p) {
+          final gw = p.grossWeight;
+          if (gw == null) return true;
+          return gw >= _weightMin.value && gw <= _weightMax.value;
+        }).toList();
+      }
+
+      if (_priceMin.value > 0 || _priceMax.value < 5000000) {
+        allFetched = allFetched.where((p) {
+          final price = _calculatePrice(p);
+          if (price == null) return true;
+          return price >= _priceMin.value && price <= _priceMax.value;
+        }).toList();
       }
 
       if (isPagination) {
@@ -408,10 +422,7 @@ class SearchProductController extends GetxController {
         _searchResults.value = allFetched;
       }
 
-      final expected = _selectedKarats.isNotEmpty
-          ? _pageLimit * _selectedKarats.length
-          : _pageLimit;
-      if (allFetched.length < expected) {
+      if (allFetched.length < _pageLimit) {
         _searchHasMore = false;
       } else {
         _searchPage++;
@@ -525,6 +536,7 @@ class SearchProductController extends GetxController {
           "categoryId": categoryId,
           "page": 1,
           "limit": _pageLimit,
+          "showReverse": true,
         },
       );
 
@@ -595,6 +607,7 @@ class SearchProductController extends GetxController {
           "categoryId": categoryId,
           "page": _filteredPage,
           "limit": _pageLimit,
+          "showReverse": true,
         },
       );
 
@@ -654,7 +667,7 @@ class SearchProductController extends GetxController {
     _selectedCategoryName.value = '';
     _selectedCategoryIds.clear();
     _selectedCategoryNames.clear();
-    _showAllStock.value = false;
+    _stockFilter.value = 'ready';
     _weightMin.value = 0;
     _weightMax.value = 500;
     _priceMin.value = 0;
@@ -669,7 +682,7 @@ class SearchProductController extends GetxController {
     required List<String> karats,
     required List<String> categoryIds,
     required List<String> categoryNames,
-    required bool showAll,
+    required String stockFilter,
     required double wMin,
     required double wMax,
     required double pMin,
@@ -686,12 +699,16 @@ class SearchProductController extends GetxController {
       ..addAll(categoryNames);
     _selectedCategoryId.value = null;
     _selectedCategoryName.value = '';
-    _showAllStock.value = showAll;
+    _stockFilter.value = stockFilter;
     _weightMin.value = wMin;
     _weightMax.value = wMax;
     _priceMin.value = pMin;
     _priceMax.value = pMax;
-    loadFilteredProducts();
+    if (isSearching) {
+      _runSearch(_searchQuery.value.trim(), isPagination: false);
+    } else {
+      loadFilteredProducts();
+    }
   }
 
   void clearSearch() {
@@ -744,7 +761,7 @@ class SearchProductController extends GetxController {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || product.fineWeight == null) return null;
 
-    final base = product.fineWeight! * goldRate.ratePerGram;
+    final base = product.fineWeight! * (goldRate.rate / 10);
     final labour = base * 0.10;
     final subtotal = base + labour;
     final gst = subtotal * 0.03;

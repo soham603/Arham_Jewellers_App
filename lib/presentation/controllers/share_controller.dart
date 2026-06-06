@@ -49,8 +49,8 @@ class ShareController extends GetxController {
   final _selectedCategoryNames = <String>[].obs;
   List<String> get selectedCategoryNames => _selectedCategoryNames;
 
-  final _showAllStock = false.obs;
-  bool get showAllStock => _showAllStock.value;
+  final _stockFilter = 'ready'.obs;
+  String get stockFilter => _stockFilter.value;
 
   final _weightMin = 0.0.obs;
   double get weightMin => _weightMin.value;
@@ -67,7 +67,7 @@ class ShareController extends GetxController {
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
       _selectedCategoryIds.isNotEmpty ||
-      _showAllStock.value ||
+      _stockFilter.value != 'ready' ||
       _weightMin.value > 0 ||
       _weightMax.value < 500 ||
       _priceMin.value > 0 ||
@@ -76,7 +76,7 @@ class ShareController extends GetxController {
   int get activeFilterCount {
     var count = _selectedKarats.length;
     if (_selectedCategoryIds.isNotEmpty) count++;
-    if (_showAllStock.value) count++;
+    if (_stockFilter.value != 'ready') count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
     if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
     return count;
@@ -102,6 +102,18 @@ class ShareController extends GetxController {
       _selectedProducts[p.id] = p;
     }
   }
+
+  void selectAllFirst(int count) {
+    final products = _filteredProducts;
+    final limit = count.clamp(0, products.length);
+    for (var i = 0; i < limit; i++) {
+      _selectedProducts[products[i].id] = products[i];
+    }
+  }
+
+  bool get areAllSelected =>
+      _filteredProducts.isNotEmpty &&
+      _filteredProducts.every((p) => _selectedProducts.containsKey(p.id));
 
   void clearSelection() => _selectedProducts.clear();
 
@@ -245,7 +257,7 @@ class ShareController extends GetxController {
               "search": q,
               "page": _page,
               "limit": _limit,
-              if (_showAllStock.value) "showAll": true,
+              if (_stockFilter.value != 'ready') "showAll": true,
             },
           );
 
@@ -264,7 +276,8 @@ class ShareController extends GetxController {
           queryParameters: {
             "page": _page,
             "limit": _limit,
-            if (_showAllStock.value) "showAll": true,
+            "showReverse": true,
+            if (_stockFilter.value != 'ready') "showAll": true,
           },
         );
 
@@ -336,8 +349,8 @@ class ShareController extends GetxController {
       ..addAll(categoryNames);
   }
 
-  void setShowAllStock(bool val) {
-    _showAllStock.value = val;
+  void setStockFilter(String val) {
+    _stockFilter.value = val;
   }
 
   void setWeightRange(double min, double max) {
@@ -349,7 +362,7 @@ class ShareController extends GetxController {
     _selectedKarats.clear();
     _selectedCategoryIds.clear();
     _selectedCategoryNames.clear();
-    _showAllStock.value = false;
+    _stockFilter.value = 'ready';
     _weightMin.value = 0;
     _weightMax.value = 500;
     _priceMin.value = 0;
@@ -360,7 +373,7 @@ class ShareController extends GetxController {
     required List<String> karats,
     required List<String> categoryIds,
     required List<String> categoryNames,
-    required bool showAll,
+    required String stockFilter,
     required double wMin,
     required double wMax,
     required double pMin,
@@ -375,7 +388,7 @@ class ShareController extends GetxController {
     _selectedCategoryNames
       ..clear()
       ..addAll(categoryNames);
-    _showAllStock.value = showAll;
+    _stockFilter.value = stockFilter;
     _weightMin.value = wMin;
     _weightMax.value = wMax;
     _priceMin.value = pMin;
@@ -388,7 +401,7 @@ class ShareController extends GetxController {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || product.fineWeight == null) return null;
 
-    final base = product.fineWeight! * goldRate.ratePerGram;
+    final base = product.fineWeight! * (goldRate.rate / 10);
     final labour = base * 0.10;
     final subtotal = base + labour;
     final gst = subtotal * 0.03;
@@ -399,7 +412,7 @@ class ShareController extends GetxController {
   String get filterInfo => ShareService.buildFilterInfo(
         selectedKarats: _selectedKarats,
         selectedCategoryNames: _selectedCategoryNames,
-        showAllStock: _showAllStock.value,
+        showAllStock: _stockFilter.value != 'ready',
         weightMin: _weightMin.value,
         weightMax: _weightMax.value,
       );
@@ -409,13 +422,14 @@ class ShareController extends GetxController {
   final _isSharing = false.obs;
   bool get isSharing => _isSharing.value;
 
-  Future<void> shareImages() async {
+  Future<void> shareImages({String? title}) async {
     if (_selectedProducts.isEmpty) return;
     _isSharing.value = true;
     try {
       await ShareService.shareImagesDirectly(
         products: selectedProductsList,
         filterInfo: filterInfo,
+        title: title,
       );
     } catch (e, st) {
       Logger.error("ShareController", "shareImages error: $e\n$st");

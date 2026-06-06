@@ -199,7 +199,6 @@ class CarouselsController extends GetxController {
         if (linkUrl != null) "linkUrl": linkUrl,
         if (mobileImageUrl != null)
           "mobileImageUrl": mobileImageUrl,
-        if (isActive != null) "isActive": isActive,
         "image": await MultipartFile.fromFile(imageFile.path),
       };
 

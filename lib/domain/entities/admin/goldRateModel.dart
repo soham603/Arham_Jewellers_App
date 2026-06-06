@@ -1,22 +1,25 @@
 class GoldRateModel {
-  final String id;
-  final double ratePerGram;
-  final String? setBy;
-  final DateTime createdAt;
+  final dynamic id;
+  final double rate;
+  final String? source;
+  final DateTime timestamp;
+  final Map<String, dynamic>? metadata;
 
   GoldRateModel({
     required this.id,
-    required this.ratePerGram,
-    this.setBy,
-    required this.createdAt,
+    required this.rate,
+    this.source,
+    required this.timestamp,
+    this.metadata,
   });
 
   factory GoldRateModel.fromJson(Map<String, dynamic> json) {
     return GoldRateModel(
       id: json['id'] ?? '',
-      ratePerGram: (json['ratePerGram'] ?? 0).toDouble(),
-      setBy: json['setBy'],
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      rate: (json['rate'] ?? 0).toDouble(),
+      source: json['source'],
+      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
+      metadata: json['metadata'],
     );
   }
 }
