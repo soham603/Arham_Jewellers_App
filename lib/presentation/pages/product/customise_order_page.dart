@@ -2,22 +2,31 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart'; // 🔥 Added Image Picker
+import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/domain/entities/customOrderModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/customOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/orders/customOrderSuccessPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class CustomiseOrderPage extends StatefulWidget {
   final ProductModel? product;
+  final CustomOrderModel? existingOrder;
 
-  const CustomiseOrderPage({super.key, this.product});
+  const CustomiseOrderPage({super.key, this.product, this.existingOrder});
 
   @override
   State<CustomiseOrderPage> createState() => _CustomiseOrderPageState();
 }
 
 class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
+  // Edit mode
+  bool get _isEditMode => widget.existingOrder != null;
+
   // State variables for visually selectable chips
   String selectedCarat = '22K (92%)';
   String selectedMarking = 'HUID';
@@ -36,6 +45,13 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   List<File?> referenceImages = [null, null, null, null];
   bool _networkImageFailed = false;
   final ImagePicker _picker = ImagePicker();
+
+  // Edit mode: track existing network images and removal
+  List<String> _existingImageUrls = [];
+  bool _removeOldImages = false;
+
+  // Controller
+  late final CustomOrderController _customOrderController;
 
   // Form Controllers
   final TextEditingController partyNameCtrl = TextEditingController();
@@ -56,6 +72,53 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   void initState() {
     super.initState();
 
+    // Initialize CustomOrderController
+    _customOrderController = Get.isRegistered<CustomOrderController>()
+        ? Get.find<CustomOrderController>()
+        : Get.put(CustomOrderController());
+
+    if (_isEditMode) {
+      _initEditMode();
+    } else {
+      _initCreateMode();
+    }
+  }
+
+  void _initEditMode() {
+    final order = widget.existingOrder!;
+
+    // Pre-fill from existing order
+    partyCodeCtrl.text = order.partyCode;
+    partyNameCtrl.text = order.partyName;
+    if (order.area != null) areaCtrl.text = order.area!;
+    contactCtrl.text = order.contactNumber;
+    itemNameCtrl.text = order.itemName;
+    if (order.weight != null) weightCtrl.text = order.weight!;
+    if (order.noOfPieces != null) noOfPcCtrl.text = order.noOfPieces!;
+    if (order.size != null) sizeCtrl.text = order.size!;
+    if (order.lengthBroadness != null) lengthBroadnessCtrl.text = order.lengthBroadness!;
+    if (order.productDescription != null) productDescriptionCtrl.text = order.productDescription!;
+
+    // Set chip selections from order
+    // Try exact match first, then partial match on the K number
+    if (_caratOptions.contains(order.purity)) {
+      selectedCarat = order.purity;
+    } else {
+      final karatNum = RegExp(r'(\d+)').firstMatch(order.purity)?.group(1);
+      if (karatNum != null) {
+        final match = _caratOptions.where((c) => c.startsWith('${karatNum}K'));
+        if (match.isNotEmpty) selectedCarat = match.first;
+      }
+    }
+
+    if (order.style.isNotEmpty) selectedStyle = order.style;
+    if (order.marking.isNotEmpty) selectedMarking = order.marking;
+
+    // Load existing images
+    _existingImageUrls = List<String>.from(order.referenceImages);
+  }
+
+  void _initCreateMode() {
     // ── Pre-fill from logged-in user ──
     if (Get.isRegistered<AuthController>()) {
       final user = Get.find<AuthController>().user;
@@ -183,7 +246,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          "Customise Order",
+          _isEditMode ? "Modify Order" : "Customise Order",
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w800,
@@ -238,23 +301,106 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  onPressed: () {
-                    Get.back();
-                    Get.snackbar(
-                      "Success",
-                      "Custom order submitted successfully!",
-                      backgroundColor: Colors.green.shade50,
-                      colorText: Colors.green.shade800,
-                    );
+                  onPressed: () async {
+                    if (_isEditMode) {
+                      if (_customOrderController.isModifying) return;
+                    } else {
+                      if (_customOrderController.isCreating) return;
+                    }
+
+                    // Validate required fields
+                    if (itemNameCtrl.text.trim().isEmpty) {
+                      Get.snackbar("Required", "Please enter item name");
+                      return;
+                    }
+
+                    final newImages = referenceImages
+                        .where((f) => f != null)
+                        .cast<File>()
+                        .toList();
+
+                    if (_isEditMode) {
+                      final success = await _customOrderController.modifyCustomOrder(
+                        orderId: widget.existingOrder!.id,
+                        partyCode: partyCodeCtrl.text.trim(),
+                        partyName: partyNameCtrl.text.trim(),
+                        area: areaCtrl.text.trim(),
+                        contactNumber: contactCtrl.text.trim(),
+                        itemName: itemNameCtrl.text.trim(),
+                        weight: weightCtrl.text.trim(),
+                        noOfPieces: noOfPcCtrl.text.trim(),
+                        size: sizeCtrl.text.trim(),
+                        lengthBroadness: lengthBroadnessCtrl.text.trim(),
+                        productDescription: productDescriptionCtrl.text.trim(),
+                        purity: selectedCarat,
+                        style: selectedStyle,
+                        marking: selectedMarking,
+                        newImages: newImages.isNotEmpty ? newImages : null,
+                        removeOldImages: _removeOldImages,
+                      );
+
+                      if (success && mounted) {
+                        Get.back();
+                      }
+                    } else {
+                      final success = await _customOrderController.createCustomOrder(
+                        partyCode: partyCodeCtrl.text.trim(),
+                        partyName: partyNameCtrl.text.trim(),
+                        area: areaCtrl.text.trim(),
+                        contactNumber: contactCtrl.text.trim(),
+                        itemName: itemNameCtrl.text.trim(),
+                        weight: weightCtrl.text.trim(),
+                        noOfPieces: noOfPcCtrl.text.trim(),
+                        size: sizeCtrl.text.trim(),
+                        lengthBroadness: lengthBroadnessCtrl.text.trim(),
+                        productDescription: productDescriptionCtrl.text.trim(),
+                        purity: selectedCarat,
+                        style: selectedStyle,
+                        marking: selectedMarking,
+                        images: newImages.isNotEmpty ? newImages : null,
+                      );
+
+                      if (success && mounted) {
+                        Get.off(() => const CustomOrderSuccessPage());
+                      }
+                    }
                   },
-                  child: Text(
-                    'Confirm Custom Order',
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(4.2),
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  child: Obx(() {
+                    final isLoading = _isEditMode
+                        ? _customOrderController.isModifying
+                        : _customOrderController.isCreating;
+                    return isLoading
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                _isEditMode ? 'Updating...' : 'Submitting...',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(4.2),
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            _isEditMode ? 'Update Custom Order' : 'Confirm Custom Order',
+                            style: TextStyle(
+                              fontSize: context.getScreenWidth(4.2),
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          );
+                  }),
                 ),
               ),
             ],
@@ -395,6 +541,39 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         Expanded(child: _buildImageUploadBox(context, 3)),
                       ],
                     ),
+
+                    // Edit mode: Remove all existing images checkbox
+                    if (_isEditMode && _existingImageUrls.isNotEmpty) ...[
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: Checkbox(
+                              value: _removeOldImages,
+                              onChanged: (val) {
+                                setState(() {
+                                  _removeOldImages = val ?? false;
+                                });
+                              },
+                              activeColor: AppColors.primaryGold,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Remove existing images",
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(3.2),
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -698,11 +877,14 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   }
 
   Widget _buildImageUploadBox(BuildContext context, int index) {
-    bool hasImage = referenceImages[index] != null;
+    bool hasLocalImage = referenceImages[index] != null;
+    bool hasNetworkImage = _isEditMode && index < _existingImageUrls.length && _existingImageUrls[index].isNotEmpty;
+    bool hasImage = hasLocalImage || hasNetworkImage;
+
     return AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
-        onTap: () => _showImageSourceActionSheet(context, index),
+        onTap: hasNetworkImage ? null : () => _showImageSourceActionSheet(context, index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
@@ -715,7 +897,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               width: hasImage ? 1.5 : 1,
             ),
           ),
-          child: hasImage
+          child: hasLocalImage
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(13),
                   child: Stack(
@@ -746,25 +928,64 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                     ],
                   ),
                 )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_photo_alternate_outlined,
-                      color: AppColors.primaryGold.withOpacity(0.6),
-                      size: 24,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "Add",
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
+              : hasNetworkImage
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(13),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: _existingImageUrls[index],
+                            fit: BoxFit.cover,
+                            placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _existingImageUrls.removeAt(index);
+                                  _removeOldImages = true;
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_photo_alternate_outlined,
+                          color: AppColors.primaryGold.withOpacity(0.6),
+                          size: 24,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Add",
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
         ),
       ),
     );
