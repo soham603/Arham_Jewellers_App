@@ -38,8 +38,6 @@ class SearchProductController extends GetxController {
     final list = List<ProductModel>.from(products);
     list.sort((a, b) {
       switch (sortBy) {
-        case SortOption.nameAsc:
-          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
         case SortOption.weightAsc:
           return (a.grossWeight ?? a.fineWeight ?? 0).compareTo(b.grossWeight ?? b.fineWeight ?? 0);
         case SortOption.weightDesc:
