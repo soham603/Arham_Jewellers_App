@@ -15,5 +15,8 @@
         "@arenukvern/mcp_flutter"
       ]
     }
+  },
+  "experimental": {
+    "disable_paste_summary": true
   }
 }

@@ -15,6 +15,7 @@ abstract class AppRoutes {
   static const handsetRequests = '/handset-requests';
   static const share = '/share';
   static const ancillary = '/ancillary';
+  static const chat = '/chat';
 
   /// Tab index map for the main shell.
   static const int tabIndexHome = 0;

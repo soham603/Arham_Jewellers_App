@@ -51,7 +51,10 @@ class ShareService {
     return data.buffer.asUint8List();
   }
 
-  static String _buildShareText(String filterInfo) {
+  static String _buildShareText(String filterInfo, {String? title}) {
+    if (title != null && title.isNotEmpty) {
+      return '$_brandName\n$_brandSubtitle\n\n$title';
+    }
     return '$_brandName\n$_brandSubtitle\n\nFilters: $filterInfo';
   }
 
@@ -73,6 +76,7 @@ class ShareService {
   static Future<void> shareImagesDirectly({
     required List<ProductModel> products,
     required String filterInfo,
+    String? title,
   }) async {
     final tempDir = await getTemporaryDirectory();
 
@@ -96,7 +100,7 @@ class ShareService {
 
     if (files.isEmpty) return;
 
-    final shareText = _buildShareText(filterInfo);
+    final shareText = _buildShareText(filterInfo, title: title);
 
     await Share.shareXFiles(
       files,
@@ -144,13 +148,23 @@ class ShareService {
 
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final file = File('${tempDir.path}/${_brandName.replaceAll(' ', '')}_Products_$timestamp.pdf');
+    final safeTitle = title != null && title.isNotEmpty
+        ? title.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+        : null;
+    final fileName = safeTitle != null
+        ? '${safeTitle}_Products_$timestamp.pdf'
+        : '${_brandName.replaceAll(' ', '')}_Products_$timestamp.pdf';
+    final file = File('${tempDir.path}/$fileName');
     await file.writeAsBytes(pdfBytes);
 
+    final shareFileName = safeTitle != null
+        ? '$safeTitle Products.pdf'
+        : '$_brandName Products.pdf';
+
     await Share.shareXFiles(
-      [XFile(file.path, name: '$_brandName Products.pdf')],
+      [XFile(file.path, name: shareFileName)],
       subject: '$_brandName - Product Catalog',
-      text: _buildShareText(filterInfo),
+      text: _buildShareText(filterInfo, title: title),
     );
   }
 }
@@ -256,80 +270,77 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
       image = pw.MemoryImage(imageBytes);
     }
 
-    final productWidget = pw.Container(
-      margin: const pw.EdgeInsets.only(bottom: 12),
-      padding: const pw.EdgeInsets.all(10),
-      decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColor.fromHex('#E3DDD5'), width: 0.5),
-        borderRadius: pw.BorderRadius.circular(4),
-      ),
-      child: pw.Row(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          if (image != null)
-            pw.Container(
-              width: 80,
-              height: 80,
-              decoration: pw.BoxDecoration(
-                borderRadius: pw.BorderRadius.circular(4),
-              ),
-              child: pw.ClipRRect(
-                horizontalRadius: 4,
-                verticalRadius: 4,
-                child: pw.Image(image, fit: pw.BoxFit.cover),
-              ),
+    final availableWidth = PdfPageFormat.a4.width - 60;
+    final maxImageHeight = 580.0;
+    double imageDisplayHeight = maxImageHeight;
+    if (image != null) {
+      final imgW = image.width?.toDouble() ?? availableWidth;
+      final imgH = image.height?.toDouble() ?? maxImageHeight;
+      final aspectRatio = imgH / imgW;
+      imageDisplayHeight = availableWidth * aspectRatio;
+      if (imageDisplayHeight > maxImageHeight) {
+        imageDisplayHeight = maxImageHeight;
+      }
+    }
+
+    final productWidget = pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        if (image != null)
+          pw.Container(
+            width: availableWidth,
+            height: imageDisplayHeight,
+            decoration: pw.BoxDecoration(
+              borderRadius: pw.BorderRadius.circular(4),
             ),
-          if (image != null) pw.SizedBox(width: 12),
-          pw.Expanded(
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Text(
-                  (data['name'] as String).isNotEmpty
-                      ? data['name'] as String
-                      : 'Product ${i + 1}',
-                  style: pw.TextStyle(
-                    font: brandFont,
-                    fontSize: 12,
-                    color: PdfColor.fromHex('#2D2118'),
-                  ),
-                ),
-                if (data['categoryName'] != null) ...[
-                  pw.SizedBox(height: 4),
-                  pw.Text(
-                    data['categoryName'] as String,
-                    style: pw.TextStyle(
-                      font: regularFont,
-                      fontSize: 10,
-                      color: PdfColor.fromHex('#7E756C'),
-                    ),
-                  ),
-                ],
-                pw.SizedBox(height: 6),
-                pw.Row(
-                  children: [
-                    _infoChip(
-                      'Weight',
-                      data['fineWeight'] != null
-                          ? '${(data['fineWeight'] as double).toStringAsFixed(1)}g'
-                          : '-',
-                      regularFont,
-                      brandFont,
-                    ),
-                    pw.SizedBox(width: 12),
-                    _infoChip(
-                      'Touch',
-                      (data['touch'] as String?) ?? '-',
-                      regularFont,
-                      brandFont,
-                    ),
-                  ],
-                ),
-              ],
+            child: pw.ClipRRect(
+              horizontalRadius: 4,
+              verticalRadius: 4,
+              child: pw.Image(image, fit: pw.BoxFit.contain),
             ),
           ),
-        ],
-      ),
+        pw.SizedBox(height: 14),
+        pw.Text(
+          (data['name'] as String).isNotEmpty
+              ? data['name'] as String
+              : 'Product ${i + 1}',
+          style: pw.TextStyle(
+            font: brandFont,
+            fontSize: 14,
+            color: PdfColor.fromHex('#2D2118'),
+          ),
+        ),
+        pw.SizedBox(height: 4),
+        if (data['categoryName'] != null)
+          pw.Text(
+            data['categoryName'] as String,
+            style: pw.TextStyle(
+              font: regularFont,
+              fontSize: 11,
+              color: PdfColor.fromHex('#7E756C'),
+            ),
+          ),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          children: [
+            _infoChip(
+              'Weight',
+              data['fineWeight'] != null
+                  ? '${(data['fineWeight'] as double).toStringAsFixed(1)}g'
+                  : '-',
+              regularFont,
+              brandFont,
+            ),
+            pw.SizedBox(width: 12),
+            _infoChip(
+              'Touch',
+              (data['touch'] as String?) ?? '-',
+              regularFont,
+              brandFont,
+            ),
+          ],
+        ),
+      ],
     );
 
     productWidgets.add(productWidget);

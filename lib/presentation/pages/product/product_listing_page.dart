@@ -26,7 +26,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
   final ScrollController _scrollController = ScrollController();
 
-  bool _showAllStock = false;
+  String _stockFilter = 'ready';
   double _weightMin = 0;
   double _weightMax = 500;
   double _priceMin = 0;
@@ -359,7 +359,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   bool get _hasActiveFilter =>
-      _showAllStock ||
+      _stockFilter != 'ready' ||
       _weightMin > 0 ||
       _weightMax < 500 ||
       _priceMin > 0 ||
@@ -367,7 +367,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   int get _activeFilterCount {
     var count = 0;
-    if (_showAllStock) count++;
+    if (_stockFilter != 'ready') count++;
     if (_weightMin > 0 || _weightMax < 500) count++;
     if (_priceMin > 0 || _priceMax < 5000000) count++;
     return count;
@@ -376,8 +376,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
     var result = products;
 
-    if (!_showAllStock) {
+    if (_stockFilter == 'ready') {
       result = result.where((p) => p.isActive).toList();
+    } else if (_stockFilter == 'out') {
+      result = result.where((p) => !p.isActive).toList();
     }
 
     if (_weightMin > 0 || _weightMax < 500) {
@@ -392,7 +394,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       final goldRate = Get.find<GoldRateController>().currentRate;
       if (goldRate != null) {
         result = result.where((p) {
-          final price = _calculatePrice(p, goldRate.ratePerGram);
+          final price = _calculatePrice(p, goldRate.rate);
           if (price == null) return true;
           return price >= _priceMin && price <= _priceMax;
         }).toList();
@@ -402,9 +404,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return result;
   }
 
-  double? _calculatePrice(ProductModel product, double ratePerGram) {
+  double? _calculatePrice(ProductModel product, double ratePer10Gram) {
     if (product.fineWeight == null) return null;
-    final base = product.fineWeight! * ratePerGram;
+    final base = product.fineWeight! * (ratePer10Gram / 10);
     final labour = base * 0.10;
     final subtotal = base + labour;
     final gst = subtotal * 0.03;
@@ -482,7 +484,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       initialSelectedKarats: const [],
       initialSelectedCategoryIds: const [],
       initialSelectedCategoryNames: const [],
-      initialShowAllStock: _showAllStock,
+      initialStockFilter: _stockFilter,
       initialWeightMin: _weightMin,
       initialWeightMax: _weightMax,
       initialPriceMin: _priceMin,
@@ -492,18 +494,20 @@ class _ProductListingPageState extends State<ProductListingPage> {
       showStockFilter: true,
       showWeightFilter: true,
       showPriceFilter: true,
+      weightSliderMax: 100,
+      priceSliderMax: 5000000,
       onApply: ({
         required List<String> karats,
         required List<String> categoryIds,
         required List<String> categoryNames,
-        required bool showAll,
+        required String stockFilter,
         required double wMin,
         required double wMax,
         required double pMin,
         required double pMax,
       }) {
         setState(() {
-          _showAllStock = showAll;
+          _stockFilter = stockFilter;
           _weightMin = wMin;
           _weightMax = wMax;
           _priceMin = pMin;

@@ -80,12 +80,14 @@ class _SharePageState extends State<SharePage> {
                   initialSelectedKarats: controller.selectedKarats,
                   initialSelectedCategoryIds: controller.selectedCategoryIds,
                   initialSelectedCategoryNames: controller.selectedCategoryNames,
-                  initialShowAllStock: controller.showAllStock,
+                  initialStockFilter: controller.stockFilter,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
                   initialPriceMin: controller.priceMin,
                   initialPriceMax: controller.priceMax,
                   showPriceFilter: showPrice,
+                  weightSliderMax: 100,
+                  priceSliderMax: 5000000,
                   onApply: controller.applyFilters,
                 );
               },
@@ -93,6 +95,7 @@ class _SharePageState extends State<SharePage> {
             ),
             _buildFilterChips(context),
             _buildSortLayoutBar(context),
+            _buildSelectionActions(context),
             Expanded(child: _buildProductGrid(context)),
           ],
         ),
@@ -107,7 +110,7 @@ class _SharePageState extends State<SharePage> {
 
       final karats = controller.selectedKarats;
       final categoryNames = controller.selectedCategoryNames;
-      final showAll = controller.showAllStock;
+      final stockFilter = controller.stockFilter;
       final wMin = controller.weightMin;
       final wMax = controller.weightMax;
       final hasWeightFilter = wMin > 0 || wMax < 500;
@@ -147,12 +150,12 @@ class _SharePageState extends State<SharePage> {
                           setState(() {});
                         },
                       ),
-                    if (showAll)
+                    if (stockFilter != 'ready')
                       _activeFilterChip(
                         context,
-                        label: 'All Stock',
+                        label: stockFilter == 'all' ? 'All Stock' : 'Out of Stock',
                         onRemove: () {
-                          controller.setShowAllStock(false);
+                          controller.setStockFilter('ready');
                           controller.loadProducts();
                           setState(() {});
                         },
@@ -211,6 +214,148 @@ class _SharePageState extends State<SharePage> {
         ),
       );
     });
+  }
+
+  Widget _buildSelectionActions(BuildContext context) {
+    return Obx(() {
+      final products = controller.displayProducts;
+      if (products.isEmpty) return const SizedBox.shrink();
+
+      final allSelected = controller.areAllSelected;
+      final count = controller.selectedCount;
+
+      return Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(0.6),
+        ),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (allSelected) {
+                  controller.clearSelection();
+                } else {
+                  controller.selectAll();
+                }
+                setState(() {});
+              },
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: allSelected
+                      ? context.colorPalette.gold
+                      : context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: allSelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.border,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      allSelected
+                          ? Icons.deselect_rounded
+                          : Icons.select_all_rounded,
+                      size: context.getScreenWidth(3.5),
+                      color:
+                          allSelected ? Colors.white : context.colorPalette.goldDark,
+                    ),
+                    SizedBox(width: context.getScreenWidth(1)),
+                    Text(
+                      allSelected ? 'Deselect All' : 'Select All',
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(2.8),
+                        fontWeight: FontWeight.w600,
+                        color:
+                            allSelected ? Colors.white : context.colorPalette.goldDark,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(width: context.getScreenWidth(2)),
+            _quickSelectChip(
+              context,
+              label: '20',
+              onTap: () {
+                controller.selectAllFirst(20);
+                setState(() {});
+              },
+            ),
+            SizedBox(width: context.getScreenWidth(2)),
+            _quickSelectChip(
+              context,
+              label: '50',
+              onTap: () {
+                controller.selectAllFirst(50);
+                setState(() {});
+              },
+            ),
+            const Spacer(),
+            if (count > 0)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$count selected',
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(2.6),
+                    fontWeight: FontWeight.w600,
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _quickSelectChip(
+    BuildContext context, {
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: context.colorPalette.cardBg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: context.colorPalette.border),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.pin_outlined,
+              size: context.getScreenWidth(3),
+              color: context.colorPalette.goldDark,
+            ),
+            SizedBox(width: context.getScreenWidth(0.8)),
+            Text(
+              'First $label',
+              style: TextStyle(
+                fontSize: context.getScreenWidth(2.6),
+                fontWeight: FontWeight.w500,
+                color: context.colorPalette.goldDark,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSortLayoutBar(BuildContext context) {
@@ -597,7 +742,7 @@ class _SharePageState extends State<SharePage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF25D366),
+                  color: context.colorPalette.goldDark,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -782,7 +927,6 @@ class _SharePageState extends State<SharePage> {
 
   void _showShareOptions(BuildContext context) {
     final count = controller.selectedCount;
-    final filterInfo = controller.filterInfo;
 
     showModalBottomSheet(
       context: context,
@@ -823,14 +967,7 @@ class _SharePageState extends State<SharePage> {
               ),
             ),
             SizedBox(height: context.getScreenHeight(0.5)),
-            Text(
-              'Filters: $filterInfo',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3),
-                color: context.colorPalette.subTitleColor,
-              ),
-            ),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.getScreenHeight(2)),
             _shareOptionTile(
               context,
               icon: Icons.image_outlined,
@@ -839,7 +976,7 @@ class _SharePageState extends State<SharePage> {
               subtitle: 'Send product images with filter details',
               onTap: () {
                 Navigator.pop(ctx);
-                _shareWithLoading(context, () => controller.shareImages(), 'Downloading images...');
+                _showTitleDialog(context, isForImage: true);
               },
             ),
             SizedBox(height: context.getScreenHeight(1.2)),
@@ -851,7 +988,7 @@ class _SharePageState extends State<SharePage> {
               subtitle: 'Create a branded product catalog',
               onTap: () {
                 Navigator.pop(ctx);
-                _showTitleDialog(context);
+                _showTitleDialog(context, isForImage: false);
               },
             ),
             SizedBox(height: context.getScreenHeight(1.5)),
@@ -970,7 +1107,7 @@ class _SharePageState extends State<SharePage> {
     );
   }
 
-  void _showTitleDialog(BuildContext context) {
+  void _showTitleDialog(BuildContext context, {required bool isForImage}) {
     final titleController = TextEditingController();
 
     showDialog(
@@ -996,7 +1133,7 @@ class _SharePageState extends State<SharePage> {
             color: context.colorPalette.textColor,
           ),
           decoration: InputDecoration(
-            hintText: 'Enter title for PDF (optional)',
+            hintText: 'Enter title (optional)',
             hintStyle: TextStyle(
               fontSize: context.getScreenWidth(3),
               color: context.colorPalette.subTitleColor,
@@ -1025,13 +1162,23 @@ class _SharePageState extends State<SharePage> {
             onPressed: () {
               Navigator.pop(ctx);
               final title = titleController.text.trim();
-              _shareWithLoading(
-                context,
-                () => controller.shareAsPdf(
-                  title: title.isNotEmpty ? title : null,
-                ),
-                'Generating PDF...',
-              );
+              if (isForImage) {
+                _shareWithLoading(
+                  context,
+                  () => controller.shareImages(
+                    title: title.isNotEmpty ? title : null,
+                  ),
+                  'Downloading images...',
+                );
+              } else {
+                _shareWithLoading(
+                  context,
+                  () => controller.shareAsPdf(
+                    title: title.isNotEmpty ? title : null,
+                  ),
+                  'Generating PDF...',
+                );
+              }
             },
             child: Text(
               'Generate',

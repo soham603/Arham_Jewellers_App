@@ -15,22 +15,10 @@ class GoldRateScreen extends StatefulWidget {
 
 class _GoldRateScreenState extends State<GoldRateScreen> {
   final GoldRateController controller = Get.put(GoldRateController());
-  final ScrollController _scroll = ScrollController();
   final TextEditingController _rateController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _scroll.addListener(() {
-      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
-        controller.loadMore();
-      }
-    });
-  }
-
-  @override
   void dispose() {
-    _scroll.dispose();
     _rateController.dispose();
     super.dispose();
   }
@@ -56,7 +44,6 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         onRefresh: controller.refresh_,
         color: context.colorPalette.primaryColor,
         child: SingleChildScrollView(
-          controller: _scroll,
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
             context.getScreenWidth(4),
@@ -186,7 +173,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             ),
             SizedBox(height: context.getScreenHeight(2)),
             Text(
-              rate != null ? '₹${rate.ratePerGram.toStringAsFixed(0)}' : '—',
+              rate != null ? '₹${rate.rate.toStringAsFixed(0)}' : '—',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -195,13 +182,13 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               ),
             ),
             Text(
-              'per gram',
+              'per 10 g',
               style: TextStyle(
                 color: Colors.white60,
                 fontSize: context.getScreenWidth(3.5),
               ),
             ),
-            if (rate?.setBy != null) ...[
+            if (rate?.source != null) ...[
               SizedBox(height: context.getScreenHeight(1.5)),
               Container(
                 padding: EdgeInsets.symmetric(
@@ -213,7 +200,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'Set by ${rate!.setBy} • ${DateFormat('dd MMM yyyy, hh:mm a').format(rate.createdAt.toLocal())}',
+                  'Set by ${rate!.source} • ${DateFormat('dd MMM yyyy, hh:mm a').format(rate.timestamp.toLocal())}',
                   style: TextStyle(
                     color: Colors.white54,
                     fontSize: context.getScreenWidth(2.8),
@@ -280,7 +267,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
 
   void _showSetRateSheet(BuildContext context) {
     _rateController.clear();
-    final currentRate = controller.currentRate?.ratePerGram;
+    final currentRate = controller.currentRate?.rate;
     if (currentRate != null) {
       _rateController.text = currentRate.toStringAsFixed(0);
     }
@@ -329,7 +316,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               ),
               SizedBox(height: context.getScreenHeight(0.5)),
               Text(
-                'Enter the new gold rate per gram',
+                'Enter the new gold rate per 10 g',
                 style: TextStyle(
                   fontSize: context.getScreenWidth(3.5),
                   color: context.colorPalette.subTitleColor,
@@ -352,7 +339,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGold,
                   ),
-                  hintText: 'e.g. 6500',
+                  hintText: 'e.g. 72000',
                   hintStyle: TextStyle(
                     color: context.colorPalette.subTitleColor.withOpacity(0.4),
                   ),
@@ -386,7 +373,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                             return;
                           }
                           Get.back();
-                          controller.setRate(ratePerGram: rate);
+                          controller.setRate(rate: rate);
                         },
                   child: Container(
                     width: double.infinity,
@@ -484,40 +471,13 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           ...List.generate(history.length, (index) {
             final rate = history[index];
             final isFirst = index == 0;
-            final prevRate = index > 0 ? history[index - 1].ratePerGram : null;
+            final prevRate = index > 0 ? history[index - 1].rate : null;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
               child: _historyTile(context, rate, isFirst, prevRate),
             );
           }),
-          if (controller.hasMore)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
-              child: Center(
-                child: SizedBox(
-                  width: context.getScreenWidth(6),
-                  height: context.getScreenWidth(6),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: context.colorPalette.primaryColor,
-                  ),
-                ),
-              ),
-            ),
-          if (!controller.hasMore && history.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
-              child: Center(
-                child: Text(
-                  'All history loaded',
-                  style: TextStyle(
-                    fontSize: context.getScreenWidth(3),
-                    color: context.colorPalette.subTitleColor,
-                  ),
-                ),
-              ),
-            ),
         ],
       );
     });
@@ -529,7 +489,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
     bool isFirst,
     double? prevRate,
   ) {
-    final diff = prevRate != null ? rate.ratePerGram - prevRate : 0.0;
+    final diff = prevRate != null ? rate.rate - prevRate : 0.0;
     final isUp = diff > 0;
 
     return Container(
@@ -552,9 +512,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   : context.colorPalette.subTitleColor.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
-            child: Center(
-              child: Text(
-                DateFormat('dd').format(rate.createdAt.toLocal()),
+              child: Center(
+                child: Text(
+                  DateFormat('dd').format(rate.timestamp.toLocal()),
                 style: TextStyle(
                   fontSize: context.getScreenWidth(3.2),
                   fontWeight: FontWeight.w700,
@@ -569,16 +529,16 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('dd MMMM yyyy').format(rate.createdAt.toLocal()),
+                  DateFormat('dd MMMM yyyy').format(rate.timestamp.toLocal()),
                   style: TextStyle(
                     fontSize: context.getScreenWidth(3.5),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.textColor,
                   ),
                 ),
-                if (rate.setBy != null)
+                if (rate.source != null)
                   Text(
-                    'Set by ${rate.setBy}',
+                    'Set by ${rate.source}',
                     style: TextStyle(
                       fontSize: context.getScreenWidth(2.8),
                       color: context.colorPalette.subTitleColor,
@@ -591,7 +551,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '₹${rate.ratePerGram.toStringAsFixed(0)}',
+                '₹${rate.rate.toStringAsFixed(0)}',
                 style: TextStyle(
                   fontSize: context.getScreenWidth(4.2),
                   fontWeight: FontWeight.w700,

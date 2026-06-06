@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart'
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/chat/chat_screen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -527,6 +528,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.getScreenHeight(2)),
 
+                    _chatButton(context),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
                     _ancillaryLink(
                       context,
                       icon: Icons.description_rounded,
@@ -569,6 +574,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               );
             }),
+    );
+  }
+
+  Widget _chatButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Get.to(() => const ChatScreen()),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getScreenWidth(4),
+          vertical: context.getScreenHeight(1.5),
+        ),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGold.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: AppColors.primaryGold,
+                size: context.getScreenWidth(5),
+              ),
+            ),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AI Shopping Assistant',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(4.2),
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    'Browse jewellery, check rates, track orders',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: context.getScreenWidth(3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white.withOpacity(0.5),
+              size: context.getScreenWidth(5),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

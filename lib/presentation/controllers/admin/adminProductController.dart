@@ -76,7 +76,7 @@ class AdminProductController extends GetxController {
     try {
       final response = await httpClient.get(
         "/api/v1/products/get-all",
-        queryParameters: {"page": _page, "limit": _limit, "showAll": true},
+        queryParameters: {"page": _page, "limit": _limit, "showReverse": true, "showAll": true},
         options: Options(extra: {"requiresAuth": true}),
       );
 

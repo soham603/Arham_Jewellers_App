@@ -17,23 +17,6 @@ class GoldRateDetailScreen extends StatefulWidget {
 
 class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   final GoldRateController controller = Get.put(GoldRateController());
-  final ScrollController _scroll = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scroll.addListener(() {
-      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
-        controller.loadMore();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scroll.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +39,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         onRefresh: controller.refresh_,
         color: context.colorPalette.primaryColor,
         child: SingleChildScrollView(
-          controller: _scroll,
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
             context.getScreenWidth(4),
@@ -71,14 +53,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               SizedBox(height: context.getScreenHeight(2.5)),
               _graphPlaceholder(context),
               SizedBox(height: context.getScreenHeight(3)),
-              Text(
-                'Rate History',
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(5),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-              ),
+              _periodFilter(context),
               SizedBox(height: context.getScreenHeight(1.5)),
               _historyList(context),
             ],
@@ -186,7 +161,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             ),
             SizedBox(height: context.getScreenHeight(2)),
             Text(
-              rate != null ? '₹${rate.ratePerGram.toStringAsFixed(0)}' : '—',
+              rate != null ? '₹${rate.rate.toStringAsFixed(0)}' : '—',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -195,7 +170,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               ),
             ),
             Text(
-              'per gram',
+              'per 10 g',
               style: TextStyle(
                 color: Colors.white60,
                 fontSize: context.getScreenWidth(3.5),
@@ -213,7 +188,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  'Updated ${_timeAgo(rate.createdAt)}',
+                  'Updated ${_timeAgo(rate.timestamp)}',
                   style: TextStyle(
                     color: Colors.white54,
                     fontSize: context.getScreenWidth(2.8),
@@ -276,12 +251,12 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
       }
 
       final sorted = List<GoldRateModel>.from(history)..sort(
-        (a, b) => a.createdAt.compareTo(b.createdAt),
+        (a, b) => a.timestamp.compareTo(b.timestamp),
       );
 
       final spots = <FlSpot>[];
       for (var i = 0; i < sorted.length; i++) {
-        spots.add(FlSpot(i.toDouble(), sorted[i].ratePerGram));
+        spots.add(FlSpot(i.toDouble(), sorted[i].rate));
       }
 
       final rates = spots.map((s) => s.y).toList();
@@ -378,7 +353,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                             ),
                             child: Text(
                               DateFormat('dd MMM').format(
-                                sorted[idx].createdAt.toLocal(),
+                                sorted[idx].timestamp.toLocal(),
                               ),
                               style: TextStyle(
                                 fontSize: context.getScreenWidth(2),
@@ -404,7 +379,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       ),
                       getTooltipItems: (touchedSpots) {
                         return touchedSpots.map((spot) {
-                          final date = sorted[spot.x.toInt()].createdAt.toLocal();
+                          final date = sorted[spot.x.toInt()].timestamp.toLocal();
                           return LineTooltipItem(
                             '₹${spot.y.toStringAsFixed(0)}\n',
                             TextStyle(
@@ -470,6 +445,50 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
     });
   }
 
+  Widget _periodFilter(BuildContext context) {
+    final periods = ['week', 'month', 'year'];
+    return Obx(() {
+      return Row(
+        children: periods.map((p) {
+          final isSelected = controller.selectedPeriod == p;
+          return Padding(
+            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+            child: GestureDetector(
+              onTap: () => controller.fetchHistory(period: p),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getScreenWidth(3),
+                  vertical: context.getScreenHeight(0.8),
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primaryGold
+                      : context.colorPalette.boxColor,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primaryGold
+                        : context.colorPalette.subTitleColor.withOpacity(0.15),
+                  ),
+                ),
+                child: Text(
+                  p[0].toUpperCase() + p.substring(1),
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.2),
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : context.colorPalette.textColor,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    });
+  }
+
   Widget _historyList(BuildContext context) {
     return Obx(() {
       final state = controller.state;
@@ -529,40 +548,13 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           ...List.generate(history.length, (index) {
             final rate = history[index];
             final isFirst = index == 0;
-            final prevRate = index > 0 ? history[index - 1].ratePerGram : null;
+            final prevRate = index > 0 ? history[index - 1].rate : null;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
               child: _historyTile(context, rate, isFirst, prevRate),
             );
           }),
-          if (controller.hasMore)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
-              child: Center(
-                child: SizedBox(
-                  width: context.getScreenWidth(6),
-                  height: context.getScreenWidth(6),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: context.colorPalette.primaryColor,
-                  ),
-                ),
-              ),
-            ),
-          if (!controller.hasMore && history.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
-              child: Center(
-                child: Text(
-                  'All history loaded',
-                  style: TextStyle(
-                    fontSize: context.getScreenWidth(3),
-                    color: context.colorPalette.subTitleColor,
-                  ),
-                ),
-              ),
-            ),
         ],
       );
     });
@@ -574,7 +566,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
     bool isFirst,
     double? prevRate,
   ) {
-    final diff = prevRate != null ? rate.ratePerGram - prevRate : 0.0;
+    final diff = prevRate != null ? rate.rate - prevRate : 0.0;
     final isUp = diff > 0;
 
     return Container(
@@ -597,9 +589,9 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   : context.colorPalette.subTitleColor.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
-            child: Center(
-              child: Text(
-                DateFormat('dd').format(rate.createdAt.toLocal()),
+              child: Center(
+                child: Text(
+                  DateFormat('dd').format(rate.timestamp.toLocal()),
                 style: TextStyle(
                   fontSize: context.getScreenWidth(3.2),
                   fontWeight: FontWeight.w700,
@@ -614,16 +606,16 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('dd MMMM yyyy').format(rate.createdAt.toLocal()),
+                  DateFormat('dd MMMM yyyy').format(rate.timestamp.toLocal()),
                   style: TextStyle(
                     fontSize: context.getScreenWidth(3.5),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.textColor,
                   ),
                 ),
-                if (rate.setBy != null)
+                if (rate.source != null)
                   Text(
-                    'Set by ${rate.setBy}',
+                    'Set by ${rate.source}',
                     style: TextStyle(
                       fontSize: context.getScreenWidth(2.8),
                       color: context.colorPalette.subTitleColor,
@@ -636,7 +628,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '₹${rate.ratePerGram.toStringAsFixed(0)}',
+                '₹${rate.rate.toStringAsFixed(0)}',
                 style: TextStyle(
                   fontSize: context.getScreenWidth(4.2),
                   fontWeight: FontWeight.w700,

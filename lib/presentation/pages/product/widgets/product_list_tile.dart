@@ -62,9 +62,9 @@ class ProductListTile extends StatelessWidget {
                           ),
                         ),
                         errorWidget: (context, url, error) =>
-                            const RatneshFallback.m(),
+                            const RatneshFallback.s(),
                       )
-                    : const RatneshFallback.m(),
+                    : const RatneshFallback.s(),
               ),
             ),
             const SizedBox(width: 12),

@@ -68,9 +68,10 @@ class _ProductCardState extends State<ProductCard>
         final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.fineWeight);
         final touchData = _parseTouch(product.touch);
+        final size = _cleanText(product.size);
 
         final showTagNo = !widget.compact && tagNo != null;
-        final showWeight = fineWeight != null || touchData != null;
+        final showWeight = fineWeight != null || touchData != null || size != null;
 
         return MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
@@ -186,6 +187,7 @@ class _ProductCardState extends State<ProductCard>
                                 child: _WeightInfo(
                                   fineWeight: fineWeight,
                                   touchData: touchData,
+                                  size: size,
                                   fontSize: metaSize,
                                 ),
                               ),
@@ -458,11 +460,13 @@ class _WeightInfo extends StatelessWidget {
     required this.fineWeight,
     required this.touchData,
     required this.fontSize,
+    this.size,
   });
 
   final String? fineWeight;
   final _TouchData? touchData;
   final double fontSize;
+  final String? size;
 
   @override
   Widget build(BuildContext context) {
@@ -481,10 +485,14 @@ class _WeightInfo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (fineWeight != null)
-          Text('Wt: ${fineWeight}g', style: style, maxLines: 1),
+          Text('Net Wt: ${fineWeight}g', style: style, maxLines: 1),
         if (touchData != null) ...[
           if (fineWeight != null) const SizedBox(height: 2),
           _PurityRow(data: touchData!, style: style, dimSep: dimSep),
+        ],
+        if (size != null) ...[
+          if (fineWeight != null || touchData != null) const SizedBox(height: 2),
+          Text(size!, style: style, maxLines: 1),
         ],
       ],
     );
@@ -510,7 +518,7 @@ class _PurityRow extends StatelessWidget {
     final spans = <TextSpan>[];
 
     if (hasKarat) {
-      spans.add(TextSpan(text: '${data.karat}K Gold', style: style));
+      spans.add(TextSpan(text: '${data.karat}K', style: style));
     }
 
     if (hasKarat && hasTouch) {
@@ -518,7 +526,7 @@ class _PurityRow extends StatelessWidget {
     }
 
     if (hasTouch) {
-      spans.add(TextSpan(text: '${data.touchValue} Touch', style: style));
+      spans.add(TextSpan(text: '${data.touchValue}', style: style));
     }
 
     return Text.rich(
@@ -545,7 +553,7 @@ class _RetailerPrice extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final base = product.fineWeight! * goldRate.ratePerGram;
+    final base = product.fineWeight! * (goldRate.rate / 10);
     final labour = base * 0.10;
     final subtotal = base + labour;
     final gst = subtotal * 0.03;

@@ -127,12 +127,15 @@ class _SearchPageState extends State<SearchPage> {
                   initialSelectedKarats: controller.selectedKarats,
                   initialSelectedCategoryIds: controller.selectedCategoryIds,
                   initialSelectedCategoryNames: controller.selectedCategoryNames,
-                  initialShowAllStock: controller.showAllStock,
+                  initialStockFilter: controller.stockFilter,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
                   initialPriceMin: controller.priceMin,
                   initialPriceMax: controller.priceMax,
+                  showKaratFilter: false,
                   showPriceFilter: showPrice,
+                  weightSliderMax: 100,
+                  priceSliderMax: 5000000,
                   onApply: controller.applyFilters,
                 ).then((_) => setState(() {}));
               },
@@ -161,6 +164,8 @@ class _SearchPageState extends State<SearchPage> {
               },
               filterActiveCount: controller.activeFilterCount,
             ),
+            _buildKaratRow(context),
+            SizedBox(height: context.getScreenHeight(0.6)),
             _buildFilterBar(context),
             Expanded(
               child: Obx(() {
@@ -197,13 +202,28 @@ class _SearchPageState extends State<SearchPage> {
                             context.getScreenWidth(4),
                             context.getScreenHeight(0.8),
                           ),
-                          child: Text(
-                            isSearching ? 'Results' : 'Filtered Results',
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(4.2),
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF675F55),
-                            ),
+                          child: Row(
+                            children: [
+                              Text(
+                                isSearching ? 'Results' : 'Filtered Results',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(4.2),
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF675F55),
+                                ),
+                              ),
+                              if (controller.selectedKarats.isNotEmpty) ...[
+                                SizedBox(width: context.getScreenWidth(2)),
+                                Text(
+                                  '— ${controller.selectedKarats.join(", ")}',
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.5),
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.goldDark,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ),
@@ -231,6 +251,78 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  Widget _buildKaratRow(BuildContext context) {
+    final karatOptions = [
+      {'label': '18K', 'percent': '76%'},
+      {'label': '20K', 'percent': '84%'},
+      {'label': '22K', 'percent': '92%'},
+    ];
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        context.getScreenWidth(4),
+        context.getScreenHeight(0.4),
+        context.getScreenWidth(4),
+        0,
+      ),
+      child: Row(
+        children: karatOptions.map((option) {
+          final karat = option['label']!;
+          final percent = option['percent']!;
+          final isSelected = controller.selectedKarats.contains(karat);
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () {
+                controller.toggleKaratFilter(karat);
+                if (controller.isSearching) {
+                  controller.applyFilters(
+                    karats: controller.selectedKarats,
+                    categoryIds: controller.selectedCategoryIds,
+                    categoryNames: controller.selectedCategoryNames,
+                    stockFilter: controller.stockFilter,
+                    wMin: controller.weightMin,
+                    wMax: controller.weightMax,
+                    pMin: controller.priceMin,
+                    pMax: controller.priceMax,
+                  );
+                } else if (controller.hasActiveFilters) {
+                  controller.loadFilteredProducts();
+                }
+                setState(() {});
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? context.colorPalette.gold
+                      : context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.border,
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  '$karat ($percent)',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : context.colorPalette.goldDeep,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildFilterBar(BuildContext context) {
     return Obx(() {
       if (!controller.hasActiveFilters) return const SizedBox.shrink();
@@ -238,7 +330,7 @@ class _SearchPageState extends State<SearchPage> {
       final karats = controller.selectedKarats;
       final categoryIds = controller.selectedCategoryIds;
       final categoryNames = controller.selectedCategoryNames;
-      final showAll = controller.showAllStock;
+      final stockFilter = controller.stockFilter;
       final weightMin = controller.weightMin;
       final weightMax = controller.weightMax;
       final weightActive = weightMin > 0 || weightMax < 500;
@@ -252,7 +344,7 @@ class _SearchPageState extends State<SearchPage> {
           karats: newKarats,
           categoryIds: categoryIds,
           categoryNames: categoryNames,
-          showAll: showAll,
+          stockFilter: stockFilter,
           wMin: weightMin,
           wMax: weightMax,
           pMin: priceMin,
@@ -273,7 +365,7 @@ class _SearchPageState extends State<SearchPage> {
           karats: karats,
           categoryIds: newIds,
           categoryNames: newNames,
-          showAll: showAll,
+          stockFilter: stockFilter,
           wMin: weightMin,
           wMax: weightMax,
           pMin: priceMin,
@@ -310,16 +402,16 @@ class _SearchPageState extends State<SearchPage> {
                             label: name,
                             onRemove: () => removeCategory(name),
                           ),
-                        if (showAll)
+                        if (stockFilter != 'ready')
                           _activeFilterChip(
                             context,
-                            label: 'Show All',
+                            label: stockFilter == 'all' ? 'All Stock' : 'Out of Stock',
                             onRemove: () {
                               controller.applyFilters(
                                 karats: karats,
                                 categoryIds: categoryIds,
                                 categoryNames: categoryNames,
-                                showAll: false,
+                                stockFilter: 'ready',
                                 wMin: weightMin,
                                 wMax: weightMax,
                                 pMin: priceMin,
@@ -337,7 +429,7 @@ class _SearchPageState extends State<SearchPage> {
                                 karats: karats,
                                 categoryIds: categoryIds,
                                 categoryNames: categoryNames,
-                                showAll: showAll,
+                                stockFilter: stockFilter,
                                 wMin: 0,
                                 wMax: 500,
                                 pMin: priceMin,
@@ -355,7 +447,7 @@ class _SearchPageState extends State<SearchPage> {
                                 karats: karats,
                                 categoryIds: categoryIds,
                                 categoryNames: categoryNames,
-                                showAll: showAll,
+                                stockFilter: stockFilter,
                                 wMin: weightMin,
                                 wMax: weightMax,
                                 pMin: 0,

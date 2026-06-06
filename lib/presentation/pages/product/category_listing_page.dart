@@ -552,130 +552,138 @@ class _Level3Sheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CategoryController>();
 
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.52,
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
-            width: context.responsiveWidth(40, tabletVal: 48),
-            height: context.responsiveWidth(4, tabletVal: 5),
-            decoration: BoxDecoration(
-              color: context.colorPalette.goldDark.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              context.responsiveWidth(20, tabletVal: 24),
-              context.responsiveWidth(16, tabletVal: 18),
-              context.responsiveWidth(20, tabletVal: 24),
-              context.responsiveWidth(12, tabletVal: 14),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.grid_view_rounded,
-                    size: 20, color: context.colorPalette.goldDark),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    parent.name
-                        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                        .replaceAll(
-                          RegExp(r'collection', caseSensitive: false),
-                          '',
-                        )
-                        .trim(),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: context.colorPalette.goldDeep,
-                    ),
-                  ),
-                ),
-                Text(
-                  karat.displayName,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: context.colorPalette.goldDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(height: 1, color: context.colorPalette.border),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: children.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.78,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: 200,
+          maxHeight: screenHeight * 0.85,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
+              width: context.responsiveWidth(40, tabletVal: 48),
+              height: context.responsiveWidth(4, tabletVal: 5),
+              decoration: BoxDecoration(
+                color: context.colorPalette.goldDark.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
               ),
-              itemBuilder: (_, index) {
-                final cat = children[index];
-                return GestureDetector(
-                  onTap: () => onSelect(cat),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: context.colorPalette.border),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(13),
-                            ),
-                            child: _CategoryListingImage(
-                              cat: cat,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Text(
-                            cat.name
-                                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                                .replaceAll(
-                                  RegExp(r'collection', caseSensitive: false),
-                                  '',
-                                )
-                                .trim(),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: context.colorPalette.goldDeep,
-                            ),
-                          ),
-                        ),
-                      ],
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.responsiveWidth(20, tabletVal: 24),
+                context.responsiveWidth(16, tabletVal: 18),
+                context.responsiveWidth(20, tabletVal: 24),
+                context.responsiveWidth(12, tabletVal: 14),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.grid_view_rounded,
+                      size: 20, color: context.colorPalette.goldDark),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      parent.name
+                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                          .replaceAll(
+                            RegExp(r'collection', caseSensitive: false),
+                            '',
+                          )
+                          .trim(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: context.colorPalette.goldDeep,
+                      ),
                     ),
                   ),
-                );
-              },
+                  Text(
+                    karat.displayName,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: context.colorPalette.goldDark,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Divider(height: 1, color: context.colorPalette.border),
+            Flexible(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: children.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.78,
+                ),
+                itemBuilder: (_, index) {
+                  final cat = children[index];
+                  return GestureDetector(
+                    onTap: () => onSelect(cat),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.cardBg,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: context.colorPalette.border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(13),
+                              ),
+                              child: _CategoryListingImage(
+                                cat: cat,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(6),
+                            child: Text(
+                              cat.name
+                                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                                  .replaceAll(
+                                    RegExp(r'collection', caseSensitive: false),
+                                    '',
+                                  )
+                                  .trim(),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: context.colorPalette.goldDeep,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
