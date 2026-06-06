@@ -22,4 +22,10 @@ abstract class AppRoutes {
   static const int tabIndexSearch = 1;
   static const int tabIndexCart = 2;
   static const int tabIndexProfile = 3;
+
+  // ── Custom Order ──
+  static const customOrderDetail = '/custom-order-detail';
+  static const customOrderSuccess = '/custom-order-success';
+  static const adminCustomOrders = '/admin-custom-orders';
+  static const adminCustomOrderDetail = '/admin-custom-order-detail';
 }

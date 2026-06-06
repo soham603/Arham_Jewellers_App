@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/adminCustomOrdersPage.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
@@ -182,6 +183,13 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Approve Orders",
                 subtitle: "Verify orders",
                 onTap: () => Get.to(() => const ApproveOrdersScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.design_services_rounded,
+                title: "Custom Orders",
+                subtitle: "Bespoke requests",
+                onTap: () => Get.to(() => const AdminCustomOrdersPage()),
               ),
               _adminTile(
                 context,

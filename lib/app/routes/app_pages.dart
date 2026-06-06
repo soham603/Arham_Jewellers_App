@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../presentation/controllers/navigation_controller.dart';
+import '../../presentation/pages/admin/adminCustomOrdersPage.dart';
 import '../../presentation/pages/admin/handsetChangeScreen.dart';
 import '../../presentation/pages/auth/change_handset_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
@@ -8,6 +9,7 @@ import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/checkout/checkout_page.dart';
 import '../../presentation/pages/main_shell_view.dart';
 import '../../presentation/pages/notifications/notifications_page.dart';
+import '../../presentation/pages/orders/customOrderSuccessPage.dart';
 import '../../presentation/pages/orders/my_orders_page.dart';
 import '../../presentation/pages/orders/order_success_page.dart';
 import '../../presentation/pages/product/product_details_page.dart';
@@ -47,5 +49,7 @@ abstract class AppPages {
     GetPage(name: AppRoutes.share, page: SharePage.new),
     GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),
     GetPage(name: AppRoutes.chat, page: ChatScreen.new),
+    GetPage(name: AppRoutes.customOrderSuccess, page: CustomOrderSuccessPage.new),
+    GetPage(name: AppRoutes.adminCustomOrders, page: AdminCustomOrdersPage.new),
   ];
 }
