@@ -152,6 +152,22 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   // ──────────────────────── Helpers ────────────────────────
 
+  String _cleanCategoryName(String name) {
+    return name
+        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+        .trim();
+  }
+
+  Map<String, List<CategoryModel>> _getDeduplicatedCategories() {
+    final Map<String, List<CategoryModel>> grouped = {};
+    for (final cat in widget.categories) {
+      final key = _cleanCategoryName(cat.name);
+      grouped.putIfAbsent(key, () => []).add(cat);
+    }
+    return grouped;
+  }
+
   void _recomputeWeightSliderMax() {
     final products = widget.products;
     if (products.isEmpty) {
@@ -210,7 +226,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       count++;
     }
     if (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty) {
-      count += _tempSelectedCategoryIds.length;
+      final grouped = _getDeduplicatedCategories();
+      count += grouped.entries
+          .where((e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)))
+          .length;
     }
     return count;
   }
@@ -246,12 +265,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _apply() {
     final selectedIds = _tempSelectedCategoryIds.toList();
-    final selectedNames = widget.categories
-        .where((c) => selectedIds.contains(c.id))
-        .map((c) => c.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim())
+    final grouped = _getDeduplicatedCategories();
+    final selectedNames = grouped.entries
+        .where((e) => e.value.any((c) => selectedIds.contains(c.id)))
+        .map((e) => e.key)
         .toList();
     widget.onApply(
       karats: List<String>.from(_tempSelectedKarats),
@@ -440,12 +457,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildCategorySection(BuildContext context) {
     const collapsedCount = 10;
-    final allCategories = widget.categories;
-    final showExpand = allCategories.length > collapsedCount;
-    final visibleCategories =
+    final grouped = _getDeduplicatedCategories();
+    final uniqueCleanNames = grouped.keys.toList();
+    final showExpand = uniqueCleanNames.length > collapsedCount;
+    final visibleNames =
         _categoriesExpanded || !showExpand
-            ? allCategories
-            : allCategories.sublist(0, collapsedCount);
+            ? uniqueCleanNames
+            : uniqueCleanNames.sublist(0, collapsedCount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,7 +485,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 child: Text(
                   'Clear',
                   style: TextStyle(
-                    fontSize: 10,
+                fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDark,
                   ),
@@ -479,19 +497,19 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children: visibleCategories.map((cat) {
-            final isSelected = _tempSelectedCategoryIds.contains(cat.id);
-            final cleanedName = cat.name
-                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                .trim();
+          children: visibleNames.map((cleanName) {
+            final cats = grouped[cleanName]!;
+            final isSelected = cats.any((c) => _tempSelectedCategoryIds.contains(c.id));
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  if (isSelected) {
-                    _tempSelectedCategoryIds.remove(cat.id);
-                  } else {
-                    _tempSelectedCategoryIds.add(cat.id);
+                  final allSelected = cats.every((c) => _tempSelectedCategoryIds.contains(c.id));
+                  for (final cat in cats) {
+                    if (allSelected) {
+                      _tempSelectedCategoryIds.remove(cat.id);
+                    } else {
+                      _tempSelectedCategoryIds.add(cat.id);
+                    }
                   }
                 });
               },
@@ -512,7 +530,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   ),
                 ),
                 child: Text(
-                  cleanedName,
+                  cleanName,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -550,7 +568,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   Text(
                     _categoriesExpanded
                         ? 'Show less'
-                        : 'Show all ${allCategories.length} collections',
+                        : 'Show all ${uniqueCleanNames.length} collections',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -583,21 +601,21 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           children: [
             _buildStockOption(
               context,
-              label: 'Ready',
+              label: 'Ready Stock',
               isSelected: _tempStockFilter == 'ready',
               onTap: () => setState(() => _tempStockFilter = 'ready'),
             ),
             const SizedBox(width: 5),
             _buildStockOption(
               context,
-              label: 'Out',
+              label: 'Out of Stock',
               isSelected: _tempStockFilter == 'out',
               onTap: () => setState(() => _tempStockFilter = 'out'),
             ),
             const SizedBox(width: 5),
             _buildStockOption(
               context,
-              label: 'All',
+              label: 'Show All',
               isSelected: _tempStockFilter == 'all',
               onTap: () => setState(() => _tempStockFilter = 'all'),
             ),
@@ -618,7 +636,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 3),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: isSelected
                 ? context.colorPalette.gold
@@ -635,7 +653,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white

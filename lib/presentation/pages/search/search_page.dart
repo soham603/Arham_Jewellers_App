@@ -16,6 +16,7 @@ import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/fuzzy_match.dart';
 
 class SearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -778,7 +779,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             const SizedBox(height: 12),
-            ...[SortOption.nameAsc, SortOption.newest, SortOption.oldest]
+            ...[SortOption.newest, SortOption.oldest]
                 .map((option) {
               final isSelected = controller.sortBy == option;
               return GestureDetector(
@@ -947,18 +948,6 @@ class _SearchPageState extends State<SearchPage> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              if (_getCategoryKarat(cat) != null) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${_getCategoryKarat(cat)} (${_getKaratPurity(_getCategoryKarat(cat))})',
-                                  style: TextStyle(
-                                    fontSize: context.getScreenWidth(2),
-                                    fontWeight: FontWeight.w500,
-                                    color: context.colorPalette.goldDark,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
                             ],
                           ),
                         ),
@@ -1219,9 +1208,14 @@ class _SearchPageState extends State<SearchPage> {
     var filtered = allCategories;
 
     if (searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where((cat) => cat.name.toLowerCase().contains(searchQuery))
-          .toList();
+      filtered = fuzzyFilter(
+        searchQuery,
+        filtered,
+        (cat) => cat.name
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim(),
+      );
     }
 
     if (selectedKarats.isNotEmpty) {
@@ -1254,7 +1248,11 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
-    final sorted = _sortCategories(filtered, controller.sortBy);
+    // When searching, results are already sorted by fuzzy score from fuzzyFilter.
+    // Otherwise apply the chosen sort option.
+    final sorted = searchQuery.isNotEmpty
+        ? filtered
+        : _sortCategories(filtered, controller.sortBy);
 
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
@@ -1342,7 +1340,7 @@ class _SearchPageState extends State<SearchPage> {
                               if (karatName != null) ...[
                                 SizedBox(height: context.getScreenHeight(0.1)),
                                 Text(
-                                  karatName,
+                                  '$karatName • ${_getKaratPurity(karatName)}',
                                   style: TextStyle(
                                     fontSize: context.getScreenWidth(2.2),
                                     fontWeight: FontWeight.w500,
@@ -1378,9 +1376,14 @@ class _SearchPageState extends State<SearchPage> {
     final selectedKarats = controller.selectedKarats;
 
     if (searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where((cat) => cat.name.toLowerCase().contains(searchQuery))
-          .toList();
+      filtered = fuzzyFilter(
+        searchQuery,
+        filtered,
+        (cat) => cat.name
+            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
+            .trim(),
+      );
     }
 
     if (selectedKarats.isNotEmpty) {
@@ -1404,9 +1407,6 @@ class _SearchPageState extends State<SearchPage> {
       List<CategoryModel> categories, SortOption sort) {
     final sorted = List<CategoryModel>.from(categories);
     switch (sort) {
-      case SortOption.nameAsc:
-        sorted.sort((a, b) => a.name.compareTo(b.name));
-        break;
       case SortOption.newest:
         sorted.sort((a, b) =>
             (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
