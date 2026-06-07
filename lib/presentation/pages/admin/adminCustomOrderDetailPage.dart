@@ -9,6 +9,8 @@ import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -53,9 +55,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final statusInfo = _getStatusInfo(widget.order.status);
-    final isPending = widget.order.status.toUpperCase() == 'PENDING';
-    final isAssigned = widget.order.status.toUpperCase() == 'ASSIGNED';
+    final order = widget.order;
+    final statusInfo = _getStatusInfo(order.status);
+    final isPending = order.status.toUpperCase() == 'PENDING';
+    final isAssigned = order.status.toUpperCase() == 'ASSIGNED';
 
     return Scaffold(
       backgroundColor: AppColors.pageBg,
@@ -67,7 +70,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getScreenWidth(5)),
         ),
         title: Text(
-          'Order #${widget.order.id.substring(0, 8).toUpperCase()}',
+          'Order #${order.id.substring(0, 8).toUpperCase()}',
           style: TextStyle(
             fontSize: context.getScreenWidth(5.5),
             fontWeight: FontWeight.w700,
@@ -78,7 +81,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         actions: [
           Container(
             margin: EdgeInsets.only(right: context.getScreenWidth(4)),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: statusInfo.bgColor,
               borderRadius: BorderRadius.circular(20),
@@ -103,71 +106,205 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               _buildInfoCard(
                 context,
                 children: [
-                  _buildInfoRow(context, 'Order ID', '#${widget.order.id.substring(0, 8).toUpperCase()}'),
+                  _buildInfoRow(context, 'Order ID', '#${order.id.substring(0, 8).toUpperCase()}'),
                   _buildInfoDivider(),
-                  _buildInfoRow(context, 'Date', _formatDate(widget.order.createdAt)),
+                  _buildInfoRow(context, 'Date', _formatDate(order.createdAt)),
                   _buildInfoDivider(),
-                  _buildInfoRow(context, 'Status', widget.order.status.toUpperCase()),
+                  _buildInfoRow(context, 'Status', order.status.toUpperCase()),
                 ],
               ),
 
               SizedBox(height: context.getScreenHeight(2)),
+
+              // ── Customer Details ──
+              if (order.partyName != null || order.contactNumber != null || order.user.name.isNotEmpty) ...[
+                _buildSectionTitle(context, 'Customer Details'),
+                SizedBox(height: context.getScreenHeight(1)),
+                _buildInfoCard(
+                  context,
+                  children: [
+                    if (order.partyName != null && order.partyName!.isNotEmpty)
+                      _buildInfoRow(context, 'Party Name', order.partyName!),
+                    if (order.partyName != null && order.partyName!.isNotEmpty) _buildInfoDivider(),
+                    if (order.contactNumber != null && order.contactNumber!.isNotEmpty)
+                      _buildInfoRow(context, 'Contact', order.contactNumber!),
+                    if (order.contactNumber != null && order.contactNumber!.isNotEmpty) _buildInfoDivider(),
+                    if (order.area != null && order.area!.isNotEmpty)
+                      _buildInfoRow(context, 'Area', order.area!),
+                    if (order.area != null && order.area!.isNotEmpty) _buildInfoDivider(),
+                    if (order.partyCode != null && order.partyCode!.isNotEmpty)
+                      _buildInfoRow(context, 'Party Code', order.partyCode!),
+                    if (order.partyCode != null && order.partyCode!.isNotEmpty) _buildInfoDivider(),
+                    if (order.user.name.isNotEmpty)
+                      _buildInfoRow(context, 'User Name', order.user.name),
+                    if (order.user.name.isNotEmpty) _buildInfoDivider(),
+                    if (order.user.phoneNumber.isNotEmpty)
+                      _buildInfoRow(context, 'User Phone', order.user.phoneNumber),
+                  ],
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+              ],
 
               // ── Item Details ──
-              _buildSectionTitle(context, 'Items'),
-              SizedBox(height: context.getScreenHeight(1)),
-              _buildInfoCard(
-                context,
-                children: [
-                  ...widget.order.orderItems.map(
-                    (item) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 6),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              item.product.name,
-                              style: TextStyle(
-                                fontSize: context.getScreenWidth(3.8),
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textDark,
+              if (order.itemName != null || order.orderItems.isNotEmpty) ...[
+                _buildSectionTitle(context, 'Item Details'),
+                SizedBox(height: context.getScreenHeight(1)),
+                _buildInfoCard(
+                  context,
+                  children: [
+                    if (order.itemName != null && order.itemName!.isNotEmpty)
+                      _buildInfoRow(context, 'Item Name', order.itemName!),
+                    if (order.itemName != null && order.itemName!.isNotEmpty) _buildInfoDivider(),
+                    if (order.purity != null && order.purity!.isNotEmpty)
+                      _buildInfoRow(context, 'Purity', order.purity!),
+                    if (order.purity != null && order.purity!.isNotEmpty) _buildInfoDivider(),
+                    if (order.style != null && order.style!.isNotEmpty)
+                      _buildInfoRow(context, 'Style', order.style!),
+                    if (order.style != null && order.style!.isNotEmpty) _buildInfoDivider(),
+                    if (order.marking != null && order.marking!.isNotEmpty)
+                      _buildInfoRow(context, 'Marking', order.marking!),
+                    if (order.marking != null && order.marking!.isNotEmpty) _buildInfoDivider(),
+                    if (order.weight != null && order.weight!.isNotEmpty)
+                      _buildInfoRow(context, 'Weight', '${order.weight}g'),
+                    if (order.weight != null && order.weight!.isNotEmpty) _buildInfoDivider(),
+                    if (order.noOfPieces != null && order.noOfPieces!.isNotEmpty)
+                      _buildInfoRow(context, 'No. of Pieces', order.noOfPieces!),
+                    if (order.noOfPieces != null && order.noOfPieces!.isNotEmpty) _buildInfoDivider(),
+                    if (order.size != null && order.size!.isNotEmpty)
+                      _buildInfoRow(context, 'Size', order.size!),
+                    if (order.size != null && order.size!.isNotEmpty) _buildInfoDivider(),
+                    if (order.lengthBroadness != null && order.lengthBroadness!.isNotEmpty)
+                      _buildInfoRow(context, 'Dimensions', order.lengthBroadness!),
+                    if (order.lengthBroadness != null && order.lengthBroadness!.isNotEmpty) _buildInfoDivider(),
+                    if (order.productDescription != null && order.productDescription!.isNotEmpty)
+                      _buildInfoRow(context, 'Description', order.productDescription!),
+                    // Fallback: show catalog items if no custom item info
+                    if (order.itemName == null || order.itemName!.isEmpty) ...[
+                      ...order.orderItems.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  item.product.name,
+                                  style: TextStyle(
+                                    fontSize: context.getScreenWidth(3.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textDark,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Text(
+                                'x${item.quantity}',
+                                style: TextStyle(
+                                  fontSize: context.getScreenWidth(3.5),
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            'x${item.quantity}',
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(3.5),
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
+                    ],
+                  ],
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+              ],
 
-              SizedBox(height: context.getScreenHeight(2)),
+              // ── Reference Images ──
+              if (order.referenceImages.isNotEmpty) ...[
+                _buildSectionTitle(context, 'Reference Images'),
+                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(
+                  height: context.getScreenWidth(25),
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: order.referenceImages.length,
+                    separatorBuilder: (_, __) => SizedBox(width: context.getScreenWidth(3)),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () => _showImageZoom(context, order.referenceImages[index]),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            width: context.getScreenWidth(25),
+                            height: context.getScreenWidth(25),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: const Color(0xFFE7DED2)),
+                            ),
+                            child: CachedNetworkImage(
+                              imageUrl: order.referenceImages[index],
+                              fit: BoxFit.cover,
+                              placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              errorWidget: (_, __, ___) => const RatneshFallback.xs(),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+              ],
 
               // ── Admin Message ──
-              if (widget.order.adminMessage != null && widget.order.adminMessage!.isNotEmpty) ...[
+              if (order.adminMessage != null && order.adminMessage!.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Admin Message'),
                 SizedBox(height: context.getScreenHeight(1)),
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(context.getScreenWidth(4)),
                   decoration: BoxDecoration(
-                    color: AppColors.tileBg,
+                    color: order.status.toUpperCase() == 'REJECTED'
+                        ? const Color(0xFFFEE2E2).withValues(alpha: 0.5)
+                        : AppColors.tileBg,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE7DED2)),
+                    border: Border.all(
+                      color: order.status.toUpperCase() == 'REJECTED'
+                          ? const Color(0xFFDC2626).withValues(alpha: 0.2)
+                          : const Color(0xFFE7DED2),
+                    ),
                   ),
                   child: Text(
-                    widget.order.adminMessage!,
+                    order.adminMessage!,
                     style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textMuted, height: 1.5),
                   ),
                 ),
                 SizedBox(height: context.getScreenHeight(2)),
+              ],
+
+              // ── Assigned Craftsman ──
+              if (isAssigned || order.status.toUpperCase() == 'COMPLETED') ...[
+                if (order.assignedKarigarName != null && order.assignedKarigarName!.isNotEmpty) ...[
+                  _buildSectionTitle(context, 'Assigned Craftsman'),
+                  SizedBox(height: context.getScreenHeight(1)),
+                  _buildInfoCard(
+                    context,
+                    children: [
+                      _buildInfoRow(context, 'Name', order.assignedKarigarName!),
+                      if (order.talkedToStaffName != null && order.talkedToStaffName!.isNotEmpty) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Contact Person', order.talkedToStaffName!),
+                      ],
+                      if (order.assignAdminNotes != null && order.assignAdminNotes!.isNotEmpty) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Notes', order.assignAdminNotes!),
+                      ],
+                      if (order.deliveryDate != null && order.deliveryDate!.isNotEmpty) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Delivery Date', order.deliveryDate!),
+                      ],
+                      if (order.completeAdminNotes != null && order.completeAdminNotes!.isNotEmpty) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Completion Notes', order.completeAdminNotes!),
+                      ],
+                    ],
+                  ),
+                  SizedBox(height: context.getScreenHeight(2)),
+                ],
               ],
 
               // ── Action Buttons ──
@@ -229,83 +366,11 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ),
               ],
 
-              SizedBox(height: context.getScreenHeight(3)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Reject Dialog ──
-  void _showRejectDialog(BuildContext context) {
-    final reasonCtrl = TextEditingController();
-
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
-        child: Container(
-          padding: EdgeInsets.all(context.getScreenWidth(5)),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: context.getScreenWidth(16),
-                height: context.getScreenWidth(16),
-                decoration: const BoxDecoration(color: Color(0xFFFEE2E2), shape: BoxShape.circle),
-                child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getScreenWidth(7)),
-              ),
+              // ── WhatsApp Button ──
               SizedBox(height: context.getScreenHeight(2)),
-              Text("Reject Order", style: TextStyle(fontSize: context.getScreenWidth(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
-              SizedBox(height: context.getScreenHeight(1)),
-              Text("Provide a reason for rejection", style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textMuted)),
-              SizedBox(height: context.getScreenHeight(2)),
-              TextField(
-                controller: reasonCtrl,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Reason...',
-                  hintStyle: TextStyle(color: AppColors.textMuted),
-                  filled: true,
-                  fillColor: AppColors.pageBg,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
+              _buildWhatsAppButton(context, order),
+
               SizedBox(height: context.getScreenHeight(3)),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: context.getScreenHeight(5),
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.grey.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                        onPressed: () => Get.back(),
-                        child: Text("Cancel", style: TextStyle(fontSize: context.getScreenWidth(3.8), color: AppColors.textDark)),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: context.getScreenWidth(3)),
-                  Expanded(
-                    child: SizedBox(
-                      height: context.getScreenHeight(5),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-                        onPressed: () async {
-                          Get.back();
-                          await _controller.performCustomOrderAction(
-                            orderId: widget.order.id,
-                            action: 'REJECT',
-                            adminMessage: reasonCtrl.text.trim(),
-                          );
-                        },
-                        child: Text("Reject", style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w700, color: Colors.white)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -367,11 +432,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     SizedBox(height: context.getScreenHeight(0.8)),
                     TextField(
                       controller: staffNameCtrl,
+                      style: TextStyle(fontSize: context.getScreenWidth(3.3)),
                       decoration: InputDecoration(
                         hintText: 'Who you spoke with',
-                        hintStyle: TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                       ),
                     ),
@@ -382,11 +449,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     TextField(
                       controller: notesCtrl,
                       maxLines: 2,
+                      style: TextStyle(fontSize: context.getScreenWidth(3.3)),
                       decoration: InputDecoration(
                         hintText: 'Optional notes',
-                        hintStyle: TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                       ),
                     ),
@@ -421,6 +490,82 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
             ),
           );
         },
+      ),
+    );
+  }
+
+  // ── Reject Dialog ──
+  void _showRejectDialog(BuildContext context) {
+    final reasonCtrl = TextEditingController();
+
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
+        child: Container(
+          padding: EdgeInsets.all(context.getScreenWidth(5)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: context.getScreenWidth(16),
+                height: context.getScreenWidth(16),
+                decoration: const BoxDecoration(color: Color(0xFFFEE2E2), shape: BoxShape.circle),
+                child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getScreenWidth(7)),
+              ),
+              SizedBox(height: context.getScreenHeight(2)),
+              Text("Reject Order", style: TextStyle(fontSize: context.getScreenWidth(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
+              SizedBox(height: context.getScreenHeight(1)),
+              Text("Provide a reason for rejection", style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textMuted)),
+              SizedBox(height: context.getScreenHeight(2)),
+              TextField(
+                controller: reasonCtrl,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: 'Reason...',
+                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                  filled: true,
+                  fillColor: AppColors.pageBg,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                ),
+              ),
+              SizedBox(height: context.getScreenHeight(3)),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: context.getScreenHeight(5),
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.grey.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                        onPressed: () => Get.back(),
+                        child: Text("Cancel", style: TextStyle(fontSize: context.getScreenWidth(3.8), color: AppColors.textDark)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: context.getScreenWidth(3)),
+                  Expanded(
+                    child: SizedBox(
+                      height: context.getScreenHeight(5),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                        onPressed: () async {
+                          Get.back();
+                          await _controller.performCustomOrderAction(
+                            orderId: widget.order.id,
+                            action: 'REJECT',
+                            adminMessage: reasonCtrl.text.trim(),
+                          );
+                        },
+                        child: Text("Reject", style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w700, color: Colors.white)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -470,7 +615,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                           controller: dateCtrl,
                           decoration: InputDecoration(
                             hintText: 'Select delivery date',
-                            hintStyle: TextStyle(color: AppColors.textMuted),
+                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
                             filled: true,
                             fillColor: AppColors.pageBg,
                             suffixIcon: Icon(Icons.calendar_today_rounded, color: AppColors.primaryGold, size: 20),
@@ -488,7 +633,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       maxLines: 2,
                       decoration: InputDecoration(
                         hintText: 'Optional notes',
-                        hintStyle: TextStyle(color: AppColors.textMuted),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -526,11 +671,92 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
+  // ── Image Zoom ──
+  void _showImageZoom(BuildContext context, String imageUrl) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: EdgeInsets.zero,
+        child: GestureDetector(
+          onTap: () => Get.back(),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (_, __) => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                  errorWidget: (_, __, ___) => const Icon(Icons.error_outline, color: Colors.white, size: 40),
+                ),
+              ),
+              Positioned(
+                top: 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, color: Colors.white, size: 20),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── WhatsApp Button ──
+  Widget _buildWhatsAppButton(BuildContext context, AdminOrderModel order) {
+    final phone = order.contactNumber ?? order.user.phoneNumber;
+    if (phone.isEmpty) return const SizedBox.shrink();
+
+    return GestureDetector(
+      onTap: () async {
+        final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+        final url = "https://wa.me/$cleanPhone";
+        await launchUrl(Uri.parse(url));
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE9F9EE),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
+            SizedBox(width: context.getScreenWidth(2)),
+            Text(
+              "Connect on WhatsApp",
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.w700,
+                fontSize: context.getScreenWidth(3.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Helpers ──
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Row(
       children: [
         Container(width: 4, height: 16, decoration: BoxDecoration(color: AppColors.primaryGold, borderRadius: BorderRadius.circular(4))),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Text(title, style: TextStyle(fontSize: context.getScreenWidth(4.2), fontWeight: FontWeight.w800, color: AppColors.textDark)),
       ],
     );
@@ -543,9 +769,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryGold.withOpacity(0.12)),
+        border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.12)),
         boxShadow: [
-          BoxShadow(color: AppColors.primaryGold.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 4)),
+          BoxShadow(color: AppColors.primaryGold.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(children: children),
@@ -554,7 +780,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
   Widget _buildInfoRow(BuildContext context, String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
