@@ -140,7 +140,7 @@ class SearchProductController extends GetxController {
   }
 
   List<String> get availableSizes {
-    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    final source = allProducts;
     final sizes = <String>{};
     for (final p in source) {
       final s = p.size;
@@ -151,15 +151,15 @@ class SearchProductController extends GetxController {
   }
 
   bool get hasWeightData {
-    final source = isSearching ? _searchResults : _filteredInitialProducts;
-    return source.any((p) => p.grossWeight != null);
+    final source = allProducts;
+    return source.any((p) => p.fineWeight != null);
   }
 
   double get availableWeightMax {
-    final source = isSearching ? _searchResults : _filteredInitialProducts;
+    final source = allProducts;
     double max = 0;
     for (final p in source) {
-      final gw = p.grossWeight;
+      final gw = p.fineWeight;
       if (gw != null && gw > max) max = gw;
     }
     return max > 0 ? max.ceilToDouble() : 100;

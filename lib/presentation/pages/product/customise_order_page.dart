@@ -143,6 +143,10 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     if (widget.product != null) {
       final p = widget.product!;
 
+      if (p.name.isNotEmpty) {
+        itemNameCtrl.text = p.name;
+      }
+
       if (p.grossWeight != null && p.grossWeight! > 0) {
         weightCtrl.text = p.grossWeight!.toStringAsFixed(2);
       } else if (p.rawData != null && p.rawData!['GrossWt'] != null) {
@@ -351,9 +355,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                       final success = await _customOrderController.createCustomOrder(
                         productId: widget.product?.id,
                         partyCode: partyCodeCtrl.text.trim(),
-                        partyName: partyNameCtrl.text.trim(),
-                        area: areaCtrl.text.trim(),
-                        contactNumber: contactCtrl.text.trim(),
                         itemName: itemNameCtrl.text.trim(),
                         weight: weightCtrl.text.trim(),
                         noOfPieces: noOfPcCtrl.text.trim(),

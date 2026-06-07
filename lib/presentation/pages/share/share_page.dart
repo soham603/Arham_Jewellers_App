@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/share_controller.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -425,6 +426,30 @@ class _SharePageState extends State<SharePage> {
                               color: isSelected
                                   ? context.colorPalette.goldDeep
                                   : context.colorPalette.textColor,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductListingPage(
+                                categoryId: cat.id,
+                                karat: controller.selectedKarat,
+                                title: cat.name,
+                              ),
+                            ),
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+                            decoration: BoxDecoration(
+                              color: context.colorPalette.gold.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.visibility_outlined,
+                              size: context.getScreenWidth(4),
+                              color: context.colorPalette.goldDark,
                             ),
                           ),
                         ),

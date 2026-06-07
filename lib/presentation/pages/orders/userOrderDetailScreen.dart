@@ -256,18 +256,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                               ),
                             ],
                           ),
-                          if (item.stockNote != null &&
-                              item.stockNote!.isNotEmpty) ...[
-                            SizedBox(height: context.getScreenHeight(0.5)),
-                            Text(
-                              "Note: ${item.stockNote}",
-                              style: TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: context.getScreenWidth(3),
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
+
                         ],
                       ),
                     ),

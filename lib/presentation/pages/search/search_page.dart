@@ -232,7 +232,7 @@ class _SearchPageState extends State<SearchPage> {
                   showStockFilter: false,
                   showCategoryFilter: true,
                   showPriceFilter: showPrice,
-                  showWeightFilter: controller.hasWeightData,
+                  showWeightFilter: false,
                   weightSliderMax: controller.availableWeightMax,
                   products: controller.allProducts,
                   categories: _allCategories,

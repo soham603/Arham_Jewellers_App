@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminCustomOrderDetailPage.dart';
@@ -235,31 +236,12 @@ class _AdminCustomOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusInfo = _getStatusInfo(order.status);
+    final statusInfo = getStatusInfo(order.status);
 
-    return GestureDetector(
+    return StatusBorderCard(
+      status: order.status,
       onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE7DED2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 4,
-              decoration: BoxDecoration(
-                color: statusInfo.color,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-            ),
-            Padding(
+      child: Padding(
               padding: EdgeInsets.all(context.getScreenWidth(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,16 +265,10 @@ class _AdminCustomOrderCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: statusInfo.bgColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              statusInfo.label,
-                              style: TextStyle(fontSize: context.getScreenWidth(3), fontWeight: FontWeight.w600, color: statusInfo.color),
-                            ),
+                          StatusBadge(
+                            label: statusInfo.label,
+                            color: statusInfo.color,
+                            bgColor: statusInfo.bgColor,
                           ),
                           SizedBox(width: context.getScreenWidth(2)),
                           Icon(Icons.arrow_forward_ios_rounded, size: context.getScreenWidth(3), color: AppColors.textMuted),
@@ -322,9 +298,6 @@ class _AdminCustomOrderCard extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -332,30 +305,6 @@ class _AdminCustomOrderCard extends StatelessWidget {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
-
-  _StatusInfo _getStatusInfo(String status) {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-        return _StatusInfo('Pending', const Color(0xFFF5A623), const Color(0xFFFFF4E0));
-      case 'APPROVED':
-        return _StatusInfo('Approved', const Color(0xFF2D8C56), const Color(0xFFE6F7EE));
-      case 'ASSIGNED':
-        return _StatusInfo('Assigned', const Color(0xFF3B82F6), const Color(0xFFEFF6FF));
-      case 'COMPLETED':
-        return _StatusInfo('Completed', AppColors.primaryGold, const Color(0xFFF9F3E8));
-      case 'REJECTED':
-        return _StatusInfo('Rejected', const Color(0xFFDC2626), const Color(0xFFFEE2E2));
-      default:
-        return _StatusInfo(status, AppColors.textMuted, AppColors.tileBg);
-    }
-  }
-}
-
-class _StatusInfo {
-  final String label;
-  final Color color;
-  final Color bgColor;
-  const _StatusInfo(this.label, this.color, this.bgColor);
 }
 
 class _AdminOrderShimmer extends StatelessWidget {

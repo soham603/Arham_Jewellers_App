@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -58,6 +59,35 @@ class _ProductListingPageState extends State<ProductListingPage> {
   bool get _isCategoryFilter => widget.categoryId != null;
   bool get _hasKarat => widget.karat != null;
   bool get _isCategoryOnly => _isCategoryFilter && !_hasKarat;
+
+  List<ProductModel> get _displayedProducts => _isCategoryOnly
+      ? _controller.categoryProducts
+      : _isCategoryFilter
+          ? _controller.filteredProducts
+          : _controller.karatProducts;
+
+  double get _displayedWeightMax {
+    double max = 0;
+    for (final p in _displayedProducts) {
+      final gw = p.fineWeight;
+      if (gw != null && gw > max) max = gw;
+    }
+    return max > 0 ? max.ceilToDouble() : 200;
+  }
+
+  bool get _hasWeightData {
+    return _displayedProducts.any((p) => p.fineWeight != null);
+  }
+
+  List<String> get _displayedAvailableSizes {
+    final sizes = <String>{};
+    for (final p in _displayedProducts) {
+      final s = p.size;
+      if (s != null && s.isNotEmpty) sizes.add(s);
+    }
+    final sorted = sizes.toList()..sort();
+    return sorted;
+  }
 
   @override
   void initState() {
@@ -148,8 +178,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
           if (_karatPurityLabel != null)
             Center(
               child: Container(
-                margin: const EdgeInsets.only(top: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                margin: const EdgeInsets.only(top: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: context.colorPalette.gold.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(8),
@@ -158,7 +188,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   _karatPurityLabel!,
                   style: GoogleFonts.bodoniModa(
                     fontWeight: FontWeight.w700,
-                    fontSize: 12,
+                    fontSize: 11,
                     color: context.colorPalette.goldDeep,
                   ),
                 ),
@@ -326,7 +356,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          const CategoryDivider(vertical: 4),
+          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -393,6 +425,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
                           Icons.tune_rounded,
                           size: 18,
                           color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Filter',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+                          ),
                         ),
                         if (_activeFilterCount > 0) ...[
                           const SizedBox(width: 4),
@@ -487,14 +528,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   bool get _hasActiveFilter =>
       _weightMin > 0 ||
-      _weightMax < _controller.availableWeightMax ||
+      _weightMax < _displayedWeightMax ||
       _priceMin > 0 ||
       _priceMax < 5000000 ||
       _selectedSizes.isNotEmpty;
 
   int get _activeFilterCount {
     var count = 0;
-    if (_weightMin > 0 || _weightMax < _controller.availableWeightMax) count++;
+    if (_weightMin > 0 || _weightMax < _displayedWeightMax) count++;
     if (_priceMin > 0 || _priceMax < 5000000) count++;
     count += _selectedSizes.length;
     return count;
@@ -509,9 +550,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
       result = result.where((p) => !p.isActive).toList();
     }
 
-    if (_weightMin > 0 || _weightMax < _controller.availableWeightMax) {
+    if (_weightMin > 0 || _weightMax < _displayedWeightMax) {
       result = result.where((p) {
-        final gw = p.grossWeight;
+        final gw = p.fineWeight;
         if (gw == null) return true;
         return gw >= _weightMin && gw <= _weightMax;
       }).toList();
@@ -596,11 +637,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
       initialPriceMax: _priceMax,
       showKaratFilter: false,
       showStockFilter: false,
-      showWeightFilter: _controller.hasWeightData,
+      showWeightFilter: _hasWeightData,
       showPriceFilter: true,
-      weightSliderMax: _controller.availableWeightMax,
-      products: _controller.allProducts,
+      weightSliderMax: _displayedWeightMax,
+      products: _displayedProducts,
       priceSliderMax: 5000000,
+      showSizeFilter: _displayedAvailableSizes.isNotEmpty,
+      initialSelectedSizes: _selectedSizes,
+      availableSizes: _displayedAvailableSizes,
       onApply: ({
         required List<String> karats,
         required List<String> categoryIds,

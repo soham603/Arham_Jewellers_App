@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 import '../../presentation/controllers/navigation_controller.dart';
-import '../../presentation/pages/admin/adminCustomOrdersPage.dart';
 import '../../presentation/pages/admin/handsetChangeScreen.dart';
 import '../../presentation/pages/auth/change_handset_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
@@ -50,6 +49,5 @@ abstract class AppPages {
     GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),
     GetPage(name: AppRoutes.chat, page: ChatScreen.new),
     GetPage(name: AppRoutes.customOrderSuccess, page: CustomOrderSuccessPage.new),
-    GetPage(name: AppRoutes.adminCustomOrders, page: AdminCustomOrdersPage.new),
   ];
 }
