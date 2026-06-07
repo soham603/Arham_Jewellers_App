@@ -1,5 +1,6 @@
 class CustomOrderModel {
   final String id;
+  final String? productId;
   final String partyCode;
   final String partyName;
   final String? area;
@@ -28,6 +29,7 @@ class CustomOrderModel {
 
   CustomOrderModel({
     required this.id,
+    this.productId,
     required this.partyCode,
     required this.partyName,
     this.area,
@@ -58,6 +60,7 @@ class CustomOrderModel {
   factory CustomOrderModel.fromJson(Map<String, dynamic> json) {
     return CustomOrderModel(
       id: json['id']?.toString() ?? '',
+      productId: json['productId']?.toString(),
       partyCode: json['partyCode']?.toString() ?? '',
       partyName: json['partyName']?.toString() ?? '',
       area: json['area']?.toString(),

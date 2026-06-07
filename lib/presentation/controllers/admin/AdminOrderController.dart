@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
@@ -25,6 +27,8 @@ class AdminOrderController extends GetxController {
   bool get isActionLoading => _isActionLoading.value;
 
   final RxString selectedStatus = "PENDING".obs;
+
+  final RxString selectedOrderType = "all".obs;
 
   final searchController = TextEditingController();
 
@@ -71,13 +75,10 @@ class AdminOrderController extends GetxController {
 
       final response = await httpClient.get(
         "/api/v1/admin-order/get-AllOrders",
-
         queryParameters: {
           "page": _page,
-          "limit": 10,
-
+          "limit": _pageLimit,
           "status": selectedStatus.value,
-
           if (searchController.text.trim().isNotEmpty)
             "userPhoneNumber": "+91${searchController.text.trim()}",
         },
@@ -94,10 +95,19 @@ class AdminOrderController extends GetxController {
 
         final fetched = raw.map((e) => AdminOrderModel.fromJson(e)).toList();
 
-        if (isPagination) {
-          _orders.addAll(fetched);
+        final List<AdminOrderModel> filtered;
+        if (selectedOrderType.value == "custom") {
+          filtered = fetched.where((o) => o.isCustom).toList();
+        } else if (selectedOrderType.value == "normal") {
+          filtered = fetched.where((o) => !o.isCustom).toList();
         } else {
-          _orders.value = fetched;
+          filtered = fetched;
+        }
+
+        if (isPagination) {
+          _orders.addAll(filtered);
+        } else {
+          _orders.value = filtered;
         }
 
         _hasMore = currentPage < totalPages;
@@ -179,6 +189,15 @@ class AdminOrderController extends GetxController {
     fetchOrders();
   }
 
+  void changeOrderType(String value) {
+    if (selectedOrderType.value == value) return;
+    selectedOrderType.value = value;
+    _orders.clear();
+    _page = 1;
+    _hasMore = true;
+    fetchOrders();
+  }
+
   void onSearchChanged(String value) {
     _debounce?.cancel();
 
@@ -246,6 +265,82 @@ class AdminOrderController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      _isActionLoading.value = false;
+    }
+  }
+
+  Future<bool> performCustomOrderAction({
+    required String orderId,
+    required String action,
+    String? adminMessage,
+    String? assignedKarigarId,
+    String? talkedToStaffName,
+    String? assignAdminNotes,
+    String? deliveryDate,
+    String? completeAdminNotes,
+  }) async {
+    try {
+      _isActionLoading.value = true;
+
+      final body = <String, dynamic>{
+        "orderId": orderId,
+        "action": action,
+        if (adminMessage != null && adminMessage.isNotEmpty)
+          "adminMessage": adminMessage,
+        if (assignedKarigarId != null) "assignedKarigarId": assignedKarigarId,
+        if (talkedToStaffName != null) "talkedToStaffName": talkedToStaffName,
+        if (assignAdminNotes != null) "assignAdminNotes": assignAdminNotes,
+        if (deliveryDate != null) "deliveryDate": deliveryDate,
+        if (completeAdminNotes != null)
+          "completeAdminNotes": completeAdminNotes,
+      };
+
+      final response = await httpClient.post(
+        ApiUrlConstants.ADMIN_CUSTOM_ORDER_ACTION,
+        data: body,
+        options: Options(extra: {"requiresAuth": true}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await fetchOrders();
+
+        Get.snackbar(
+          "Success",
+          response.data['message'] ?? "Order updated",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF2D9D59),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        return true;
+      } else {
+        Get.snackbar(
+          "Error",
+          response.data?['message'] ?? "Failed to update order",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return false;
+      }
+    } catch (e, st) {
+      Logger.error("AdminOrderController", "performCustomOrderAction error: $e\n$st");
+
+      String errorMessage = "Something went wrong";
+      if (e is DioException) {
+        errorMessage =
+            e.response?.data?['message']?.toString() ?? e.message ?? errorMessage;
+      }
+
+      Get.snackbar(
+        "Error",
+        errorMessage,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return false;
     } finally {
       _isActionLoading.value = false;
     }

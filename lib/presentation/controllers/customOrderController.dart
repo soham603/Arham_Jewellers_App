@@ -11,8 +11,6 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class CustomOrderController extends GetxController {
   static CustomOrderController get instance => Get.find();
 
-  static const int _pageLimit = 10;
-
   // ── Create state ──
   final _createState = CurrentAppState.INITIAL.obs;
   CurrentAppState get createState => _createState.value;
@@ -34,39 +32,12 @@ class CustomOrderController extends GetxController {
   final _isDeleting = false.obs;
   bool get isDeleting => _isDeleting.value;
 
-  // ── Fetch state ──
-  final _fetchState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get fetchState => _fetchState.value;
-
-  final _isFetching = false.obs;
-  bool get isFetching => _isFetching.value;
-
-  final _userCustomOrders = <CustomOrderModel>[].obs;
-  List<CustomOrderModel> get userCustomOrders => _userCustomOrders;
-
-  final _hasMore = true.obs;
-  bool get hasMore => _hasMore.value;
-
-  final _totalOrders = 0.obs;
-  int get totalOrders => _totalOrders.value;
-
-  int _page = 1;
-
-  // ── Selected order for detail view ──
-  final _selectedOrder = Rxn<CustomOrderModel>();
-  CustomOrderModel? get selectedOrder => _selectedOrder.value;
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchUserCustomOrders();
-  }
-
   // =====================================================
   // CREATE CUSTOM ORDER
   // =====================================================
 
   Future<bool> createCustomOrder({
+    String? productId,
     required String partyCode,
     required String partyName,
     String? area,
@@ -89,6 +60,7 @@ class CustomOrderController extends GetxController {
       _createState.value = CurrentAppState.LOADING;
 
       final formData = FormData.fromMap({
+        if (productId != null && productId.isNotEmpty) 'productId': productId,
         'partyCode': partyCode,
         'partyName': partyName,
         if (area != null && area.isNotEmpty) 'area': area,
@@ -128,8 +100,6 @@ class CustomOrderController extends GetxController {
 
         Logger.info("CustomOrderController",
             "Custom order created: ${_createdOrderId.value}");
-
-        await fetchUserCustomOrders();
 
         return true;
       }
@@ -223,12 +193,6 @@ class CustomOrderController extends GetxController {
 
         Logger.info("CustomOrderController", "Custom order modified: $orderId");
 
-        await fetchUserCustomOrders();
-
-        if (_selectedOrder.value?.id == orderId) {
-          await fetchOrderDetail(orderId);
-        }
-
         return true;
       }
 
@@ -271,8 +235,6 @@ class CustomOrderController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        _userCustomOrders.removeWhere((o) => o.id == orderId);
-
         Get.snackbar(
           "Deleted",
           "Custom order deleted successfully",
@@ -304,98 +266,6 @@ class CustomOrderController extends GetxController {
       return false;
     } finally {
       _isDeleting.value = false;
-    }
-  }
-
-  // =====================================================
-  // FETCH USER CUSTOM ORDERS
-  // =====================================================
-
-  Future<void> fetchUserCustomOrders({bool isPagination = false}) async {
-    if (_isFetching.value) return;
-    if (!_hasMore.value && isPagination) return;
-
-    try {
-      _isFetching.value = true;
-
-      if (!isPagination) {
-        _fetchState.value = CurrentAppState.LOADING;
-        _page = 1;
-        _hasMore.value = true;
-        _userCustomOrders.clear();
-      }
-
-      final response = await httpClient.get(
-        ApiUrlConstants.CUSTOM_ORDER_USER_ALL,
-        queryParameters: {"page": _page, "limit": _pageLimit},
-        options: Options(extra: {"requiresAuth": true}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'] ?? {};
-        final List raw = data['orders'] is List ? data['orders'] : [];
-
-        final fetched = raw
-            .map((e) => CustomOrderModel.fromJson(e))
-            .toList();
-
-        if (isPagination) {
-          _userCustomOrders.addAll(fetched);
-        } else {
-          _userCustomOrders.value = fetched;
-        }
-
-        _totalOrders.value = data['total'] ?? 0;
-
-        if (fetched.length < _pageLimit) {
-          _hasMore.value = false;
-        } else {
-          _page++;
-        }
-
-        _fetchState.value = CurrentAppState.SUCCESS;
-      } else {
-        _fetchState.value = CurrentAppState.ERROR;
-      }
-    } catch (e, st) {
-      Logger.error("CustomOrderController", "fetchUserCustomOrders error: $e\n$st");
-      _fetchState.value = CurrentAppState.ERROR;
-    } finally {
-      _isFetching.value = false;
-    }
-  }
-
-  Future<void> loadMoreOrders() async {
-    if (_isFetching.value || !_hasMore.value) return;
-    await fetchUserCustomOrders(isPagination: true);
-  }
-
-  Future<void> refreshOrders() async {
-    _page = 1;
-    _hasMore.value = true;
-    _userCustomOrders.clear();
-    await fetchUserCustomOrders();
-  }
-
-  // =====================================================
-  // FETCH SINGLE ORDER DETAIL
-  // =====================================================
-
-  Future<void> fetchOrderDetail(String orderId) async {
-    try {
-      final response = await httpClient.get(
-        '/api/v1/orders/custom-order/$orderId',
-        options: Options(extra: {"requiresAuth": true}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data != null) {
-          _selectedOrder.value = CustomOrderModel.fromJson(data);
-        }
-      }
-    } catch (e) {
-      Logger.error("CustomOrderController", "fetchOrderDetail error: $e");
     }
   }
 
