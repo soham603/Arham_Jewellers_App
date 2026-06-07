@@ -34,6 +34,9 @@ class FilterBottomSheet extends StatefulWidget {
   final bool showCategoryFilter;
   final List<CategoryModel> categories;
   final List<String> initialSelectedCategoryIds;
+  final bool showSizeFilter;
+  final List<String> initialSelectedSizes;
+  final List<String> availableSizes;
 
   const FilterBottomSheet({
     super.key,
@@ -47,6 +50,7 @@ class FilterBottomSheet extends StatefulWidget {
     this.showWeightFilter = true,
     this.showPriceFilter = false,
     this.showCategoryFilter = false,
+    this.showSizeFilter = false,
     this.initialPriceMin = 0,
     this.initialPriceMax = 5000000,
     this.priceSliderMax = 5000000,
@@ -54,6 +58,8 @@ class FilterBottomSheet extends StatefulWidget {
     this.products = const [],
     this.categories = const [],
     this.initialSelectedCategoryIds = const [],
+    this.initialSelectedSizes = const [],
+    this.availableSizes = const [],
   });
 
   static Future<void> show(
@@ -75,6 +81,9 @@ class FilterBottomSheet extends StatefulWidget {
     List<ProductModel> products = const [],
     List<CategoryModel> categories = const [],
     List<String> initialSelectedCategoryIds = const [],
+    bool showSizeFilter = false,
+    List<String> initialSelectedSizes = const [],
+    List<String> availableSizes = const [],
   }) {
     return showModalBottomSheet(
       context: context,
@@ -91,6 +100,7 @@ class FilterBottomSheet extends StatefulWidget {
         showWeightFilter: showWeightFilter,
         showPriceFilter: showPriceFilter,
         showCategoryFilter: showCategoryFilter,
+        showSizeFilter: showSizeFilter,
         initialPriceMin: initialPriceMin,
         initialPriceMax: initialPriceMax,
         priceSliderMax: priceSliderMax,
@@ -98,6 +108,8 @@ class FilterBottomSheet extends StatefulWidget {
         products: products,
         categories: categories,
         initialSelectedCategoryIds: initialSelectedCategoryIds,
+        initialSelectedSizes: initialSelectedSizes,
+        availableSizes: availableSizes,
       ),
     );
   }
@@ -119,6 +131,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late double _tempPriceMax;
   late double _effectiveWeightSliderMax;
   late Set<String> _tempSelectedCategoryIds;
+  late List<String> _tempSelectedSizes;
   bool _categoriesExpanded = false;
 
   @override
@@ -130,6 +143,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     _tempStockFilter = widget.initialStockFilter;
 
     _tempSelectedCategoryIds = Set<String>.from(widget.initialSelectedCategoryIds);
+
+    _tempSelectedSizes = List<String>.from(widget.initialSelectedSizes);
 
     _effectiveWeightSliderMax =
         widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
@@ -190,7 +205,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
     var maxWeight = 0.0;
     for (final p in filtered) {
-      final gw = p.grossWeight;
+      final gw = p.fineWeight;
       if (gw != null && gw > maxWeight) maxWeight = gw;
     }
 
@@ -231,6 +246,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           .where((e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)))
           .length;
     }
+    if (widget.showSizeFilter) {
+      count += _tempSelectedSizes.length;
+    }
     return count;
   }
 
@@ -260,6 +278,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         _tempPriceMax = widget.priceSliderMax;
       }
       if (widget.showCategoryFilter) _tempSelectedCategoryIds.clear();
+      if (widget.showSizeFilter) _tempSelectedSizes.clear();
     });
   }
 
@@ -279,7 +298,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       wMax: _tempWeightMax,
       pMin: _tempPriceMin,
       pMax: _tempPriceMax,
-      sizes: const [],
+      sizes: List<String>.from(_tempSelectedSizes),
     );
     Navigator.pop(context);
   }
@@ -292,8 +311,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
     return Container(
       height: context.isTablet
-          ? MediaQuery.of(context).size.height * 0.45
-          : MediaQuery.of(context).size.height * 0.55,
+          ? MediaQuery.of(context).size.height * 0.50
+          : MediaQuery.of(context).size.height * 0.60,
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
         borderRadius: BorderRadius.vertical(
@@ -330,6 +349,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   ],
                   if (widget.showWeightFilter) ...[
                     _buildWeightSection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showSizeFilter &&
+                      widget.availableSizes.isNotEmpty) ...[
+                    _buildSizeSection(context),
                     const SizedBox(height: 14),
                   ],
                   if (widget.showPriceFilter) _buildPriceSection(context),
@@ -677,7 +701,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Weight Range (g)',
+              'Fine Weight Range (g)',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -695,29 +719,115 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ],
         ),
         const SizedBox(height: 2),
-        SizedBox(
-          height: 32,
-          child: RangeSlider(
-            values: RangeValues(
-              _tempWeightMin.clamp(0, sliderMax),
-              _tempWeightMax.clamp(0, sliderMax),
-            ),
-            min: 0,
-            max: sliderMax,
-            divisions: divisions,
-            activeColor: context.colorPalette.gold,
-            inactiveColor: context.colorPalette.border,
-            labels: RangeLabels(
-              '${_tempWeightMin.round()}g',
-              '${_tempWeightMax.round()}g',
-            ),
-            onChanged: (values) {
-              setState(() {
-                _tempWeightMin = values.start;
-                _tempWeightMax = values.end;
-              });
-            },
+        SliderTheme(
+          data: SliderThemeData(
+            rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+            trackHeight: 3,
           ),
+          child: SizedBox(
+            height: 32,
+            child: RangeSlider(
+              values: RangeValues(
+                _tempWeightMin.clamp(0, sliderMax),
+                _tempWeightMax.clamp(0, sliderMax),
+              ),
+              min: 0,
+              max: sliderMax,
+              divisions: divisions,
+              activeColor: context.colorPalette.gold,
+              inactiveColor: context.colorPalette.border,
+              labels: RangeLabels(
+                '${_tempWeightMin.round()}g',
+                '${_tempWeightMax.round()}g',
+              ),
+              onChanged: (values) {
+                setState(() {
+                  _tempWeightMin = values.start;
+                  _tempWeightMax = values.end;
+                });
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSizeSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Size',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.goldDeep,
+              ),
+            ),
+            if (_tempSelectedSizes.isNotEmpty)
+              GestureDetector(
+                onTap: () => setState(() => _tempSelectedSizes.clear()),
+                child: Text(
+                  'Clear',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: widget.availableSizes.map((size) {
+            final isSelected = _tempSelectedSizes.contains(size);
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _tempSelectedSizes.remove(size);
+                  } else {
+                    _tempSelectedSizes.add(size);
+                  }
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? context.colorPalette.gold
+                      : context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.border,
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  size,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : context.colorPalette.goldDeep,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -753,28 +863,35 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ],
         ),
         const SizedBox(height: 2),
-        SizedBox(
-          height: 32,
-          child: RangeSlider(
-            values: RangeValues(
-              _tempPriceMin.clamp(0, sliderMax),
-              _tempPriceMax.clamp(0, sliderMax),
+        SliderTheme(
+          data: SliderThemeData(
+            rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+            trackHeight: 3,
+          ),
+          child: SizedBox(
+            height: 32,
+            child: RangeSlider(
+              values: RangeValues(
+                _tempPriceMin.clamp(0, sliderMax),
+                _tempPriceMax.clamp(0, sliderMax),
+              ),
+              min: 0,
+              max: sliderMax,
+              divisions: divisions,
+              activeColor: context.colorPalette.gold,
+              inactiveColor: context.colorPalette.border,
+              labels: RangeLabels(
+                _formatPriceLabel(_tempPriceMin),
+                _formatPriceLabel(_tempPriceMax),
+              ),
+              onChanged: (values) {
+                setState(() {
+                  _tempPriceMin = values.start;
+                  _tempPriceMax = values.end;
+                });
+              },
             ),
-            min: 0,
-            max: sliderMax,
-            divisions: divisions,
-            activeColor: context.colorPalette.gold,
-            inactiveColor: context.colorPalette.border,
-            labels: RangeLabels(
-              _formatPriceLabel(_tempPriceMin),
-              _formatPriceLabel(_tempPriceMax),
-            ),
-            onChanged: (values) {
-              setState(() {
-                _tempPriceMin = values.start;
-                _tempPriceMax = values.end;
-              });
-            },
           ),
         ),
       ],
