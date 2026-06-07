@@ -37,7 +37,12 @@ class CraftsmanController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final List raw = response.data['data'] ?? [];
+        final dynamic data = response.data['data'];
+        final List raw = data is List
+            ? data
+            : data is Map<String, dynamic>
+                ? (data['craftsmen'] ?? data['results'] ?? data['data'] ?? [])
+                : [];
         _craftsmen.value =
             raw.map((e) => CraftsmanModel.fromJson(e)).toList();
         _state.value = CurrentAppState.SUCCESS;
