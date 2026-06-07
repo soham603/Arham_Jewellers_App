@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CategoryListingPage extends StatefulWidget {
   final List<Karat> karats;
@@ -47,7 +48,9 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
         await controller.fetchAllKaratCategories().timeout(
               const Duration(seconds: 15),
             );
-      } catch (_) {}
+      } catch (e) {
+        Logger.warning("CategoryListingPage", "Failed to fetch categories: $e");
+      }
     }
 
     bool anyError = false;

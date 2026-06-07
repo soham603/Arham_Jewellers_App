@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 import '../../presentation/controllers/CategoryController.dart';
 
@@ -378,7 +379,9 @@ class _AnimatedHintState extends State<_AnimatedHint> {
       if (names.isNotEmpty) {
         widget.onNamesReady(names);
       }
-    } catch (_) {}
+    } catch (e) {
+      Logger.warning("SearchBarWidget", "Failed to load categories: $e");
+    }
   }
 
   static String _cleanCategoryName(String name) {

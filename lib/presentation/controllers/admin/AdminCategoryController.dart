@@ -4,171 +4,187 @@ import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
-import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CategoryManagerController extends GetxController {
   static CategoryManagerController get instance => Get.find();
 
-  // ── List state ────────────────────────────────────────────────────────────
-  final _categories = <CategoryModel>[].obs;
-  List<CategoryModel> get categories => _categories;
+  // ── All categories cache ──────────────────────────────────────────────────
+  final _allCategories = <CategoryModel>[].obs;
+  List<CategoryModel> get allCategories => _allCategories;
 
-  final _state = CurrentAppState.INITIAL.obs;
-  CurrentAppState get state => _state.value;
-
-  final _total = 0.obs;
-  int get total => _total.value;
-
-  int _page = 1;
-  final int _limit = 20;
-  bool _hasMore = true;
-  bool get hasMore => _hasMore;
-
-  // ── Filters ───────────────────────────────────────────────────────────────
-  final _selectedLevel = Rxn<int>();       // null = all
-  int? get selectedLevel => _selectedLevel.value;
-
-  final _showDeleted = false.obs;
-  bool get showDeleted => _showDeleted.value;
-
-  final _searchName = ''.obs;
-  String get searchName => _searchName.value;
+  final _loading = false.obs;
+  bool get loading => _loading.value;
 
   // ── Action states ─────────────────────────────────────────────────────────
-  final _actionLoadingId = ''.obs;   // which item is currently doing an action
+  final _actionLoadingId = ''.obs;
   String get actionLoadingId => _actionLoadingId.value;
 
   // ── Image picker ──────────────────────────────────────────────────────────
   final _pickedImage = Rxn<File>();
   File? get pickedImage => _pickedImage.value;
-
   final ImagePicker _picker = ImagePicker();
 
   @override
   void onInit() {
     super.onInit();
-    fetchCategories();
+    fetchAll();
   }
 
-  // ── Fetch ─────────────────────────────────────────────────────────────────
-  Future<void> fetchCategories({bool isPagination = false}) async {
-    if (!_hasMore && isPagination) return;
-    if (_state.value == CurrentAppState.LOADING && !isPagination) return;
-
-    if (!isPagination) {
-      _state.value = CurrentAppState.LOADING;
-      _page = 1;
-      _hasMore = true;
-    }
-
+  // ── Fetch ALL categories in one call ─────────────────────────────────────
+  Future<void> fetchAll({bool force = false}) async {
+    if (!force && _allCategories.isNotEmpty) return;
+    _loading.value = true;
     try {
       final response = await httpClient.get(
         "/api/v1/category/get-All",
-        queryParameters: {
-          "page": _page,
-          "limit": _limit,
-          "full": true,
-          if (_selectedLevel.value != null) "level": _selectedLevel.value,
-          if (_searchName.value.isNotEmpty) "name": _searchName.value,
-          if (_showDeleted.value) "isDeleted": true,
-        },
+        queryParameters: {"full": true},
         options: Options(extra: {"requiresAuth": true}),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['results'] ?? [];
-        final fetched = raw.map((e) => CategoryModel.fromJson(e)).toList();
-
-        if (isPagination) {
-          _categories.addAll(fetched);
-        } else {
-          _categories.value = fetched;
-        }
-
-        _total.value = data['total'] ?? fetched.length;
-
-        if (fetched.length < _limit) {
-          _hasMore = false;
-        } else {
-          _page++;
-        }
-
-        _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
+        final List raw = response.data['data']['results'] ?? [];
+        _allCategories.value = raw.map((e) => CategoryModel.fromJson(e)).toList();
       }
-    } catch (e, st) {
-      _state.value = CurrentAppState.ERROR;
-      Logger.error("CategoryManagerController", "fetch error: $e\n$st");
+    } catch (e) {
+      Logger.error("CategoryManagerController", "fetchAll error: $e");
+    } finally {
+      _loading.value = false;
     }
   }
 
-  Future<void> loadMore() async {
-    if (!_hasMore || _state.value == CurrentAppState.LOADING) return;
-    await fetchCategories(isPagination: true);
+  // ── Filtered views (client-side) ─────────────────────────────────────────
+  List<CategoryModel> byLevel(int level, {String? parentId, bool includeDeleted = true}) {
+    return _allCategories.where((c) {
+      if (c.level != level) return false;
+      if (!includeDeleted && c.isDeleted) return false;
+      if (parentId != null && c.parentId != parentId) return false;
+      return true;
+    }).toList();
   }
 
-  Future<void> refresh() async {
-    _page = 1;
-    _hasMore = true;
-    await fetchCategories();
+  List<CategoryModel> get level1Categories => byLevel(1, includeDeleted: true);
+
+  // Grouped L1: merge duplicates by name, return one entry per unique name
+  List<CategoryModel> get level1Grouped {
+    final seen = <String, CategoryModel>{};
+    for (final c in level1Categories) {
+      final key = c.name.trim().toLowerCase();
+      if (!seen.containsKey(key)) {
+        seen[key] = c;
+      }
+    }
+    return seen.values.toList();
   }
 
-  // ── Filters ───────────────────────────────────────────────────────────────
-  void setLevelFilter(int? level) {
-    _selectedLevel.value = level;
-    refresh();
+  // Count of L1 parents sharing this group's name
+  int level1GroupCount(String name) {
+    return level1Categories.where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase()).length;
   }
 
-  void setShowDeleted(bool val) {
-    _showDeleted.value = val;
-    refresh();
+  // All L1 parent IDs sharing this group's name
+  List<String> level1GroupIds(String name) {
+    return level1Categories
+        .where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase())
+        .map((c) => c.id)
+        .toList();
   }
 
-  void setNameSearch(String name) {
-    _searchName.value = name;
-    refresh();
+  // All L2 children from all L1 parents in this group (merged)
+  List<CategoryModel> level2ForGroup(String l1Name) {
+    final ids = level1GroupIds(l1Name);
+    return _allCategories.where((c) {
+      if (c.level != 2) return false;
+      if (c.parentId == null) return false;
+      return ids.contains(c.parentId);
+    }).toList();
   }
 
-  void clearFilters() {
-    _selectedLevel.value = null;
-    _showDeleted.value = false;
-    _searchName.value = '';
-    refresh();
+  List<CategoryModel> level2For(String parentId) => byLevel(2, parentId: parentId, includeDeleted: true);
+  List<CategoryModel> get level2All => byLevel(2, includeDeleted: true);
+
+  List<CategoryModel> level3For(String parentId) => byLevel(3, parentId: parentId, includeDeleted: true);
+  List<CategoryModel> get level3All => byLevel(3, includeDeleted: true);
+
+  String? parentName(String? parentId) {
+    if (parentId == null) return null;
+    try {
+      return _allCategories.firstWhere((c) => c.id == parentId).name;
+    } catch (_) {
+      return null;
+    }
   }
 
   // ── Image picker ──────────────────────────────────────────────────────────
   Future<void> pickImage() async {
-    final picked = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (picked != null) {
-      _pickedImage.value = File(picked.path);
-    }
+    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked != null) _pickedImage.value = File(picked.path);
   }
 
   void clearPickedImage() => _pickedImage.value = null;
+
+  // ── Create ────────────────────────────────────────────────────────────────
+  Future<bool> createCategory({
+    required String name,
+    required String boxName,
+    String? description,
+    String? parentId,
+    int? level,
+    File? imageFile,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'name': name,
+        'boxName': boxName,
+        if (description != null && description.isNotEmpty) 'description': description,
+        if (parentId != null) 'parentId': parentId,
+        if (level != null) 'level': level,
+        if (imageFile != null) 'file': await MultipartFile.fromFile(imageFile.path),
+      });
+
+      final response = await httpClient.post(
+        "/api/v1/category/create",
+        data: formData,
+        options: Options(
+          headers: {"Content-Type": "multipart/form-data"},
+          extra: {"requiresAuth": true},
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final created = CategoryModel.fromJson(response.data['data']);
+        _allCategories.insert(0, created);
+        _pickedImage.value = null;
+        Logger.info("CategoryManagerController", "Category created: ${created.name}");
+        return true;
+      }
+    } catch (e) {
+      Logger.error("CategoryManagerController", "create error: $e");
+    }
+    return false;
+  }
 
   // ── Edit ──────────────────────────────────────────────────────────────────
   Future<bool> editCategory({
     required String id,
     String? name,
+    String? boxName,
+    String? description,
+    String? parentId,
     List<Map<String, String>>? existingImages,
+    File? imageFile,
   }) async {
     _actionLoadingId.value = id;
 
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
+        if (boxName != null && boxName.isNotEmpty) "boxName": boxName,
+        if (description != null) "description": description,
+        if (parentId != null) "parentId": parentId,
         if (existingImages != null)
-          "images": existingImages
-              .map((e) => {"url": e["url"], "publicId": e["publicId"]})
-              .toList(),
-        if (_pickedImage.value != null)
-          "image": await MultipartFile.fromFile(_pickedImage.value!.path),
+          "images": existingImages.map((e) => {"url": e["url"], "publicId": e["publicId"]}).toList(),
+        if (imageFile != null) "image": await MultipartFile.fromFile(imageFile.path),
       });
 
       final response = await httpClient.put(
@@ -182,9 +198,8 @@ class CategoryManagerController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final updated = CategoryModel.fromJson(response.data['data']);
-        final idx = _categories.indexWhere((c) => c.id == id);
-        if (idx != -1) _categories[idx] = updated;
-
+        final idx = _allCategories.indexWhere((c) => c.id == id);
+        if (idx != -1) _allCategories[idx] = updated;
         _pickedImage.value = null;
         Logger.info("CategoryManagerController", "Category $id updated");
         return true;
@@ -197,6 +212,7 @@ class CategoryManagerController extends GetxController {
     return false;
   }
 
+  // ── Delete ────────────────────────────────────────────────────────────────
   Future<bool> deleteCategory(String id) async {
     _actionLoadingId.value = id;
 
@@ -207,23 +223,17 @@ class CategoryManagerController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final idx = _categories.indexWhere((c) => c.id == id);
+        final idx = _allCategories.indexWhere((c) => c.id == id);
         if (idx != -1) {
-          final cat = _categories[idx];
-          _categories[idx] = CategoryModel(
-            id: cat.id,
-            name: cat.name,
-            nameSlug: cat.nameSlug,
-            parentId: cat.parentId,
-            level: cat.level,
-            imageUrl: cat.imageUrl,
-            images: cat.images,
-            isDeleted: true,
-            createdAt: cat.createdAt,
-            updatedAt: cat.updatedAt,
+          final cat = _allCategories[idx];
+          _allCategories[idx] = CategoryModel(
+            id: cat.id, name: cat.name, nameSlug: cat.nameSlug,
+            parentId: cat.parentId, level: cat.level,
+            imageUrl: cat.imageUrl, images: cat.images,
+            isDeleted: true, createdAt: cat.createdAt, updatedAt: cat.updatedAt,
           );
         }
-        Logger.info("CategoryManagerController", "Category $id soft-deleted");
+        Logger.info("CategoryManagerController", "Category $id deleted");
         return true;
       }
     } catch (e) {
@@ -246,9 +256,8 @@ class CategoryManagerController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final updated = CategoryModel.fromJson(response.data['data']);
-        final idx = _categories.indexWhere((c) => c.id == id);
-        if (idx != -1) _categories[idx] = updated;
-
+        final idx = _allCategories.indexWhere((c) => c.id == id);
+        if (idx != -1) _allCategories[idx] = updated;
         Logger.info("CategoryManagerController", "Category $id restored");
         return true;
       }

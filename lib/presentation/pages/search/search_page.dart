@@ -51,14 +51,9 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    if (categoryController.k18Categories.isEmpty &&
-        categoryController.k20Categories.isEmpty &&
-        categoryController.k22Categories.isEmpty) {
-      categoryController.fetchAllKaratCategories().then((_) => _loadCategories());
-    } else {
-      _loadCategories();
-    }
-    categoryController.fetchLatestLevel3Categories();
+    // CategoryController fetches tree eagerly in onInit()
+    // Just load local category variants from cached data
+    _loadCategories();
     if (widget.initialCategoryId != null &&
         widget.initialCategoryId!.isNotEmpty &&
         widget.initialCategoryName != null &&
@@ -85,7 +80,10 @@ class _SearchPageState extends State<SearchPage> {
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _focusNode.requestFocus();
+        if (mounted) {
+          _focusNode.requestFocus();
+          controller.ensureProductsLoaded();
+        }
       });
     }
   }
@@ -1045,11 +1043,11 @@ class _SearchPageState extends State<SearchPage> {
                       .trim();
                   String? karatName;
                   if (categoryController.k18Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '18K';
+                    karatName = '76';
                   } else if (categoryController.k20Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '20K';
+                    karatName = '84';
                   } else if (categoryController.k22Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '22K';
+                    karatName = '92';
                   }
                   final displayName = karatName != null ? '$cleanedName — $karatName' : cleanedName;
                   return GestureDetector(

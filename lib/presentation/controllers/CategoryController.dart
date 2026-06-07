@@ -123,20 +123,24 @@ class CategoryController extends GetxController {
   // Replaces: _getKaratId × 3 + fetchCategoriesForKarat × 3 + _fetchSubcategories per tap
   Future<void>? _treeFetchFuture;
   bool _treeHasFullData = false;
+  bool _isInitialized = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (!_isInitialized) {
+      _isInitialized = true;
+      // Eagerly fetch the category tree on app start
+      fetchCategoryTree();
+    }
+  }
 
   /// Fetches the full category tree in a single API call.
-  ///
-  /// When [full] is `true` (default), returns all 3 levels (Karat → Collection → Style).
-  /// When [full] is `false`, returns only Level 1 & Level 2 (useful for initial load).
-  Future<void> fetchCategoryTree({bool full = true}) async {
-    // If already fetching with the same or greater scope, return the in-progress future
-    if (_treeFetchFuture != null) {
-      // If we already have full data or are fetching full, just wait
-      if (_treeHasFullData || full) return _treeFetchFuture!;
-      // If requesting full but current fetch is partial, wait and re-fetch
-      await _treeFetchFuture;
-      if (_treeHasFullData) return;
-    }
+  /// Always fetches full data (all 3 levels) to avoid redundant refetches.
+  Future<void> fetchCategoryTree() async {
+    // If already fetching or have data, return early
+    if (_treeFetchFuture != null) return _treeFetchFuture!;
+    if (_treeHasFullData && _k18Categories.isNotEmpty) return;
 
     _k18State.value = CurrentAppState.LOADING;
     _k20State.value = CurrentAppState.LOADING;
@@ -146,17 +150,16 @@ class CategoryController extends GetxController {
     _k20Categories.clear();
     _k22Categories.clear();
 
-    _treeFetchFuture = _doFetchCategoryTree(full: full);
+    _treeFetchFuture = _doFetchCategoryTree();
     await _treeFetchFuture;
     _treeFetchFuture = null;
   }
 
-  Future<void> _doFetchCategoryTree({bool full = true}) async {
-
+  Future<void> _doFetchCategoryTree() async {
     try {
       final response = await httpClient.get(
         '/api/v1/category/get-All',
-        queryParameters: {'tree': true, 'full': full},
+        queryParameters: {'tree': true, 'full': true},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -190,7 +193,7 @@ class CategoryController extends GetxController {
           // Populate latest level-3 categories from tree
           _populateLatestLevel3FromTree(results);
 
-          _treeHasFullData = full;
+          _treeHasFullData = true;
           return;
         }
       }
@@ -207,7 +210,7 @@ class CategoryController extends GetxController {
   }
 
   // Backward-compatible alias (always fetches full tree)
-  Future<void> fetchAllKaratCategories() => fetchCategoryTree(full: true);
+  Future<void> fetchAllKaratCategories() => fetchCategoryTree();
 
   void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
     final allLevel3 = <CategoryModel>[];
@@ -244,21 +247,15 @@ class CategoryController extends GetxController {
     if (_latestLevel3State.value == CurrentAppState.LOADING) return;
     if (_latestLevel3Categories.isNotEmpty && _treeHasFullData) return;
 
-    // If tree was fetched but without full data, fetch full tree
-    if (_k18State.value == CurrentAppState.SUCCESS && !_treeHasFullData) {
-      await fetchCategoryTree(full: true);
-      return;
-    }
-
-    // If tree was already fetched with full data, level-3 data is already populated
+    // If tree was already fetched, level-3 data is already populated
     if (_k18State.value == CurrentAppState.SUCCESS) return;
 
     // Fallback: fetch tree (which includes level-3)
-    await fetchCategoryTree(full: true);
+    await fetchCategoryTree();
   }
 
   // ── Toggle expansion of a level-2 category ───────────────────────────────
-  // Level-3 data is pre-cached from tree; falls back to fetching full tree if empty
+  // Level-3 data is pre-cached from tree; falls back to fetching tree if empty
   Future<void> toggleExpand(CategoryModel category) async {
     final id = category.id;
 
@@ -274,13 +271,11 @@ class CategoryController extends GetxController {
     _showProductSection.value = false;
 
     // Level-3 data is already cached from tree response
-    // If not cached (e.g., initial load used full=false), fetch full tree on demand
+    // If not cached, fetch tree on demand
     if (!_level3Cache.containsKey(id) || (_level3Cache[id]?.isEmpty ?? true)) {
-      if (!_treeHasFullData) {
-        _level3LoadingIds.add(id);
-        await fetchCategoryTree(full: true);
-        _level3LoadingIds.remove(id);
-      }
+      _level3LoadingIds.add(id);
+      await fetchCategoryTree();
+      _level3LoadingIds.remove(id);
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class ChainListingPage extends StatefulWidget {
@@ -40,12 +41,16 @@ class _ChainListingPageState extends State<ChainListingPage> {
         _stateForKarat(k) == CurrentAppState.SUCCESS &&
         _filteredCategories(k).isNotEmpty);
 
+    // CategoryController fetches tree eagerly in onInit()
+    // Only fetch if data is not yet available
     if (!allHaveData) {
       try {
-        await controller.fetchAllKaratCategories().timeout(
+        await controller.fetchCategoryTree().timeout(
               const Duration(seconds: 15),
             );
-      } catch (_) {}
+      } catch (e) {
+        Logger.warning("ChainListingPage", "Failed to fetch categories: $e");
+      }
     }
 
     bool anyError = false;

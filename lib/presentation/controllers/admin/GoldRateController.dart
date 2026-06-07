@@ -46,12 +46,17 @@ class GoldRateController extends GetxController {
 
   final _dateRangeLabel = ''.obs;
   String get dateRangeLabel => _dateRangeLabel.value;
+  
+  bool _isInitialized = false;
 
   @override
   void onInit() {
     super.onInit();
-    fetchCurrentRate();
-    fetchHistory();
+    if (!_isInitialized) {
+      _isInitialized = true;
+      fetchCurrentRate();
+      fetchHistory();
+    }
   }
 
   Future<void> fetchCurrentRate() async {

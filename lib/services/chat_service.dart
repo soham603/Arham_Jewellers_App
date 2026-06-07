@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
 enum ChatEventType { toolCall, textDelta, done, error }
@@ -95,7 +96,9 @@ class ChatService {
               } else if (type == 'error') {
                 yield ChatEvent(type: ChatEventType.error, content: data['error']);
               }
-            } catch (_) {}
+            } catch (e) {
+              Logger.warning("ChatService", "Failed to parse SSE chunk: $e");
+            }
           }
         }
       }

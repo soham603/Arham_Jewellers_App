@@ -105,11 +105,9 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
       _transformationController.value = Matrix4.identity();
     } else {
       final position = _doubleTapDetails!.localPosition;
-      // ignore: deprecated_member_use
       _transformationController.value = Matrix4.identity()
         ..translate(-position.dx * (_zoomedScale - 1),
             -position.dy * (_zoomedScale - 1))
-        // ignore: deprecated_member_use
         ..scale(_zoomedScale);
     }
     setState(() => _isZoomed = !_isZoomed);

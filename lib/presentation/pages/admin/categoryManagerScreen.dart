@@ -1,10 +1,11 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class CategoryManagerScreen extends StatefulWidget {
   const CategoryManagerScreen({super.key});
@@ -13,26 +14,20 @@ class CategoryManagerScreen extends StatefulWidget {
   State<CategoryManagerScreen> createState() => _CategoryManagerScreenState();
 }
 
-class _CategoryManagerScreenState extends State<CategoryManagerScreen> {
+class _CategoryManagerScreenState extends State<CategoryManagerScreen>
+    with SingleTickerProviderStateMixin {
   final CategoryManagerController ctrl = Get.put(CategoryManagerController());
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        ctrl.loadMore();
-      }
-    });
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
-    _searchController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -43,750 +38,942 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen> {
       appBar: AppBar(
         backgroundColor: context.colorPalette.backgroundColor,
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_rounded, color: context.colorPalette.textColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
-          'Category Manager',
+          'Categories',
           style: TextStyle(
             fontSize: context.getScreenWidth(5),
             fontWeight: FontWeight.w700,
             color: context.colorPalette.textColor,
           ),
         ),
-        actions: [
-          Obx(
-            () => Padding(
-              padding: EdgeInsets.only(right: context.getScreenWidth(4)),
-              child: Text(
-                '${ctrl.total} total',
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(3.2),
-                  color: context.colorPalette.subTitleColor,
-                ),
-              ),
-            ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(context.getScreenHeight(4.5)),
+          child: TabBar(
+            controller: _tabController,
+            labelColor: context.colorPalette.primaryColor,
+            unselectedLabelColor: context.colorPalette.subTitleColor,
+            indicatorColor: context.colorPalette.primaryColor,
+            indicatorWeight: 3,
+            labelStyle: TextStyle(fontSize: context.getScreenWidth(3.5), fontWeight: FontWeight.w600),
+            unselectedLabelStyle: TextStyle(fontSize: context.getScreenWidth(3.5), fontWeight: FontWeight.w400),
+            tabs: const [
+              Tab(text: 'Level 1'),
+              Tab(text: 'Level 2'),
+              Tab(text: 'Level 3'),
+            ],
           ),
-        ],
+        ),
       ),
-      body: Column(
-        children: [
-          _buildFilters(context),
-          const Divider(height: 1),
-          Expanded(
-            child: Obx(() {
-              if (ctrl.state == CurrentAppState.LOADING &&
-                  ctrl.categories.isEmpty) {
-                return _buildShimmerList(context);
-              }
+      body: Obx(() {
+        if (ctrl.loading && ctrl.allCategories.isEmpty) {
+          return _shimmer();
+        }
+        return TabBarView(
+          controller: _tabController,
+          children: [
+            _Level1Tab(ctrl: ctrl),
+            _Level2Tab(ctrl: ctrl),
+            _Level3Tab(ctrl: ctrl),
+          ],
+        );
+      }),
+    );
+  }
+}
 
-              if (ctrl.state == CurrentAppState.ERROR &&
-                  ctrl.categories.isEmpty) {
-                return _buildError(context);
-              }
+// ══════════════════════════════════════════════════════════════════════════════
+// Level 1 Tab — grouped by name, shows count of duplicate parents
+// ══════════════════════════════════════════════════════════════════════════════
+class _Level1Tab extends StatelessWidget {
+  final CategoryManagerController ctrl;
+  const _Level1Tab({required this.ctrl});
 
-              if (ctrl.state == CurrentAppState.SUCCESS &&
-                  ctrl.categories.isEmpty) {
-                return _buildEmpty(context);
-              }
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final items = ctrl.level1Grouped;
+      if (items.isEmpty) return _empty('No Level 1 categories.', null);
 
-              return RefreshIndicator(
-                onRefresh: ctrl.refresh,
-                color: context.colorPalette.primaryColor,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(4),
-                    vertical: context.getScreenHeight(1),
-                  ),
-                  itemCount: ctrl.categories.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == ctrl.categories.length) {
-                      return _buildListFooter(context);
-                    }
-                    return _buildCategoryCard(context, ctrl.categories[index]);
-                  },
-                ),
-              );
-            }),
+      return RefreshIndicator(
+        onRefresh: () => ctrl.fetchAll(force: true),
+        color: context.colorPalette.primaryColor,
+        child: ListView.builder(
+          padding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(4), context.getScreenHeight(1),
+            context.getScreenWidth(4), context.getScreenHeight(8),
           ),
-        ],
+          itemCount: items.length,
+          itemBuilder: (_, i) {
+            final cat = items[i];
+            final count = ctrl.level1GroupCount(cat.name);
+            return _GroupedL1Tile(cat: cat, count: count, ctrl: ctrl);
+          },
+        ),
+      );
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Level 2 Tab — L1 picker → L2 list
+// ══════════════════════════════════════════════════════════════════════════════
+class _Level2Tab extends StatefulWidget {
+  final CategoryManagerController ctrl;
+  const _Level2Tab({required this.ctrl});
+
+  @override
+  State<_Level2Tab> createState() => _Level2TabState();
+}
+
+class _Level2TabState extends State<_Level2Tab> {
+  CategoryModel? _selectedL1;
+
+  @override
+  Widget build(BuildContext context) {
+    final ctrl = widget.ctrl;
+
+    // Step 1: pick L1 group
+    if (_selectedL1 == null) {
+      return Obx(() {
+        final parents = ctrl.level1Grouped;
+        if (parents.isEmpty) return _empty('No Level 1 categories.', null);
+        return _ParentPickerList(parents: parents, onSelect: (p) => setState(() => _selectedL1 = p));
+      });
+    }
+
+    // Step 2: show merged L2 under selected L1 group
+    return Obx(() {
+      final items = ctrl.level2ForGroup(_selectedL1!.name);
+      return _DrillDownList(
+        breadcrumb: _selectedL1!.name,
+        onBack: () => setState(() => _selectedL1 = null),
+        items: items,
+        emptyMsg: 'No Level 2 under ${_selectedL1!.name}.',
+        onRefresh: () => ctrl.fetchAll(force: true),
+        onAddNew: () => _showCreateSheet(context, ctrl, level: 2, parentId: _selectedL1!.id),
+        onEdit: (cat) => _showEditSheet(context, ctrl, cat),
+        onDelete: (cat) => _confirmDelete(context, ctrl, cat),
+        onRestore: (cat) => _confirmRestore(context, ctrl, cat),
+        ctrl: ctrl,
+      );
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Level 3 Tab — L1 picker → L2 picker → L3 list
+// ══════════════════════════════════════════════════════════════════════════════
+class _Level3Tab extends StatefulWidget {
+  final CategoryManagerController ctrl;
+  const _Level3Tab({required this.ctrl});
+
+  @override
+  State<_Level3Tab> createState() => _Level3TabState();
+}
+
+class _Level3TabState extends State<_Level3Tab> {
+  CategoryModel? _selectedL1;
+  CategoryModel? _selectedL2;
+
+  @override
+  Widget build(BuildContext context) {
+    final ctrl = widget.ctrl;
+
+    // Step 1: pick L1 group
+    if (_selectedL1 == null) {
+      return Obx(() {
+        final parents = ctrl.level1Grouped;
+        if (parents.isEmpty) return _empty('No Level 1 categories.', null);
+        return _ParentPickerList(parents: parents, onSelect: (p) => setState(() => _selectedL1 = p));
+      });
+    }
+
+    // Step 2: pick L2 from merged group
+    if (_selectedL2 == null) {
+      return Obx(() {
+        final items = ctrl.level2ForGroup(_selectedL1!.name);
+        return _DrillDownList(
+          breadcrumb: _selectedL1!.name,
+          onBack: () => setState(() { _selectedL1 = null; _selectedL2 = null; }),
+          items: items,
+          emptyMsg: 'No Level 2 under ${_selectedL1!.name}.',
+          onRefresh: () => ctrl.fetchAll(force: true),
+          isParentPicker: true,
+          onSelectParent: (p) => setState(() => _selectedL2 = p),
+          ctrl: ctrl,
+        );
+      });
+    }
+
+    // Step 3: show L3 under selected L2
+    return Obx(() {
+      final items = ctrl.level3For(_selectedL2!.id);
+      return _DrillDownList(
+        breadcrumb: '${_selectedL1!.name} → ${_selectedL2!.name}',
+        onBack: () => setState(() { _selectedL2 = null; }),
+        items: items,
+        emptyMsg: 'No Level 3 under ${_selectedL2!.name}.',
+        onRefresh: () => ctrl.fetchAll(force: true),
+        onAddNew: () => _showCreateSheet(context, ctrl, level: 3, parentId: _selectedL2!.id),
+        onEdit: (cat) => _showEditSheet(context, ctrl, cat),
+        onDelete: (cat) => _confirmDelete(context, ctrl, cat),
+        onRestore: (cat) => _confirmRestore(context, ctrl, cat),
+        ctrl: ctrl,
+      );
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Shared: Parent picker list
+// ══════════════════════════════════════════════════════════════════════════════
+class _ParentPickerList extends StatelessWidget {
+  final List<CategoryModel> parents;
+  final ValueChanged<CategoryModel> onSelect;
+  const _ParentPickerList({required this.parents, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () => Get.find<CategoryManagerController>().fetchAll(),
+      color: context.colorPalette.primaryColor,
+      child: ListView.builder(
+        padding: EdgeInsets.fromLTRB(
+          context.getScreenWidth(4), context.getScreenHeight(1),
+          context.getScreenWidth(4), context.getScreenHeight(8),
+        ),
+        itemCount: parents.length,
+        itemBuilder: (_, i) => _ParentTile(cat: parents[i], onTap: () => onSelect(parents[i])),
       ),
     );
   }
+}
 
-  // ── Filter Bar ────────────────────────────────────────────────────────────
-  Widget _buildFilters(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(4),
-        vertical: context.getScreenHeight(1),
+// ══════════════════════════════════════════════════════════════════════════════
+// Shared: Drill-down list
+// ══════════════════════════════════════════════════════════════════════════════
+class _DrillDownList extends StatelessWidget {
+  final String breadcrumb;
+  final VoidCallback onBack;
+  final List<CategoryModel> items;
+  final String emptyMsg;
+  final Future<void> Function() onRefresh;
+  final VoidCallback? onAddNew;
+  final void Function(CategoryModel)? onEdit;
+  final void Function(CategoryModel)? onDelete;
+  final void Function(CategoryModel)? onRestore;
+  final void Function(CategoryModel)? onSelectParent;
+  final bool isParentPicker;
+  final CategoryManagerController ctrl;
+
+  const _DrillDownList({
+    required this.breadcrumb,
+    required this.onBack,
+    required this.items,
+    required this.emptyMsg,
+    required this.onRefresh,
+    this.onAddNew,
+    this.onEdit,
+    this.onDelete,
+    this.onRestore,
+    this.onSelectParent,
+    this.isParentPicker = false,
+    required this.ctrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Breadcrumb bar
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getScreenWidth(4),
+            vertical: context.getScreenHeight(1),
+          ),
+          color: context.colorPalette.boxColor.withOpacity(0.4),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: onBack,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.arrow_back_ios_rounded, size: context.getScreenWidth(3.5), color: context.colorPalette.primaryColor),
+                    SizedBox(width: context.getScreenWidth(1)),
+                    Text('Back', style: TextStyle(fontSize: context.getScreenWidth(3.3), color: context.colorPalette.primaryColor, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              SizedBox(width: context.getScreenWidth(3)),
+              Icon(Icons.chevron_right_rounded, size: context.getScreenWidth(4), color: context.colorPalette.subTitleColor),
+              SizedBox(width: context.getScreenWidth(1.5)),
+              Expanded(
+                child: Text(
+                  breadcrumb, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: context.getScreenWidth(3.5), fontWeight: FontWeight.w600, color: context.colorPalette.textColor),
+                ),
+              ),
+              if (onAddNew != null)
+                GestureDetector(
+                  onTap: onAddNew,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2.5), vertical: context.getScreenHeight(0.6)),
+                    decoration: BoxDecoration(color: context.colorPalette.primaryColor, borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add, color: Colors.white, size: context.getScreenWidth(3.5)),
+                        SizedBox(width: context.getScreenWidth(1)),
+                        Text('New', style: TextStyle(color: Colors.white, fontSize: context.getScreenWidth(3), fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Divider(height: 1, color: context.colorPalette.boxColor),
+        // Content
+        Expanded(
+          child: items.isEmpty
+              ? _empty(emptyMsg, onBack)
+              : RefreshIndicator(
+                  onRefresh: onRefresh,
+                  color: context.colorPalette.primaryColor,
+                  child: ListView.builder(
+                    padding: EdgeInsets.fromLTRB(
+                      context.getScreenWidth(4), context.getScreenHeight(1),
+                      context.getScreenWidth(4), context.getScreenHeight(8),
+                    ),
+                    itemCount: items.length,
+                    itemBuilder: (_, i) {
+                      final cat = items[i];
+                      if (isParentPicker && onSelectParent != null) {
+                        return _ParentTile(cat: cat, onTap: () => onSelectParent!(cat));
+                      }
+                      return _CategoryTile(
+                        cat: cat,
+                        onEdit: onEdit != null ? () => onEdit!(cat) : null,
+                        onDelete: onDelete != null ? () => onDelete!(cat) : null,
+                        onRestore: onRestore != null ? () => onRestore!(cat) : null,
+                        ctrl: ctrl,
+                      );
+                    },
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Shared tiles
+// ══════════════════════════════════════════════════════════════════════════════
+
+/// L1 tile with group count badge (e.g. "18K (4)")
+class _GroupedL1Tile extends StatelessWidget {
+  final CategoryModel cat;
+  final int count;
+  final CategoryManagerController ctrl;
+  const _GroupedL1Tile({required this.cat, required this.count, required this.ctrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showL1GroupSheet(context, ctrl, cat),
+      child: Container(
+        margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+        padding: EdgeInsets.all(context.getScreenWidth(3)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            _Thumb(cat: cat, size: 12),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                  if (cat.nameSlug.isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: context.getScreenWidth(2.8), color: context.colorPalette.subTitleColor)),
+                  ],
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: context.getScreenHeight(0.4)),
+              decoration: BoxDecoration(
+                color: context.colorPalette.primaryColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text('$count', style: TextStyle(fontSize: context.getScreenWidth(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
+            ),
+            SizedBox(width: context.getScreenWidth(2)),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+          ],
+        ),
       ),
-      color: context.colorPalette.backgroundColor,
+    );
+  }
+}
+
+/// Bottom sheet showing all L1 parents in a group + action buttons
+void _showL1GroupSheet(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
+  final parents = ctrl.level1GroupIds(cat.name).map((id) => ctrl.allCategories.firstWhere((c) => c.id == id)).toList();
+  final l2Items = ctrl.level2ForGroup(cat.name);
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _L1GroupSheet(cat: cat, parents: parents, l2Items: l2Items, ctrl: ctrl),
+  );
+}
+
+class _L1GroupSheet extends StatelessWidget {
+  final CategoryModel cat;
+  final List<CategoryModel> parents;
+  final List<CategoryModel> l2Items;
+  final CategoryManagerController ctrl;
+  const _L1GroupSheet({required this.cat, required this.parents, required this.l2Items, required this.ctrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: context.getScreenHeight(60),
+      decoration: BoxDecoration(
+        color: context.colorPalette.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Column(
         children: [
-          // Search
           Container(
-            height: context.getScreenHeight(5.5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFCFC7BC)),
-              color: const Color(0xFFF4F1EC),
-            ),
-            child: TextField(
-              controller: _searchController,
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
-                color: context.colorPalette.textColor,
-              ),
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
-                  vertical: context.getScreenHeight(1.5),
-                ),
-                border: InputBorder.none,
-                hintText: 'Search by name...',
-                hintStyle: TextStyle(
-                  color: const Color(0xFFA29A90),
-                  fontSize: context.getScreenWidth(3.5),
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: context.getScreenWidth(4.5),
-                  color: const Color(0xFF8D847A),
-                ),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? GestureDetector(
-                        onTap: () {
-                          _searchController.clear();
-                          ctrl.setNameSearch('');
-                          setState(() {});
-                        },
-                        child: Icon(
-                          Icons.close,
-                          size: context.getScreenWidth(4),
-                          color: const Color(0xFF8D847A),
-                        ),
-                      )
-                    : null,
-              ),
-              onChanged: (v) {
-                setState(() {});
-                ctrl.setNameSearch(v);
+            margin: EdgeInsets.only(top: context.getScreenHeight(1)),
+            width: context.getScreenWidth(10),
+            height: 4,
+            decoration: BoxDecoration(color: context.colorPalette.subTitleColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+          ),
+          SizedBox(height: context.getScreenHeight(1.5)),
+          Text('${cat.name} — ${parents.length} parents, ${l2Items.length} sub-categories',
+            style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+          SizedBox(height: context.getScreenHeight(1.5)),
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+              itemCount: parents.length,
+              separatorBuilder: (_, __) => Divider(height: 1, color: context.colorPalette.boxColor),
+              itemBuilder: (_, i) {
+                final p = parents[i];
+                final childCount = ctrl.level2For(p.id).length;
+                return ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: _Thumb(cat: p, size: 8),
+                  title: Text(p.name, style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                  subtitle: Text('$childCount sub-categories', style: TextStyle(fontSize: context.getScreenWidth(2.7), color: context.colorPalette.subTitleColor)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit_rounded, size: context.getScreenWidth(4.5), color: context.colorPalette.primaryColor),
+                        onPressed: () { Navigator.pop(context); _showEditSheet(context, ctrl, p); },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_rounded, size: context.getScreenWidth(4.5), color: Colors.red),
+                        onPressed: () { Navigator.pop(context); _confirmDelete(context, ctrl, p); },
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ),
           SizedBox(height: context.getScreenHeight(1)),
-          // Level filter + show deleted toggle
-          Row(
-            children: [
-              Expanded(child: _buildLevelDropdown(context)),
-              SizedBox(width: context.getScreenWidth(3)),
-              Obx(() => _buildDeletedToggle(context)),
-              SizedBox(width: context.getScreenWidth(2)),
-              _buildClearButton(context),
-            ],
-          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildLevelDropdown(BuildContext context) {
-    return Obx(
-      () => Container(
-        height: context.getScreenHeight(5),
-        padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(3)),
+class _ParentTile extends StatelessWidget {
+  final CategoryModel cat;
+  final VoidCallback onTap;
+  const _ParentTile({required this.cat, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+        padding: EdgeInsets.all(context.getScreenWidth(3)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFCFC7BC)),
-          color: const Color(0xFFF4F1EC),
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<int?>(
-            value: ctrl.selectedLevel,
-            isExpanded: true,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              size: context.getScreenWidth(4.5),
-              color: const Color(0xFF8D847A),
-            ),
-            style: TextStyle(
-              fontSize: context.getScreenWidth(3.5),
-              color: context.colorPalette.textColor,
-            ),
-            hint: Text(
-              'All Levels',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.5),
-                color: const Color(0xFFA29A90),
+        child: Row(
+          children: [
+            _Thumb(cat: cat, size: 12),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                  if (cat.nameSlug.isNotEmpty) ...[
+                    SizedBox(height: 2),
+                    Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: context.getScreenWidth(2.8), color: context.colorPalette.subTitleColor)),
+                  ],
+                ],
               ),
             ),
-            items: [
-              DropdownMenuItem<int?>(
-                value: null,
-                child: Text(
-                  'All Levels',
-                  style: TextStyle(fontSize: context.getScreenWidth(3.5)),
-                ),
-              ),
-              ...List.generate(
-                3,
-                (i) => DropdownMenuItem<int?>(
-                  value: i + 1,
-                  child: Text(
-                    'Level ${i + 1}',
-                    style: TextStyle(fontSize: context.getScreenWidth(3.5)),
-                  ),
-                ),
-              ),
-            ],
-            onChanged: ctrl.setLevelFilter,
-          ),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildDeletedToggle(BuildContext context) {
-    final active = ctrl.showDeleted;
-    return GestureDetector(
-      onTap: () => ctrl.setShowDeleted(!active),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(3),
-          vertical: context.getScreenHeight(1.2),
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: active
-              ? Colors.red.withOpacity(0.12)
-              : const Color(0xFFF4F1EC),
-          border: Border.all(
-            color: active
-                ? Colors.red.withOpacity(0.4)
-                : const Color(0xFFCFC7BC),
-          ),
-        ),
+class _CategoryTile extends StatelessWidget {
+  final CategoryModel cat;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onRestore;
+  final CategoryManagerController ctrl;
+
+  const _CategoryTile({
+    required this.cat,
+    this.onEdit,
+    this.onDelete,
+    this.onRestore,
+    required this.ctrl,
+  });
+
+  Color _levelColor(int? level) {
+    switch (level) {
+      case 1: return const Color(0xFFD4AF37);
+      case 2: return const Color(0xFF8B6914);
+      case 3: return const Color(0xFF5C4A1E);
+      default: return Colors.grey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDeleted = cat.isDeleted;
+    final levelColor = _levelColor(cat.level);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+      decoration: BoxDecoration(
+        color: context.colorPalette.boxColor,
+        borderRadius: BorderRadius.circular(12),
+        border: isDeleted ? Border.all(color: Colors.red.withOpacity(0.25)) : null,
+      ),
+      child: IntrinsicHeight(
         child: Row(
           children: [
-            Icon(
-              active ? Icons.visibility : Icons.visibility_off_outlined,
-              size: context.getScreenWidth(4),
-              color: active ? Colors.red : const Color(0xFF8D847A),
-            ),
-            SizedBox(width: context.getScreenWidth(1.5)),
-            Text(
-              'Deleted',
-              style: TextStyle(
-                fontSize: context.getScreenWidth(3.2),
-                color: active ? Colors.red : const Color(0xFF8D847A),
-                fontWeight: active ? FontWeight.w600 : FontWeight.normal,
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: isDeleted ? Colors.red : levelColor,
+                borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
               ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+              child: _Thumb(cat: cat),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        _LevelBadge(level: cat.level, color: levelColor),
+                        if (isDeleted) ...[
+                          SizedBox(width: context.getScreenWidth(2)),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
+                            decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                            child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getScreenWidth(2.5), fontWeight: FontWeight.w600)),
+                          ),
+                        ],
+                      ],
+                    ),
+                    SizedBox(height: context.getScreenHeight(0.3)),
+                    Text(
+                      cat.name, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: context.getScreenWidth(3.6), fontWeight: FontWeight.w600,
+                        color: context.colorPalette.textColor,
+                        decoration: isDeleted ? TextDecoration.lineThrough : null,
+                        height: 1.3,
+                      ),
+                    ),
+                    if (cat.nameSlug.isNotEmpty) ...[
+                      SizedBox(height: 2),
+                      Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: context.getScreenWidth(2.6), color: context.colorPalette.subTitleColor)),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: context.getScreenWidth(2), top: context.getScreenHeight(0.8), bottom: context.getScreenHeight(0.8)),
+              child: Obx(() {
+                final isLoading = ctrl.actionLoadingId == cat.id;
+                if (isLoading) {
+                  return SizedBox(width: context.getScreenWidth(5), height: context.getScreenWidth(5),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: context.colorPalette.primaryColor));
+                }
+                if (isDeleted && onRestore != null) {
+                  return _CircleBtn(icon: Icons.restore_rounded, color: Colors.green, onTap: onRestore!);
+                }
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (onEdit != null) _CircleBtn(icon: Icons.edit_rounded, color: context.colorPalette.primaryColor, onTap: onEdit!),
+                    if (onEdit != null && onDelete != null) SizedBox(height: context.getScreenHeight(0.5)),
+                    if (onDelete != null) _CircleBtn(icon: Icons.delete_rounded, color: Colors.red, onTap: onDelete!),
+                  ],
+                );
+              }),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildClearButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _searchController.clear();
-        setState(() {});
-        ctrl.clearFilters();
-      },
-      child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(2.5)),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFCFC7BC)),
-          color: const Color(0xFFF4F1EC),
-        ),
-        child: Icon(
-          Icons.refresh_rounded,
-          size: context.getScreenWidth(4.5),
-          color: const Color(0xFF8D847A),
-        ),
-      ),
-    );
-  }
+// ══════════════════════════════════════════════════════════════════════════════
+// Shared widgets
+// ══════════════════════════════════════════════════════════════════════════════
+class _Thumb extends StatelessWidget {
+  final CategoryModel cat;
+  final double size;
+  const _Thumb({required this.cat, this.size = 13});
 
-  // ── Category Card ─────────────────────────────────────────────────────────
-  Widget _buildCategoryCard(BuildContext context, CategoryModel cat) {
-    return Obx(() {
-      final isDeleted = cat.isDeleted;
-      final isLoading = ctrl.actionLoadingId == cat.id;
-
-      return Opacity(
-        opacity: isDeleted ? 0.45 : 1.0,
-        child: Container(
-          margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
-          decoration: BoxDecoration(
-            color: isDeleted
-                ? Colors.red.withOpacity(0.04)
-                : context.colorPalette.boxColor,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isDeleted
-                  ? Colors.red.withOpacity(0.2)
-                  : context.colorPalette.boxColor,
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(context.getScreenWidth(3.5)),
-            child: Row(
-              children: [
-                // ── Image ─────────────────────────────────────────────────
-                _buildCategoryImage(context, cat),
-                SizedBox(width: context.getScreenWidth(3)),
-
-                // ── Info ──────────────────────────────────────────────────
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          _buildLevelBadge(context, cat.level),
-                          SizedBox(width: context.getScreenWidth(2)),
-                          if (isDeleted)
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: context.getScreenWidth(2),
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                'DELETED',
-                                style: TextStyle(
-                                  fontSize: context.getScreenWidth(2.5),
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: context.getScreenHeight(0.5)),
-                      Text(
-                        cat.name,
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(4),
-                          fontWeight: FontWeight.w600,
-                          color: context.colorPalette.textColor,
-                          decoration: isDeleted
-                              ? TextDecoration.lineThrough
-                              : null,
-                        ),
-                      ),
-                      SizedBox(height: context.getScreenHeight(0.3)),
-                      Text(
-                        cat.nameSlug,
-                        style: TextStyle(
-                          fontSize: context.getScreenWidth(3),
-                          color: context.colorPalette.subTitleColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // ── Actions ───────────────────────────────────────────────
-                if (isLoading)
-                  SizedBox(
-                    width: context.getScreenWidth(5),
-                    height: context.getScreenWidth(5),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: context.colorPalette.primaryColor,
-                    ),
-                  )
-                else
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!isDeleted) ...[
-                        _iconButton(
-                          context,
-                          icon: Icons.edit_outlined,
-                          color: context.colorPalette.primaryColor,
-                          onTap: () => _showEditSheet(context, cat),
-                        ),
-                        SizedBox(width: context.getScreenWidth(1)),
-                        _iconButton(
-                          context,
-                          icon: Icons.delete_outline_rounded,
-                          color: Colors.red,
-                          onTap: () => _confirmDelete(context, cat),
-                        ),
-                      ] else
-                        _iconButton(
-                          context,
-                          icon: Icons.restore_rounded,
-                          color: Colors.green,
-                          onTap: () => ctrl.restoreCategory(cat.id),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
-  }
-
-  Widget _buildCategoryImage(BuildContext context, CategoryModel cat) {
-    final size = context.getScreenWidth(14);
-
+  @override
+  Widget build(BuildContext context) {
+    final s = context.getScreenWidth(size);
     return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: context.colorPalette.boxColor,
-      ),
+      width: s, height: s,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: context.colorPalette.backgroundColor),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: cat.imageUrl != null && cat.imageUrl!.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: cat.imageUrl!,
-                fit: BoxFit.cover,
-                placeholder: (_, __) =>
-                    Container(color: context.colorPalette.shimmerBaseColor),
-                errorWidget: (_, __, ___) => _imagePlaceholder(context),
+        borderRadius: BorderRadius.circular(8),
+        child: cat.imageUrl.isNotEmpty
+            ? Opacity(
+                opacity: cat.isDeleted ? 0.5 : 1.0,
+                child: CachedNetworkImage(
+                  imageUrl: cat.imageUrl, fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(color: context.colorPalette.shimmerBaseColor),
+                  errorWidget: (_, __, ___) => _noImg(context),
+                ),
               )
-            : _imagePlaceholder(context),
+            : _noImg(context),
       ),
     );
   }
 
-  Widget _imagePlaceholder(BuildContext context) {
+  Widget _noImg(BuildContext context) {
     return Container(
-      color: context.colorPalette.boxColor,
-      child: Icon(
-        Icons.image_outlined,
-        size: context.getScreenWidth(6),
-        color: context.colorPalette.subTitleColor,
-      ),
+      color: context.colorPalette.backgroundColor,
+      child: Icon(Icons.category_outlined, size: context.getScreenWidth(5), color: context.colorPalette.subTitleColor),
     );
   }
+}
 
-  Widget _buildLevelBadge(BuildContext context, int? level) {
-    final colors = {
-      1: const Color(0xFFD4AF37),
-      2: const Color(0xFF8B6914),
-      3: const Color(0xFF5C4A1E),
-    };
-    final color = colors[level] ?? context.colorPalette.subTitleColor;
+class _LevelBadge extends StatelessWidget {
+  final int? level;
+  final Color color;
+  const _LevelBadge({required this.level, required this.color});
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(2),
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Text(
-        'L${level ?? "?"}',
-        style: TextStyle(
-          fontSize: context.getScreenWidth(2.8),
-          color: color,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
+      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
+      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+      child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getScreenWidth(2.5), color: color, fontWeight: FontWeight.w700)),
     );
   }
+}
 
-  Widget _iconButton(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+class _CircleBtn extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  const _CircleBtn({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(2)),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(icon, size: context.getScreenWidth(4.5), color: color),
+        padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+        decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+        child: Icon(icon, size: context.getScreenWidth(3.5), color: color),
       ),
     );
   }
+}
 
-  // ── Edit Bottom Sheet ─────────────────────────────────────────────────────
-  void _showEditSheet(BuildContext context, CategoryModel cat) {
-    final nameController = TextEditingController(text: cat.name);
-    ctrl.clearPickedImage();
+Widget _shimmer() {
+  return ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: 5,
+    itemBuilder: (_, __) => Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      height: 72,
+      decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
+    ),
+  );
+}
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          return Container(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            ),
-            decoration: BoxDecoration(
-              color: context.colorPalette.backgroundColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+Widget _empty(String msg, VoidCallback? onBack) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.category_outlined, size: 48, color: Colors.grey.shade400),
+          const SizedBox(height: 12),
+          Text(msg, textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Colors.grey.shade500)),
+          if (onBack != null) ...[
+            const SizedBox(height: 16),
+            TextButton(onPressed: onBack, child: const Text('Go Back')),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Create / Edit form sheet
+// ══════════════════════════════════════════════════════════════════════════════
+void _showCreateSheet(BuildContext context, CategoryManagerController ctrl, {required int level, String? parentId}) {
+  _showFormSheet(context, ctrl, isCreate: true, level: level, parentId: parentId);
+}
+
+void _showEditSheet(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
+  _showFormSheet(context, ctrl, isCreate: false, existing: cat);
+}
+
+void _showFormSheet(BuildContext context, CategoryManagerController ctrl, {
+  required bool isCreate,
+  CategoryModel? existing,
+  int? level,
+  String? parentId,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => _CategoryFormSheet(
+      isCreate: isCreate,
+      existing: existing,
+      level: level ?? existing?.level ?? 1,
+      parentId: parentId ?? existing?.parentId,
+      ctrl: ctrl,
+    ),
+  );
+}
+
+class _CategoryFormSheet extends StatefulWidget {
+  final bool isCreate;
+  final CategoryModel? existing;
+  final int level;
+  final String? parentId;
+  final CategoryManagerController ctrl;
+
+  const _CategoryFormSheet({
+    required this.isCreate,
+    this.existing,
+    required this.level,
+    this.parentId,
+    required this.ctrl,
+  });
+
+  @override
+  State<_CategoryFormSheet> createState() => _CategoryFormSheetState();
+}
+
+class _CategoryFormSheetState extends State<_CategoryFormSheet> {
+  final _nameCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  File? _pickedImage;
+  bool _submitting = false;
+
+  bool get isEditing => !widget.isCreate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existing != null) {
+      _nameCtrl.text = widget.existing!.name;
+      _descCtrl.text = widget.existing!.description ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _descCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked != null) setState(() => _pickedImage = File(picked.path));
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _submitting = true);
+
+    final ok = isEditing
+        ? await widget.ctrl.editCategory(
+            id: widget.existing!.id,
+            name: _nameCtrl.text.trim(),
+            boxName: _nameCtrl.text.trim(),
+            description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            imageFile: _pickedImage,
+          )
+        : await widget.ctrl.createCategory(
+            name: _nameCtrl.text.trim(),
+            boxName: _nameCtrl.text.trim(),
+            description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+            level: widget.level,
+            parentId: widget.parentId,
+            imageFile: _pickedImage,
+          );
+
+    if (ok && mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(isEditing ? 'Updated' : 'Created'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ));
+    }
+    if (mounted) setState(() => _submitting = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      decoration: BoxDecoration(
+        color: context.colorPalette.backgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollCtrl) {
+          return Form(
+            key: _formKey,
+            child: ListView(
+              controller: scrollCtrl,
+              padding: EdgeInsets.fromLTRB(
+                context.getScreenWidth(5), context.getScreenHeight(1.5),
+                context.getScreenWidth(5), context.getScreenHeight(3),
               ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(5)),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // handle
-                  Center(
-                    child: Container(
-                      width: context.getScreenWidth(10),
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: context.colorPalette.boxColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(2)),
-                  Text(
-                    'Edit Category',
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(5),
-                      fontWeight: FontWeight.w700,
-                      color: context.colorPalette.textColor,
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(0.5)),
-                  Text(
-                    cat.nameSlug,
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(3.2),
-                      color: context.colorPalette.subTitleColor,
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(2.5)),
+              children: [
+                Center(child: Container(width: context.getScreenWidth(10), height: 4,
+                  decoration: BoxDecoration(color: context.colorPalette.boxColor, borderRadius: BorderRadius.circular(2)))),
+                SizedBox(height: context.getScreenHeight(2)),
+                Text(
+                  isEditing ? 'Edit Category' : 'New Level ${widget.level} Category',
+                  style: TextStyle(fontSize: context.getScreenWidth(5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor),
+                ),
+                SizedBox(height: context.getScreenHeight(2.5)),
 
-                  // Name field
-                  Text(
-                    'Name',
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(3.5),
-                      fontWeight: FontWeight.w600,
-                      color: context.colorPalette.textColor,
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
-                  TextField(
-                    controller: nameController,
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(4),
-                      color: context.colorPalette.textColor,
-                    ),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(4),
-                        vertical: context.getScreenHeight(1.5),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.colorPalette.boxColor,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.colorPalette.boxColor,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: context.colorPalette.primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                _label('Name'),
+                SizedBox(height: context.getScreenHeight(0.6)),
+                TextFormField(
+                  controller: _nameCtrl,
+                  style: TextStyle(fontSize: context.getScreenWidth(3.8), color: context.colorPalette.textColor),
+                  decoration: _inputDec(context, 'Enter name'),
+                  validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
 
-                  // Image picker
-                  Text(
-                    'Image',
-                    style: TextStyle(
-                      fontSize: context.getScreenWidth(3.5),
-                      fontWeight: FontWeight.w600,
-                      color: context.colorPalette.textColor,
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(1)),
-                  Obx(() {
-                    final picked = ctrl.pickedImage;
-                    return GestureDetector(
-                      onTap: () async {
-                        await ctrl.pickImage();
-                        setSheetState(() {});
-                      },
-                      child: Container(
-                        height: context.getScreenHeight(15),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: picked != null
-                                ? context.colorPalette.primaryColor
-                                : context.colorPalette.boxColor,
-                            width: picked != null ? 2 : 1,
-                          ),
-                          color: context.colorPalette.boxColor.withOpacity(0.4),
-                        ),
-                        child: picked != null
-                            ? Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.file(
-                                      picked,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        ctrl.clearPickedImage();
-                                        setSheetState(() {});
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.all(4),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.black54,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.close,
-                                          size: context.getScreenWidth(4),
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // show existing image preview if any
-                                  if (cat.imageUrl != null &&
-                                      cat.imageUrl!.isNotEmpty)
-                                    _existingImagePreview(context, cat)
-                                  else ...[
-                                    Icon(
-                                      Icons.add_photo_alternate_outlined,
-                                      size: context.getScreenWidth(8),
-                                      color: context.colorPalette.subTitleColor,
-                                    ),
-                                    SizedBox(
-                                      height: context.getScreenHeight(0.5),
-                                    ),
-                                    Text(
-                                      'Tap to pick image',
-                                      style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.5),
-                                        color:
-                                            context.colorPalette.subTitleColor,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                      ),
-                    );
-                  }),
-                  SizedBox(height: context.getScreenHeight(3)),
+                _label('Description (optional)'),
+                SizedBox(height: context.getScreenHeight(0.6)),
+                TextFormField(
+                  controller: _descCtrl,
+                  style: TextStyle(fontSize: context.getScreenWidth(3.8), color: context.colorPalette.textColor),
+                  maxLines: 3,
+                  decoration: _inputDec(context, 'Brief description...'),
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
 
-                  // Save button
-                  Obx(() {
-                    final loading = ctrl.actionLoadingId == cat.id;
-                    return SizedBox(
-                      width: double.infinity,
-                      height: context.getScreenHeight(6.5),
-                      child: ElevatedButton(
-                        onPressed: loading
-                            ? null
-                            : () async {
-                                final success = await ctrl.editCategory(
-                                  id: cat.id,
-                                  name: nameController.text.trim(),
-                                  existingImages: cat.imageUrl != null
-                                      ? [
-                                          {
-                                            "url": cat.imageUrl!,
-                                            "publicId": cat.imagePublicId ?? '',
-                                          },
-                                        ]
-                                      : [],
-                                );
-                                if (success && context.mounted) {
-                                  Get.back();
-                                  Get.snackbar(
-                                    'Updated',
-                                    '${cat.name} updated successfully',
-                                    backgroundColor: Colors.green.withOpacity(
-                                      0.9,
-                                    ),
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 2),
-                                  );
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: context.colorPalette.primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        child: loading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(
-                                'Save Changes',
-                                style: TextStyle(
-                                  fontSize: context.getScreenWidth(4),
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
+                _label('Image (optional)'),
+                SizedBox(height: context.getScreenHeight(0.8)),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: context.getScreenHeight(14),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _pickedImage != null ? context.colorPalette.primaryColor : context.colorPalette.boxColor,
+                        width: _pickedImage != null ? 2 : 1,
                       ),
-                    );
-                  }),
-                  SizedBox(height: context.getScreenHeight(1)),
-                ],
-              ),
+                      color: context.colorPalette.boxColor.withOpacity(0.4),
+                    ),
+                    child: _pickedImage != null
+                        ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(_pickedImage!, fit: BoxFit.cover))
+                        : _imagePlaceholder(context),
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(3)),
+
+                SizedBox(
+                  width: double.infinity, height: context.getScreenHeight(6),
+                  child: ElevatedButton(
+                    onPressed: _submitting ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: context.colorPalette.primaryColor,
+                      disabledBackgroundColor: context.colorPalette.primaryColor.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: _submitting
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : Text(isEditing ? 'Save' : 'Create',
+                            style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w600, color: Colors.white)),
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -794,208 +981,92 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen> {
     );
   }
 
-  Widget _existingImagePreview(BuildContext context, CategoryModel cat) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: CachedNetworkImage(
-            imageUrl: cat.imageUrl!,
-            height: context.getScreenHeight(10),
-            fit: BoxFit.cover,
-          ),
-        ),
-        Container(
-          height: context.getScreenHeight(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.black.withOpacity(0.35),
-          ),
-        ),
-        Column(
-          children: [
-            Icon(
-              Icons.edit,
-              color: Colors.white,
-              size: context.getScreenWidth(5),
-            ),
+  Widget _label(String text) {
+    return Text(text, style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor));
+  }
+
+  Widget _imagePlaceholder(BuildContext context) {
+    if (isEditing && widget.existing!.imageUrl.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(fit: StackFit.expand, children: [
+          CachedNetworkImage(imageUrl: widget.existing!.imageUrl, fit: BoxFit.cover),
+          Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
+          Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getScreenWidth(6)),
             SizedBox(height: context.getScreenHeight(0.3)),
-            Text(
-              'Tap to change',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: context.getScreenWidth(3),
-              ),
-            ),
-          ],
+            Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: context.getScreenWidth(3))),
+          ])),
+        ]),
+      );
+    }
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Icon(Icons.add_photo_alternate_outlined, size: context.getScreenWidth(8), color: context.colorPalette.subTitleColor),
+      SizedBox(height: context.getScreenHeight(0.5)),
+      Text('Tap to pick image', style: TextStyle(fontSize: context.getScreenWidth(3.3), color: context.colorPalette.subTitleColor)),
+    ]);
+  }
+}
+
+InputDecoration _inputDec(BuildContext context, String hint) {
+  return InputDecoration(
+    isDense: true,
+    contentPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(3.5), vertical: context.getScreenHeight(1.3)),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
+    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
+    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.primaryColor)),
+    hintText: hint,
+    hintStyle: TextStyle(fontSize: context.getScreenWidth(3.3), color: context.colorPalette.subTitleColor),
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Confirm dialogs
+// ══════════════════════════════════════════════════════════════════════════════
+void _confirmDelete(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      backgroundColor: context.colorPalette.backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text('Delete "${cat.name}"?', style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+      content: Text('You can restore it later.', style: TextStyle(fontSize: context.getScreenWidth(3.5), color: context.colorPalette.subTitleColor)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor))),
+        Obx(() => TextButton(
+          onPressed: ctrl.actionLoadingId == cat.id ? null : () async {
+            Navigator.pop(context);
+            final ok = await ctrl.deleteCategory(cat.id);
+            if (ok && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"${cat.name}" deleted'), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+          },
+          child: ctrl.actionLoadingId == cat.id
+              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
+              : const Text('Delete', style: TextStyle(color: Colors.red)),
+        )),
+      ],
+    ),
+  );
+}
+
+void _confirmRestore(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      backgroundColor: context.colorPalette.backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text('Restore "${cat.name}"?', style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+      content: Text('Move back to active.', style: TextStyle(fontSize: context.getScreenWidth(3.5), color: context.colorPalette.subTitleColor)),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor))),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            final ok = await ctrl.restoreCategory(cat.id);
+            if (ok && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"${cat.name}" restored'), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+          },
+          child: const Text('Restore', style: TextStyle(color: Colors.green)),
         ),
       ],
-    );
-  }
-
-  // ── Delete confirm ────────────────────────────────────────────────────────
-  void _confirmDelete(BuildContext context, CategoryModel cat) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: context.colorPalette.backgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Delete Category?',
-          style: TextStyle(
-            fontSize: context.getScreenWidth(4.5),
-            fontWeight: FontWeight.w700,
-            color: context.colorPalette.textColor,
-          ),
-        ),
-        content: Text(
-          '"${cat.name}" will be soft-deleted. You can restore it later.',
-          style: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
-            color: context.colorPalette.subTitleColor,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: context.colorPalette.subTitleColor),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              final success = await ctrl.deleteCategory(cat.id);
-              if (success) {
-                Get.snackbar(
-                  'Deleted',
-                  '"${cat.name}" has been soft-deleted',
-                  backgroundColor: Colors.red.withOpacity(0.9),
-                  colorText: Colors.white,
-                  duration: const Duration(seconds: 2),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Shimmer List ──────────────────────────────────────────────────────────
-  Widget _buildShimmerList(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
-      itemCount: 8,
-      itemBuilder: (_, __) => Container(
-        margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
-        height: context.getScreenHeight(10),
-        decoration: BoxDecoration(
-          color: context.colorPalette.shimmerBaseColor,
-          borderRadius: BorderRadius.circular(14),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildListFooter(BuildContext context) {
-    if (ctrl.state == CurrentAppState.LOADING) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
-        child: Center(
-          child: SizedBox(
-            width: context.getScreenWidth(6),
-            height: context.getScreenWidth(6),
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              color: context.colorPalette.primaryColor,
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (!ctrl.hasMore) {
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
-        child: Center(
-          child: Text(
-            'All ${ctrl.total} categories loaded',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(3.2),
-              color: context.colorPalette.subTitleColor,
-            ),
-          ),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildError(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: context.getScreenWidth(12),
-            color: Colors.red,
-          ),
-          SizedBox(height: context.getScreenHeight(1.5)),
-          Text(
-            'Failed to load categories',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(4),
-              color: context.colorPalette.textColor,
-            ),
-          ),
-          SizedBox(height: context.getScreenHeight(2)),
-          ElevatedButton(
-            onPressed: ctrl.refresh,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.colorPalette.primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('Retry', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmpty(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.category_outlined,
-            size: context.getScreenWidth(12),
-            color: context.colorPalette.subTitleColor,
-          ),
-          SizedBox(height: context.getScreenHeight(1.5)),
-          Text(
-            'No categories found',
-            style: TextStyle(
-              fontSize: context.getScreenWidth(4),
-              color: context.colorPalette.subTitleColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    ),
+  );
 }

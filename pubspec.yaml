@@ -32,7 +32,6 @@ dependencies:
     sdk: flutter
   get: ^4.7.2
   google_fonts: ^6.3.0
-  cupertino_icons: ^1.0.8
   dio: ^5.9.2
   shared_preferences: ^2.5.5
   another_flushbar: ^1.12.32
