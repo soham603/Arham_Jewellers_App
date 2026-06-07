@@ -283,24 +283,40 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 context,
                                 label: "Qty: ${item.quantity}",
                               ),
-                              SizedBox(width: context.getScreenWidth(2)),
-                              _itemDetailChip(
-                                context,
-                                label: "₹${item.price.toStringAsFixed(2)}",
-                              ),
+                              if (item.price > 0) ...[
+                                SizedBox(width: context.getScreenWidth(2)),
+                                _itemDetailChip(
+                                  context,
+                                  label: "₹${item.price.toStringAsFixed(2)}",
+                                ),
+                              ],
+                              ...() {
+                                final chips = <Widget>[];
+                                final rawData = controller.getProductRawData(item.product.id);
+                                final netWtVal = rawData != null ? double.tryParse(rawData['NetWt']?.toString() ?? '') : null;
+                                final fineWtVal = rawData != null ? double.tryParse(rawData['FineWt']?.toString() ?? '') : null;
+                                final weight = netWtVal ?? fineWtVal;
+                                if (weight != null) {
+                                  final isFallback = netWtVal == null;
+                                  chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                  chips.add(_itemDetailChip(
+                                    context,
+                                    label: "${isFallback ? 'Fine' : 'Net'}: ${weight.toStringAsFixed(2)}g",
+                                  ));
+                                }
+                                final sizeVal = rawData?['Size1']?.toString();
+                                if (sizeVal != null && sizeVal.isNotEmpty) {
+                                  chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                  chips.add(_itemDetailChip(
+                                    context,
+                                    label: "Size: $sizeVal",
+                                  ));
+                                }
+                                return chips;
+                              }(),
                             ],
                           ),
-                          if (item.stockNote.isNotEmpty) ...[
-                            SizedBox(height: context.getScreenHeight(0.5)),
-                            Text(
-                              "Note: ${item.stockNote}",
-                              style: TextStyle(
-                                color: AppColors.textMuted,
-                                fontSize: context.getScreenWidth(3),
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
+
                         ],
                       ),
                     ),
@@ -613,14 +629,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            child: Text(
-              "Approve",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3.8),
-              ),
-            ),
+            child: Obx(() => controller.isActionLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    "Approve",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getScreenWidth(3.8),
+                    ),
+                  )),
           ),
         ),
         SizedBox(width: context.getScreenWidth(3)),

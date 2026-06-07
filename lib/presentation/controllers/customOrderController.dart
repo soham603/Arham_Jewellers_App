@@ -39,9 +39,6 @@ class CustomOrderController extends GetxController {
   Future<bool> createCustomOrder({
     String? productId,
     required String partyCode,
-    required String partyName,
-    String? area,
-    required String contactNumber,
     required String itemName,
     String? weight,
     String? noOfPieces,
@@ -62,9 +59,6 @@ class CustomOrderController extends GetxController {
       final formData = FormData.fromMap({
         if (productId != null && productId.isNotEmpty) 'productId': productId,
         'partyCode': partyCode,
-        'partyName': partyName,
-        if (area != null && area.isNotEmpty) 'area': area,
-        'contactNumber': contactNumber,
         'itemName': itemName,
         if (weight != null && weight.isNotEmpty) 'weight': weight,
         if (noOfPieces != null && noOfPieces.isNotEmpty)

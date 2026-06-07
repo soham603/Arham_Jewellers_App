@@ -896,7 +896,7 @@ class _OrderImagesStack extends StatelessWidget {
     }
 
     final displayImages = images.take(3).toList();
-    final extraCount = order.items.length - displayImages.length;
+    final totalItems = order.items.length;
 
     return SizedBox(
       width: size,
@@ -927,22 +927,22 @@ class _OrderImagesStack extends StatelessWidget {
                 ),
               ),
             ),
-          if (extraCount > 0)
+          if (totalItems > 1)
             Positioned(
               bottom: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Text(
-                  "+$extraCount",
+                  "$totalItems",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getScreenWidth(2.5),
+                    fontSize: context.getScreenWidth(3.2),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
