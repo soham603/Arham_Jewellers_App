@@ -42,6 +42,9 @@ class AdminOrderController extends GetxController {
   final _productImageCache = <String, String?>{}.obs;
   String? getProductImage(String productId) => _productImageCache[productId];
 
+  final _productRawDataCache = <String, Map<String, dynamic>>{};
+  Map<String, dynamic>? getProductRawData(String productId) => _productRawDataCache[productId];
+
   @override
   void onInit() {
     super.onInit();
@@ -104,6 +107,8 @@ class AdminOrderController extends GetxController {
           filtered = fetched;
         }
 
+        filtered.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
         if (isPagination) {
           _orders.addAll(filtered);
         } else {
@@ -165,6 +170,9 @@ class AdminOrderController extends GetxController {
           if (match != null) {
             final product = ProductModel.fromJson(match);
             _productImageCache[entry.key] = product.displayImageUrl;
+            if (product.rawData != null) {
+              _productRawDataCache[entry.key] = product.rawData!;
+            }
           }
         }
       } catch (e) {
@@ -234,15 +242,6 @@ class AdminOrderController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchOrders();
-
-        Get.snackbar(
-          "Success",
-          response.data["message"] ?? "Order updated",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-        );
       } else {
         Get.snackbar(
           "Error",
@@ -345,4 +344,5 @@ class AdminOrderController extends GetxController {
       _isActionLoading.value = false;
     }
   }
+
 }

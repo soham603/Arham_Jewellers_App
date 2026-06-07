@@ -57,7 +57,7 @@ class ShareService {
     if (title != null && title.isNotEmpty) {
       return '$_brandName\n$_brandSubtitle\n\n$title';
     }
-    return '$_brandName\n$_brandSubtitle\n\nFilters: $filterInfo';
+    return '$_brandName\n$_brandSubtitle\n\n$filterInfo';
   }
 
   /// Downloads an image and optionally compresses it.

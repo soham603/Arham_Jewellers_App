@@ -67,7 +67,7 @@ abstract class AppTheme {
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.2),
       ),
-      hintStyle: GoogleFonts.inter(fontSize: 20, color: Color(0xFFA39A8F)),
+      hintStyle: GoogleFonts.inter(fontSize: 14, color: Color(0xFFA39A8F)),
     ),
   );
 }
