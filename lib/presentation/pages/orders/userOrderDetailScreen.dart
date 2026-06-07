@@ -467,18 +467,25 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
   Future<void> _downloadOrderPdf(BuildContext context, UserOrderModel order) async {
     final ctx = context;
+    final controller = UserOrderController.instance;
     _shareWithLoading(
       ctx,
       () async {
-        final items = order.items.map((item) => {
-          'name': item.product.name,
-          'imageUrl': item.product.displayImageUrl,
-          'quantity': item.quantity,
-          'price': item.price,
-          'isRejected': item.isRejected,
+        final items = order.items.map((item) {
+          final productData = controller.getProductData(item.product.id);
+          return {
+            'name': item.product.name,
+            'imageUrl': item.product.displayImageUrl,
+            'quantity': item.quantity,
+            'price': item.price,
+            'isRejected': item.isRejected,
+            'category': productData?.category?.name ?? '-',
+            'karat': productData?.touch ?? productData?.karat ?? '-',
+            'netWeight': productData?.netWeight,
+          };
         }).toList();
 
-        await ShareService.shareOrderDetailsPdf(
+        await ShareService.saveOrderPdfToDownloads(
           orderId: order.id,
           orderToken: order.orderToken,
           status: order.status,
@@ -571,7 +578,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           ],
         ),
         content: Text(
-          'Order $displayId PDF has been saved to Downloads. Share it with us on WhatsApp for any queries.',
+          'Order $displayId PDF has been saved to your Downloads folder. Share it with us on WhatsApp for any queries.',
           style: TextStyle(
             fontSize: context.getScreenWidth(3.8),
             color: AppColors.textMuted,

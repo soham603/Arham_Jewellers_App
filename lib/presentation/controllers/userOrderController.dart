@@ -81,7 +81,11 @@ class UserOrderController extends GetxController {
   final _imageCacheTimestamp = <String, DateTime>{};
   static const _cacheTTL = Duration(minutes: 5);
   RxMap<String, String?> get productImageCache => _productImageCache;
-  
+
+  final _productDataCache = <String, ProductModel>{};
+
+  ProductModel? getProductData(String productId) => _productDataCache[productId];
+
   String? getProductImage(String productId) {
     final timestamp = _imageCacheTimestamp[productId];
     if (timestamp != null && DateTime.now().difference(timestamp) > _cacheTTL) {
@@ -360,6 +364,7 @@ class UserOrderController extends GetxController {
             if (match != null) {
               final product = ProductModel.fromJson(match);
               _productImageCache[entry.key] = product.displayImageUrl;
+              _productDataCache[entry.key] = product;
               _imageCacheTimestamp[entry.key] = DateTime.now();
             }
           }

@@ -391,6 +391,109 @@ class ShareService {
 
     return file;
   }
+
+  static const MethodChannel _channel = MethodChannel('com.arhamjewellers/file_saver');
+
+  static Future<String?> _saveBytesToDownloads({
+    required List<int> bytes,
+    required String fileName,
+  }) async {
+    try {
+      final result = await _channel.invokeMethod<String>('saveToDownloads', {
+        'bytes': bytes,
+        'fileName': fileName,
+      });
+      return result;
+    } on PlatformException catch (e) {
+      Logger.error('ShareService', 'Failed to save to downloads: ${e.message}');
+      return null;
+    }
+  }
+
+  static Future<String?> saveOrderPdfToDownloads({
+    required String orderId,
+    int? orderToken,
+    required String status,
+    required DateTime createdAt,
+    required List<Map<String, dynamic>> items,
+    double? totalAmount,
+  }) async {
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    final imageFutures = items.map((item) async {
+      final url = item['imageUrl'] as String?;
+      if (url == null || url.isEmpty) return null;
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: 200,
+        quality: 80,
+      );
+    }).toList();
+    final imageBytesList = await Future.wait(imageFutures);
+
+    final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'orderId': orderId,
+      'orderToken': orderToken,
+      'status': status,
+      'createdAt': createdAt.toIso8601String(),
+      'items': items,
+      'totalAmount': totalAmount,
+      'imageBytesList': imageBytesList,
+    });
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final displayId = orderToken != null ? '$orderToken' : orderId.substring(0, 8).toUpperCase();
+    final fileName = 'Order_${displayId}_$timestamp.pdf';
+
+    return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+  }
+
+  static Future<String?> saveCartEnquiryPdfToDownloads({
+    required List<ProductModel> products,
+    required List<int> quantities,
+  }) async {
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    final imageFutures = products.map((p) async {
+      final url = p.displayImageUrl;
+      if (url == null || url.isEmpty) return null;
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: 200,
+        quality: 80,
+      );
+    }).toList();
+    final imageBytesList = await Future.wait(imageFutures);
+
+    final rows = <Map<String, dynamic>>[];
+    for (var i = 0; i < products.length; i++) {
+      final p = products[i];
+      rows.add({
+        'index': i + 1,
+        'name': p.name,
+        'category': p.category?.name ?? '-',
+        'karat': p.touch ?? p.karat ?? '-',
+        'netWt': p.netWeight ?? p.fineWeight,
+        'qty': quantities[i],
+      });
+    }
+
+    final pdfBytes = await compute(_buildCartEnquiryPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'rows': rows,
+      'imageBytesList': imageBytesList,
+    });
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = 'Cart_Enquiry_$timestamp.pdf';
+
+    return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+  }
 }
 
 Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
@@ -881,9 +984,9 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
     ),
   );
 
-  final colWidths = <double>[40, 200, 60, 100, 80];
+  final colWidths = <double>[36, 24, 125, 65, 50, 55, 34, 70, 65];
 
-  final tableHeaderStyle = pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColors.white);
+  final tableHeaderStyle = pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColor.fromHex('#FFFFFF'));
   final tableCellStyle = pw.TextStyle(font: regularFont, fontSize: 8.5, color: darkColor);
 
   pw.TableRow buildRow(List<String> cells, {bool isHeader = false, pw.MemoryImage? image, String? itemStatus}) {
@@ -962,15 +1065,20 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
   }
 
   final tableRows = <pw.TableRow>[
-    buildRow(['', 'Item', 'Qty', 'Price', 'Status'], isHeader: true),
+    buildRow(['#', 'Name', 'Category', 'Karat', 'Net Wt (g)', 'Qty', 'Price', 'Status'], isHeader: true),
     ...items.asMap().entries.map((entry) {
       final ci = entry.key;
       final item = entry.value;
       final imgBytes = ci < imageBytesList.length ? imageBytesList[ci] : null;
       final img = imgBytes != null ? pw.MemoryImage(imgBytes) : null;
       final itemStatus = item['isRejected'] == true ? 'Rejected' : 'Confirmed';
+      final netWt = item['netWeight'] as double?;
       return buildRow([
+        '${ci + 1}',
         item['name'] as String? ?? '-',
+        item['category'] as String? ?? '-',
+        item['karat'] as String? ?? '-',
+        netWt != null ? netWt.toStringAsFixed(2) : '-',
         '${item['quantity'] ?? 0}',
         '₹${(item['price'] as double? ?? 0).toStringAsFixed(2)}',
         itemStatus,
