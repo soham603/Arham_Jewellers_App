@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
@@ -39,6 +40,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   // ── Selection state ──────────────────────────────────────────
   final Set<String> _selectedProductIds = {};
   bool get _isSelectMode => _selectedProductIds.isNotEmpty;
+  bool get _isAdmin => Get.find<AuthController>().isAdmin;
 
   void _toggleSelection(String productId) {
     setState(() {
@@ -301,7 +303,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                 ),
                               );
                             },
-                      onLongPress: () => _toggleSelection(product.id),
+                      onLongPress: _isAdmin ? () => _toggleSelection(product.id) : null,
                     );
                   },
                 );
@@ -336,7 +338,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                               ),
                             );
                           },
-                    onLongPress: () => _toggleSelection(product.id),
+                    onLongPress: _isAdmin ? () => _toggleSelection(product.id) : null,
                   );
                 },
               );
@@ -361,14 +363,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
           const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _buildStockChip('Ready Stock', 'ready', Icons.check_circle_outline_rounded, context),
-                const SizedBox(width: 8),
-                _buildStockChip('Out of Stock', 'out', Icons.remove_circle_outline_rounded, context),
-                const SizedBox(width: 8),
-                _buildStockChip('Show All', 'all', Icons.select_all_rounded, context),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildStockChip('Ready Stock', 'ready', Icons.check_circle_outline_rounded, context),
+                  const SizedBox(width: 8),
+                  _buildStockChip('Out of Stock', 'out', Icons.remove_circle_outline_rounded, context),
+                  const SizedBox(width: 8),
+                  _buildStockChip('Show All', 'all', Icons.select_all_rounded, context),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 4),
@@ -401,6 +406,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                             fontWeight: FontWeight.w500,
                             color: context.colorPalette.goldDark,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),

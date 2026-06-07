@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -133,22 +131,6 @@ class _RegisterPageState extends State<RegisterPage> {
     stateFocusNode.dispose();
     cityFocusNode.dispose();
     super.dispose();
-  }
-
-  Future<String> getDeviceName() async {
-    final deviceInfo = DeviceInfoPlugin();
-    try {
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        return androidInfo.model;
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        return iosInfo.name;
-      }
-    } catch (e) {
-      return 'Unknown Device';
-    }
-    return 'Unknown Device';
   }
 
   @override

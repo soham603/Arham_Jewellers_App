@@ -277,44 +277,47 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             ],
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
-                          Row(
-                            children: [
-                              _itemDetailChip(
-                                context,
-                                label: "Qty: ${item.quantity}",
-                              ),
-                              if (item.price > 0) ...[
-                                SizedBox(width: context.getScreenWidth(2)),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
                                 _itemDetailChip(
                                   context,
-                                  label: "₹${item.price.toStringAsFixed(2)}",
+                                  label: "Qty: ${item.quantity}",
                                 ),
+                                if (item.price > 0) ...[
+                                  SizedBox(width: context.getScreenWidth(2)),
+                                  _itemDetailChip(
+                                    context,
+                                    label: "₹${item.price.toStringAsFixed(2)}",
+                                  ),
+                                ],
+                                ...() {
+                                  final chips = <Widget>[];
+                                  final rawData = controller.getProductRawData(item.product.id);
+                                  final netWtVal = rawData != null ? double.tryParse(rawData['NetWt']?.toString() ?? '') : null;
+                                  final fineWtVal = rawData != null ? double.tryParse(rawData['FineWt']?.toString() ?? '') : null;
+                                  final weight = netWtVal ?? fineWtVal;
+                                  if (weight != null) {
+                                    final isFallback = netWtVal == null;
+                                    chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                    chips.add(_itemDetailChip(
+                                      context,
+                                      label: "${isFallback ? 'Fine' : 'Net'}: ${weight.toStringAsFixed(2)}g",
+                                    ));
+                                  }
+                                  final sizeVal = rawData?['Size1']?.toString();
+                                  if (sizeVal != null && sizeVal.isNotEmpty) {
+                                    chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                    chips.add(_itemDetailChip(
+                                      context,
+                                      label: "Size: $sizeVal",
+                                    ));
+                                  }
+                                  return chips;
+                                }(),
                               ],
-                              ...() {
-                                final chips = <Widget>[];
-                                final rawData = controller.getProductRawData(item.product.id);
-                                final netWtVal = rawData != null ? double.tryParse(rawData['NetWt']?.toString() ?? '') : null;
-                                final fineWtVal = rawData != null ? double.tryParse(rawData['FineWt']?.toString() ?? '') : null;
-                                final weight = netWtVal ?? fineWtVal;
-                                if (weight != null) {
-                                  final isFallback = netWtVal == null;
-                                  chips.add(SizedBox(width: context.getScreenWidth(2)));
-                                  chips.add(_itemDetailChip(
-                                    context,
-                                    label: "${isFallback ? 'Fine' : 'Net'}: ${weight.toStringAsFixed(2)}g",
-                                  ));
-                                }
-                                final sizeVal = rawData?['Size1']?.toString();
-                                if (sizeVal != null && sizeVal.isNotEmpty) {
-                                  chips.add(SizedBox(width: context.getScreenWidth(2)));
-                                  chips.add(_itemDetailChip(
-                                    context,
-                                    label: "Size: $sizeVal",
-                                  ));
-                                }
-                                return chips;
-                              }(),
-                            ],
+                            ),
                           ),
 
                         ],
@@ -481,24 +484,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       children: [
         Icon(icon, size: context.getScreenWidth(4.5), color: AppColors.textMuted),
         SizedBox(width: context.getScreenWidth(2.5)),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: context.getScreenWidth(2.8),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: context.getScreenWidth(2.8),
+                ),
               ),
-            ),
-            Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: context.getScreenWidth(3.6),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: context.getScreenWidth(3.6),
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
