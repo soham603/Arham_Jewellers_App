@@ -9,16 +9,9 @@ class LogColors {
   static const String blue = '\x1B[34m';
   static const String magenta = '\x1B[35m';
   static const String cyan = '\x1B[36m';
-  static const String white = '\x1B[37m';
 }
 
 class Logger {
-  static void debug(String tag, dynamic message) {
-    final msg =
-        "${LogColors.cyan}[DEBUG][$tag]${LogColors.reset} $message";
-    _log(msg);
-  }
-
   static void info(String tag, dynamic message) {
     final msg =
         "${LogColors.green}[INFO][$tag]${LogColors.reset} $message";
@@ -40,12 +33,6 @@ class Logger {
     if (stackTrace != null) {
       _log("${LogColors.red}$stackTrace${LogColors.reset}");
     }
-  }
-
-  static void verbose(String tag, dynamic message) {
-    final msg =
-        "${LogColors.magenta}[VERBOSE][$tag]${LogColors.reset} $message";
-    _log(msg);
   }
 
   static void _log(String message) {

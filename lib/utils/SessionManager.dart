@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -21,9 +20,6 @@ class SessionManager {
   factory SessionManager() => _instance;
 
   SessionManager._internal();
-
-  final _tokenController = StreamController<bool>.broadcast();
-  Stream<bool> get tokenStatusStream => _tokenController.stream;
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -48,13 +44,11 @@ class SessionManager {
       await prefs.setString(
           DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, refreshExpiry.toString());
 
-      _tokenController.add(true);
       Logger.info("SessionManager", "Tokens saved");
       return true;
     } catch (e, st) {
       Logger.error("SessionManager", "Error saving tokens → $e",
           stackTrace: st);
-      _tokenController.add(false);
       return false;
     }
   }
@@ -113,7 +107,6 @@ class SessionManager {
       await prefs.remove(DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
       await prefs.remove(DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
 
-      _tokenController.add(false);
       Logger.info("SessionManager", "Tokens cleared");
       return true;
     } catch (e, st) {
@@ -198,9 +191,5 @@ class SessionManager {
     await clearTokens();
     await clearUser();
     await clearFcmToken();
-  }
-
-  void dispose() {
-    _tokenController.close();
   }
 }

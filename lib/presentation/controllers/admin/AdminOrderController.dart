@@ -40,15 +40,31 @@ class AdminOrderController extends GetxController {
   bool get hasMore => _hasMore;
 
   final _productImageCache = <String, String?>{}.obs;
-  String? getProductImage(String productId) => _productImageCache[productId];
+  final _imageCacheTimestamp = <String, DateTime>{};
+  static const _cacheTTL = Duration(minutes: 5);
+  
+  String? getProductImage(String productId) {
+    final timestamp = _imageCacheTimestamp[productId];
+    if (timestamp != null && DateTime.now().difference(timestamp) > _cacheTTL) {
+      _productImageCache.remove(productId);
+      _imageCacheTimestamp.remove(productId);
+      return null;
+    }
+    return _productImageCache[productId];
+  }
 
   final _productRawDataCache = <String, Map<String, dynamic>>{};
   Map<String, dynamic>? getProductRawData(String productId) => _productRawDataCache[productId];
+  
+  bool _isInitialized = false;
 
   @override
   void onInit() {
     super.onInit();
-    fetchOrders();
+    if (!_isInitialized) {
+      _isInitialized = true;
+      fetchOrders();
+    }
   }
 
   @override
@@ -134,50 +150,62 @@ class AdminOrderController extends GetxController {
     }
   }
 
+  bool _isFetchingImages = false;
+
   Future<void> _fetchProductImages() async {
-    final uniqueProducts = <String, String>{};
-    for (final order in _orders) {
-      for (final item in order.orderItems) {
-        final id = item.product.id;
-        if (!_productImageCache.containsKey(id) &&
-            !uniqueProducts.containsKey(id)) {
-          uniqueProducts[id] = item.product.name;
-        }
-      }
-    }
+    if (_isFetchingImages) return;
+    _isFetchingImages = true;
 
-    if (uniqueProducts.isEmpty) return;
-
-    for (final entry in uniqueProducts.entries) {
-      try {
-        final response = await httpClient.get(
-          "/api/v1/products/search",
-          queryParameters: {
-            "search": entry.value,
-            "page": 1,
-            "limit": 10,
-            "showAll": true,
-          },
-        );
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final List raw = response.data['data']['data'] ?? [];
-          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
-                (p) => p?['id'] == entry.key,
-                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
-              );
-
-          if (match != null) {
-            final product = ProductModel.fromJson(match);
-            _productImageCache[entry.key] = product.displayImageUrl;
-            if (product.rawData != null) {
-              _productRawDataCache[entry.key] = product.rawData!;
-            }
+    try {
+      final uniqueProducts = <String, String>{};
+      for (final order in _orders) {
+        for (final item in order.orderItems) {
+          final id = item.product.id;
+          if (!_productImageCache.containsKey(id) &&
+              !uniqueProducts.containsKey(id)) {
+            uniqueProducts[id] = item.product.name;
           }
         }
-      } catch (e) {
-        Logger.error("AdminOrderController", "Image fetch failed for ${entry.key}: $e");
       }
+
+      if (uniqueProducts.isEmpty) return;
+
+      final futures = uniqueProducts.entries.map((entry) async {
+        try {
+          final response = await httpClient.get(
+            "/api/v1/products/search",
+            queryParameters: {
+              "search": entry.value,
+              "page": 1,
+              "limit": 10,
+              "showAll": true,
+            },
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final List raw = response.data['data']['data'] ?? [];
+            final match = raw.cast<Map<String, dynamic>?>().firstWhere(
+                  (p) => p?['id'] == entry.key,
+                  orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+                );
+
+            if (match != null) {
+              final product = ProductModel.fromJson(match);
+              _productImageCache[entry.key] = product.displayImageUrl;
+              _imageCacheTimestamp[entry.key] = DateTime.now();
+              if (product.rawData != null) {
+                _productRawDataCache[entry.key] = product.rawData!;
+              }
+            }
+          }
+        } catch (e) {
+          Logger.error("AdminOrderController", "Image fetch failed for ${entry.key}: $e");
+        }
+      });
+
+      await Future.wait(futures);
+    } finally {
+      _isFetchingImages = false;
     }
   }
 

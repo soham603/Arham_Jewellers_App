@@ -178,18 +178,29 @@ class SearchProductController extends GetxController {
 
   // ── Debounce ─────────────────────────────────────────────────────────────
   Timer? _debounce;
+  
+  bool _hasLoadedInitial = false;
 
   @override
   void onInit() {
     super.onInit();
     _loadRecentSearches();
-    loadInitialProducts();
+    // Removed: loadInitialProducts() — now called on-demand via ensureProductsLoaded()
   }
 
   @override
   void onClose() {
     _debounce?.cancel();
     super.onClose();
+  }
+
+  /// Ensures initial products are loaded on first use.
+  /// Call this when the user first interacts with search or scrolls.
+  void ensureProductsLoaded() {
+    if (!_hasLoadedInitial && _initialProducts.isEmpty) {
+      _hasLoadedInitial = true;
+      loadInitialProducts();
+    }
   }
 
   // ── Initial products (no search) ─────────────────────────────────────────
@@ -255,43 +266,56 @@ class SearchProductController extends GetxController {
       List<ProductModel> allFetched = [];
 
       if (_selectedCategoryIds.isNotEmpty) {
-        for (final categoryId in _selectedCategoryIds) {
-          final response = await httpClient.get(
-            "/api/v1/products/get-all",
-            queryParameters: {
-              "categoryId": categoryId,
-              "page": _filteredInitialPage,
-              "limit": _pageLimit,
-              "showReverse": true,
-              if (_stockFilter.value != 'ready') "showAll": true,
-            },
-          );
+        final categoryFutures = _selectedCategoryIds.map((categoryId) async {
+          try {
+            final response = await httpClient.get(
+              "/api/v1/products/get-all",
+              queryParameters: {
+                "categoryId": categoryId,
+                "page": _filteredInitialPage,
+                "limit": _pageLimit,
+                "showReverse": true,
+                if (_stockFilter.value != 'ready') "showAll": true,
+              },
+            );
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final data = response.data['data'];
-            final List raw = data['data'] is List ? data['data'] : [];
-            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              final data = response.data['data'];
+              final List raw = data['data'] is List ? data['data'] : [];
+              return raw.map((e) => ProductModel.fromJson(e)).toList();
+            }
+          } catch (e) {
+            Logger.error("SearchProductController", "Failed to fetch category $categoryId: $e");
           }
-        }
+          return <ProductModel>[];
+        });
+        final results = await Future.wait(categoryFutures);
+        allFetched = results.expand((list) => list).toList();
       } else if (_selectedKarats.isNotEmpty) {
-        // Karat only, no category — use search endpoint
-        for (final karat in _selectedKarats) {
-          final response = await httpClient.get(
-            "/api/v1/products/search",
-            queryParameters: {
-              "search": _karatToSearchValue(karat),
-              "page": _filteredInitialPage,
-              "limit": _pageLimit,
-              if (_stockFilter.value != 'ready') "showAll": true,
-            },
-          );
+        final karatFutures = _selectedKarats.map((karat) async {
+          try {
+            final response = await httpClient.get(
+              "/api/v1/products/search",
+              queryParameters: {
+                "search": _karatToSearchValue(karat),
+                "page": _filteredInitialPage,
+                "limit": _pageLimit,
+                if (_stockFilter.value != 'ready') "showAll": true,
+              },
+            );
 
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final data = response.data['data'];
-            final List raw = data['data'] is List ? data['data'] : [];
-            allFetched.addAll(raw.map((e) => ProductModel.fromJson(e)).toList());
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              final data = response.data['data'];
+              final List raw = data['data'] is List ? data['data'] : [];
+              return raw.map((e) => ProductModel.fromJson(e)).toList();
+            }
+          } catch (e) {
+            Logger.error("SearchProductController", "Failed to fetch karat $karat: $e");
           }
-        }
+          return <ProductModel>[];
+        });
+        final results = await Future.wait(karatFutures);
+        allFetched = results.expand((list) => list).toList();
       } else {
         // No filters
         final response = await httpClient.get(
@@ -547,25 +571,29 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      List<ProductModel> allFetched = [];
+      final karatFutures = karats.map((karat) async {
+        try {
+          final response = await httpClient.get(
+            "/api/v1/products/search",
+            queryParameters: {
+              "search": _karatToSearchValue(karat),
+              "page": _karatPage,
+              "limit": _pageLimit,
+            },
+          );
 
-      for (final karat in karats) {
-        final response = await httpClient.get(
-          "/api/v1/products/search",
-          queryParameters: {
-            "search": _karatToSearchValue(karat),
-            "page": _karatPage,
-            "limit": _pageLimit,
-          },
-        );
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final data = response.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-          allFetched.addAll(fetched);
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            return raw.map((e) => ProductModel.fromJson(e)).toList();
+          }
+        } catch (e) {
+          Logger.error("SearchProductController", "Failed to fetch karat $karat: $e");
         }
-      }
+        return <ProductModel>[];
+      });
+      final results = await Future.wait(karatFutures);
+      final allFetched = results.expand((list) => list).toList();
 
       if (isPagination) {
         _karatProducts.addAll(allFetched);

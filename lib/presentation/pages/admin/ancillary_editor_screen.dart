@@ -5,8 +5,7 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
-// 🔥 Exact import path pointing to your new controller
-import 'package:ratnesh_gold_app/presentation/controllers/admin/ancillary_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
 
 class AncillaryEditorScreen extends StatefulWidget {
   final String category;
@@ -20,7 +19,6 @@ class AncillaryEditorScreen extends StatefulWidget {
 class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
   final HtmlEditorController controller = HtmlEditorController();
 
-  // 🔥 Properly instantiating the controller here
   final AncillaryController apiController = Get.put(AncillaryController());
 
   bool isLoading = true;
@@ -33,9 +31,7 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
   }
 
   Future<void> _loadInitialHtml() async {
-    final initialContent = await apiController.fetchAncillaryHtml(
-      widget.category,
-    );
+    await apiController.fetchPage(widget.category);
 
     if (mounted) {
       setState(() {
@@ -43,8 +39,9 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
       });
     }
 
+    final page = apiController.getPage(widget.category);
     Future.delayed(const Duration(milliseconds: 500), () {
-      controller.setText(initialContent ?? "");
+      controller.setText(page?.content ?? "");
     });
   }
 
@@ -88,9 +85,11 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
                 setState(() => isSaving = true);
 
                 final htmlText = await controller.getText();
-                final success = await apiController.updateAncillaryHtml(
-                  widget.category,
-                  htmlText,
+                final page = apiController.getPage(widget.category);
+                final success = await apiController.updatePage(
+                  pageKey: widget.category,
+                  title: page?.title ?? widget.category,
+                  content: htmlText,
                 );
 
                 setState(() => isSaving = false);

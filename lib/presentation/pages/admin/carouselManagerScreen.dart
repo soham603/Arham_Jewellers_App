@@ -1135,12 +1135,13 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               SizedBox(height: context.getScreenHeight(2)),
 
               // ── Image Picker ────────────────────────────────────────────
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: context.getScreenHeight(20),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
+              AspectRatio(
+                aspectRatio: 2.0,
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                     color: context.colorPalette.boxColor,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
@@ -1225,9 +1226,30 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             ],
                           ],
                         ),
+                    ),
+                  ),
                 ),
+              SizedBox(height: context.getScreenHeight(1)),
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: context.getScreenWidth(3.5),
+                    color: context.colorPalette.subTitleColor,
+                  ),
+                  SizedBox(width: context.getScreenWidth(1.5)),
+                  Expanded(
+                    child: Text(
+                      'Recommended: 2:1 ratio (e.g. 1920x960) for best results',
+                      style: TextStyle(
+                        color: context.colorPalette.subTitleColor,
+                        fontSize: context.getScreenWidth(2.8),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.getScreenHeight(1)),
 
               // ── Title ─────────────────────────────────────────────────────
               _buildField(

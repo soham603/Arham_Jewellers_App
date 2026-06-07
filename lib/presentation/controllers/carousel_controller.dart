@@ -67,12 +67,17 @@ class CarouselsController extends GetxController {
 
   int _productPage = 1;
   final int _productLimit = 10;
+  
+  bool _isInitialized = false;
 
   @override
   void onInit() {
     super.onInit();
-    getAllCarousels();
-    loadLatestProducts();
+    if (!_isInitialized) {
+      _isInitialized = true;
+      getAllCarousels();
+      loadLatestProducts();
+    }
   }
 
   Future<void> getAllCarousels() async {
