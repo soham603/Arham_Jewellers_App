@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -23,6 +24,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
   late final UserOrderController _orderController;
   final ScrollController _scrollController = ScrollController();
   late final TabController _tabController;
+  DateTime? _lastBackPress;
 
   static const _tabs = ['All', 'Pending', 'Approved', 'Rejected'];
   static const _filters = ['all', 'pending', 'approved', 'rejected'];
@@ -129,9 +131,29 @@ class _MyOrdersPageState extends State<MyOrdersPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.pageBg,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastBackPress != null && now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
+          SystemNavigator.pop();
+        } else {
+          _lastBackPress = now;
+          HapticFeedback.lightImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Press back again to exit'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.pageBg,
+        appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
         leading: IconButton(
@@ -194,6 +216,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         ],
       ),
       ),
+    ),
     );
   }
 }

@@ -114,13 +114,16 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
 
-    return Scaffold(
-      backgroundColor: palette.pageBackgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
-          child: Column(
-            children: [
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {},
+      child: Scaffold(
+        backgroundColor: palette.pageBackgroundColor,
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
+            child: Column(
+              children: [
               const Spacer(flex: 2),
               AnimatedBuilder(
                 animation: _controller,
@@ -218,6 +221,7 @@ class _SplashPageState extends State<SplashPage>
           ),
         ),
       ),
+    ),
     );
   }
 }

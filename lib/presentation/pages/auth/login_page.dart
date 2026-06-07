@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
@@ -33,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isAdminLogin = false;
   bool _obscurePassword = true;
   String selectedCountryCode = "+91";
+  DateTime? _lastBackPress;
 
   void validateForm() {
     setState(() {
@@ -59,52 +61,73 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final hasKeyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(5),
-                        vertical: context.getScreenHeight(2),
-                      ),
-                      child: Column(
-                        children: [
-                          // 1. Logo & Header
-                          _buildTopSection(context, hasKeyboard: hasKeyboard),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        final now = DateTime.now();
+        if (_lastBackPress != null && now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
+          SystemNavigator.pop();
+        } else {
+          _lastBackPress = now;
+          HapticFeedback.lightImpact();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Press back again to exit'),
+              duration: Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+            ),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getScreenWidth(5),
+                          vertical: context.getScreenHeight(2),
+                        ),
+                        child: Column(
+                          children: [
+                            // 1. Logo & Header
+                            _buildTopSection(context, hasKeyboard: hasKeyboard),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                            SizedBox(height: context.getScreenHeight(2)),
 
-                          // 2. Form
-                          Expanded(
-                            child: Center(
-                              child: Form(
-                                key: _formKey,
-                                child: _buildFormSection(context),
+                            // 2. Form
+                            Expanded(
+                              child: Center(
+                                child: Form(
+                                  key: _formKey,
+                                  child: _buildFormSection(context),
+                                ),
                               ),
                             ),
-                          ),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                            SizedBox(height: context.getScreenHeight(2)),
 
-                          // 3. Bottom Links & Terms
-                          _buildBottomSection(context),
-                        ],
+                            // 3. Bottom Links & Terms
+                            _buildBottomSection(context),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -252,21 +275,6 @@ class _LoginPageState extends State<LoginPage> {
               }
               return null;
             },
-          ),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: () {},
-              child: Text(
-                'Forgot Password?',
-                style: TextStyle(
-                  fontSize: context.getScreenWidth(3.2),
-                  color: AppColors.primaryGold,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
           ),
 
           SizedBox(height: context.getScreenHeight(2)),
