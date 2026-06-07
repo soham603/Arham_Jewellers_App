@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
-import '../../app/routes/app_routes.dart';
 import '../../presentation/controllers/CategoryController.dart';
 import '../../presentation/controllers/navigation_controller.dart';
 
@@ -79,11 +78,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
 
     return GestureDetector(
       onTap: () {
-        try {
-          Get.find<NavigationController>().switchTab(AppRoutes.tabIndexSearch);
-        } catch (_) {
-          Get.toNamed(AppRoutes.search);
-        }
+        Get.find<NavigationController>().switchTab(1);
       },
 
       child: Container(

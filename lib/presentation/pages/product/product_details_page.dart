@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -233,7 +232,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                             onPressed: () {
                               Navigator.of(context).pop();
-                              Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
+                              Get.find<NavigationController>().switchTab(2);
                             },
                             child: Text(
                               'View Cart',
@@ -538,12 +537,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Specification",
-                            style: TextStyle(
-                              fontSize: context.getScreenWidth(5),
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF2C3E50),
+                          Flexible(
+                            child: Text(
+                              "Specification",
+                              style: TextStyle(
+                                fontSize: context.getScreenWidth(5),
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF2C3E50),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           ElevatedButton.icon(
@@ -729,22 +731,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildTrustBadge(
-                              context,
-                              Icons.local_shipping_outlined,
-                              "Pan-India\nShipping",
+                            Expanded(
+                              child: _buildTrustBadge(
+                                context,
+                                Icons.local_shipping_outlined,
+                                "Pan-India\nShipping",
+                              ),
                             ),
-                            _buildTrustBadge(
-                              context,
-                              Icons.verified_outlined,
-                              "Certified\nQuality",
+                            Expanded(
+                              child: _buildTrustBadge(
+                                context,
+                                Icons.verified_outlined,
+                                "Certified\nQuality",
+                              ),
                             ),
-                            _buildTrustBadge(
-                              context,
-                              Icons.star_border,
-                              "Premium\nFinish",
+                            Expanded(
+                              child: _buildTrustBadge(
+                                context,
+                                Icons.star_border,
+                                "Premium\nFinish",
+                              ),
                             ),
                           ],
                         ),
@@ -830,6 +837,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   // --- Helper Widget for Trust Badges ---
   Widget _buildTrustBadge(BuildContext context, IconData icon, String text) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           icon,

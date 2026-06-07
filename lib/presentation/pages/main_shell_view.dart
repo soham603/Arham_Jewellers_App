@@ -52,10 +52,7 @@ class MainShellView extends GetView<NavigationController> {
           backgroundColor: Colors.white,
           body: SafeArea(
             bottom: false,
-            child: IndexedStack(
-              index: index,
-              children: pages,
-            ),
+            child: pages[index],
           ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: index,

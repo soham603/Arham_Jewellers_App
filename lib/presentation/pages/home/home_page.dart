@@ -60,14 +60,8 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) setState(() => _showCollectionShimmer = false);
     });
-    if (carouselController.list.isEmpty) {
-      carouselController.getAllCarousels();
-    }
-    if (categoryController.k18Categories.isEmpty) {
-      // Use full=false for initial load (only level-1 & level-2)
-      // Level-3 will be fetched on-demand when a level-2 is expanded
-      categoryController.fetchCategoryTree(full: false);
-    }
+    // CategoryController fetches tree eagerly in onInit()
+    // No need to fetch here
     _startCarouselAutoSlide();
   }
 
@@ -103,8 +97,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> _onRefresh() async {
     await Future.wait([
       carouselController.getAllCarousels(),
-      // On pull-to-refresh, fetch full tree (level-3 included)
-      categoryController.fetchCategoryTree(full: true),
+      // On pull-to-refresh, refresh tree data
+      categoryController.fetchCategoryTree(),
       carouselController.loadLatestProducts(),
     ]);
   }
@@ -1355,44 +1349,48 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
 
       child: Row(
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const LogoWidget(
-                logoSize: 36,
-                showIcon: true,
-                showName: false,
-                showSubtitle: false,
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'RATNESHGOLD',
-                    style: GoogleFonts.bodoniModa(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
-                      color: context.colorPalette.goldDeep,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const LogoWidget(
+                  logoSize: 36,
+                  showIcon: true,
+                  showName: false,
+                  showSubtitle: false,
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'RATNESHGOLD',
+                      style: GoogleFonts.bodoniModa(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        color: context.colorPalette.goldDeep,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Purity • Quality • Trust',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: context.colorPalette.goldDark,
-                      letterSpacing: 0.3,
+                    Text(
+                      'Purity • Quality • Trust',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: context.colorPalette.goldDark,
+                        letterSpacing: 0.3,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
 
           const Spacer(),
@@ -1412,11 +1410,7 @@ class _TopBar extends StatelessWidget {
             return auth.isAdmin ? const SizedBox() : _IconBtn(
               icon: Icons.shopping_bag_outlined,
               onTap: () {
-                try {
-                  Get.find<NavigationController>().switchTab(AppRoutes.tabIndexCart);
-                } catch (_) {
-                  Get.toNamed(AppRoutes.cart);
-                }
+                Get.find<NavigationController>().switchTab(2);
               },
             );
           }),
@@ -1589,8 +1583,8 @@ class _CarouselSection extends StatelessWidget {
 
       return Column(
         children: [
-          SizedBox(
-            height: context.getScreenHeight(22),
+          AspectRatio(
+            aspectRatio: 2.0,
 
             child: PageView.builder(
               controller: pageController,
@@ -1684,12 +1678,15 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: context.colorPalette.goldDeep,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: context.colorPalette.goldDeep,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             if (badge != null) ...[

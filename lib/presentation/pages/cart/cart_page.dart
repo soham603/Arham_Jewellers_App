@@ -709,7 +709,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ),
                 onPressed: () {
-                  Get.find<NavigationController>().switchTab(AppRoutes.tabIndexSearch);
+                  Get.find<NavigationController>().switchTab(1);
                 },
                 child: Text(
                   'Browse Products',
@@ -738,12 +738,15 @@ class _CartPageState extends State<CartPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            left,
-            style: TextStyle(
-              fontSize: context.getScreenWidth(bold ? 4.3 : 4),
-              color: bold ? AppColors.textDark : AppColors.textMuted,
-              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+          Flexible(
+            child: Text(
+              left,
+              style: TextStyle(
+                fontSize: context.getScreenWidth(bold ? 4.3 : 4),
+                color: bold ? AppColors.textDark : AppColors.textMuted,
+                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           Text(
