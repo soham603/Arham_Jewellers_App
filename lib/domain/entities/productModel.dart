@@ -322,7 +322,9 @@ class ProductModel {
   /// Example:
   /// product.size
   String? get size {
-    return rawData?['Size1'];
+    final value = rawData?['Size1'];
+    if (value == null) return null;
+    return value.toString();
   }
 
   /// Example:

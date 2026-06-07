@@ -10,6 +10,30 @@ class AdminOrderModel {
   final AdminOrderUserModel user;
   final List<AdminOrderItemModel> orderItems;
 
+  // Custom order fields
+  final String? productId;
+  final String? partyCode;
+  final String? partyName;
+  final String? area;
+  final String? contactNumber;
+  final String? itemName;
+  final String? weight;
+  final String? noOfPieces;
+  final String? size;
+  final String? lengthBroadness;
+  final String? productDescription;
+  final String? purity;
+  final String? style;
+  final String? marking;
+  final List<String> referenceImages;
+  final String? assignedKarigarId;
+  final String? assignedKarigarName;
+  final String? talkedToStaffName;
+  final String? assignAdminNotes;
+  final String? completeAdminNotes;
+  final String? deliveryDate;
+  final bool isCustomOrder;
+
   AdminOrderModel({
     required this.id,
     required this.status,
@@ -20,6 +44,28 @@ class AdminOrderModel {
     required this.isCustom,
     required this.user,
     required this.orderItems,
+    this.productId,
+    this.partyCode,
+    this.partyName,
+    this.area,
+    this.contactNumber,
+    this.itemName,
+    this.weight,
+    this.noOfPieces,
+    this.size,
+    this.lengthBroadness,
+    this.productDescription,
+    this.purity,
+    this.style,
+    this.marking,
+    this.referenceImages = const [],
+    this.assignedKarigarId,
+    this.assignedKarigarName,
+    this.talkedToStaffName,
+    this.assignAdminNotes,
+    this.completeAdminNotes,
+    this.deliveryDate,
+    this.isCustomOrder = false,
   });
 
   factory AdminOrderModel.fromJson(
@@ -48,7 +94,7 @@ class AdminOrderModel {
         json["updatedAt"],
       ),
 
-      isCustom: json["isCustom"] ?? false,
+      isCustom: json["isCustomOrder"] ?? json["isCustom"] ?? false,
 
       user: AdminOrderUserModel.fromJson(
         json["user"] ?? {},
@@ -63,6 +109,33 @@ class AdminOrderModel {
                 ),
               )
               : [],
+
+      // Custom order fields
+      productId: json["productId"]?.toString(),
+      partyCode: json["partyCode"]?.toString(),
+      partyName: json["partyName"]?.toString(),
+      area: json["area"]?.toString(),
+      contactNumber: json["contactNumber"]?.toString(),
+      itemName: json["itemName"]?.toString(),
+      weight: json["weight"]?.toString(),
+      noOfPieces: json["noOfPieces"]?.toString(),
+      size: json["size"]?.toString(),
+      lengthBroadness: json["lengthBroadness"]?.toString(),
+      productDescription: json["productDescription"]?.toString(),
+      purity: json["purity"]?.toString(),
+      style: json["style"]?.toString(),
+      marking: json["marking"]?.toString(),
+      referenceImages: json["referenceImages"] != null
+          ? List<String>.from(
+              (json["referenceImages"] as List).map((e) => e.toString()))
+          : [],
+      assignedKarigarId: json["assignedKarigarId"]?.toString(),
+      assignedKarigarName: json["assignedKarigarName"]?.toString(),
+      talkedToStaffName: json["talkedToStaffName"]?.toString(),
+      assignAdminNotes: json["assignAdminNotes"]?.toString(),
+      completeAdminNotes: json["completeAdminNotes"]?.toString(),
+      deliveryDate: json["deliveryDate"]?.toString(),
+      isCustomOrder: json["isCustomOrder"] ?? false,
     );
   }
 }
@@ -169,11 +242,13 @@ class AdminOrderProductModel {
   final String id;
   final String name;
   final String? imageUrl;
+  final Map<String, dynamic>? rawData;
 
   AdminOrderProductModel({
     required this.id,
     required this.name,
     this.imageUrl,
+    this.rawData,
   });
 
   factory AdminOrderProductModel.fromJson(
@@ -183,8 +258,29 @@ class AdminOrderProductModel {
       id: json["id"] ?? "",
       name: json["name"] ?? "",
       imageUrl: json["imageUrl"],
+      rawData: json["rawData"] != null
+          ? Map<String, dynamic>.from(json["rawData"])
+          : null,
     );
   }
 
   String? get displayImageUrl => imageUrl;
+
+  double? get netWeight {
+    final value = rawData?['NetWt'];
+    if (value == null) return null;
+    return double.tryParse(value.toString());
+  }
+
+  double? get fineWeight {
+    final value = rawData?['FineWt'];
+    if (value == null) return null;
+    return double.tryParse(value.toString());
+  }
+
+  String? get size {
+    final value = rawData?['Size1'];
+    if (value == null) return null;
+    return value.toString();
+  }
 }
