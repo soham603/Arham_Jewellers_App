@@ -260,7 +260,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               top: 0,
               left: 0,
               right: 0,
-              height: context.getScreenHeight(45),
+              height: context.getScreenHeight(38),
               child: Stack(
                 children: [
                   Container(
@@ -434,7 +434,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             // --- 2. Curved Bottom Sheet (Details) ---
             Positioned(
-              top: context.getScreenHeight(40),
+              top: context.getScreenHeight(33),
               left: 0,
               right: 0,
               bottom: 0,
@@ -446,16 +446,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
                     context.getScreenWidth(5),
-                    context.getScreenHeight(3),
+                    context.getScreenHeight(2),
                     context.getScreenWidth(5),
-                    context.getScreenHeight(4),
+                    context.getScreenHeight(3),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Product Title
                       Text(
-                        widget.product.name.toUpperCase(),
+                        widget.product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim().toUpperCase(),
                         style: TextStyle(
                           fontSize: context.getScreenWidth(6.5),
                           fontWeight: FontWeight.w900,
@@ -465,7 +465,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(0.5)),
+                      SizedBox(height: context.getScreenHeight(0.3)),
 
                       // Tag Number
                       Text(
@@ -477,7 +477,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.getScreenHeight(1)),
 
                       // Price
                       if (price != null && (Get.find<AuthController>().user?.isRetailer == true || Get.find<AuthController>().isAdmin))
@@ -485,7 +485,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
                             horizontal: context.getScreenWidth(4),
-                            vertical: context.getScreenHeight(1.2),
+                            vertical: context.getScreenHeight(0.8),
                           ),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -503,12 +503,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.currency_rupee,
-                                color: AppColors.primaryGold,
-                                size: context.getScreenWidth(6),
-                              ),
-                              SizedBox(width: context.getScreenWidth(2)),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -535,7 +529,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                         ),
 
-                      SizedBox(height: context.getScreenHeight(2.5)),
+                      SizedBox(height: context.getScreenHeight(1.5)),
 
                       // Specifications Header & Customize Button
                       Row(
@@ -588,7 +582,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ],
                       ),
 
-                      SizedBox(height: context.getScreenHeight(2)),
+                      SizedBox(height: context.getScreenHeight(1)),
 
                       // 2x2 Specifications Grid
                       if (grossWeight != null || netWeight != null) ...[
@@ -616,7 +610,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               ),
                           ],
                         ),
-                        SizedBox(height: context.getScreenHeight(1.5)),
+                        SizedBox(height: context.getScreenHeight(1)),
                         Row(
                           children: [
                             if (netWeight != null)
@@ -666,10 +660,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ],
 
-                      SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.getScreenHeight(1)),
 
                       // Size (Full Width)
-                      if (size != null) ...[
+                      if (size != null && size.isNotEmpty) ...[
                         SizedBox(
                           width: double.infinity,
                           child: _buildSpecBox(
@@ -679,7 +673,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             size,
                           ),
                         ),
-                        SizedBox(height: context.getScreenHeight(1.5)),
+                        SizedBox(height: context.getScreenHeight(1)),
                       ],
 
                       // 5th Specification (Full Width Collection Name)
@@ -693,7 +687,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(3)),
+                      SizedBox(height: context.getScreenHeight(1.5)),
 
                       // Description Header
                       Text(
@@ -705,11 +699,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(1)),
+                      SizedBox(height: context.getScreenHeight(0.5)),
 
                       // Dynamic Description Text
                       Text(
-                        "Elegant ${widget.product.name} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
+                        "Elegant ${widget.product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
                         style: TextStyle(
                           fontSize: context.getScreenWidth(3.8),
                           color: Colors.grey.shade700,
@@ -717,12 +711,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(3)),
+                      SizedBox(height: context.getScreenHeight(1.5)),
 
                       // Trust Badges Box
                       Container(
                         padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(2),
+                          vertical: context.getScreenHeight(1.2),
                         ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFF9F6F0),
@@ -773,7 +767,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.getScreenWidth(3),
-        vertical: context.getScreenHeight(1.5),
+        vertical: context.getScreenHeight(1),
       ),
       decoration: BoxDecoration(
         color: Colors.white,

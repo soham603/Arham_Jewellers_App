@@ -214,7 +214,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   Future<void> _pickImage(ImageSource source, int index) async {
     try {
-      final XFile? image = await _picker.pickImage(source: source);
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 90,
+      );
       if (image != null) {
         setState(() {
           referenceImages[index] = File(image.path);
@@ -344,6 +349,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                       }
                     } else {
                       final success = await _customOrderController.createCustomOrder(
+                        productId: widget.product?.id,
                         partyCode: partyCodeCtrl.text.trim(),
                         partyName: partyNameCtrl.text.trim(),
                         area: areaCtrl.text.trim(),

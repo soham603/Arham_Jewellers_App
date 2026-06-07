@@ -10,10 +10,14 @@ class ProductListTile extends StatelessWidget {
     super.key,
     required this.product,
     required this.onTap,
+    this.onLongPress,
+    this.isSelected = false,
   });
 
   final ProductModel product;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -24,20 +28,27 @@ class ProductListTile extends StatelessWidget {
     final fineWeight = _formatValue(product.fineWeight);
     final grossWeight = _formatValue(product.grossWeight);
     final touchData = _parseTouch(product.touch);
+    final size = _cleanText(product.size);
 
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE7E2DB)),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGold : const Color(0xFFE7E2DB),
+            width: isSelected ? 2.0 : 1.0,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
+              color: isSelected
+                  ? AppColors.primaryGold.withOpacity(0.15)
+                  : Colors.black.withOpacity(0.04),
+              blurRadius: isSelected ? 10 : 6,
               offset: const Offset(0, 1),
             ),
           ],
@@ -45,27 +56,54 @@ class ProductListTile extends StatelessWidget {
         child: Row(
           children: [
             // Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 80,
-                height: 80,
-                child: imageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: const Color(0xFFE8E3DB),
-                          highlightColor: const Color(0xFFF7F3ED),
-                          child: const DecoratedBox(
-                            decoration: BoxDecoration(color: Colors.white),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: imageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: const Color(0xFFE8E3DB),
+                              highlightColor: const Color(0xFFF7F3ED),
+                              child: const DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.white),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const RatneshFallback.s(),
+                          )
+                        : const RatneshFallback.s(),
+                  ),
+                ),
+                if (isSelected)
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGold,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 3,
                           ),
-                        ),
-                        errorWidget: (context, url, error) =>
-                            const RatneshFallback.s(),
-                      )
-                    : const RatneshFallback.s(),
-              ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 12),
             // Details
@@ -126,6 +164,7 @@ class ProductListTile extends StatelessWidget {
                       if (fineWeight != null && fineWeight != grossWeight)
                         _InfoChip(label: 'Fine: ${fineWeight}g'),
                       if (touchData != null) _InfoChip(label: touchData),
+                      if (size != null) _InfoChip(label: 'Size: $size'),
                     ],
                   ),
                 ],
