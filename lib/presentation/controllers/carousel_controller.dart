@@ -233,7 +233,15 @@ class CarouselsController extends GetxController {
           response.data['message'] ?? 'Create failed';
     } catch (e) {
       _createState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      if (e is DioException) {
+        _error.value =
+            e.response?.data?['message']?.toString() ??
+            e.error?.toString() ??
+            e.message ??
+            'Create failed';
+      } else {
+        _error.value = 'Create failed';
+      }
 
       Logger.error(
         "CarouselsController",
@@ -356,7 +364,15 @@ class CarouselsController extends GetxController {
     } catch (e) {
       _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      if (e is DioException) {
+        _error.value =
+            e.response?.data?['message']?.toString() ??
+            e.error?.toString() ??
+            e.message ??
+            'Edit failed';
+      } else {
+        _error.value = 'Edit failed';
+      }
 
       Logger.error(
         "CarouselsController",
@@ -410,7 +426,15 @@ class CarouselsController extends GetxController {
     } catch (e) {
       _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      if (e is DioException) {
+        _error.value =
+            e.response?.data?['message']?.toString() ??
+            e.error?.toString() ??
+            e.message ??
+            'Delete failed';
+      } else {
+        _error.value = 'Delete failed';
+      }
 
       Logger.error(
         "CarouselsController",
@@ -459,7 +483,15 @@ class CarouselsController extends GetxController {
     } catch (e) {
       _restoreLoadingId.value = '';
       _restoreState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      if (e is DioException) {
+        _error.value =
+            e.response?.data?['message']?.toString() ??
+            e.error?.toString() ??
+            e.message ??
+            'Restore failed';
+      } else {
+        _error.value = 'Restore failed';
+      }
 
       Logger.error(
         "CarouselsController",
