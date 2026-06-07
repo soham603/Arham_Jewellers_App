@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:image/image.dart' as img;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -59,19 +60,52 @@ class ShareService {
     return '$_brandName\n$_brandSubtitle\n\nFilters: $filterInfo';
   }
 
-  static Future<Uint8List?> _downloadImage(String imageUrl) async {
+  /// Downloads an image and optionally compresses it.
+  /// [maxLongestEdge] — if the image's longest side exceeds this, it is scaled
+  /// down proportionally. No cropping is done.
+  /// [quality] — JPEG encoding quality (1–100). Higher = better quality.
+  static Future<Uint8List?> _downloadAndCompressImage(
+    String imageUrl, {
+    int? maxLongestEdge,
+    int quality = 92,
+  }) async {
     try {
       final response = await _dio.get<List<int>>(
         imageUrl,
         options: Options(responseType: ResponseType.bytes),
       );
       if (response.statusCode == 200 && response.data != null) {
-        return Uint8List.fromList(response.data!);
+        final bytes = Uint8List.fromList(response.data!);
+        if (maxLongestEdge == null) return bytes;
+        return _compressImage(bytes, maxLongestEdge: maxLongestEdge, quality: quality);
       }
     } catch (e) {
       Logger.error("ShareService", "Failed to download image: $imageUrl\n$e");
     }
     return null;
+  }
+
+  /// Compresses image bytes: resizes if longest edge exceeds [maxLongestEdge],
+  /// re-encodes as JPEG at given [quality]. No cropping — aspect ratio preserved.
+  static Uint8List? _compressImage(
+    Uint8List bytes, {
+    int maxLongestEdge = 1600,
+    int quality = 92,
+  }) {
+    final decoded = img.decodeJpg(bytes);
+    if (decoded == null) return bytes;
+
+    final longest = decoded.width > decoded.height ? decoded.width : decoded.height;
+    if (longest <= maxLongestEdge) return bytes;
+
+    final resized = img.copyResize(
+      decoded,
+      width: decoded.width >= decoded.height ? maxLongestEdge : null,
+      height: decoded.height > decoded.width ? maxLongestEdge : null,
+      interpolation: img.Interpolation.linear,
+    );
+
+    return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
   }
 
   static Future<void> shareImagesDirectly({
@@ -87,7 +121,11 @@ class ShareService {
       final imageUrl = product.displayImageUrl;
       if (imageUrl == null || imageUrl.isEmpty) return null;
 
-      final bytes = await _downloadImage(imageUrl);
+      final bytes = await _downloadAndCompressImage(
+        imageUrl,
+        maxLongestEdge: 1600,
+        quality: 92,
+      );
       if (bytes == null) return null;
 
       final fileName = 'product_${i + 1}_${product.id}.jpg';
@@ -114,6 +152,7 @@ class ShareService {
     required List<ProductModel> products,
     required String filterInfo,
     String? title,
+    int productsPerPage = 1,
   }) async {
     final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
     final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
@@ -121,30 +160,22 @@ class ShareService {
     final imageFutures = products.map((product) async {
       final imageUrl = product.displayImageUrl;
       if (imageUrl == null || imageUrl.isEmpty) return null;
-      return _downloadImage(imageUrl);
+      return _downloadAndCompressImage(
+        imageUrl,
+        maxLongestEdge: 2000,
+        quality: 90,
+      );
     }).toList();
 
     final imageBytesList = await Future.wait(imageFutures);
-
-    final productDataList = products.asMap().entries.map((entry) {
-      final i = entry.key;
-      final product = entry.value;
-      return {
-        'index': i,
-        'name': product.name,
-        'categoryName': product.category?.name,
-        'fineWeight': product.netWeight ?? product.fineWeight,
-        'touch': product.touch,
-      };
-    }).toList();
 
     final pdfBytes = await compute(_buildPdfInIsolate, {
       'arhamLogoBytes': arhamLogoBytes,
       'ratneshLogoBytes': ratneshLogoBytes,
       'imageBytesList': imageBytesList,
-      'productDataList': productDataList,
-      'title': title,
+      'filterInfo': filterInfo,
       'totalProducts': products.length,
+      'productsPerPage': productsPerPage,
     });
 
     final tempDir = await getTemporaryDirectory();
@@ -175,7 +206,7 @@ class ShareService {
     required String filterInfo,
     String? title,
   }) async {
-    final products = await _fetchProductsForCategories(categoryIds);
+    final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
     await shareImagesDirectly(products: products, filterInfo: filterInfo, title: title);
   }
@@ -185,16 +216,21 @@ class ShareService {
     required List<String> categoryIds,
     required String filterInfo,
     String? title,
+    int productsPerPage = 1,
   }) async {
-    final products = await _fetchProductsForCategories(categoryIds);
+    final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
-    await shareAsPdf(products: products, filterInfo: filterInfo, title: title);
+    await shareAsPdf(
+      products: products,
+      filterInfo: filterInfo,
+      title: title,
+      productsPerPage: productsPerPage,
+    );
   }
 
-  /// Fetches products for multiple category IDs (one request per category) and deduplicates.
-  static Future<List<ProductModel>> _fetchProductsForCategories(List<String> categoryIds) async {
-    final allProducts = <ProductModel>[];
-    final seen = <String>{};
+  /// Fetches the total product count for the given category IDs (lightweight — uses limit=1 per category).
+  static Future<int> fetchProductCount(List<String> categoryIds) async {
+    int totalCount = 0;
 
     for (final categoryId in categoryIds) {
       try {
@@ -203,19 +239,58 @@ class ShareService {
           queryParameters: {
             "categoryId": categoryId,
             "page": 1,
-            "limit": 500,
+            "limit": 1,
             "showReverse": true,
           },
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final data = response.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          for (final item in raw) {
-            final product = ProductModel.fromJson(item);
-            if (seen.add(product.id)) {
-              allProducts.add(product);
+          totalCount += (data['totalCount'] ?? 0) as int;
+        }
+      } catch (e) {
+        Logger.error("ShareService", "Failed to fetch product count for category $categoryId: $e");
+      }
+    }
+
+    return totalCount;
+  }
+
+  /// Fetches products for multiple category IDs (one request per category) and deduplicates.
+  static Future<List<ProductModel>> fetchProductsForCategories(List<String> categoryIds) async {
+    final allProducts = <ProductModel>[];
+    final seen = <String>{};
+
+    for (final categoryId in categoryIds) {
+      try {
+        int page = 1;
+        const int limit = 50;
+        bool hasMore = true;
+
+        while (hasMore) {
+          final response = await httpClient.get(
+            "/api/v1/products/get-all",
+            queryParameters: {
+              "categoryId": categoryId,
+              "page": page,
+              "limit": limit,
+              "showReverse": true,
+            },
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            for (final item in raw) {
+              final product = ProductModel.fromJson(item);
+              if (seen.add(product.id)) {
+                allProducts.add(product);
+              }
             }
+            hasMore = raw.length >= limit;
+            page++;
+          } else {
+            hasMore = false;
           }
         }
       } catch (e) {
@@ -236,7 +311,11 @@ class ShareService {
     final imageFutures = products.map((p) async {
       final url = p.displayImageUrl;
       if (url == null || url.isEmpty) return null;
-      return _downloadImage(url);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: 200,
+        quality: 80,
+      );
     }).toList();
     final imageBytesList = await Future.wait(imageFutures);
 
@@ -283,7 +362,11 @@ class ShareService {
     final imageFutures = items.map((item) async {
       final url = item['imageUrl'] as String?;
       if (url == null || url.isEmpty) return null;
-      return _downloadImage(url);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: 200,
+        quality: 80,
+      );
     }).toList();
     final imageBytesList = await Future.wait(imageFutures);
 
@@ -314,12 +397,9 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
   final arhamLogoBytes = params['arhamLogoBytes'] as Uint8List;
   final ratneshLogoBytes = params['ratneshLogoBytes'] as Uint8List;
   final imageBytesList = params['imageBytesList'] as List<Uint8List?>;
-  final productDataList = params['productDataList'] as List<Map<String, dynamic>>;
-  final title = params['title'] as String?;
+  final filterInfo = params['filterInfo'] as String;
   final totalProducts = params['totalProducts'] as int;
-
-  final brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
-  final brandSubtitle = 'Purity - Quality - Trust';
+  final productsPerPage = params['productsPerPage'] as int? ?? 1;
 
   final pdf = pw.Document();
 
@@ -330,6 +410,13 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
   final arhamLogo = pw.MemoryImage(arhamLogoBytes);
   final ratneshLogo = pw.MemoryImage(ratneshLogoBytes);
 
+  final goldColor = PdfColor.fromHex('#A57A36');
+  final darkColor = PdfColor.fromHex('#2D2118');
+
+  final brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
+  final brandSubtitle = 'Purity - Quality - Trust';
+
+  // High-contrast header page: dark background, light text
   final headerContent = pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.center,
     mainAxisAlignment: pw.MainAxisAlignment.center,
@@ -345,44 +432,27 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
       pw.SizedBox(height: 8),
       pw.Text(
         brandName,
-        style: pw.TextStyle(
-          font: brandFont,
-          fontSize: 24,
-          color: PdfColor.fromHex('#A57A36'),
-        ),
+        style: pw.TextStyle(font: brandFont, fontSize: 24, color: goldColor),
       ),
       pw.SizedBox(height: 4),
       pw.Text(
         brandSubtitle,
-        style: pw.TextStyle(
-          font: lightFont,
-          fontSize: 10,
-          color: PdfColor.fromHex('#7E756C'),
-        ),
+        style: pw.TextStyle(font: lightFont, fontSize: 10, color: PdfColors.white),
       ),
       pw.SizedBox(height: 12),
-      pw.Divider(color: PdfColor.fromHex('#A57A36'), thickness: 1),
+      pw.Divider(color: goldColor, thickness: 2),
       pw.SizedBox(height: 12),
-      if (title != null) ...[
+      if (filterInfo.isNotEmpty) ...[
         pw.Text(
-          title,
-          style: pw.TextStyle(
-            font: brandFont,
-            fontSize: 16,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColor.fromHex('#2D2118'),
-          ),
+          filterInfo,
+          style: pw.TextStyle(font: brandFont, fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
           textAlign: pw.TextAlign.center,
         ),
-        pw.SizedBox(height: 8),
+        pw.SizedBox(height: 10),
       ],
       pw.Text(
         'Total Products: $totalProducts',
-        style: pw.TextStyle(
-          font: regularFont,
-          fontSize: 11,
-          color: PdfColor.fromHex('#7E756C'),
-        ),
+        style: pw.TextStyle(font: regularFont, fontSize: 11, color: PdfColor.fromHex('#BBBBBB')),
       ),
     ],
   );
@@ -394,129 +464,110 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
       build: (context) => [
         pw.Container(
           height: PdfPageFormat.a4.height - 60,
+          decoration: pw.BoxDecoration(color: darkColor),
+          padding: const pw.EdgeInsets.all(30),
           child: pw.Center(child: headerContent),
         ),
       ],
     ),
   );
 
-  final productWidgets = <pw.Widget>[];
+  final totalPages = (totalProducts / productsPerPage).ceil();
 
-  for (var i = 0; i < productDataList.length; i++) {
-    final data = productDataList[i];
-    final imageBytes = imageBytesList[i];
+  const double gap = 8;
 
-    pw.MemoryImage? image;
-    if (imageBytes != null) {
-      image = pw.MemoryImage(imageBytes);
-    }
+  for (int page = 0; page < totalPages; page++) {
+    final startIndex = page * productsPerPage;
+    final endIndex = (startIndex + productsPerPage).clamp(0, totalProducts);
+    final pageCount = endIndex - startIndex;
 
-    final availableWidth = PdfPageFormat.a4.width - 60;
-    final maxImageHeight = 580.0;
-    double imageDisplayHeight = maxImageHeight;
-    if (image != null) {
-      final imgW = image.width?.toDouble() ?? availableWidth;
-      final imgH = image.height?.toDouble() ?? maxImageHeight;
-      final aspectRatio = imgH / imgW;
-      imageDisplayHeight = availableWidth * aspectRatio;
-      if (imageDisplayHeight > maxImageHeight) {
-        imageDisplayHeight = maxImageHeight;
+    if (productsPerPage == 4) {
+      final rowHeight = (PdfPageFormat.a4.height - 60 - gap) / 2;
+      final colWidth = (PdfPageFormat.a4.width - 60 - gap) / 2;
+
+      final rows = <pw.Widget>[];
+      for (int row = 0; row < 2; row++) {
+        final rowStart = row * 2;
+        final rowEnd = (rowStart + 2).clamp(0, pageCount);
+        if (rowStart >= pageCount) break;
+
+        final cols = <pw.Widget>[];
+        for (int j = rowStart; j < rowEnd; j++) {
+          final idx = startIndex + j;
+          final imageBytes = imageBytesList[idx];
+          if (imageBytes != null) {
+            cols.add(
+              pw.SizedBox(
+                width: colWidth,
+                height: rowHeight,
+                child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+              ),
+            );
+          } else {
+            cols.add(pw.SizedBox(width: colWidth, height: rowHeight));
+          }
+          if (j < rowEnd - 1) cols.add(pw.SizedBox(width: gap));
+        }
+        rows.add(pw.Row(children: cols));
+        if (row == 0 && rowEnd < pageCount) rows.add(pw.SizedBox(height: gap));
       }
-    }
 
-    final productWidget = pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        if (image != null)
-          pw.Container(
-            width: availableWidth,
-            height: imageDisplayHeight,
-            decoration: pw.BoxDecoration(
-              borderRadius: pw.BorderRadius.circular(4),
-            ),
-            child: pw.ClipRRect(
-              horizontalRadius: 4,
-              verticalRadius: 4,
-              child: pw.Image(image, fit: pw.BoxFit.contain),
-            ),
-          ),
-        pw.SizedBox(height: 14),
-        pw.Text(
-          (data['name'] as String).isNotEmpty
-              ? data['name'] as String
-              : 'Product ${i + 1}',
-          style: pw.TextStyle(
-            font: brandFont,
-            fontSize: 14,
-            color: PdfColor.fromHex('#2D2118'),
-          ),
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(30),
+          build: (context) => rows,
         ),
-        pw.SizedBox(height: 4),
-        if (data['categoryName'] != null)
-          pw.Text(
-            data['categoryName'] as String,
-            style: pw.TextStyle(
-              font: regularFont,
-              fontSize: 11,
-              color: PdfColor.fromHex('#7E756C'),
+      );
+    } else {
+      final totalGaps = (pageCount - 1) * gap;
+      final imageHeight = (PdfPageFormat.a4.height - 60 - totalGaps) / pageCount;
+
+      final images = <pw.Widget>[];
+      for (int j = 0; j < pageCount; j++) {
+        final idx = startIndex + j;
+        final imageBytes = imageBytesList[idx];
+        if (imageBytes != null) {
+          images.add(
+            pw.Container(
+              height: imageHeight,
+              child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
             ),
-          ),
-        pw.SizedBox(height: 8),
-        pw.Row(
-          children: [
-            _infoChip(
-              'Weight',
-              data['fineWeight'] != null
-                  ? '${(data['fineWeight'] as double).toStringAsFixed(1)}g'
-                  : '-',
-              regularFont,
-              brandFont,
-            ),
-            pw.SizedBox(width: 12),
-            _infoChip(
-              'Touch',
-              (data['touch'] as String?) ?? '-',
-              regularFont,
-              brandFont,
+          );
+        } else {
+          images.add(pw.Container(height: imageHeight));
+        }
+      }
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(30),
+          build: (context) => [
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+              children: [
+                for (int i = 0; i < images.length; i++) ...[
+                  if (i > 0) pw.SizedBox(height: gap),
+                  images[i],
+                ],
+              ],
             ),
           ],
         ),
-      ],
-    );
-
-    productWidgets.add(productWidget);
-  }
-
-  for (int page = 0; page < totalProducts; page++) {
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(30),
-        build: (context) => [productWidgets[page]],
-        footer: (context) => pw.Container(
-          alignment: pw.Alignment.centerRight,
-          child: pw.Text(
-            'Page ${page + 2} of ${totalProducts + 1}',
-            style: pw.TextStyle(
-              font: lightFont,
-              fontSize: 8,
-              color: PdfColor.fromHex('#7E756C'),
-            ),
-          ),
-        ),
-      ),
-    );
+      );
+    }
   }
 
   return await pdf.save();
 }
 
-pw.Widget _infoChip(String label, String value, pw.Font regularFont, pw.Font boldFont) {
+pw.Widget _infoChipCompact(String label, String value, pw.Font regularFont, pw.Font boldFont, {double fontSize = 8}) {
   return pw.Container(
-    padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+    padding: pw.EdgeInsets.symmetric(horizontal: fontSize * 0.5, vertical: fontSize * 0.25),
     decoration: pw.BoxDecoration(
       color: PdfColor.fromHex('#F1EEE9'),
-      borderRadius: pw.BorderRadius.circular(3),
+      borderRadius: pw.BorderRadius.circular(2),
     ),
     child: pw.RichText(
       text: pw.TextSpan(
@@ -525,7 +576,7 @@ pw.Widget _infoChip(String label, String value, pw.Font regularFont, pw.Font bol
             text: '$label: ',
             style: pw.TextStyle(
               font: regularFont,
-              fontSize: 9,
+              fontSize: fontSize,
               color: PdfColor.fromHex('#7E756C'),
             ),
           ),
@@ -533,7 +584,7 @@ pw.Widget _infoChip(String label, String value, pw.Font regularFont, pw.Font bol
             text: value,
             style: pw.TextStyle(
               font: boldFont,
-              fontSize: 9,
+              fontSize: fontSize,
               color: PdfColor.fromHex('#2D2118'),
             ),
           ),

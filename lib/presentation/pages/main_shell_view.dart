@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../core/widgets/app_bottom_nav.dart';
 import '../controllers/navigation_controller.dart';
 import '../controllers/AuthController.dart';
+import '../controllers/share_controller.dart';
 import 'home/home_page.dart';
 import 'search/search_page.dart';
 import 'cart/cart_page.dart';
@@ -34,6 +35,13 @@ class MainShellView extends GetView<NavigationController> {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
+        if (Get.isRegistered<ShareController>()) {
+          final shareCtrl = Get.find<ShareController>();
+          if (shareCtrl.drillLevel == 3) {
+            shareCtrl.goBackToLevel2();
+            return;
+          }
+        }
         controller.handleBack();
       },
       child: Obx(() {
