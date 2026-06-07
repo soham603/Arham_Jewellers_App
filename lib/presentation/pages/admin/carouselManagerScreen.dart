@@ -1053,7 +1053,10 @@ class _CarouselFormSheet extends StatefulWidget {
 
 class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   final CarouselsController controller = Get.find();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
   final _linkController = TextEditingController();
+  final _formError = ''.obs;
   File? _pickedImage;
   bool _isActive = true;
   bool _isSubmitting = false;
@@ -1062,6 +1065,8 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   void initState() {
     super.initState();
     if (widget.existing != null) {
+      _titleController.text = widget.existing!.title;
+      _descriptionController.text = widget.existing!.description;
       _linkController.text = widget.existing!.linkUrl ?? '';
       _isActive = widget.existing!.isActive;
     }
@@ -1069,6 +1074,8 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
     _linkController.dispose();
     super.dispose();
   }
@@ -1222,6 +1229,23 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(2)),
 
+              // ── Title ─────────────────────────────────────────────────────
+              _buildField(
+                context,
+                'Title (optional)',
+                _titleController,
+              ),
+              SizedBox(height: context.getScreenHeight(1.5)),
+
+              // ── Description ───────────────────────────────────────────────
+              _buildField(
+                context,
+                'Description (optional)',
+                _descriptionController,
+                maxLines: 3,
+              ),
+              SizedBox(height: context.getScreenHeight(1.5)),
+
               // ── Link URL ─────────────────────────────────────────────────
               _buildField(
                 context,
@@ -1230,6 +1254,48 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 keyboardType: TextInputType.url,
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
+
+              // ── Inline Error ──────────────────────────────────────────────
+              Obx(
+                () => _formError.value.isNotEmpty
+                    ? Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getScreenWidth(3),
+                          vertical: context.getScreenHeight(1),
+                        ),
+                        margin: EdgeInsets.only(
+                          bottom: context.getScreenHeight(1.5),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.red.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: context.getScreenWidth(4.5),
+                            ),
+                            SizedBox(width: context.getScreenWidth(2)),
+                            Expanded(
+                              child: Text(
+                                _formError.value,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: context.getScreenWidth(3.2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
 
               // ── isActive toggle ───────────────────────────
               Row(
@@ -1259,17 +1325,31 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   onPressed: _isSubmitting
                       ? null
                       : () async {
+                          _formError.value = '';
+                          if (_pickedImage == null && widget.existing == null) {
+                            _formError.value = 'Please select an image';
+                            return;
+                          }
                           setState(() => _isSubmitting = true);
                           await widget.onSubmit(
-                            title: null,
-                            description: null,
+                            title: _titleController.text.trim().isEmpty
+                                ? null
+                                : _titleController.text.trim(),
+                            description: _descriptionController.text.trim().isEmpty
+                                ? null
+                                : _descriptionController.text.trim(),
                             linkUrl: _linkController.text.trim().isEmpty
                                 ? null
                                 : _linkController.text.trim(),
                             imageFile: _pickedImage,
                             isActive: _isActive,
                           );
-                          if (mounted) setState(() => _isSubmitting = false);
+                          if (mounted) {
+                            setState(() => _isSubmitting = false);
+                            if (controller.error.isNotEmpty) {
+                              _formError.value = controller.error;
+                            }
+                          }
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.colorPalette.primaryColor,
