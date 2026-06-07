@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCustomOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminCustomOrderDetailPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -16,7 +16,7 @@ class AdminCustomOrdersPage extends StatefulWidget {
 }
 
 class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
-  late final AdminCustomOrderController _controller;
+  late final AdminOrderController _controller;
   final ScrollController _scrollController = ScrollController();
 
   static const _statusFilters = ['PENDING', 'ASSIGNED', 'COMPLETED', 'REJECTED'];
@@ -24,13 +24,14 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
   @override
   void initState() {
     super.initState();
-    _controller = Get.isRegistered<AdminCustomOrderController>()
-        ? Get.find<AdminCustomOrderController>()
-        : Get.put(AdminCustomOrderController());
+    _controller = Get.isRegistered<AdminOrderController>()
+        ? Get.find<AdminOrderController>()
+        : Get.put(AdminOrderController());
+    _controller.changeOrderType("custom");
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-        _controller.fetchCustomOrders(isPagination: true);
+        _controller.fetchOrders(isPagination: true);
       }
     });
   }
@@ -166,7 +167,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                         Text('Failed to load orders', style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
                         SizedBox(height: context.getScreenHeight(1)),
                         TextButton(
-                          onPressed: () => _controller.fetchCustomOrders(),
+                          onPressed: () => _controller.fetchOrders(),
                           child: Text('Tap to retry', style: TextStyle(fontSize: context.getScreenWidth(4), color: AppColors.primaryGold, fontWeight: FontWeight.w600)),
                         ),
                       ],
@@ -190,7 +191,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                 return RefreshIndicator(
                   color: AppColors.primaryGold,
                   backgroundColor: Colors.white,
-                  onRefresh: () => _controller.fetchCustomOrders(),
+                  onRefresh: () => _controller.fetchOrders(),
                   child: ListView.separated(
                     controller: _scrollController,
                     padding: EdgeInsets.fromLTRB(

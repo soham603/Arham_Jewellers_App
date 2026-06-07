@@ -6,7 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCustomOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -20,15 +20,15 @@ class AdminCustomOrderDetailPage extends StatefulWidget {
 }
 
 class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage> {
-  late final AdminCustomOrderController _controller;
+  late final AdminOrderController _controller;
   late final CraftsmanController _craftsmanController;
 
   @override
   void initState() {
     super.initState();
-    _controller = Get.isRegistered<AdminCustomOrderController>()
-        ? Get.find<AdminCustomOrderController>()
-        : Get.put(AdminCustomOrderController());
+    _controller = Get.isRegistered<AdminOrderController>()
+        ? Get.find<AdminOrderController>()
+        : Get.put(AdminOrderController());
     _craftsmanController = Get.isRegistered<CraftsmanController>()
         ? Get.find<CraftsmanController>()
         : Get.put(CraftsmanController());
@@ -294,7 +294,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                         onPressed: () async {
                           Get.back();
-                          await _controller.performAction(
+                          await _controller.performCustomOrderAction(
                             orderId: widget.order.id,
                             action: 'REJECT',
                             adminMessage: reasonCtrl.text.trim(),
@@ -404,7 +404,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                             ? null
                             : () async {
                                 Get.back();
-                                await _controller.performAction(
+                                await _controller.performCustomOrderAction(
                                   orderId: widget.order.id,
                                   action: 'APPROVE_AND_ASSIGN',
                                   assignedKarigarId: selectedCraftsman!.id,
@@ -506,7 +506,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                         ),
                         onPressed: () async {
                           Get.back();
-                          await _controller.performAction(
+                          await _controller.performCustomOrderAction(
                             orderId: widget.order.id,
                             action: 'COMPLETE',
                             deliveryDate: selectedDate?.toIso8601String().split('T').first,

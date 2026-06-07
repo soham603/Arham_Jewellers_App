@@ -17,11 +17,9 @@ class ApiUrlConstants {
   static const String CUSTOM_ORDER_CREATE = '/api/v1/orders/custom-order';
   static String customOrderModify(String orderId) => '/api/v1/orders/custom-order/$orderId';
   static String customOrderDelete(String orderId) => '/api/v1/orders/custom-order/$orderId';
-  static const String CUSTOM_ORDER_USER_ALL = '/api/v1/orders/custom-order';
 
   // ── Admin Custom Order ──
   static const String ADMIN_CUSTOM_ORDER_ACTION = '/api/v1/admin-order/custom-order/action';
-  static const String ADMIN_CUSTOM_ORDER_ALL = '/api/v1/admin-order/custom-order';
 
   // ── Craftsman ──
   static const String CRAFTSMAN_GET_ALL = '/api/v1/craftsman/get-All';
