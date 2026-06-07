@@ -166,14 +166,37 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
-                  Text(
-                    rate != null ? '₹${rate.rate.toStringAsFixed(0)}/10g' : '—',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: context.getScreenWidth(7),
-                      height: 1.1,
-                    ),
+                  Text.rich(
+                    rate != null
+                        ? TextSpan(children: [
+                            TextSpan(
+                              text: '₹${NumberFormat.decimalPattern('en_IN').format(rate.rate)}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: context.getScreenWidth(7),
+                                height: 1.1,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '/10g',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w400,
+                                fontSize: context.getScreenWidth(3),
+                                height: 1.1,
+                              ),
+                            ),
+                          ])
+                        : const TextSpan(
+                            text: '—',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 32,
+                              height: 1.1,
+                            ),
+                          ),
                   ),
                 ],
               ),
