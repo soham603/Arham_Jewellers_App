@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
@@ -17,9 +18,14 @@ class MyOrdersPage extends StatefulWidget {
   State<MyOrdersPage> createState() => _MyOrdersPageState();
 }
 
-class _MyOrdersPageState extends State<MyOrdersPage> {
+class _MyOrdersPageState extends State<MyOrdersPage>
+    with SingleTickerProviderStateMixin {
   late final UserOrderController _orderController;
   final ScrollController _scrollController = ScrollController();
+  late final TabController _tabController;
+
+  static const _tabs = ['All', 'Pending', 'Approved', 'Rejected'];
+  static const _filters = ['all', 'pending', 'approved', 'rejected'];
 
   @override
   void initState() {
@@ -27,6 +33,14 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
     _orderController = Get.isRegistered<UserOrderController>()
         ? Get.find<UserOrderController>()
         : Get.put(UserOrderController());
+
+    _tabController = TabController(length: _tabs.length, vsync: this);
+
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _orderController.setFilter(_filters[_tabController.index]);
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderController.fetchUserOrders();
@@ -43,7 +57,74 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _tabController.dispose();
     super.dispose();
+  }
+
+  Widget _buildOrdersList() {
+    return Obx(() {
+      final state = _orderController.ordersState;
+      final orders = _orderController.filteredOrders;
+
+      if (state == CurrentAppState.LOADING) {
+        return _OrdersShimmer(context: context);
+      }
+
+      if (state == CurrentAppState.ERROR) {
+        return _ErrorView(
+          context: context,
+          onRetry: () {
+            _orderController.fetchUserOrders();
+          },
+        );
+      }
+
+      if (orders.isEmpty && state == CurrentAppState.SUCCESS) {
+        return _EmptyOrdersView(context: context);
+      }
+
+      return RefreshIndicator(
+        color: AppColors.primaryGold,
+        backgroundColor: Colors.white,
+        onRefresh: () async {
+          await _orderController.refreshOrders();
+        },
+        child: ListView.separated(
+          controller: _scrollController,
+          padding: EdgeInsets.fromLTRB(
+            context.getScreenWidth(4),
+            context.getScreenHeight(2),
+            context.getScreenWidth(4),
+            context.getScreenHeight(2),
+          ),
+          itemCount: orders.length +
+              (_orderController.hasMoreOrders ? 1 : 0),
+          separatorBuilder: (_, __) =>
+              SizedBox(height: context.getScreenHeight(1.5)),
+          itemBuilder: (context, index) {
+            if (index == orders.length) {
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: context.getScreenHeight(2),
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryGold,
+                    strokeWidth: 2,
+                  ),
+                ),
+              );
+            }
+
+            return _OrderCard(
+              order: orders[index],
+              context: context,
+              controller: _orderController,
+            );
+          },
+        ),
+      );
+    });
   }
 
   @override
@@ -81,6 +162,22 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           ),
           SizedBox(width: context.getScreenWidth(2)),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: AppColors.primaryGold,
+          unselectedLabelColor: AppColors.textMuted,
+          indicatorColor: AppColors.primaryGold,
+          indicatorWeight: 3,
+          labelStyle: TextStyle(
+            fontSize: context.getScreenWidth(3.8),
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontSize: context.getScreenWidth(3.8),
+            fontWeight: FontWeight.w400,
+          ),
+          tabs: _tabs.map((t) => Tab(text: t)).toList(),
+        ),
       ),
       body: ResponsiveWrapper(
         child: Column(
@@ -89,74 +186,10 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           Container(height: 3, color: AppColors.divider),
 
           Expanded(
-            child: Obx(() {
-              final state = _orderController.ordersState;
-              final orders = _orderController.userOrders;
-
-              // ── Loading state ──────────────────────────────────────
-              if (state == CurrentAppState.LOADING) {
-                return _OrdersShimmer(context: context);
-              }
-
-              // ── Error state ────────────────────────────────────────
-              if (state == CurrentAppState.ERROR) {
-                return _ErrorView(
-                  context: context,
-                  onRetry: () {
-                    _orderController.fetchUserOrders();
-                  },
-                );
-              }
-
-              // ── Empty state ────────────────────────────────────────
-              if (orders.isEmpty && state == CurrentAppState.SUCCESS) {
-                return _EmptyOrdersView(context: context);
-              }
-
-              // ── Orders list ────────────────────────────────────────
-              return RefreshIndicator(
-                color: AppColors.primaryGold,
-                backgroundColor: Colors.white,
-                onRefresh: () async {
-                  await _orderController.refreshOrders();
-                },
-                child: ListView.separated(
-                  controller: _scrollController,
-                  padding: EdgeInsets.fromLTRB(
-                    context.getScreenWidth(4),
-                    context.getScreenHeight(2),
-                    context.getScreenWidth(4),
-                    context.getScreenHeight(2),
-                  ),
-                  itemCount: orders.length +
-                      (_orderController.hasMoreOrders ? 1 : 0),
-                  separatorBuilder: (_, __) =>
-                      SizedBox(height: context.getScreenHeight(1.5)),
-                  itemBuilder: (context, index) {
-                    // ── Load more indicator ──────────────────────────
-                    if (index == orders.length) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(2),
-                        ),
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primaryGold,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    }
-
-                    return _OrderCard(
-                      order: orders[index],
-                      context: context,
-                      controller: _orderController,
-                    );
-                  },
-                ),
-              );
-            }),
+            child: TabBarView(
+              controller: _tabController,
+              children: _filters.map((_) => _buildOrdersList()).toList(),
+            ),
           ),
         ],
       ),
@@ -176,35 +209,14 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusInfo = _getStatusInfo(order.status);
+    final statusInfo = getStatusInfo(order.status);
 
-    return GestureDetector(
+    return StatusBorderCard(
+      status: order.status,
       onTap: () {
         Get.to(() => UserOrderDetailScreen(order: order));
       },
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE7DED2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Top accent bar per order status ───────────────────────
-            Container(
-              height: 4,
-              decoration: BoxDecoration(
-                color: statusInfo.color,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-            ),
-
-            Padding(
+      child: Padding(
               padding: EdgeInsets.all(context.getScreenWidth(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +251,7 @@ class _OrderCard extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          _StatusBadge(
+                          StatusBadge(
                             label: statusInfo.label,
                             color: statusInfo.color,
                             bgColor: statusInfo.bgColor,
@@ -389,9 +401,6 @@ class _OrderCard extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -419,103 +428,6 @@ class _OrderCard extends StatelessWidget {
     }
     return amount.toStringAsFixed(0);
   }
-
-  _StatusInfo _getStatusInfo(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return _StatusInfo(
-          label: 'Pending',
-          color: const Color(0xFFF5A623),
-          bgColor: const Color(0xFFFFF4E0),
-        );
-      case 'confirmed':
-        return _StatusInfo(
-          label: 'Confirmed',
-          color: const Color(0xFF2D8C56),
-          bgColor: const Color(0xFFE6F7EE),
-        );
-      case 'processing':
-        return _StatusInfo(
-          label: 'Processing',
-          color: const Color(0xFFA57A36),
-          bgColor: const Color(0xFFF9F3E8),
-        );
-      case 'completed':
-      case 'delivered':
-        return _StatusInfo(
-          label: 'Delivered',
-          color: AppColors.primaryGold,
-          bgColor: const Color(0xFFF9F3E8),
-        );
-      case 'cancelled':
-        return _StatusInfo(
-          label: 'Cancelled',
-          color: const Color(0xFFDC2626),
-          bgColor: const Color(0xFFFEE2E2),
-        );
-      case 'rejected':
-        return _StatusInfo(
-          label: 'Rejected',
-          color: const Color(0xFFDC2626),
-          bgColor: const Color(0xFFFEE2E2),
-        );
-      default:
-        return _StatusInfo(
-          label: status.isNotEmpty
-              ? '${status[0].toUpperCase()}${status.substring(1)}'
-              : 'Unknown',
-          color: AppColors.textMuted,
-          bgColor: AppColors.tileBg,
-        );
-    }
-  }
-}
-
-// ── Status Badge ────────────────────────────────────────────────────────────
-
-class _StatusBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Color bgColor;
-
-  const _StatusBadge({
-    required this.label,
-    required this.color,
-    required this.bgColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: context.getScreenWidth(3),
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
-
-// ── Status Info Model ────────────────────────────────────────────────────────
-
-class _StatusInfo {
-  final String label;
-  final Color color;
-  final Color bgColor;
-
-  const _StatusInfo({
-    required this.label,
-    required this.color,
-    required this.bgColor,
-  });
 }
 
 // ── Loading Shimmer ──────────────────────────────────────────────────────────
@@ -734,7 +646,7 @@ class _OrderImagesStack extends StatelessWidget {
     }
 
     final displayImages = images.take(3).toList();
-    final extraCount = order.items.length - displayImages.length;
+    final totalItems = order.items.length;
 
     return SizedBox(
       width: size,
@@ -765,22 +677,22 @@ class _OrderImagesStack extends StatelessWidget {
                 ),
               ),
             ),
-          if (extraCount > 0)
+          if (totalItems > 1)
             Positioned(
               bottom: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Text(
-                  "+$extraCount",
+                  "$totalItems",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getScreenWidth(2.5),
+                    fontSize: context.getScreenWidth(3.2),
                     fontWeight: FontWeight.w700,
                   ),
                 ),

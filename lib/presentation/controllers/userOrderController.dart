@@ -81,6 +81,34 @@ class UserOrderController extends GetxController {
   RxMap<String, String?> get productImageCache => _productImageCache;
   String? getProductImage(String productId) => _productImageCache[productId];
 
+  // ── Status filter ──────────────────────────────────────────────────────
+
+  final _selectedFilter = 'all'.obs;
+  String get selectedFilter => _selectedFilter.value;
+
+  void setFilter(String filter) => _selectedFilter.value = filter;
+
+  List<UserOrderModel> get filteredOrders {
+    switch (_selectedFilter.value) {
+      case 'pending':
+        return _userOrders
+            .where((o) => o.status.toLowerCase() == 'pending')
+            .toList();
+      case 'approved':
+        return _userOrders.where((o) {
+          final s = o.status.toLowerCase();
+          return s == 'confirmed' || s == 'processing' || s == 'approved' || s == 'assigned';
+        }).toList();
+      case 'rejected':
+        return _userOrders.where((o) {
+          final s = o.status.toLowerCase();
+          return s == 'rejected' || s == 'cancelled';
+        }).toList();
+      default:
+        return _userOrders.toList();
+    }
+  }
+
 
   Future<bool> createOrder() async {
     if (_isCreatingOrder.value) return false;
