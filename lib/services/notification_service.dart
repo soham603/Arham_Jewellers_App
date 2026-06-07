@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @pragma('vm:entry-point')
@@ -145,13 +146,15 @@ class NotificationService {
       _fcmToken = await _messaging!.getToken();
       if (_fcmToken != null && _fcmToken!.isNotEmpty) {
         Logger.info("NotificationService", "FCM Token obtained");
+        await SessionManager().saveFcmToken(_fcmToken!);
       } else {
         Logger.info("NotificationService", "FCM Token empty, notifications disabled");
       }
 
-      _messaging!.onTokenRefresh.listen((newToken) {
+      _messaging!.onTokenRefresh.listen((newToken) async {
         _fcmToken = newToken;
         Logger.info("NotificationService", "FCM Token refreshed");
+        await SessionManager().saveFcmToken(newToken);
         onTokenRefreshed?.call(newToken);
       });
     } catch (e) {
@@ -251,6 +254,7 @@ class NotificationService {
       _fcmToken = await _messaging!.getToken();
       if (_fcmToken != null && _fcmToken!.isNotEmpty) {
         Logger.info("NotificationService", "FCM Token obtained on retry");
+        await SessionManager().saveFcmToken(_fcmToken!);
       }
     } catch (e) {
       Logger.warning("NotificationService", "FCM Token not available: $e");

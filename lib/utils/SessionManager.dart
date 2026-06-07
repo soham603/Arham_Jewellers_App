@@ -12,6 +12,7 @@ class DatabaseKeyConstants {
   static const String REFRESH_TOKEN_EXPIRY = 'refresh_token_expiry';
 
   static const String USER = 'user_data';
+  static const String FCM_TOKEN = 'fcm_token';
 }
 
 class SessionManager {
@@ -168,9 +169,35 @@ class SessionManager {
     Logger.info("SessionManager", "User cleared");
   }
 
+  // ── FCM token persistence ─────────────────────────────────────────
+  Future<bool> saveFcmToken(String token) async {
+    try {
+      final prefs = await _prefs;
+      await prefs.setString(DatabaseKeyConstants.FCM_TOKEN, token);
+      Logger.info("SessionManager", "FCM token saved");
+      return true;
+    } catch (e, st) {
+      Logger.error("SessionManager", "Error saving FCM token → $e",
+          stackTrace: st);
+      return false;
+    }
+  }
+
+  Future<String?> getFcmToken() async {
+    final prefs = await _prefs;
+    return prefs.getString(DatabaseKeyConstants.FCM_TOKEN);
+  }
+
+  Future<void> clearFcmToken() async {
+    final prefs = await _prefs;
+    await prefs.remove(DatabaseKeyConstants.FCM_TOKEN);
+    Logger.info("SessionManager", "FCM token cleared");
+  }
+
   Future<void> clearAll() async {
     await clearTokens();
     await clearUser();
+    await clearFcmToken();
   }
 
   void dispose() {
