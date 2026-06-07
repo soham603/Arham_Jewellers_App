@@ -579,7 +579,7 @@ class _CartPageState extends State<CartPage> {
     _shareWithLoading(
       context,
       () async {
-        await ShareService.shareCartEnquiryPdf(
+        await ShareService.saveCartEnquiryPdfToDownloads(
           products: products,
           quantities: quantities,
         );
@@ -609,7 +609,7 @@ class _CartPageState extends State<CartPage> {
           ],
         ),
         content: Text(
-          'Your enquiry PDF has been saved to Downloads. Share it with us on WhatsApp so we can assist you with pricing and availability.',
+          'Your enquiry PDF has been saved to your Downloads folder. Share it with us on WhatsApp so we can assist you with pricing and availability.',
           style: TextStyle(
             fontSize: context.getScreenWidth(3.8),
             color: AppColors.textMuted,
