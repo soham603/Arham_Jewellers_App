@@ -37,6 +37,12 @@ class AuthController extends GetxController {
   bool get isAdmin => _isAdmin.value;
   RxBool get isAdminRx => _isAdmin;
 
+  Future<String?> _getFcmToken() async {
+    final inMemory = NotificationService().fcmToken;
+    if (inMemory != null && inMemory.isNotEmpty) return inMemory;
+    return SessionManager().getFcmToken();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -66,7 +72,7 @@ class AuthController extends GetxController {
       _userLoginState.value = CurrentAppState.LOADING;
       _userLoginErrorMsg.value = "";
 
-      final fcmToken = NotificationService().fcmToken;
+      final fcmToken = await _getFcmToken();
 
       final response = await httpClient.post(
         "/api/v1/auth/user-login",
@@ -140,7 +146,7 @@ class AuthController extends GetxController {
       _adminLoginState.value = CurrentAppState.LOADING;
       _adminLoginErrorMsg.value = "";
 
-      final fcmToken = NotificationService().fcmToken;
+      final fcmToken = await _getFcmToken();
 
       final response = await httpClient.post(
         "/api/v1/auth/admin-login",
