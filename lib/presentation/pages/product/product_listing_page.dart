@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -33,6 +34,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double _priceMin = 0;
   double _priceMax = 5000000;
   List<String> _selectedSizes = [];
+
+  // ── Selection state ──────────────────────────────────────────
+  final Set<String> _selectedProductIds = {};
+  bool get _isSelectMode => _selectedProductIds.isNotEmpty;
+
+  void _toggleSelection(String productId) {
+    setState(() {
+      if (_selectedProductIds.contains(productId)) {
+        _selectedProductIds.remove(productId);
+      } else {
+        _selectedProductIds.add(productId);
+      }
+    });
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _selectedProductIds.clear();
+    });
+  }
 
   bool get _isCategoryFilter => widget.categoryId != null;
   bool get _hasKarat => widget.karat != null;
@@ -90,15 +111,37 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
       appBar: AppBar(
-        title: _buildAppBarTitleWidget(context),
+        title: _isSelectMode
+            ? Text(
+                '${_selectedProductIds.length} selected',
+                style: GoogleFonts.bodoniModa(
+                  fontWeight: FontWeight.w700,
+                  color: context.colorPalette.goldDeep,
+                  fontSize: 18,
+                ),
+              )
+            : _buildAppBarTitleWidget(context),
         centerTitle: true,
         backgroundColor: context.colorPalette.cream,
         elevation: 0,
         scrolledUnderElevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_rounded, color: context.colorPalette.goldDeep),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (_isSelectMode) {
+              _clearSelection();
+            } else {
+              Navigator.pop(context);
+            }
+          },
         ),
+        actions: [
+          if (_isSelectMode)
+            IconButton(
+              icon: Icon(Icons.close, color: context.colorPalette.goldDeep),
+              onPressed: _clearSelection,
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -217,14 +260,18 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     final product = products[index];
                     return ProductListTile(
                       product: product,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductDetailsPage(product: product),
-                          ),
-                        );
-                      },
+                      isSelected: _selectedProductIds.contains(product.id),
+                      onTap: _isSelectMode
+                          ? () => _toggleSelection(product.id)
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProductDetailsPage(product: product),
+                                ),
+                              );
+                            },
+                      onLongPress: () => _toggleSelection(product.id),
                     );
                   },
                 );
@@ -248,14 +295,18 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   final product = products[index];
                   return ProductCard(
                     product: product,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProductDetailsPage(product: product),
-                        ),
-                      );
-                    },
+                    isSelected: _selectedProductIds.contains(product.id),
+                    onTap: _isSelectMode
+                        ? () => _toggleSelection(product.id)
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductDetailsPage(product: product),
+                              ),
+                            );
+                          },
+                    onLongPress: () => _toggleSelection(product.id),
                   );
                 },
               );
@@ -263,6 +314,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           ),
         ],
       ),
+      bottomNavigationBar: _isSelectMode ? _buildSelectionBar(context) : null,
     );
   }
 
@@ -271,116 +323,169 @@ class _ProductListingPageState extends State<ProductListingPage> {
       final currentSort = _controller.sortBy;
       final isGrid = _controller.isGrid;
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => _showSortSheet(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: context.colorPalette.border),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.sort_rounded,
-                      size: 18,
-                      color: context.colorPalette.goldDark,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      currentSort.label,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: context.colorPalette.goldDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _buildStockChip('Ready Stock', 'ready', Icons.check_circle_outline_rounded, context),
+                const SizedBox(width: 8),
+                _buildStockChip('Out of Stock', 'out', Icons.remove_circle_outline_rounded, context),
+                const SizedBox(width: 8),
+                _buildStockChip('Show All', 'all', Icons.select_all_rounded, context),
+              ],
             ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () => _showFilterSheet(context),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _hasActiveFilter ? context.colorPalette.gold.withOpacity(0.08) : Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.border,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.tune_rounded,
-                      size: 18,
-                      color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => _showSortSheet(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.colorPalette.border),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Filter',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
-                      ),
-                    ),
-                    if (_activeFilterCount > 0) ...[
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: context.colorPalette.gold,
-                          borderRadius: BorderRadius.circular(8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.sort_rounded,
+                          size: 18,
+                          color: context.colorPalette.goldDark,
                         ),
-                        child: Text(
-                          '$_activeFilterCount',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                        const SizedBox(width: 6),
+                        Text(
+                          currentSort.label,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: context.colorPalette.goldDark,
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _showFilterSheet(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _hasActiveFilter ? context.colorPalette.gold.withOpacity(0.08) : Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.border,
                       ),
-                    ],
-                  ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.tune_rounded,
+                          size: 18,
+                          color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+                        ),
+                        if (_activeFilterCount > 0) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: context.colorPalette.gold,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '$_activeFilterCount',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _controller.toggleLayout(),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.colorPalette.border),
+                    ),
+                    child: Icon(
+                      isGrid ? Icons.list_rounded : Icons.grid_view_rounded,
+                      size: 20,
+                      color: context.colorPalette.goldDark,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () => _controller.toggleLayout(),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: context.colorPalette.border),
-                ),
-                child: Icon(
-                  isGrid ? Icons.list_rounded : Icons.grid_view_rounded,
-                  size: 20,
-                  color: context.colorPalette.goldDark,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     });
   }
 
+  Widget _buildStockChip(String label, String value, IconData icon, BuildContext context) {
+    final isSelected = _stockFilter == value;
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected) {
+          setState(() {
+            _stockFilter = value;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colorPalette.gold.withOpacity(0.08)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? context.colorPalette.gold : context.colorPalette.border,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? context.colorPalette.gold : context.colorPalette.goldDark,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? context.colorPalette.gold : context.colorPalette.goldDark,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   bool get _hasActiveFilter =>
-      _stockFilter != 'ready' ||
       _weightMin > 0 ||
       _weightMax < _controller.availableWeightMax ||
       _priceMin > 0 ||
@@ -389,7 +494,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   int get _activeFilterCount {
     var count = 0;
-    if (_stockFilter != 'ready') count++;
     if (_weightMin > 0 || _weightMax < _controller.availableWeightMax) count++;
     if (_priceMin > 0 || _priceMax < 5000000) count++;
     count += _selectedSizes.length;
@@ -491,7 +595,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       initialPriceMin: _priceMin,
       initialPriceMax: _priceMax,
       showKaratFilter: false,
-      showStockFilter: true,
+      showStockFilter: false,
       showWeightFilter: _controller.hasWeightData,
       showPriceFilter: true,
       weightSliderMax: _controller.availableWeightMax,
@@ -607,6 +711,334 @@ class _ProductListingPageState extends State<ProductListingPage> {
             }),
             const SizedBox(height: 12),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ── Selection bottom bar ──────────────────────────────────────
+  Widget _buildSelectionBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        12 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: context.colorPalette.border)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _clearSelection,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: context.colorPalette.cardBg,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: context.colorPalette.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.close, size: 16, color: context.colorPalette.goldDark),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Clear',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: context.colorPalette.goldDark,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              '${_selectedProductIds.length} selected',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.goldDeep,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () => _showShareOptionsDialog(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: context.colorPalette.goldDark,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.share_rounded, size: 16, color: Colors.white),
+                  SizedBox(width: 4),
+                  Text(
+                    'Share',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Share options dialog ──────────────────────────────────────
+  void _showShareOptionsDialog(BuildContext context) {
+    final selectedProducts = _getSelectedProducts();
+    if (selectedProducts.isEmpty) return;
+
+    final titleController = TextEditingController(
+      text: widget.title ?? '${widget.karat ?? ''} Collection'.trim(),
+    );
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            20 + MediaQuery.of(ctx).padding.bottom,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Share ${selectedProducts.length} product${selectedProducts.length == 1 ? '' : 's'}',
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(4.5),
+                  fontWeight: FontWeight.w700,
+                  color: context.colorPalette.textColor,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  labelStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                  hintText: 'e.g. New Collection 2024',
+                  hintStyle: TextStyle(color: context.colorPalette.subTitleColor.withOpacity(0.5)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: context.colorPalette.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: context.colorPalette.gold, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
+                style: TextStyle(
+                  fontSize: context.getScreenWidth(3.5),
+                  color: context.colorPalette.textColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _shareOptionTile(
+                ctx,
+                icon: Icons.image_outlined,
+                iconColor: const Color(0xFF25D366),
+                title: 'Share Images',
+                subtitle: 'Send product images directly',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _shareAsImages(context, titleController.text.trim());
+                },
+              ),
+              const SizedBox(height: 10),
+              _shareOptionTile(
+                ctx,
+                icon: Icons.picture_as_pdf_outlined,
+                iconColor: const Color(0xFFE53935),
+                title: 'Share as PDF',
+                subtitle: 'Create a branded product catalog',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _shareAsPdf(context, titleController.text.trim());
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shareOptionTile(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.cardBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.colorPalette.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(context.getScreenWidth(2)),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: iconColor, size: context.getScreenWidth(5.5)),
+            ),
+            SizedBox(width: context.getScreenWidth(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(3.8),
+                      fontWeight: FontWeight.w600,
+                      color: context.colorPalette.textColor,
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.2)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: context.getScreenWidth(2.8),
+                      color: context.colorPalette.subTitleColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<ProductModel> _getSelectedProducts() {
+    final allProducts = _isCategoryOnly
+        ? _controller.categoryProducts
+        : _isCategoryFilter
+            ? _controller.filteredProducts
+            : _controller.karatProducts;
+    return allProducts.where((p) => _selectedProductIds.contains(p.id)).toList();
+  }
+
+  void _shareAsImages(BuildContext context, String title) {
+    final products = _getSelectedProducts();
+    if (products.isEmpty) return;
+
+    _showLoadingDialog(context, 'Preparing images...');
+
+    ShareService.shareImagesDirectly(
+      products: products,
+      filterInfo: title.isNotEmpty ? title : 'Products',
+      title: title.isNotEmpty ? title : null,
+    ).whenComplete(() {
+      if (mounted) Navigator.of(context).pop();
+      _clearSelection();
+    });
+  }
+
+  void _shareAsPdf(BuildContext context, String title) {
+    final products = _getSelectedProducts();
+    if (products.isEmpty) return;
+
+    _showLoadingDialog(context, 'Generating PDF...');
+
+    ShareService.shareAsPdf(
+      products: products,
+      filterInfo: title.isNotEmpty ? title : 'Products',
+      title: title.isNotEmpty ? title : null,
+    ).whenComplete(() {
+      if (mounted) Navigator.of(context).pop();
+      _clearSelection();
+    });
+  }
+
+  void _showLoadingDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: context.colorPalette.gold,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: context.getScreenWidth(3.5),
+                    fontWeight: FontWeight.w500,
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

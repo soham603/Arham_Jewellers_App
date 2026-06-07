@@ -19,12 +19,16 @@ class ProductCard extends StatefulWidget {
     this.compact = false,
     this.onTap,
     this.onAddToCart,
+    this.onLongPress,
+    this.isSelected = false,
   });
 
   final ProductModel product;
   final bool compact;
   final VoidCallback? onTap;
   final VoidCallback? onAddToCart;
+  final VoidCallback? onLongPress;
+  final bool isSelected;
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -97,140 +101,165 @@ class _ProductCardState extends State<ProductCard>
                   hint: widget.onTap != null
                       ? 'Tap to open product details'
                       : null,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(
-                        color: _isHovered
-                            ? AppColors.primaryGold.withOpacity(0.3)
-                            : _cardBorderColor,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _isHovered
-                              ? AppColors.primaryGold.withOpacity(0.12)
-                              : Colors.black.withOpacity(0.06),
-                          blurRadius: _isHovered ? 16 : 10,
-                          offset: Offset(0, _isHovered ? 6 : 3),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(radius),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: widget.onTap,
-                        borderRadius: BorderRadius.circular(radius),
-                        mouseCursor: widget.onTap != null
-                            ? SystemMouseCursors.click
-                            : MouseCursor.defer,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              child: AspectRatio(
-                                aspectRatio: 3 / 4,
-                                child: _ProductImage(
-                                imageUrl: imageUrl,
-                                productName: displayName,
-                                iconSize: iconSize,
-                                isNew: _isRecent(product),
-                                isHovered: _isHovered,
-                                width: width,
+                  child: Stack(
+                      children: [
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(radius),
+                            border: Border.all(
+                              color: widget.isSelected
+                                  ? AppColors.primaryGold
+                                  : _isHovered
+                                      ? AppColors.primaryGold.withOpacity(0.3)
+                                      : _cardBorderColor,
+                              width: widget.isSelected ? 2.0 : 1.0,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: widget.isSelected
+                                    ? AppColors.primaryGold.withOpacity(0.2)
+                                    : _isHovered
+                                        ? AppColors.primaryGold.withOpacity(0.12)
+                                        : Colors.black.withOpacity(0.06),
+                                blurRadius: widget.isSelected ? 12 : (_isHovered ? 16 : 10),
+                                offset: Offset(0, _isHovered ? 6 : 3),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(radius),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: widget.onTap,
+                              onLongPress: widget.onLongPress,
+                              borderRadius: BorderRadius.circular(radius),
+                              mouseCursor: widget.onTap != null
+                                  ? SystemMouseCursors.click
+                                  : MouseCursor.defer,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: 3 / 4,
+                                      child: _ProductImage(
+                                        imageUrl: imageUrl,
+                                        productName: displayName,
+                                        iconSize: iconSize,
+                                        isNew: _isRecent(product),
+                                        isHovered: _isHovered,
+                                        width: width,
+                                      ),
+                                    ),
+                                  ),
+                                  if (categoryName != null)
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(vertical: vPad),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFFFF6DD),
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(100),
+                                            bottomRight: Radius.circular(100),
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.only(
+                                          left: hPad,
+                                          right: vPad,
+                                          top: 1,
+                                          bottom: 1,
+                                        ),
+                                        constraints: BoxConstraints(maxWidth: width * 0.7),
+                                        child: Text(
+                                          categoryName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: bodySize,
+                                            color: AppColors.primaryGold,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  if (showWeight)
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                        hPad,
+                                        categoryName != null ? gap3 : vPad,
+                                        hPad,
+                                        vPad,
+                                      ),
+                                      child: _WeightInfo(
+                                        fineWeight: fineWeight,
+                                        touchData: touchData,
+                                        size: size,
+                                        fontSize: metaSize,
+                                      ),
+                                    ),
+                                  if (!widget.compact && _showRetailerPrice(product))
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(hPad, gap3, hPad, vPad),
+                                      child: _RetailerPrice(
+                                        product: product,
+                                        fontSize: metaSize,
+                                      ),
+                                    ),
+                                  if (!widget.compact)
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(hPad, gap3, hPad, hPad),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: _ViewButton(
+                                              onPressed: widget.onTap,
+                                              height: buttonHeight,
+                                              fontSize: buttonTextSize,
+                                            ),
+                                          ),
+                                          SizedBox(width: gap2),
+                                          _CartButton(
+                                            product: widget.product,
+                                            height: buttonHeight,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
                           ),
-                            if (categoryName != null)
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: vPad),
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFFFF6DD),
-                                    borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(100),
-                                      bottomRight: Radius.circular(100),
-                                    ),
-                                  ),
-                                  padding: EdgeInsets.only(
-                                    left: hPad,
-                                    right: vPad,
-                                    top: 1,
-                                    bottom: 1,
-                                  ),
-                                  constraints: BoxConstraints(
-                                      maxWidth: width * 0.7),
-                                  child: Text(
-                                    categoryName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: bodySize,
-                                      color: AppColors.primaryGold,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if (showWeight)
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  hPad,
-                                  categoryName != null ? gap3 : vPad,
-                                  hPad,
-                                  vPad,
-                                ),
-                                child: _WeightInfo(
-                                  fineWeight: fineWeight,
-                                  touchData: touchData,
-                                  size: size,
-                                  fontSize: metaSize,
-                                ),
-                              ),
-                            if (!widget.compact && _showRetailerPrice(product))
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                  hPad,
-                                  gap3,
-                                  hPad,
-                                  vPad,
-                                ),
-                                child: _RetailerPrice(
-                                  product: product,
-                                  fontSize: metaSize,
-                                ),
-                              ),
-                            if (!widget.compact)
-                              Padding(
-                                padding: EdgeInsets.fromLTRB(
-                                    hPad, gap3, hPad, hPad),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: _ViewButton(
-                                        onPressed: widget.onTap,
-                                        height: buttonHeight,
-                                        fontSize: buttonTextSize,
-                                      ),
-                                    ),
-                                    SizedBox(width: gap2),
-                                    _CartButton(
-                                      product: widget.product,
-                                      height: buttonHeight,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
                         ),
-                      ),
+                        if (widget.isSelected)
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGold,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                ),
               ),
             ),
           ),
