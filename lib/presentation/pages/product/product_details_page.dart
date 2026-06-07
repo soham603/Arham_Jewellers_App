@@ -120,14 +120,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   String _formatPrice(double value) {
-    if (value >= 10000000) {
-      return '\u20B9${(value / 10000000).toStringAsFixed(2)} Cr';
-    } else if (value >= 100000) {
-      return '\u20B9${(value / 100000).toStringAsFixed(2)} L';
-    } else if (value >= 1000) {
-      return '\u20B9${(value / 1000).toStringAsFixed(2)} K';
+    final intVal = value.toInt();
+    final str = intVal.toString();
+    if (str.length <= 3) return '\u20B9$intVal';
+    String result = str.substring(str.length - 3);
+    int i = str.length - 3;
+    while (i > 0) {
+      final chunk = str.substring(i - 2 < 0 ? 0 : i - 2, i);
+      result = '$chunk,$result';
+      i -= 2;
     }
-    return '\u20B9${value.toStringAsFixed(0)}';
+    return '\u20B9$result';
   }
 
   @override

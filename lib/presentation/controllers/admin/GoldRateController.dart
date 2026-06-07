@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
@@ -48,26 +47,11 @@ class GoldRateController extends GetxController {
   final _dateRangeLabel = ''.obs;
   String get dateRangeLabel => _dateRangeLabel.value;
 
-  Timer? _autoRefreshTimer;
-
   @override
   void onInit() {
     super.onInit();
     fetchCurrentRate();
     fetchHistory();
-    _startAutoRefresh();
-  }
-
-  @override
-  void onClose() {
-    _autoRefreshTimer?.cancel();
-    super.onClose();
-  }
-
-  void _startAutoRefresh() {
-    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 60), (_) {
-      fetchCurrentRate();
-    });
   }
 
   Future<void> fetchCurrentRate() async {
