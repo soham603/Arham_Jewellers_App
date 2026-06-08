@@ -36,8 +36,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
   }
 
-  String _getConvertedPurity(Map<String, dynamic> rawData, String? karat, {String? tagNo, String? name}) {
-    final touchRaw = rawData['SalesTouch']?.toString().trim() ??
+  String _getConvertedPurity(
+    Map<String, dynamic> rawData,
+    String? karat, {
+    String? tagNo,
+    String? name,
+  }) {
+    final touchRaw =
+        rawData['SalesTouch']?.toString().trim() ??
         rawData['Touch']?.toString().trim();
     if (touchRaw != null && touchRaw.isNotEmpty) {
       final resolved = _resolvePurityValue(touchRaw);
@@ -92,28 +98,41 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 
   String? _resolveKaratValue(String raw) {
-    final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(raw.trim());
+    final match = RegExp(
+      r'(\d+)\s*K',
+      caseSensitive: false,
+    ).firstMatch(raw.trim());
     final numStr = match?.group(1);
     if (numStr == null) return null;
     final value = int.tryParse(numStr);
     if (value == null) return null;
 
     switch (value) {
-      case 9: return '0.380 (9 K)';
-      case 14: return '0.600 (14 K)';
-      case 18: return '0.760 (18 K)';
-      case 20: return '0.840 (20 K)';
-      case 22: return '0.920 (22 K)';
-      case 24: return '1.000 (24 K)';
+      case 9:
+        return '0.380 (9 K)';
+      case 14:
+        return '0.600 (14 K)';
+      case 18:
+        return '0.760 (18 K)';
+      case 20:
+        return '0.840 (20 K)';
+      case 22:
+        return '0.920 (22 K)';
+      case 24:
+        return '1.000 (24 K)';
     }
     return null;
   }
 
   double? _calculatePrice() {
     final goldRate = Get.find<GoldRateController>().currentRate;
-    if (goldRate == null || widget.product.fineWeight == null) return null;
+    if (goldRate == null || widget.product.karigarNetWt == null) return null;
     return GoldRateController.calculatePrice(
-      fineWeight: widget.product.fineWeight!,
+      fineWeight:
+          widget.product.karigarNetWt ??
+          widget.product.netWeight ??
+          widget.product.fineWeight ??
+          0,
       ratePer10Gram: goldRate.rate,
     );
   }
@@ -135,10 +154,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final rawData = widget.product.rawData ?? {};
-    final netWeight = rawData["FineWt"]?.toString();
+    final netWeight = rawData["KarigarNetWt"]?.toString();
     final grossWeight = rawData["GrossWt"]?.toString();
     final displayGrossWeight = grossWeight ?? netWeight;
-    final purity = _getConvertedPurity(rawData, widget.product.karat, tagNo: widget.product.tagNo, name: widget.product.name);
+    final purity = _getConvertedPurity(
+      rawData,
+      widget.product.karat,
+      tagNo: widget.product.tagNo,
+      name: widget.product.name,
+    );
     final pieces = rawData["Pieces"]?.toString() ?? "1";
     final collectionName = widget.product.category?.name ?? "—";
     final size = widget.product.size?.toString();
@@ -160,7 +184,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       bottomNavigationBar: Get.find<AuthController>().isAdmin
           ? const SizedBox.shrink()
           : Obx(() {
-              final quantity = cartController.getProductQuantity(widget.product.id);
+              final quantity = cartController.getProductQuantity(
+                widget.product.id,
+              );
               final isInCart = quantity > 0;
 
               return SafeArea(
@@ -189,13 +215,21 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: isInCart ? 0 : 2,
-                              shadowColor: AppColors.primaryGold.withOpacity(0.2),
-                              backgroundColor: isInCart ? Colors.grey.shade100 : const Color(0xFFF9F6F0),
-                              foregroundColor: isInCart ? Colors.grey : AppColors.primaryGold,
+                              shadowColor: AppColors.primaryGold.withOpacity(
+                                0.2,
+                              ),
+                              backgroundColor: isInCart
+                                  ? Colors.grey.shade100
+                                  : const Color(0xFFF9F6F0),
+                              foregroundColor: isInCart
+                                  ? Colors.grey
+                                  : AppColors.primaryGold,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 side: BorderSide(
-                                  color: isInCart ? Colors.grey.shade300 : AppColors.primaryGold.withOpacity(0.4),
+                                  color: isInCart
+                                      ? Colors.grey.shade300
+                                      : AppColors.primaryGold.withOpacity(0.4),
                                   width: 1.2,
                                 ),
                               ),
@@ -223,7 +257,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: 6,
-                              shadowColor: AppColors.primaryGold.withOpacity(0.5),
+                              shadowColor: AppColors.primaryGold.withOpacity(
+                                0.5,
+                              ),
                               backgroundColor: AppColors.primaryGold,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
@@ -408,8 +444,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       bottom: context.getScreenHeight(8),
                       right: context.getScreenWidth(4),
                       child: GestureDetector(
-                        onTap: () =>
-                            showImageZoomDialog(context, widget.product.imageUrl!),
+                        onTap: () => showImageZoomDialog(
+                          context,
+                          widget.product.imageUrl!,
+                        ),
                         child: Container(
                           padding: EdgeInsets.all(context.getScreenWidth(2.5)),
                           decoration: BoxDecoration(
@@ -457,7 +495,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     children: [
                       // Product Title
                       Text(
-                        widget.product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim().toUpperCase(),
+                        widget.product.name
+                            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                            .replaceAll(
+                              RegExp(r'collection', caseSensitive: false),
+                              '',
+                            )
+                            .trim()
+                            .toUpperCase(),
                         style: TextStyle(
                           fontSize: context.getScreenWidth(6.5),
                           fontWeight: FontWeight.w900,
@@ -482,7 +527,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       SizedBox(height: context.getScreenHeight(1)),
 
                       // Price
-                      if (price != null && (Get.find<AuthController>().user?.isRetailer == true || Get.find<AuthController>().isAdmin))
+                      if (price != null &&
+                          (Get.find<AuthController>().user?.isRetailer ==
+                                  true ||
+                              Get.find<AuthController>().isAdmin))
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(

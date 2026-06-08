@@ -20,7 +20,13 @@ class ProductListingPage extends StatefulWidget {
   final String? categoryId;
   final String? title;
 
-  const ProductListingPage({super.key, this.karat, this.karats, this.categoryId, this.title});
+  const ProductListingPage({
+    super.key,
+    this.karat,
+    this.karats,
+    this.categoryId,
+    this.title,
+  });
 
   @override
   State<ProductListingPage> createState() => _ProductListingPageState();
@@ -65,8 +71,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
   List<ProductModel> get _displayedProducts => _isCategoryOnly
       ? _controller.categoryProducts
       : _isCategoryFilter
-          ? _controller.filteredProducts
-          : _controller.karatProducts;
+      ? _controller.filteredProducts
+      : _controller.karatProducts;
 
   double get _displayedWeightMax {
     double max = 0;
@@ -100,11 +106,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
     _controller = Get.put(SearchProductController(), tag: tag);
 
     if (_isCategoryFilter && _hasKarat) {
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+      );
     } else if (_isCategoryFilter) {
       _controller.loadProductsByCategory(widget.categoryId!);
     } else {
-      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+      final karatsToLoad =
+          widget.karats ??
+          (widget.karat != null ? [widget.karat!] : <String>[]);
       _controller.loadProductsByKarats(karatsToLoad);
     }
 
@@ -158,7 +169,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
         elevation: 0,
         scrolledUnderElevation: 1,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded, color: context.colorPalette.goldDeep),
+          icon: Icon(
+            Icons.arrow_back_ios_rounded,
+            color: context.colorPalette.goldDeep,
+          ),
           onPressed: () {
             if (_isSelectMode) {
               _clearSelection();
@@ -203,21 +217,24 @@ class _ProductListingPageState extends State<ProductListingPage> {
               final state = _isCategoryOnly
                   ? _controller.categoryState
                   : _isCategoryFilter
-                      ? _controller.filteredState
-                      : _controller.karatState;
+                  ? _controller.filteredState
+                  : _controller.karatState;
               final rawProducts = _isCategoryOnly
                   ? _controller.categoryProducts
                   : _isCategoryFilter
-                      ? _controller.filteredProducts
-                      : _controller.karatProducts;
+                  ? _controller.filteredProducts
+                  : _controller.karatProducts;
               final hasMore = _isCategoryOnly
                   ? false
                   : _isCategoryFilter
-                      ? _controller.filteredHasMore
-                      : _controller.karatHasMore;
+                  ? _controller.filteredHasMore
+                  : _controller.karatHasMore;
 
               final filteredProducts = _applyClientSideFilters(rawProducts);
-              final products = _controller.sortProducts(filteredProducts, _controller.sortBy);
+              final products = _controller.sortProducts(
+                filteredProducts,
+                _controller.sortBy,
+              );
               final isGrid = _controller.isGrid;
 
               if (state == CurrentAppState.LOADING && products.isEmpty) {
@@ -229,21 +246,37 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, color: context.colorPalette.goldDark, size: 48),
+                      Icon(
+                        Icons.error_outline,
+                        color: context.colorPalette.goldDark,
+                        size: 48,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         'Failed to load products',
-                        style: TextStyle(color: context.colorPalette.goldDark, fontSize: 16),
+                        style: TextStyle(
+                          color: context.colorPalette.goldDark,
+                          fontSize: 16,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
                           if (_isCategoryOnly) {
-                            _controller.loadProductsByCategory(widget.categoryId!);
+                            _controller.loadProductsByCategory(
+                              widget.categoryId!,
+                            );
                           } else if (_isCategoryFilter) {
-                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!);
+                            _controller.loadByCategoryWithKaratFilter(
+                              widget.categoryId!,
+                              widget.karat!,
+                            );
                           } else {
-                            final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+                            final karatsToLoad =
+                                widget.karats ??
+                                (widget.karat != null
+                                    ? [widget.karat!]
+                                    : <String>[]);
                             _controller.loadProductsByKarats(karatsToLoad);
                           }
                         },
@@ -263,11 +296,18 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.diamond_outlined, color: context.colorPalette.goldDark, size: 48),
+                      Icon(
+                        Icons.diamond_outlined,
+                        color: context.colorPalette.goldDark,
+                        size: 48,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         'No products found',
-                        style: TextStyle(color: context.colorPalette.goldDark, fontSize: 16),
+                        style: TextStyle(
+                          color: context.colorPalette.goldDark,
+                          fontSize: 16,
+                        ),
                       ),
                     ],
                   ),
@@ -299,11 +339,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ProductDetailsPage(product: product),
+                                  builder: (_) =>
+                                      ProductDetailsPage(product: product),
                                 ),
                               );
                             },
-                      onLongPress: _isAdmin ? () => _toggleSelection(product.id) : null,
+                      onLongPress: _isAdmin
+                          ? () => _toggleSelection(product.id)
+                          : null,
                     );
                   },
                 );
@@ -334,11 +377,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ProductDetailsPage(product: product),
+                                builder: (_) =>
+                                    ProductDetailsPage(product: product),
                               ),
                             );
                           },
-                    onLongPress: _isAdmin ? () => _toggleSelection(product.id) : null,
+                    onLongPress: _isAdmin
+                        ? () => _toggleSelection(product.id)
+                        : null,
                   );
                 },
               );
@@ -367,11 +413,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildStockChip('Ready Stock', 'ready', Icons.check_circle_outline_rounded, context),
+                  _buildStockChip(
+                    'Ready Stock',
+                    'ready',
+                    Icons.check_circle_outline_rounded,
+                    context,
+                  ),
                   const SizedBox(width: 8),
-                  _buildStockChip('Out of Stock', 'out', Icons.remove_circle_outline_rounded, context),
+                  _buildStockChip(
+                    'Out of Stock',
+                    'out',
+                    Icons.remove_circle_outline_rounded,
+                    context,
+                  ),
                   const SizedBox(width: 8),
-                  _buildStockChip('Show All', 'all', Icons.select_all_rounded, context),
+                  _buildStockChip(
+                    'Show All',
+                    'all',
+                    Icons.select_all_rounded,
+                    context,
+                  ),
                 ],
               ),
             ),
@@ -384,7 +445,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 GestureDetector(
                   onTap: () => _showSortSheet(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -416,12 +480,19 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 GestureDetector(
                   onTap: () => _showFilterSheet(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: _hasActiveFilter ? context.colorPalette.gold.withOpacity(0.08) : Colors.white,
+                      color: _hasActiveFilter
+                          ? context.colorPalette.gold.withOpacity(0.08)
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.border,
+                        color: _hasActiveFilter
+                            ? context.colorPalette.gold
+                            : context.colorPalette.border,
                       ),
                     ),
                     child: Row(
@@ -430,7 +501,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         Icon(
                           Icons.tune_rounded,
                           size: 18,
-                          color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+                          color: _hasActiveFilter
+                              ? context.colorPalette.gold
+                              : context.colorPalette.goldDark,
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -438,13 +511,18 @@ class _ProductListingPageState extends State<ProductListingPage> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: _hasActiveFilter ? context.colorPalette.gold : context.colorPalette.goldDark,
+                            color: _hasActiveFilter
+                                ? context.colorPalette.gold
+                                : context.colorPalette.goldDark,
                           ),
                         ),
                         if (_activeFilterCount > 0) ...[
                           const SizedBox(width: 4),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
                               color: context.colorPalette.gold,
                               borderRadius: BorderRadius.circular(8),
@@ -488,7 +566,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
     });
   }
 
-  Widget _buildStockChip(String label, String value, IconData icon, BuildContext context) {
+  Widget _buildStockChip(
+    String label,
+    String value,
+    IconData icon,
+    BuildContext context,
+  ) {
     final isSelected = _stockFilter == value;
     return GestureDetector(
       onTap: () {
@@ -506,7 +589,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
               : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? context.colorPalette.gold : context.colorPalette.border,
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.border,
           ),
         ),
         child: Row(
@@ -515,7 +600,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? context.colorPalette.gold : context.colorPalette.goldDark,
+              color: isSelected
+                  ? context.colorPalette.gold
+                  : context.colorPalette.goldDark,
             ),
             const SizedBox(width: 4),
             Text(
@@ -523,7 +610,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? context.colorPalette.gold : context.colorPalette.goldDark,
+                color: isSelected
+                    ? context.colorPalette.gold
+                    : context.colorPalette.goldDark,
               ),
             ),
           ],
@@ -589,7 +678,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double? _calculatePrice(ProductModel product, double ratePer10Gram) {
     if (product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
-      fineWeight: product.fineWeight!,
+      fineWeight:
+          product.karigarNetWt ?? product.netWeight ?? product.fineWeight ?? 0,
       ratePer10Gram: ratePer10Gram,
     );
   }
@@ -618,7 +708,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   String? get _karatPurityLabel {
-    final karatLabel = widget.karat ?? (widget.karats != null && widget.karats!.isNotEmpty ? widget.karats!.join(', ') : null);
+    final karatLabel =
+        widget.karat ??
+        (widget.karats != null && widget.karats!.isNotEmpty
+            ? widget.karats!.join(', ')
+            : null);
     if (karatLabel == null) return null;
     final purity = _purityForKarat(karatLabel);
     if (purity == null) return null;
@@ -651,26 +745,27 @@ class _ProductListingPageState extends State<ProductListingPage> {
       showSizeFilter: _displayedAvailableSizes.isNotEmpty,
       initialSelectedSizes: _selectedSizes,
       availableSizes: _displayedAvailableSizes,
-      onApply: ({
-        required List<String> karats,
-        required List<String> categoryIds,
-        required List<String> categoryNames,
-        required String stockFilter,
-        required double wMin,
-        required double wMax,
-        required double pMin,
-        required double pMax,
-        required List<String> sizes,
-      }) {
-        setState(() {
-          _stockFilter = stockFilter;
-          _weightMin = wMin;
-          _weightMax = wMax;
-          _priceMin = pMin;
-          _priceMax = pMax;
-          _selectedSizes = sizes;
-        });
-      },
+      onApply:
+          ({
+            required List<String> karats,
+            required List<String> categoryIds,
+            required List<String> categoryNames,
+            required String stockFilter,
+            required double wMin,
+            required double wMax,
+            required double pMin,
+            required double pMax,
+            required List<String> sizes,
+          }) {
+            setState(() {
+              _stockFilter = stockFilter;
+              _weightMin = wMin;
+              _weightMax = wMax;
+              _priceMin = pMin;
+              _priceMax = pMax;
+              _selectedSizes = sizes;
+            });
+          },
     );
   }
 
@@ -724,7 +819,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 4),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 12),
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? context.colorPalette.gold.withOpacity(0.08)
@@ -747,8 +844,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         option.label,
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                           color: isSelected
                               ? context.colorPalette.gold
                               : context.colorPalette.textColor,
@@ -800,7 +898,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.close, size: 16, color: context.colorPalette.goldDark),
+                  Icon(
+                    Icons.close,
+                    size: 16,
+                    color: context.colorPalette.goldDark,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     'Clear',
@@ -840,7 +942,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   SizedBox(width: 4),
                   Text(
                     'Share',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -904,18 +1010,28 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 controller: titleController,
                 decoration: InputDecoration(
                   labelText: 'Title',
-                  labelStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                  labelStyle: TextStyle(
+                    color: context.colorPalette.subTitleColor,
+                  ),
                   hintText: 'e.g. New Collection 2024',
-                  hintStyle: TextStyle(color: context.colorPalette.subTitleColor.withOpacity(0.5)),
+                  hintStyle: TextStyle(
+                    color: context.colorPalette.subTitleColor.withOpacity(0.5),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: context.colorPalette.border),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: context.colorPalette.gold, width: 2),
+                    borderSide: BorderSide(
+                      color: context.colorPalette.gold,
+                      width: 2,
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                 ),
                 style: TextStyle(
                   fontSize: context.getScreenWidth(3.5),
@@ -979,7 +1095,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: iconColor, size: context.getScreenWidth(5.5)),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: context.getScreenWidth(5.5),
+              ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
             Expanded(
@@ -1005,7 +1125,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: context.colorPalette.subTitleColor,
+              size: context.getScreenWidth(5),
+            ),
           ],
         ),
       ),
@@ -1016,9 +1140,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final allProducts = _isCategoryOnly
         ? _controller.categoryProducts
         : _isCategoryFilter
-            ? _controller.filteredProducts
-            : _controller.karatProducts;
-    return allProducts.where((p) => _selectedProductIds.contains(p.id)).toList();
+        ? _controller.filteredProducts
+        : _controller.karatProducts;
+    return allProducts
+        .where((p) => _selectedProductIds.contains(p.id))
+        .toList();
   }
 
   void _shareAsImages(BuildContext context, String title) {

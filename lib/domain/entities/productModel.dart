@@ -146,8 +146,9 @@ class ProductModel {
 
   String? get touch {
     // 1. Try rawData (SalesTouch / Touch)
-    final raw = rawData?['SalesTouch']?.toString().trim() ??
-                rawData?['Touch']?.toString().trim();
+    final raw =
+        rawData?['SalesTouch']?.toString().trim() ??
+        rawData?['Touch']?.toString().trim();
     if (raw != null && raw.isNotEmpty) {
       final result = _resolvePurity(raw);
       if (result != null) return result;
@@ -205,19 +206,28 @@ class ProductModel {
 
   /// Maps karat values (18, 20, 22) to their purity strings.
   static String? _resolveKarat(String raw) {
-    final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(raw.trim());
+    final match = RegExp(
+      r'(\d+)\s*K',
+      caseSensitive: false,
+    ).firstMatch(raw.trim());
     final numStr = match?.group(1);
     if (numStr == null) return null;
     final value = int.tryParse(numStr);
     if (value == null) return null;
 
     switch (value) {
-      case 9: return '0.380 (9 K)';
-      case 14: return '0.600 (14 K)';
-      case 18: return '0.760 (18 K)';
-      case 20: return '0.840 (20 K)';
-      case 22: return '0.920 (22 K)';
-      case 24: return '1.000 (24 K)';
+      case 9:
+        return '0.380 (9 K)';
+      case 14:
+        return '0.600 (14 K)';
+      case 18:
+        return '0.760 (18 K)';
+      case 20:
+        return '0.840 (20 K)';
+      case 22:
+        return '0.920 (22 K)';
+      case 24:
+        return '1.000 (24 K)';
     }
     return null;
   }
@@ -265,8 +275,9 @@ class ProductModel {
   }
 
   double? get salesTouch {
-    final raw = rawData?['SalesTouch']?.toString().trim() ??
-                rawData?['Touch']?.toString().trim();
+    final raw =
+        rawData?['SalesTouch']?.toString().trim() ??
+        rawData?['Touch']?.toString().trim();
     if (raw == null || raw.isEmpty) return null;
     return double.tryParse(raw);
   }
@@ -281,6 +292,14 @@ class ProductModel {
 
   double? get fineWeight {
     final value = rawData?['FineWt'];
+
+    if (value == null) return null;
+
+    return double.tryParse(value.toString());
+  }
+
+  double? get karigarNetWt {
+    final value = rawData?['KarigarNetWt'];
 
     if (value == null) return null;
 
