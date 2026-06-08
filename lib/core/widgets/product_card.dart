@@ -583,7 +583,10 @@ class _RetailerPrice extends StatelessWidget {
     }
 
     final total = GoldRateController.calculatePrice(
-      fineWeight: product.fineWeight!,
+      fineWeight: product.karigarNetWt ??
+          product.netWeight ??
+          product.fineWeight ??
+          0,
       ratePer10Gram: goldRate.rate,
     )!;
 

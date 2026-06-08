@@ -46,7 +46,7 @@ class GoldRateController extends GetxController {
 
   final _dateRangeLabel = ''.obs;
   String get dateRangeLabel => _dateRangeLabel.value;
-  
+
   bool _isInitialized = false;
 
   @override
@@ -86,7 +86,8 @@ class GoldRateController extends GetxController {
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'fetchCurrentRate Dio: $e\n$st');
       _currentRateState.value = CurrentAppState.ERROR;
-      _error.value = e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
+      _error.value =
+          e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
     } catch (e, st) {
       Logger.error('GoldRateController', 'fetchCurrentRate: $e\n$st');
       _currentRateState.value = CurrentAppState.ERROR;
@@ -115,7 +116,8 @@ class GoldRateController extends GetxController {
       if (startDate != null && endDate != null) {
         queryParams['startDate'] = startDate;
         queryParams['endDate'] = endDate;
-      } else if (_activeFilterType.value == 'custom' && _selectedDateRange.value != null) {
+      } else if (_activeFilterType.value == 'custom' &&
+          _selectedDateRange.value != null) {
         final range = _selectedDateRange.value!;
         queryParams['startDate'] = DateFormat('yyyy-MM-dd').format(range.start);
         queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(range.end);
@@ -149,7 +151,8 @@ class GoldRateController extends GetxController {
           if (dailyTrend is List) {
             items = dailyTrend.map<GoldRateModel>((e) {
               final dateStr = e['date'] ?? '';
-              final closingRate = (e['closingRate'] ?? e['avg'] ?? 0).toDouble();
+              final closingRate = (e['closingRate'] ?? e['avg'] ?? 0)
+                  .toDouble();
               return GoldRateModel(
                 id: null,
                 rate: closingRate,
@@ -176,7 +179,8 @@ class GoldRateController extends GetxController {
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'fetchHistory Dio: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
-      _error.value = e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
+      _error.value =
+          e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
     } catch (e, st) {
       Logger.error('GoldRateController', 'fetchHistory: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
@@ -214,7 +218,8 @@ class GoldRateController extends GetxController {
           extra: {'requiresAuth': false},
           sendTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 5),
-          validateStatus: (status) => status != null && (status < 300 || status == 404),
+          validateStatus: (status) =>
+              status != null && (status < 300 || status == 404),
         ),
       );
 
@@ -257,9 +262,7 @@ class GoldRateController extends GetxController {
         data: {
           'rate': rate,
           'source': 'market',
-          'metadata': {
-            'change': change,
-          },
+          'metadata': {'change': change},
         },
         options: Options(
           extra: {'requiresAuth': true},
@@ -275,18 +278,27 @@ class GoldRateController extends GetxController {
           _currentRate.value = GoldRateModel.fromJson(data);
         }
         _actionState.value = CurrentAppState.SUCCESS;
-        Get.snackbar('Success', 'Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g');
+        Get.snackbar(
+          'Success',
+          'Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g',
+        );
         fetchHistory();
         return true;
       } else {
         _actionState.value = CurrentAppState.ERROR;
-        Get.snackbar('Error', response.data?['message'] ?? 'Failed to update rate');
+        Get.snackbar(
+          'Error',
+          response.data?['message'] ?? 'Failed to update rate',
+        );
         return false;
       }
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'setRate Dio: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
-      Get.snackbar('Error', e.response?.data?['message'] ?? e.message ?? 'Failed to update rate');
+      Get.snackbar(
+        'Error',
+        e.response?.data?['message'] ?? e.message ?? 'Failed to update rate',
+      );
       return false;
     } catch (e, st) {
       Logger.error('GoldRateController', 'setRate: $e\n$st');
@@ -297,16 +309,11 @@ class GoldRateController extends GetxController {
   }
 
   Future<void> refresh_() async {
-    if (_activeFilterType.value == 'custom' && _selectedDateRange.value != null) {
-      await Future.wait([
-        fetchCurrentRate(),
-        fetchHistory(),
-      ]);
+    if (_activeFilterType.value == 'custom' &&
+        _selectedDateRange.value != null) {
+      await Future.wait([fetchCurrentRate(), fetchHistory()]);
     } else {
-      await Future.wait([
-        fetchCurrentRate(),
-        fetchHistory(),
-      ]);
+      await Future.wait([fetchCurrentRate(), fetchHistory()]);
     }
   }
 
@@ -331,7 +338,10 @@ class GoldRateController extends GetxController {
     fetchHistory(period: period);
   }
 
-  static double? calculatePrice({required double fineWeight, required double ratePer10Gram}) {
+  static double? calculatePrice({
+    required double fineWeight,
+    required double ratePer10Gram,
+  }) {
     final base = fineWeight * (ratePer10Gram / 10);
     final labour = base * 0.10;
     final subtotal = base + labour;

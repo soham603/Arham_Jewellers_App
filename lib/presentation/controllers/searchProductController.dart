@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SearchProductController extends GetxController {
   static SearchProductController get instance =>
       Get.isRegistered<SearchProductController>()
-          ? Get.find<SearchProductController>()
-          : Get.put(SearchProductController());
+      ? Get.find<SearchProductController>()
+      : Get.put(SearchProductController());
 
   static const String _recentSearchesKey = 'recent_searches';
   static const int _maxRecentSearches = 5;
@@ -34,18 +34,29 @@ class SearchProductController extends GetxController {
     _isGrid.value = !_isGrid.value;
   }
 
-  List<ProductModel> sortProducts(List<ProductModel> products, SortOption sortBy) {
+  List<ProductModel> sortProducts(
+    List<ProductModel> products,
+    SortOption sortBy,
+  ) {
     final list = List<ProductModel>.from(products);
     list.sort((a, b) {
       switch (sortBy) {
         case SortOption.weightAsc:
-          return (a.grossWeight ?? a.fineWeight ?? 0).compareTo(b.grossWeight ?? b.fineWeight ?? 0);
+          return (a.grossWeight ?? a.fineWeight ?? 0).compareTo(
+            b.grossWeight ?? b.fineWeight ?? 0,
+          );
         case SortOption.weightDesc:
-          return (b.grossWeight ?? b.fineWeight ?? 0).compareTo(a.grossWeight ?? a.fineWeight ?? 0);
+          return (b.grossWeight ?? b.fineWeight ?? 0).compareTo(
+            a.grossWeight ?? a.fineWeight ?? 0,
+          );
         case SortOption.newest:
-          return (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0));
+          return (b.createdAt ?? DateTime(0)).compareTo(
+            a.createdAt ?? DateTime(0),
+          );
         case SortOption.oldest:
-          return (a.createdAt ?? DateTime(0)).compareTo(b.createdAt ?? DateTime(0));
+          return (a.createdAt ?? DateTime(0)).compareTo(
+            b.createdAt ?? DateTime(0),
+          );
         case SortOption.priceAsc:
           return (_calculatePrice(a) ?? 0).compareTo(_calculatePrice(b) ?? 0);
         case SortOption.priceDesc:
@@ -178,7 +189,7 @@ class SearchProductController extends GetxController {
 
   // ── Debounce ─────────────────────────────────────────────────────────────
   Timer? _debounce;
-  
+
   bool _hasLoadedInitial = false;
 
   @override
@@ -247,7 +258,10 @@ class SearchProductController extends GetxController {
       }
     } catch (e, st) {
       _initialState.value = CurrentAppState.ERROR;
-      Logger.error("SearchProductController", "loadInitialProducts error: $e\n$st");
+      Logger.error(
+        "SearchProductController",
+        "loadInitialProducts error: $e\n$st",
+      );
     }
   }
 
@@ -285,7 +299,10 @@ class SearchProductController extends GetxController {
               return raw.map((e) => ProductModel.fromJson(e)).toList();
             }
           } catch (e) {
-            Logger.error("SearchProductController", "Failed to fetch category $categoryId: $e");
+            Logger.error(
+              "SearchProductController",
+              "Failed to fetch category $categoryId: $e",
+            );
           }
           return <ProductModel>[];
         });
@@ -310,7 +327,10 @@ class SearchProductController extends GetxController {
               return raw.map((e) => ProductModel.fromJson(e)).toList();
             }
           } catch (e) {
-            Logger.error("SearchProductController", "Failed to fetch karat $karat: $e");
+            Logger.error(
+              "SearchProductController",
+              "Failed to fetch karat $karat: $e",
+            );
           }
           return <ProductModel>[];
         });
@@ -340,10 +360,13 @@ class SearchProductController extends GetxController {
       allFetched = allFetched.where((p) => seen.add(p.id)).toList();
 
       if (_selectedKarats.isNotEmpty) {
-        final filterKaratNums = _selectedKarats.map((k) {
-          final m = RegExp(r'(\d+)').firstMatch(k);
-          return m != null ? int.tryParse(m.group(1)!) : null;
-        }).whereType<int>().toSet();
+        final filterKaratNums = _selectedKarats
+            .map((k) {
+              final m = RegExp(r'(\d+)').firstMatch(k);
+              return m != null ? int.tryParse(m.group(1)!) : null;
+            })
+            .whereType<int>()
+            .toSet();
         if (filterKaratNums.isNotEmpty) {
           allFetched = allFetched.where((p) {
             final pk = p.karatNumber;
@@ -395,7 +418,10 @@ class SearchProductController extends GetxController {
       _filteredInitialState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _filteredInitialState.value = CurrentAppState.ERROR;
-      Logger.error("SearchProductController", "loadFilteredProducts error: $e\n$st");
+      Logger.error(
+        "SearchProductController",
+        "loadFilteredProducts error: $e\n$st",
+      );
     }
   }
 
@@ -423,7 +449,8 @@ class SearchProductController extends GetxController {
   }
 
   Future<void> loadMoreSearchResults() async {
-    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING) return;
+    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING)
+      return;
     await _runSearch(_searchQuery.value.trim(), isPagination: true);
   }
 
@@ -457,10 +484,13 @@ class SearchProductController extends GetxController {
       }
 
       if (_selectedKarats.isNotEmpty) {
-        final filterKaratNums = _selectedKarats.map((k) {
-          final m = RegExp(r'(\d+)').firstMatch(k);
-          return m != null ? int.tryParse(m.group(1)!) : null;
-        }).whereType<int>().toSet();
+        final filterKaratNums = _selectedKarats
+            .map((k) {
+              final m = RegExp(r'(\d+)').firstMatch(k);
+              return m != null ? int.tryParse(m.group(1)!) : null;
+            })
+            .whereType<int>()
+            .toSet();
         if (filterKaratNums.isNotEmpty) {
           allFetched = allFetched.where((p) {
             final pk = p.karatNumber;
@@ -547,18 +577,27 @@ class SearchProductController extends GetxController {
 
   String _karatToSearchValue(String karat) {
     switch (karat) {
-      case '9K': return '38';
-      case '14K': return '60';
-      case '18K': return '76';
-      case '20K': return '84';
-      case '22K': return '92';
-      case '24K': return '100';
-      default: return karat;
+      case '9K':
+        return '38';
+      case '14K':
+        return '60';
+      case '18K':
+        return '76';
+      case '20K':
+        return '84';
+      case '22K':
+        return '92';
+      case '24K':
+        return '100';
+      default:
+        return karat;
     }
   }
 
-  Future<void> loadProductsByKarats(List<String> karats,
-      {bool isPagination = false}) async {
+  Future<void> loadProductsByKarats(
+    List<String> karats, {
+    bool isPagination = false,
+  }) async {
     if (!_karatHasMore && isPagination) return;
     if (_karatState.value == CurrentAppState.LOADING) return;
 
@@ -588,7 +627,10 @@ class SearchProductController extends GetxController {
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
         } catch (e) {
-          Logger.error("SearchProductController", "Failed to fetch karat $karat: $e");
+          Logger.error(
+            "SearchProductController",
+            "Failed to fetch karat $karat: $e",
+          );
         }
         return <ProductModel>[];
       });
@@ -611,7 +653,9 @@ class SearchProductController extends GetxController {
     } catch (e, st) {
       _karatState.value = CurrentAppState.ERROR;
       Logger.error(
-          "SearchProductController", "loadProductsByKarats error: $e\n$st");
+        "SearchProductController",
+        "loadProductsByKarats error: $e\n$st",
+      );
     }
   }
 
@@ -640,8 +684,9 @@ class SearchProductController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
-        _categoryProducts.value =
-            raw.map((e) => ProductModel.fromJson(e)).toList();
+        _categoryProducts.value = raw
+            .map((e) => ProductModel.fromJson(e))
+            .toList();
         _categoryState.value = CurrentAppState.SUCCESS;
       } else {
         _categoryState.value = CurrentAppState.ERROR;
@@ -649,7 +694,9 @@ class SearchProductController extends GetxController {
     } catch (e, st) {
       _categoryState.value = CurrentAppState.ERROR;
       Logger.error(
-          "SearchProductController", "loadProductsByCategory error: $e\n$st");
+        "SearchProductController",
+        "loadProductsByCategory error: $e\n$st",
+      );
     }
   }
 
@@ -672,7 +719,8 @@ class SearchProductController extends GetxController {
   String? _currentFilterKarat;
 
   void loadMoreFilteredProducts() {
-    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING) return;
+    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING)
+      return;
     loadByCategoryWithKaratFilter(
       _currentFilterCategoryId!,
       _currentFilterKarat!,
@@ -732,7 +780,9 @@ class SearchProductController extends GetxController {
     } catch (e, st) {
       _filteredState.value = CurrentAppState.ERROR;
       Logger.error(
-          "SearchProductController", "loadByCategoryWithKaratFilter error: $e\n$st");
+        "SearchProductController",
+        "loadByCategoryWithKaratFilter error: $e\n$st",
+      );
     }
   }
 
@@ -859,7 +909,9 @@ class SearchProductController extends GetxController {
         } else {
           raw = [];
         }
-        _searchResults.value = raw.map((e) => ProductModel.fromJson(e)).toList();
+        _searchResults.value = raw
+            .map((e) => ProductModel.fromJson(e))
+            .toList();
         _searchState.value = CurrentAppState.SUCCESS;
         return _searchResults.isNotEmpty ? _searchResults.first : null;
       } else {
@@ -878,7 +930,8 @@ class SearchProductController extends GetxController {
     final goldRate = Get.find<GoldRateController>().currentRate;
     if (goldRate == null || product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
-      fineWeight: product.fineWeight!,
+      fineWeight:
+          product.karigarNetWt ?? product.netWeight ?? product.fineWeight ?? 0,
       ratePer10Gram: goldRate.rate,
     );
   }
