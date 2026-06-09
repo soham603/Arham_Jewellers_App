@@ -145,7 +145,19 @@ class ProductModel {
   }
 
   String? get touch {
-    // 1. Try rawData (SalesTouch / Touch)
+    // 1. Karat field (e.g. "18K", "22K") — explicit assignment takes top priority
+    if (karat != null) {
+      final result = _resolveKarat(karat!);
+      if (result != null) return result;
+    }
+
+    // 2. Tag number prefix (e.g. "76GR-303" → "76")
+    if (tagNo != null && tagNo!.length >= 2) {
+      final result = _resolvePurity(tagNo!.substring(0, 2));
+      if (result != null) return result;
+    }
+
+    // 3. Raw data (SalesTouch / Touch)
     final raw =
         rawData?['SalesTouch']?.toString().trim() ??
         rawData?['Touch']?.toString().trim();
@@ -154,19 +166,7 @@ class ProductModel {
       if (result != null) return result;
     }
 
-    // 2. Fallback: extract purity from tagNo prefix (e.g. "76GR-303" → "76")
-    if (tagNo != null && tagNo!.length >= 2) {
-      final result = _resolvePurity(tagNo!.substring(0, 2));
-      if (result != null) return result;
-    }
-
-    // 3. Fallback: karat field (e.g. "22", "22K")
-    if (karat != null) {
-      final result = _resolveKarat(karat!);
-      if (result != null) return result;
-    }
-
-    // 4. Fallback: extract from product name (e.g. "92", "22K")
+    // 4. Product name (e.g. "92", "22K")
     if (name.isNotEmpty) {
       final result = _resolvePurity(name);
       if (result != null) return result;
@@ -217,17 +217,17 @@ class ProductModel {
 
     switch (value) {
       case 9:
-        return '0.380 (9 K)';
+        return '38 (9 K)';
       case 14:
-        return '0.600 (14 K)';
+        return '60 (14 K)';
       case 18:
-        return '0.760 (18 K)';
+        return '76 (18 K)';
       case 20:
-        return '0.840 (20 K)';
+        return '84 (20 K)';
       case 22:
-        return '0.920 (22 K)';
+        return '92 (22 K)';
       case 24:
-        return '1.000 (24 K)';
+        return '100 (24 K)';
     }
     return null;
   }
