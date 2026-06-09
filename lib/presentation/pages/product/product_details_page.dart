@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
@@ -320,7 +319,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             child: Text(
                               isInCart ? 'Added to Cart' : 'Add to Cart',
                               style: TextStyle(
-                                fontSize: context.getResponsiveSize(4.2),
+                                fontSize: context.getResponsiveSize(3.5),
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -351,7 +350,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             child: Text(
                               'View Cart',
                               style: TextStyle(
-                                fontSize: context.getResponsiveSize(4.2),
+                                fontSize: context.getResponsiveSize(3.5),
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 0.5,
                               ),
@@ -428,38 +427,40 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             height: context.getScreenHeight(60),
             child: Stack(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  color: const Color(0xFFE6E1D9),
-                  child:
-                      product.displayImageUrl != null &&
-                          product.displayImageUrl!.trim().isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: product.displayImageUrl!,
-                          fit: BoxFit.contain,
-                          placeholder: (context, url) => Shimmer.fromColors(
-                            baseColor: const Color(0xFFE7E2DB),
-                            highlightColor: const Color(0xFFF5F1EB),
-                            child: Container(color: Colors.white),
-                          ),
-                          errorWidget: (context, url, error) => Center(
-                            child: Icon(
-                              Icons.image_not_supported_outlined,
-                              size: context.getResponsiveSize(12),
-                              color: Colors.grey,
+                IgnorePointer(
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: const Color(0xFFE6E1D9),
+                    child:
+                        product.displayImageUrl != null &&
+                            product.displayImageUrl!.trim().isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: product.displayImageUrl!,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => Shimmer.fromColors(
+                              baseColor: const Color(0xFFE7E2DB),
+                              highlightColor: const Color(0xFFF5F1EB),
+                              child: Container(color: Colors.white),
+                            ),
+                            errorWidget: (context, url, error) => Center(
+                              child: Icon(
+                                Icons.image_not_supported_outlined,
+                                size: context.getResponsiveSize(12),
+                                color: Colors.grey,
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              '[ No Image ]',
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(5),
+                                color: const Color(0xFF8C7E68),
+                              ),
                             ),
                           ),
-                        )
-                      : Center(
-                          child: Text(
-                            '[ No Image ]',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(5),
-                              color: const Color(0xFF8C7E68),
-                            ),
-                          ),
-                        ),
+                  ),
                 ),
 
                 // Top Left: Back Button Only
@@ -553,7 +554,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ],
                           ),
                           child: Text(
-                            "Net Weight: $netWeight g",
+                            "Net Wt.: $netWeight g",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: context.getResponsiveSize(3.2),
@@ -610,16 +611,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               ),
-              child: RawGestureDetector(
-                gestures: <Type, GestureRecognizerFactory>{
-                  VerticalDragGestureRecognizer:
-                      GestureRecognizerFactoryWithHandlers<
-                          VerticalDragGestureRecognizer>(
-                    () => VerticalDragGestureRecognizer(),
-                    (VerticalDragGestureRecognizer instance) {},
-                  ),
-                },
-                child: SingleChildScrollView(
+              child: SingleChildScrollView(
                   physics: const ClampingScrollPhysics(),
                   padding: EdgeInsets.fromLTRB(
                     context.getResponsiveSize(5),
@@ -641,7 +633,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           .trim()
                           .toUpperCase(),
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(6.5),
+                        fontSize: context.getResponsiveSize(5.5),
                         fontWeight: FontWeight.w900,
                         color: const Color(0xFF2C3E50),
                         height: 1.2,
@@ -655,7 +647,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Text(
                       "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.8),
+                        fontSize: context.getResponsiveSize(3.2),
                         color: Colors.grey.shade600,
                         fontWeight: FontWeight.w600,
                       ),
@@ -696,7 +688,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 Text(
                                   "PRICE",
                                   style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.6),
+                                    fontSize: context.getResponsiveSize(2.2),
                                     color: Colors.grey.shade500,
                                     fontWeight: FontWeight.w700,
                                     letterSpacing: 0.5,
@@ -726,7 +718,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: Text(
                             "Specification",
                             style: TextStyle(
-                              fontSize: context.getResponsiveSize(5),
+                              fontSize: context.getResponsiveSize(4),
                               fontWeight: FontWeight.w800,
                               color: const Color(0xFF2C3E50),
                             ),
@@ -747,7 +739,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           label: Text(
                             "Customize",
                             style: TextStyle(
-                              fontSize: context.getResponsiveSize(3.2),
+                              fontSize: context.getResponsiveSize(2.8),
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -781,7 +773,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               child: _buildSpecBox(
                                 context,
                                 Icons.scale_outlined,
-                                "NET WEIGHT",
+                                "NET WT.",
                                 "$netWeight g",
                               ),
                             ),
@@ -792,7 +784,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               child: _buildSpecBox(
                                 context,
                                 Icons.work_outline,
-                                "GROSS WEIGHT",
+                                "GROSS WT.",
                                 "$displayGrossWeight g",
                               ),
                             ),
@@ -881,7 +873,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Text(
                       "Description",
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(5),
+                        fontSize: context.getResponsiveSize(4),
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFF2C3E50),
                       ),
@@ -893,7 +885,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     Text(
                       "Elegant ${product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.8),
+                        fontSize: context.getResponsiveSize(3.2),
                         color: Colors.grey.shade700,
                         height: 1.5,
                       ),
@@ -940,7 +932,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ),
                   ],
-                ),
                 ),
               ),
             ),
@@ -993,7 +984,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: context.getResponsiveSize(2.6),
+                    fontSize: context.getResponsiveSize(2.2),
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
@@ -1003,7 +994,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.8),
+                    fontSize: context.getResponsiveSize(3.2),
                     color: const Color(0xFF2C3E50),
                     fontWeight: FontWeight.w800,
                   ),
@@ -1031,7 +1022,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         Text(
           text,
           style: TextStyle(
-            fontSize: context.getResponsiveSize(3),
+            fontSize: context.getResponsiveSize(2.5),
             color: Colors.grey.shade800,
             fontWeight: FontWeight.w600,
             height: 1.2,

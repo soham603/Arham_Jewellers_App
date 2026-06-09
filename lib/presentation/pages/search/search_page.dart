@@ -933,20 +933,14 @@ class _SearchPageState extends State<SearchPage> {
                         const SizedBox(height: 5),
                         SizedBox(
                           width: context.getResponsiveSize(20),
-                          child: Column(
-                            children: [
-                              Text(
-                                cleanedName,
-                                style: TextStyle(
-                                  fontSize: context.getResponsiveSize(2.4),
-                                  fontWeight: FontWeight.w700,
-                                  color: context.colorPalette.goldDeep,
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          child: Text(
+                            cleanedName,
+                            style: TextStyle(
+                              fontSize: context.responsiveWidth(10),
+                              fontWeight: FontWeight.w700,
+                              color: context.colorPalette.goldDeep,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
@@ -1321,33 +1315,35 @@ class _SearchPageState extends State<SearchPage> {
                             horizontal: context.getResponsiveSize(2),
                             vertical: context.getScreenHeight(0.3),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                cleanedName,
-                                style: TextStyle(
-                                  fontSize: context.getResponsiveSize(2.8),
-                                  fontWeight: FontWeight.w600,
-                                  color: context.colorPalette.textColor,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (karatName != null) ...[
-                                SizedBox(height: context.getScreenHeight(0.1)),
+                          child: ClipRect(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
                                 Text(
-                                  '$karatName • ${_getKaratPurity(karatName)}',
+                                  cleanedName,
                                   style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.2),
-                                    fontWeight: FontWeight.w500,
-                                    color: context.colorPalette.goldDark,
+                                    fontSize: context.getResponsiveSize(2.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.textColor,
                                   ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
+                                if (karatName != null) ...[
+                                  SizedBox(height: context.getScreenHeight(0.1)),
+                                  Text(
+                                    '$karatName • ${_getKaratPurity(karatName)}',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(2.2),
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colorPalette.goldDark,
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
+                          )
                         ),
                       ),
                     ],
@@ -1529,19 +1525,11 @@ class _BrowseCategoryImage extends StatelessWidget {
     if (cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: cat.imageUrl,
-        width: context.getResponsiveSize(16),
-        height: context.getResponsiveSize(16),
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => RatneshFallback.xs(
-          width: context.getResponsiveSize(16),
-          height: context.getResponsiveSize(16),
-        ),
+        errorWidget: (_, __, ___) => const RatneshFallback.xs(),
       );
     }
 
-    return RatneshFallback.xs(
-      width: context.getResponsiveSize(16),
-      height: context.getResponsiveSize(16),
-    );
+    return const RatneshFallback.xs();
   }
 }

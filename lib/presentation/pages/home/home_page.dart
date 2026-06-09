@@ -585,6 +585,8 @@ GestureDetector(
                                             builder: (context) =>
                                                 ProductDetailsPage(
                                                   product: product,
+                                                  products: products,
+                                                  initialIndex: index,
                                                 ),
                                           ),
                                         );
