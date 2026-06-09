@@ -487,7 +487,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: context.colorPalette.backgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -592,7 +592,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Get.back(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               style: TextButton.styleFrom(
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.symmetric(
@@ -618,8 +618,8 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                           approvedTillDate: date,
                           isRetailer: isRetailer,
                         );
-                        if (context.mounted) {
-                          Get.back();
+                        if (dialogContext.mounted) {
+                          Navigator.of(dialogContext).pop();
                         }
                       },
                 style: ElevatedButton.styleFrom(
@@ -661,7 +661,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   void _confirmReject(BuildContext context, AccessRequestModel req) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: context.colorPalette.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -700,7 +700,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(color: context.colorPalette.subTitleColor),
@@ -714,8 +714,8 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       await controller.rejectRequest(
                         requestId: req.id,
                       );
-                      if (context.mounted) {
-                        Get.back();
+                      if (dialogContext.mounted) {
+                        Navigator.of(dialogContext).pop();
                       }
                     },
               style: ElevatedButton.styleFrom(
@@ -1521,7 +1521,7 @@ class _RequestCardState extends State<_RequestCard> {
   void _confirmRetailerToggle(BuildContext context, AccessRequestModel req, bool newValue) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: context.colorPalette.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -1560,7 +1560,7 @@ class _RequestCardState extends State<_RequestCard> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             style: TextButton.styleFrom(
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.symmetric(
@@ -1583,7 +1583,7 @@ class _RequestCardState extends State<_RequestCard> {
               onPressed: isLoading
                   ? null
                   : () async {
-                      Get.back();
+                      Navigator.of(dialogContext).pop();
                       final ok = await widget.controller.updateRetailer(
                         requestId: req.id,
                         isRetailer: newValue,
@@ -1634,7 +1634,7 @@ class _RequestCardState extends State<_RequestCard> {
 
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
           final hasPassword = _newPasswordController.text.trim().isNotEmpty;
 
@@ -1757,7 +1757,7 @@ class _RequestCardState extends State<_RequestCard> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Get.back(),
+                onPressed: () => Navigator.of(dialogContext).pop(),
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.symmetric(
@@ -1776,7 +1776,7 @@ class _RequestCardState extends State<_RequestCard> {
               ElevatedButton(
                 onPressed: hasPassword
                     ? () {
-                        Get.back();
+                        Navigator.of(dialogContext).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
