@@ -54,7 +54,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         title: Text(
           'Checkout',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -85,7 +85,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 Text(
                   "Booking Summary",
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.5),
+                    fontSize: context.getFontSize(4.5),
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),
@@ -96,7 +96,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 Text(
                    "$totalItems item${totalItems != 1 ? 's' : ''} in your booking",
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.4),
+                    fontSize: context.getFontSize(3.4),
                     color: AppColors.textMuted,
                   ),
                 ),
@@ -176,7 +176,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.6),
+                                  fontSize: context.getFontSize(3.6),
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textDark,
                                   height: 1.2,
@@ -187,7 +187,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   item.product.touch!,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.0),
+                                    fontSize: context.getFontSize(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -195,7 +195,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   'Gross Wt: ${item.product.grossWeight}g',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.0),
+                                    fontSize: context.getFontSize(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -203,7 +203,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.0),
+                                    fontSize: context.getFontSize(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -211,7 +211,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 Text(
                                   item.product.size!,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.0),
+                                    fontSize: context.getFontSize(3.0),
                                     color: AppColors.textMuted,
                                   ),
                                 ),
@@ -219,7 +219,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               Text(
                                 'Qty: ${item.quantity}',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.0),
+                                  fontSize: context.getFontSize(3.0),
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -231,14 +231,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     Text(
                                       "₹${price.toStringAsFixed(0)} × ${item.quantity}",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.2),
+                                        fontSize: context.getFontSize(3.2),
                                         color: AppColors.textMuted,
                                       ),
                                     ),
                                     Text(
                                       "₹${itemTotal.toStringAsFixed(0)}",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.8),
+                                        fontSize: context.getFontSize(3.8),
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.primaryGold,
                                       ),
@@ -373,7 +373,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(5.5),
+                              fontSize: context.getFontSize(5.5),
                               fontWeight: FontWeight.w700,
                               color: AppColors.textDark,
                             ),
@@ -386,7 +386,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             textAlign: TextAlign.center,
 
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(3.8),
+                              fontSize: context.getFontSize(3.8),
                               color: AppColors.textMuted,
                               height: 1.5,
                             ),
@@ -418,7 +418,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     child: Text(
                                       "Cancel",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.8),
+                                        fontSize: context.getFontSize(3.8),
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textDark,
                                       ),
@@ -450,7 +450,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     child: Text(
                                       "Book Now",
                                       style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.8),
+                                        fontSize: context.getFontSize(3.8),
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white,
                                       ),
@@ -494,7 +494,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           Text(
                             "Booking...",
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(4.3),
+                              fontSize: context.getFontSize(4.3),
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -504,7 +504,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     : Text(
                         "Book Now",
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(4.2),
+                          fontSize: context.getFontSize(4.2),
                           fontWeight: FontWeight.w700,
                         ),
                       );
@@ -524,7 +524,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         Text(
           left,
           style: TextStyle(
-            fontSize: context.getScreenWidth(isTotal ? 4.2 : 3.9),
+            fontSize: context.getFontSize(isTotal ? 4.2 : 3.9),
             color: isTotal ? AppColors.textDark : AppColors.textMuted,
             fontWeight: isTotal ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -532,7 +532,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         Text(
           right,
           style: TextStyle(
-            fontSize: context.getScreenWidth(isTotal ? 4.5 : 4),
+            fontSize: context.getFontSize(isTotal ? 4.5 : 4),
             color: isTotal ? AppColors.primaryGold : AppColors.textDark,
             fontWeight: FontWeight.w700,
           ),

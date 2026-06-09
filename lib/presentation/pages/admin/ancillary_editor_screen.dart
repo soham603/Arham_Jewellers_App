@@ -64,7 +64,7 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getScreenWidth(4.5),
+            fontSize: context.getFontSize(4.5),
           ),
         ),
         actions: [
@@ -112,7 +112,7 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
                 style: TextStyle(
                   color: AppColors.primaryGold,
                   fontWeight: FontWeight.w800,
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                 ),
               ),
             ),

@@ -72,7 +72,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         title: Text(
           'Order #${order.id.substring(0, 8).toUpperCase()}',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -88,7 +88,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
             ),
             child: Text(
               statusInfo.label,
-              style: TextStyle(fontSize: context.getScreenWidth(3), fontWeight: FontWeight.w600, color: statusInfo.color),
+              style: TextStyle(fontSize: context.getFontSize(3), fontWeight: FontWeight.w600, color: statusInfo.color),
             ),
           ),
         ],
@@ -189,7 +189,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                                 child: Text(
                                   item.product.name,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.8),
+                                    fontSize: context.getFontSize(3.8),
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.textDark,
                                   ),
@@ -198,7 +198,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                               Text(
                                 'x${item.quantity}',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.5),
+                                  fontSize: context.getFontSize(3.5),
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -270,7 +270,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   ),
                   child: Text(
                     order.adminMessage!,
-                    style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textMuted, height: 1.5),
+                    style: TextStyle(fontSize: context.getFontSize(3.5), color: AppColors.textMuted, height: 1.5),
                   ),
                 ),
                 SizedBox(height: context.getScreenHeight(2)),
@@ -320,7 +320,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     onPressed: () => _showRejectDialog(context),
                     child: Text(
                       "Reject Order",
-                      style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w700, color: const Color(0xFFDC2626)),
+                      style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w700, color: const Color(0xFFDC2626)),
                     ),
                   ),
                 ),
@@ -339,7 +339,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     child: Obx(() {
                       return _controller.isActionLoading
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : Text("Approve & Assign", style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w700));
+                          : Text("Approve & Assign", style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w700));
                     }),
                   ),
                 ),
@@ -360,7 +360,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     child: Obx(() {
                       return _controller.isActionLoading
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : Text("Mark Completed", style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w700));
+                          : Text("Mark Completed", style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w700));
                     }),
                   ),
                 ),
@@ -398,10 +398,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Approve & Assign Karigar", style: TextStyle(fontSize: context.getScreenWidth(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
+                    Text("Approve & Assign Karigar", style: TextStyle(fontSize: context.getFontSize(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
                     SizedBox(height: context.getScreenHeight(2)),
 
-                    Text("Select Craftsman", style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                    Text("Select Craftsman", style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
                     SizedBox(height: context.getScreenHeight(0.8)),
                     Obx(() {
                       final craftsmen = _craftsmanController.craftsmen;
@@ -416,10 +416,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                           child: DropdownButton<CraftsmanModel>(
                             isExpanded: true,
                             value: selectedCraftsman,
-                            hint: Text('Select craftsman', style: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3))),
+                            hint: Text('Select craftsman', style: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3))),
                             items: craftsmen.map((c) => DropdownMenuItem(
                               value: c,
-                              child: Text(c.displayName, style: TextStyle(fontSize: context.getScreenWidth(3.3))),
+                              child: Text(c.displayName, style: TextStyle(fontSize: context.getFontSize(3.3))),
                             )).toList(),
                             onChanged: (val) => setDialogState(() => selectedCraftsman = val),
                           ),
@@ -428,14 +428,14 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     }),
 
                     SizedBox(height: context.getScreenHeight(2)),
-                    Text("Staff Name", style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                    Text("Staff Name", style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
                     SizedBox(height: context.getScreenHeight(0.8)),
                     TextField(
                       controller: staffNameCtrl,
-                      style: TextStyle(fontSize: context.getScreenWidth(3.3)),
+                      style: TextStyle(fontSize: context.getFontSize(3.3)),
                       decoration: InputDecoration(
                         hintText: 'Who you spoke with',
-                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -444,15 +444,15 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     ),
 
                     SizedBox(height: context.getScreenHeight(2)),
-                    Text("Notes", style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                    Text("Notes", style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
                     SizedBox(height: context.getScreenHeight(0.8)),
                     TextField(
                       controller: notesCtrl,
                       maxLines: 2,
-                      style: TextStyle(fontSize: context.getScreenWidth(3.3)),
+                      style: TextStyle(fontSize: context.getFontSize(3.3)),
                       decoration: InputDecoration(
                         hintText: 'Optional notes',
-                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
@@ -481,7 +481,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                                   assignAdminNotes: notesCtrl.text.trim(),
                                 );
                               },
-                        child: Text("Confirm", style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w700, color: Colors.white)),
+                        child: Text("Confirm", style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w700, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -515,16 +515,16 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getScreenWidth(7)),
               ),
               SizedBox(height: context.getScreenHeight(2)),
-              Text("Reject Order", style: TextStyle(fontSize: context.getScreenWidth(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
+              Text("Reject Order", style: TextStyle(fontSize: context.getFontSize(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
               SizedBox(height: context.getScreenHeight(1)),
-              Text("Provide a reason for rejection", style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textMuted)),
+              Text("Provide a reason for rejection", style: TextStyle(fontSize: context.getFontSize(3.5), color: AppColors.textMuted)),
               SizedBox(height: context.getScreenHeight(2)),
               TextField(
                 controller: reasonCtrl,
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Reason...',
-                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                   filled: true,
                   fillColor: AppColors.pageBg,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -539,7 +539,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.grey.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                         onPressed: () => Get.back(),
-                        child: Text("Cancel", style: TextStyle(fontSize: context.getScreenWidth(3.8), color: AppColors.textDark)),
+                        child: Text("Cancel", style: TextStyle(fontSize: context.getFontSize(3.8), color: AppColors.textDark)),
                       ),
                     ),
                   ),
@@ -557,7 +557,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                             adminMessage: reasonCtrl.text.trim(),
                           );
                         },
-                        child: Text("Reject", style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w700, color: Colors.white)),
+                        child: Text("Reject", style: TextStyle(fontSize: context.getFontSize(3.8), fontWeight: FontWeight.w700, color: Colors.white)),
                       ),
                     ),
                   ),
@@ -590,10 +590,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Mark as Completed", style: TextStyle(fontSize: context.getScreenWidth(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
+                    Text("Mark as Completed", style: TextStyle(fontSize: context.getFontSize(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
                     SizedBox(height: context.getScreenHeight(2)),
 
-                    Text("Delivery Date", style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                    Text("Delivery Date", style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
                     SizedBox(height: context.getScreenHeight(0.8)),
                     GestureDetector(
                       onTap: () async {
@@ -615,7 +615,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                           controller: dateCtrl,
                           decoration: InputDecoration(
                             hintText: 'Select delivery date',
-                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                             filled: true,
                             fillColor: AppColors.pageBg,
                             suffixIcon: Icon(Icons.calendar_today_rounded, color: AppColors.primaryGold, size: 20),
@@ -626,14 +626,14 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     ),
 
                     SizedBox(height: context.getScreenHeight(2)),
-                    Text("Completion Notes", style: TextStyle(fontSize: context.getScreenWidth(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+                    Text("Completion Notes", style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
                     SizedBox(height: context.getScreenHeight(0.8)),
                     TextField(
                       controller: notesCtrl,
                       maxLines: 2,
                       decoration: InputDecoration(
                         hintText: 'Optional notes',
-                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                         filled: true,
                         fillColor: AppColors.pageBg,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -658,7 +658,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                             completeAdminNotes: notesCtrl.text.trim(),
                           );
                         },
-                        child: Text("Confirm Complete", style: TextStyle(fontSize: context.getScreenWidth(4), fontWeight: FontWeight.w700, color: Colors.white)),
+                        child: Text("Confirm Complete", style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w700, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -742,7 +742,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
               ),
             ),
           ],
@@ -757,7 +757,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
       children: [
         Container(width: 4, height: 16, decoration: BoxDecoration(color: AppColors.primaryGold, borderRadius: BorderRadius.circular(4))),
         const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: context.getScreenWidth(4.2), fontWeight: FontWeight.w800, color: AppColors.textDark)),
+        Text(title, style: TextStyle(fontSize: context.getFontSize(4.2), fontWeight: FontWeight.w800, color: AppColors.textDark)),
       ],
     );
   }
@@ -786,10 +786,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         children: [
           SizedBox(
             width: context.getScreenWidth(28),
-            child: Text(label, style: TextStyle(fontSize: context.getScreenWidth(3.2), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
+            child: Text(label, style: TextStyle(fontSize: context.getFontSize(3.2), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
           ),
           Expanded(
-            child: Text(value, style: TextStyle(fontSize: context.getScreenWidth(3.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
+            child: Text(value, style: TextStyle(fontSize: context.getFontSize(3.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
           ),
         ],
       ),

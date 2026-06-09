@@ -50,7 +50,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getScreenWidth(5),
+            fontSize: context.getFontSize(5),
           ),
         ),
       ),
@@ -107,7 +107,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   "Order #${order.id.substring(0, 8)}",
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: context.getScreenWidth(5),
+                    fontSize: context.getFontSize(5),
                   ),
                 ),
               ),
@@ -129,7 +129,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     style: TextStyle(
                       color: AppColors.primaryGold,
                       fontWeight: FontWeight.w800,
-                      fontSize: context.getScreenWidth(2.6),
+                      fontSize: context.getFontSize(2.6),
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -151,7 +151,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               style: TextStyle(
                 color: _orderStatusColor(order.status),
                 fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3),
+                fontSize: context.getFontSize(3),
               ),
             ),
           ),
@@ -196,7 +196,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             "Order Items",
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: context.getScreenWidth(4.4),
+              fontSize: context.getFontSize(4.4),
             ),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -251,7 +251,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   item.product.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: context.getScreenWidth(3.8),
+                                    fontSize: context.getFontSize(3.8),
                                   ),
                                 ),
                               ),
@@ -270,7 +270,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     style: TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.w700,
-                                      fontSize: context.getScreenWidth(2.2),
+                                      fontSize: context.getFontSize(2.2),
                                     ),
                                   ),
                                 ),
@@ -347,7 +347,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         label,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: context.getScreenWidth(2.8),
+          fontSize: context.getFontSize(2.8),
           color: AppColors.textDark,
         ),
       ),
@@ -392,7 +392,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               "Total Amount",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: context.getScreenWidth(4),
+                fontSize: context.getFontSize(4),
                 color: AppColors.textMuted,
               ),
             ),
@@ -401,7 +401,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             "₹${total.toStringAsFixed(2)}",
             style: TextStyle(
               fontWeight: FontWeight.w800,
-              fontSize: context.getScreenWidth(5),
+              fontSize: context.getFontSize(5),
               color: AppColors.textDark,
             ),
           ),
@@ -434,7 +434,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             "Customer Details",
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: context.getScreenWidth(4.4),
+              fontSize: context.getFontSize(4.4),
             ),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -492,14 +492,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 label,
                 style: TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: context.getScreenWidth(2.8),
+                  fontSize: context.getFontSize(2.8),
                 ),
               ),
               Text(
                 value,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: context.getScreenWidth(3.6),
+                  fontSize: context.getFontSize(3.6),
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 2,
@@ -525,7 +525,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           "$label: ",
           style: TextStyle(
             color: AppColors.textMuted,
-            fontSize: context.getScreenWidth(3.2),
+            fontSize: context.getFontSize(3.2),
           ),
         ),
         Expanded(
@@ -533,7 +533,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             value,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: context.getScreenWidth(3.2),
+              fontSize: context.getFontSize(3.2),
             ),
           ),
         ),
@@ -571,7 +571,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 order.status == "REJECTED" ? "Rejection Reason" : "Admin Message",
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  fontSize: context.getScreenWidth(4.4),
+                  fontSize: context.getFontSize(4.4),
                 ),
               ),
             ],
@@ -594,7 +594,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Text(
               order.adminMessage!,
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.4),
+                fontSize: context.getFontSize(3.4),
                 color: AppColors.textDark,
                 height: 1.5,
               ),
@@ -650,7 +650,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: context.getScreenWidth(3.8),
+                      fontSize: context.getFontSize(3.8),
                     ),
                   )),
           ),
@@ -677,7 +677,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
               ),
             ),
           ),
@@ -712,7 +712,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.w700,
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
               ),
             ),
           ],
@@ -737,7 +737,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Text(
                 "Reject Order",
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(5),
+                  fontSize: context.getFontSize(5),
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -746,7 +746,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 "Order #${order.id.substring(0, 8)}",
                 style: TextStyle(
                   color: Colors.grey.shade600,
-                  fontSize: context.getScreenWidth(3.4),
+                  fontSize: context.getFontSize(3.4),
                 ),
               ),
               SizedBox(height: context.getScreenHeight(2)),
@@ -755,12 +755,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 maxLines: 3,
                 textInputAction: TextInputAction.done,
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.6),
+                  fontSize: context.getFontSize(3.6),
                 ),
                 decoration: InputDecoration(
                   hintText: "Enter rejection reason",
                   hintStyle: TextStyle(
-                    fontSize: context.getScreenWidth(3.4),
+                    fontSize: context.getFontSize(3.4),
                     color: Colors.grey.shade400,
                   ),
                   filled: true,
@@ -790,7 +790,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(3.6),
+                          fontSize: context.getFontSize(3.6),
                         ),
                       ),
                     ),
@@ -834,7 +834,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(3.6),
+                          fontSize: context.getFontSize(3.6),
                         ),
                       ),
                     ),

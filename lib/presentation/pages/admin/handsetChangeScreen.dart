@@ -53,7 +53,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         title: Text(
           'Handset Changes',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -74,7 +74,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                 child: Text(
                   '${controller.total} total',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.2),
+                    fontSize: context.getFontSize(3.2),
                     fontWeight: FontWeight.w600,
                     color: _filterColor(controller.activeFilter),
                   ),
@@ -187,7 +187,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                     f,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3),
+                      fontSize: context.getFontSize(3),
                       fontWeight: FontWeight.w700,
                       color: isActive ? Colors.white : color,
                       letterSpacing: 0.5,
@@ -228,7 +228,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
             child: Text(
               'All requests loaded',
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.2),
+                fontSize: context.getFontSize(3.2),
                 color: context.colorPalette.subTitleColor,
               ),
             ),
@@ -316,7 +316,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
           Text(
             'Failed to load',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getFontSize(4.5),
               fontWeight: FontWeight.w600,
               color: context.colorPalette.textColor,
             ),
@@ -326,7 +326,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
             controller.error,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getScreenWidth(3.2),
+              fontSize: context.getFontSize(3.2),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -362,7 +362,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                 ? 'No ${controller.activeFilter.toLowerCase()} requests found'
                 : 'No ${controller.activeFilter.toLowerCase()} requests',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getFontSize(4.5),
               fontWeight: FontWeight.w600,
               color: context.colorPalette.textColor,
             ),
@@ -459,7 +459,7 @@ class _RequestCardState extends State<_RequestCard> {
                         (userName.isNotEmpty ? userName[0] : '?')
                             .toUpperCase(),
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(5),
+                          fontSize: context.getFontSize(5),
                           fontWeight: FontWeight.w700,
                           color: cardColor,
                         ),
@@ -474,7 +474,7 @@ class _RequestCardState extends State<_RequestCard> {
                         Text(
                           userName,
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(4.2),
+                            fontSize: context.getFontSize(4.2),
                             fontWeight: FontWeight.w700,
                             color: context.colorPalette.textColor,
                           ),
@@ -483,7 +483,7 @@ class _RequestCardState extends State<_RequestCard> {
                         Text(
                           userPhone,
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.2),
+                            fontSize: context.getFontSize(3.2),
                             color: context.colorPalette.subTitleColor,
                           ),
                         ),
@@ -506,7 +506,7 @@ class _RequestCardState extends State<_RequestCard> {
                           req.status,
                           style: TextStyle(
                             color: statusColor,
-                            fontSize: context.getScreenWidth(2.8),
+                            fontSize: context.getFontSize(2.8),
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.5,
                           ),
@@ -560,7 +560,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   'Old Device',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(2.8),
+                                    fontSize: context.getFontSize(2.8),
                                     color: context.colorPalette.subTitleColor,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -569,7 +569,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   req.oldDeviceName ?? '—',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.5),
+                                    fontSize: context.getFontSize(3.5),
                                     fontWeight: FontWeight.w700,
                                     color: context.colorPalette.textColor,
                                   ),
@@ -578,7 +578,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   req.oldDeviceId ?? '—',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(2.6),
+                                    fontSize: context.getFontSize(2.6),
                                     color: context.colorPalette.subTitleColor,
                                   ),
                                 ),
@@ -604,7 +604,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   'New Device',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(2.8),
+                                    fontSize: context.getFontSize(2.8),
                                     color: context.colorPalette.subTitleColor,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -613,7 +613,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   req.newDeviceName,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.5),
+                                    fontSize: context.getFontSize(3.5),
                                     fontWeight: FontWeight.w700,
                                     color: context.colorPalette.textColor,
                                   ),
@@ -623,7 +623,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   req.newDeviceId,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(2.6),
+                                    fontSize: context.getFontSize(2.6),
                                     color: context.colorPalette.subTitleColor,
                                   ),
                                   textAlign: TextAlign.end,
@@ -685,7 +685,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   'Rejection Reason',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3),
+                                    fontSize: context.getFontSize(3),
                                     color: context.colorPalette.subTitleColor,
                                   ),
                                 ),
@@ -693,7 +693,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   req.rejectionReason!,
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.5),
+                                    fontSize: context.getFontSize(3.5),
                                     fontWeight: FontWeight.w600,
                                     color: Colors.red.shade700,
                                   ),
@@ -776,7 +776,7 @@ class _RequestCardState extends State<_RequestCard> {
             Text(
               'Approve Request',
               style: TextStyle(
-                fontSize: context.getScreenWidth(4.5),
+                fontSize: context.getFontSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -786,7 +786,7 @@ class _RequestCardState extends State<_RequestCard> {
         content: Text(
           'Allow ${req.userName ?? 'this user'} to change their handset to ${req.newDeviceName}?',
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
+            fontSize: context.getFontSize(3.8),
             color: context.colorPalette.textColor,
           ),
         ),
@@ -871,7 +871,7 @@ class _RequestCardState extends State<_RequestCard> {
             Text(
               'Reject Request',
               style: TextStyle(
-                fontSize: context.getScreenWidth(4.5),
+                fontSize: context.getFontSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -885,7 +885,7 @@ class _RequestCardState extends State<_RequestCard> {
             Text(
               'Reject handset change request from ${req.userName ?? 'this user'}?',
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
                 color: context.colorPalette.textColor,
               ),
             ),
@@ -896,7 +896,7 @@ class _RequestCardState extends State<_RequestCard> {
               decoration: InputDecoration(
                 hintText: 'Enter rejection reason...',
                 hintStyle: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: context.colorPalette.subTitleColor,
                 ),
                 border: OutlineInputBorder(
@@ -1049,7 +1049,7 @@ class _RequestCardState extends State<_RequestCard> {
                     label,
                     style: TextStyle(
                       color: outlined ? color : Colors.white,
-                      fontSize: context.getScreenWidth(3.5),
+                      fontSize: context.getFontSize(3.5),
                       fontWeight: FontWeight.w600,
                     ),
                   ),

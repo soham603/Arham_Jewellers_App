@@ -52,7 +52,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
         title: Text(
           label,
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -92,7 +92,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                     controller.error.isNotEmpty ? controller.error : 'Failed to load content',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.8),
+                      fontSize: context.getFontSize(3.8),
                       color: Colors.red.shade400,
                     ),
                   ),
@@ -127,7 +127,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 Text(
                   'No content available',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4),
+                    fontSize: context.getFontSize(4),
                     color: AppColors.textMuted,
                   ),
                 ),
@@ -148,7 +148,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 Text(
                   page.title,
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(6),
+                    fontSize: context.getFontSize(6),
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),

@@ -836,7 +836,7 @@ class _KaratSection extends StatelessWidget {
                                 textAlign: TextAlign.center,
 
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(2.8),
+                                  fontSize: context.getFontSize(2.8),
 
                                   color: isExpanded
                                       ? context.colorPalette.goldDeep
@@ -1835,7 +1835,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                           .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                           .trim(),
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(2.8),
+                        fontSize: context.getFontSize(2.8),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDeep,
                       ),
@@ -1937,7 +1937,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                   "Bespoke Service",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getScreenWidth(2.6),
+                    fontSize: context.getFontSize(2.6),
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -1963,7 +1963,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "BRING IDEAS TO LIFE",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: context.getScreenWidth(2.8),
+                            fontSize: context.getFontSize(2.8),
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.2,
                           ),
@@ -1977,7 +1977,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                             color: const Color(
                               0xFF3E2723,
                             ), // Deep Espresso Brown
-                            fontSize: context.getScreenWidth(5.5),
+                            fontSize: context.getFontSize(5.5),
                             fontWeight: FontWeight.w900,
                             height: 1.1,
                           ),
@@ -1986,7 +1986,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Dream Jewelry",
                           style: TextStyle(
                             color: const Color(0xFF3E2723).withOpacity(0.8),
-                            fontSize: context.getScreenWidth(4),
+                            fontSize: context.getFontSize(4),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -2012,7 +2012,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Turn your unique inspirations into\nstunning gold masterpieces.",
                           style: TextStyle(
                             color: const Color(0xFF5D4037),
-                            fontSize: context.getScreenWidth(2.8),
+                            fontSize: context.getFontSize(2.8),
                             fontWeight: FontWeight.w600,
                             height: 1.3,
                           ),
@@ -2049,7 +2049,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 "Start Designing",
                                 style: TextStyle(
                                   color: context.colorPalette.goldDeep,
-                                  fontSize: context.getScreenWidth(3),
+                                  fontSize: context.getFontSize(3),
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -2116,7 +2116,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       text,
       style: TextStyle(
         color: const Color(0xFF3E2723),
-        fontSize: context.getScreenWidth(2.6),
+        fontSize: context.getFontSize(2.6),
         fontWeight: FontWeight.w800,
       ),
     );

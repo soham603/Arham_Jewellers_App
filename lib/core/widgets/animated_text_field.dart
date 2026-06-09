@@ -103,7 +103,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
           maxLength: widget.maxLength,
           textCapitalization: widget.textCapitalization,
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.5).clamp(14.0, 17.0),
+            fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
             color: AppColors.textDark,
             fontWeight: FontWeight.w500,
           ),
@@ -111,7 +111,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             hintText: displayHintText,
             hintStyle: TextStyle(
               color: Colors.grey.shade400,
-              fontSize: context.getScreenWidth(3.5).clamp(14.0, 17.0),
+              fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
             ),
             counterText: "",
             filled: true,

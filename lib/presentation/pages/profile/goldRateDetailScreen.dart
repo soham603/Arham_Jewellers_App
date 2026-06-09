@@ -30,7 +30,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         title: Text(
           'Gold Rate',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -96,7 +96,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 controller.error.isNotEmpty ? controller.error : 'Failed to load rate',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: Colors.red.shade400,
                 ),
               ),
@@ -162,7 +162,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     'Today\'s Gold Rate',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: context.getScreenWidth(3.2),
+                      fontSize: context.getFontSize(3.2),
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
@@ -176,7 +176,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: context.getScreenWidth(7.5),
+                          fontSize: context.getFontSize(7.5),
                           height: 1.0,
                         ),
                       ),
@@ -188,7 +188,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                           style: TextStyle(
                             color: Colors.white70,
                             fontWeight: FontWeight.w500,
-                            fontSize: context.getScreenWidth(4.0),
+                            fontSize: context.getFontSize(4.0),
                           ),
                         ),
                       ),
@@ -212,7 +212,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
-                    fontSize: context.getScreenWidth(2.6),
+                    fontSize: context.getFontSize(2.6),
                   ),
                 ),
               ),
@@ -261,7 +261,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               Text(
                 'Need at least 2 data points for graph',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: context.colorPalette.subTitleColor.withOpacity(0.6),
                 ),
               ),
@@ -314,7 +314,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               child: Text(
                 'Gold Price Graph',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.textColor,
                 ),
@@ -354,7 +354,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                               '₹${(value / 1000).toStringAsFixed(0)}k',
                               textAlign: TextAlign.right,
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(2.6),
+                                fontSize: context.getFontSize(2.6),
                                 fontWeight: FontWeight.w500,
                                 color: context.colorPalette.subTitleColor.withOpacity(0.7),
                               ),
@@ -384,7 +384,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                                 sorted[idx].timestamp.toLocal(),
                               ),
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(2.2),
+                                fontSize: context.getFontSize(2.2),
                                 color: context.colorPalette.subTitleColor
                                     .withOpacity(0.6),
                               ),
@@ -413,14 +413,14 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                             TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: context.getScreenWidth(3),
+                              fontSize: context.getFontSize(3),
                             ),
                             children: [
                               TextSpan(
                                 text: DateFormat('dd MMM yyyy').format(date),
                                 style: TextStyle(
                                   color: Colors.white70,
-                                  fontSize: context.getScreenWidth(2.3),
+                                  fontSize: context.getFontSize(2.3),
                                 ),
                               ),
                             ],
@@ -520,7 +520,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         child: Text(
                           displayLabel,
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.2),
+                            fontSize: context.getFontSize(3.2),
                             fontWeight: FontWeight.w600,
                             color: isSelected
                                 ? Colors.white
@@ -581,7 +581,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         Text(
                           'Custom',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.2),
+                            fontSize: context.getFontSize(3.2),
                             fontWeight: FontWeight.w600,
                             color: isCustom
                                 ? Colors.white
@@ -640,7 +640,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     child: Text(
                       'Showing: ${controller.dateRangeLabel}',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3),
+                        fontSize: context.getFontSize(3),
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryGoldDark,
                       ),
@@ -707,7 +707,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     Text(
                       "Market Trend",
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(3.2),
+                        fontSize: context.getFontSize(3.2),
                         color: context.colorPalette.subTitleColor,
                         fontWeight: FontWeight.w500,
                       ),
@@ -724,7 +724,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         Text(
                           stats.overallTrend.toUpperCase(),
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(4.5),
+                            fontSize: context.getFontSize(4.5),
                             fontWeight: FontWeight.w800,
                             color: trendColor,
                           ),
@@ -745,7 +745,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   child: Text(
                     '${isUp ? '+' : ''}${stats.changePercent.toStringAsFixed(2)}%',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.5),
+                      fontSize: context.getFontSize(3.5),
                       fontWeight: FontWeight.w700,
                       color: trendColor,
                     ),
@@ -789,7 +789,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             Text(
               label,
               style: TextStyle(
-                fontSize: context.getScreenWidth(3),
+                fontSize: context.getFontSize(3),
                 color: context.colorPalette.subTitleColor,
                 fontWeight: FontWeight.w500,
               ),
@@ -800,7 +800,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         Text(
           '₹${value.toStringAsFixed(0)}',
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
+            fontSize: context.getFontSize(3.8),
             fontWeight: FontWeight.w700,
             color: context.colorPalette.textColor,
           ),
@@ -831,7 +831,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           child: Text(
             controller.error.isNotEmpty ? controller.error : 'No history available',
             style: TextStyle(
-              fontSize: context.getScreenWidth(3.5),
+              fontSize: context.getFontSize(3.5),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -853,7 +853,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 Text(
                   'No rate history yet',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.8),
+                    fontSize: context.getFontSize(3.8),
                     color: context.colorPalette.subTitleColor,
                   ),
                 ),
@@ -913,7 +913,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 child: Text(
                   DateFormat('dd').format(rate.timestamp.toLocal()),
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.2),
+                  fontSize: context.getFontSize(3.2),
                   fontWeight: FontWeight.w700,
                   color: isFirst ? AppColors.primaryGold : context.colorPalette.subTitleColor,
                 ),
@@ -928,7 +928,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 Text(
                   DateFormat('dd MMMM yyyy').format(rate.timestamp.toLocal()),
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.5),
+                    fontSize: context.getFontSize(3.5),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.textColor,
                   ),
@@ -937,7 +937,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   Text(
                     'Set by ${rate.source}',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(2.8),
+                      fontSize: context.getFontSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -950,7 +950,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               Text(
                 '₹${rate.rate.toStringAsFixed(0)}',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4.2),
+                  fontSize: context.getFontSize(4.2),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.textColor,
                 ),
@@ -979,7 +979,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       Text(
                         '₹${diff.abs().toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(2.5),
+                          fontSize: context.getFontSize(2.5),
                           fontWeight: FontWeight.w600,
                           color: isUp ? Colors.green : Colors.red,
                         ),

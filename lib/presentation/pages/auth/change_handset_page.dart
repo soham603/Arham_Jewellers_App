@@ -137,7 +137,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
         Text(
           'Change Handset',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
           ),
@@ -148,7 +148,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
         Text(
           'Verify your identity to link this new device to your account securely.',
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.3),
+            fontSize: context.getFontSize(3.3),
             color: AppColors.textMuted,
             height: 1.4,
           ),
@@ -178,7 +178,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
             textStyle: TextStyle(
               color: AppColors.textDark,
               fontWeight: FontWeight.w600,
-              fontSize: context.getScreenWidth(3.5),
+              fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
             ),
           ),
           validator: (value) {
@@ -323,7 +323,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 child: Text(
                   'Verify & Change Handset',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.2),
+                    fontSize: context.getFontSize(4.2),
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,

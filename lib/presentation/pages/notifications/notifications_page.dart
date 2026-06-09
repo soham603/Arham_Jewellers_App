@@ -43,7 +43,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         title: Text(
           'Notifications',
           style: TextStyle(
-            fontSize: context.getScreenWidth(6),
+            fontSize: context.getFontSize(6),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -129,7 +129,7 @@ class _EmptyState extends StatelessWidget {
           Text(
             'No notifications yet',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getFontSize(4.5),
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -139,7 +139,7 @@ class _EmptyState extends StatelessWidget {
             'You\'ll receive notifications about\norders, offers, and updates',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getScreenWidth(3.5),
+              fontSize: context.getFontSize(3.5),
               color: AppColors.textMuted,
             ),
           ),
@@ -232,7 +232,7 @@ class _NotificationCard extends StatelessWidget {
                         child: Text(
                           notification.title,
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.8),
+                            fontSize: context.getFontSize(3.8),
                             fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w700,
                             color: AppColors.textDark,
                           ),
@@ -256,7 +256,7 @@ class _NotificationCard extends StatelessWidget {
                   Text(
                     notification.body,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.3),
+                      fontSize: context.getFontSize(3.3),
                       color: AppColors.textMuted,
                     ),
                     maxLines: 2,
@@ -266,7 +266,7 @@ class _NotificationCard extends StatelessWidget {
                   Text(
                     timeAgo,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(2.8),
+                      fontSize: context.getFontSize(2.8),
                       color: AppColors.textMuted.withOpacity(0.7),
                     ),
                   ),

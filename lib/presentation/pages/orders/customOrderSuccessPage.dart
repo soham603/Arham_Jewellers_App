@@ -34,7 +34,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                 Text(
                   'Order Submitted!',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(7),
+                    fontSize: context.getFontSize(7),
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),
@@ -43,7 +43,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                 Text(
                   'Your custom order has been placed successfully. Our team will review and contact you shortly.',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.8),
+                    fontSize: context.getFontSize(3.8),
                     color: AppColors.textMuted,
                     height: 1.6,
                   ),
@@ -66,7 +66,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                     child: Text(
                       'Back to Home',
                       style: TextStyle(
-                        fontSize: context.getScreenWidth(4.2),
+                        fontSize: context.getFontSize(4.2),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -78,7 +78,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                   child: Text(
                     'View My Orders',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.8),
+                      fontSize: context.getFontSize(3.8),
                       color: AppColors.primaryGold,
                       fontWeight: FontWeight.w600,
                     ),

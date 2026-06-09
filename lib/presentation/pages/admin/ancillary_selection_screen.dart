@@ -35,7 +35,7 @@ class AncillarySelectionScreen extends StatelessWidget {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getScreenWidth(4.5),
+            fontSize: context.getFontSize(4.5),
           ),
         ),
       ),
@@ -61,7 +61,7 @@ class AncillarySelectionScreen extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textDark,
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                 ),
               ),
               trailing: Icon(
