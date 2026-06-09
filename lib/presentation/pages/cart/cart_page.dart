@@ -238,14 +238,13 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ],
-                                        if ((item.product.netWeight ??
-                                            item.product.fineWeight) !=
+                                        if (item.product.karigarNetWt !=
                                                 null) ...[
                                           SizedBox(
                                               height:
                                                   context.getScreenHeight(0.2)),
                                           Text(
-                                            'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
+                                            'Net Wt: ${item.product.karigarNetWt}g',
                                             style: TextStyle(
                                               fontSize:
                                                   context.getResponsiveSize(3.0),

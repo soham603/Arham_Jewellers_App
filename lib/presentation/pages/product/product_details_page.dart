@@ -229,8 +229,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return GoldRateController.calculatePrice(
       fineWeight:
           product.karigarNetWt ??
-          product.netWeight ??
-          product.fineWeight ??
           0,
       ratePer10Gram: goldRate.rate,
     );

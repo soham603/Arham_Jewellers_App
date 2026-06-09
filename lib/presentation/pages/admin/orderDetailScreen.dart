@@ -295,15 +295,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 ...() {
                                   final chips = <Widget>[];
                                   final rawData = controller.getProductRawData(item.product.id);
-                                  final netWtVal = rawData != null ? double.tryParse(rawData['NetWt']?.toString() ?? '') : null;
-                                  final fineWtVal = rawData != null ? double.tryParse(rawData['FineWt']?.toString() ?? '') : null;
-                                  final weight = netWtVal ?? fineWtVal;
+                                  final karigarNetWtVal = rawData != null ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '') : null;
+                                  final weight = karigarNetWtVal;
                                   if (weight != null) {
-                                    final isFallback = netWtVal == null;
                                     chips.add(SizedBox(width: context.getResponsiveSize(2)));
                                     chips.add(_itemDetailChip(
                                       context,
-                                      label: "${isFallback ? 'Fine' : 'Net'}: ${weight.toStringAsFixed(2)}g",
+                                      label: "Net Wt: ${weight.toStringAsFixed(2)}g",
                                     ));
                                   }
                                   final sizeVal = rawData?['Size1']?.toString();

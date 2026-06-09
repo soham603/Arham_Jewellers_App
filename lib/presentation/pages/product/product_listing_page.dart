@@ -699,7 +699,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
       fineWeight:
-          product.karigarNetWt ?? product.netWeight ?? product.fineWeight ?? 0,
+          product.karigarNetWt ?? 0,
       ratePer10Gram: ratePer10Gram,
     );
   }

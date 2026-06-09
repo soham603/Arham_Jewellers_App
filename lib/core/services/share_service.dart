@@ -327,7 +327,7 @@ class ShareService {
         'name': p.name,
         'category': p.category?.name ?? '-',
         'karat': p.touch ?? p.karat ?? '-',
-        'netWt': p.netWeight ?? p.fineWeight,
+        'netWt': p.karigarNetWt,
         'qty': quantities[i],
       });
     }
@@ -477,7 +477,7 @@ class ShareService {
         'name': p.name,
         'category': p.category?.name ?? '-',
         'karat': p.touch ?? p.karat ?? '-',
-        'netWt': p.netWeight ?? p.fineWeight,
+        'netWt': p.karigarNetWt,
         'qty': quantities[i],
       });
     }

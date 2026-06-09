@@ -25,7 +25,7 @@ class ProductListTile extends StatelessWidget {
     final imageUrl = _cleanText(product.displayImageUrl);
     final categoryName = _cleanText(product.category?.name);
     final tagNo = _cleanText(product.tagNo);
-    final fineWeight = _formatValue(product.fineWeight);
+    final fineWeight = _formatValue(product.karigarNetWt);
     final grossWeight = _formatValue(product.grossWeight);
     final touchData = _parseTouch(product.touch);
     final size = _cleanText(product.size);
@@ -162,7 +162,7 @@ class ProductListTile extends StatelessWidget {
                       if (grossWeight != null)
                         _InfoChip(label: 'Wt: ${grossWeight}g'),
                       if (fineWeight != null && fineWeight != grossWeight)
-                        _InfoChip(label: 'Fine: ${fineWeight}g'),
+                        _InfoChip(label: 'Net Wt: ${fineWeight}g'),
                       if (touchData != null) _InfoChip(label: touchData),
                       if (size != null) _InfoChip(label: 'Size: $size'),
                     ],

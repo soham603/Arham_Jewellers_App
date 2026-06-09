@@ -199,9 +199,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                              if ((item.product.netWeight ?? item.product.fineWeight) != null)
+                              if (item.product.karigarNetWt != null)
                                 Text(
-                                  'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
+                                  'Net Wt: ${item.product.karigarNetWt}g',
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(3.0),
                                     color: AppColors.textMuted,
