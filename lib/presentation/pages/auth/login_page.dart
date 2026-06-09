@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
         if (didPop) return;
         final now = DateTime.now();
         if (_lastBackPress != null && now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
-          SystemNavigator.pop();
+          if (!kIsWeb) SystemNavigator.pop();
         } else {
           _lastBackPress = now;
           HapticFeedback.lightImpact();
