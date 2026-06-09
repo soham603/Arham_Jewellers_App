@@ -1000,7 +1000,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               Text(
                 'Share ${selectedProducts.length} product${selectedProducts.length == 1 ? '' : 's'}',
                 style: TextStyle(
-                  fontSize: context.getFontSize(4.5),
+                  fontSize: context.getResponsiveSize(4.5),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.textColor,
                 ),
@@ -1034,7 +1034,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                 ),
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   color: context.colorPalette.textColor,
                 ),
               ),
@@ -1098,7 +1098,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: context.getFontSize(5.5),
+                size: context.getResponsiveSize(5.5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -1109,7 +1109,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.8),
+                      fontSize: context.getResponsiveSize(3.8),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.textColor,
                     ),
@@ -1118,7 +1118,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -1128,7 +1128,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Icon(
               Icons.chevron_right_rounded,
               color: context.colorPalette.subTitleColor,
-              size: context.getFontSize(5),
+              size: context.getResponsiveSize(5),
             ),
           ],
         ),
@@ -1207,7 +1207,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 Text(
                   message,
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w500,
                     color: context.colorPalette.textColor,
                   ),

@@ -356,7 +356,7 @@ class _SearchPageState extends State<SearchPage> {
                                   Text(
                                     'Results (${_filteredCategoryCount})',
                                     style: TextStyle(
-                                      fontSize: context.getFontSize(4.2),
+                                      fontSize: context.getResponsiveSize(4.2),
                                       fontWeight: FontWeight.w700,
                                       color: const Color(0xFF675F55),
                                     ),
@@ -366,7 +366,7 @@ class _SearchPageState extends State<SearchPage> {
                                     Text(
                                       '— ${controller.selectedKarats.join(", ")}',
                                       style: TextStyle(
-                                        fontSize: context.getFontSize(3.5),
+                                        fontSize: context.getResponsiveSize(3.5),
                                         fontWeight: FontWeight.w600,
                                         color: context.colorPalette.goldDark,
                                       ),
@@ -501,7 +501,7 @@ class _SearchPageState extends State<SearchPage> {
                       '$karat ($percent)',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.2),
+                        fontSize: context.getResponsiveSize(3.2),
                         fontWeight: FontWeight.w700,
                         color: isSelected
                             ? Colors.white
@@ -677,14 +677,14 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           Icon(
                             Icons.close,
-                            size: context.getFontSize(3),
+                            size: context.getResponsiveSize(3),
                             color: context.colorPalette.goldDark,
                           ),
                           SizedBox(width: context.getScreenWidth(0.8)),
                           Text(
                             'Clear',
                             style: TextStyle(
-                              fontSize: context.getFontSize(2.8),
+                              fontSize: context.getResponsiveSize(2.8),
                               fontWeight: FontWeight.w500,
                               color: context.colorPalette.goldDark,
                             ),
@@ -876,7 +876,7 @@ class _SearchPageState extends State<SearchPage> {
               child: Text(
                 'Browse Categories',
                 style: TextStyle(
-                  fontSize: context.getFontSize(4.2),
+                  fontSize: context.getResponsiveSize(4.2),
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF675F55),
                 ),
@@ -915,8 +915,8 @@ class _SearchPageState extends State<SearchPage> {
                     child: Column(
                       children: [
                         Container(
-                          width: context.getScreenWidth(16),
-                          height: context.getScreenWidth(16),
+                          width: context.getResponsiveSize(16),
+                          height: context.getResponsiveSize(16),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -938,7 +938,7 @@ class _SearchPageState extends State<SearchPage> {
                               Text(
                                 cleanedName,
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(2.4),
+                                  fontSize: context.getResponsiveSize(2.4),
                                   fontWeight: FontWeight.w700,
                                   color: context.colorPalette.goldDeep,
                                 ),
@@ -986,7 +986,7 @@ class _SearchPageState extends State<SearchPage> {
                 Text(
                   'Latest Collections',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.2),
+                    fontSize: context.getResponsiveSize(4.2),
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF675F55),
                   ),
@@ -1027,7 +1027,7 @@ class _SearchPageState extends State<SearchPage> {
               Text(
                 'Latest Collections',
                 style: TextStyle(
-                  fontSize: context.getFontSize(4.2),
+                  fontSize: context.getResponsiveSize(4.2),
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF675F55),
                 ),
@@ -1076,7 +1076,7 @@ class _SearchPageState extends State<SearchPage> {
                       child: Text(
                         displayName,
                         style: TextStyle(
-                          fontSize: context.getFontSize(3),
+                          fontSize: context.getResponsiveSize(3),
                           color: context.colorPalette.textColor,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1116,7 +1116,7 @@ class _SearchPageState extends State<SearchPage> {
                 Text(
                   'Recent Searches (${all.length})',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.2),
+                    fontSize: context.getResponsiveSize(4.2),
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF675F55),
                   ),
@@ -1127,7 +1127,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: Text(
                       'Clear all',
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.2),
+                        fontSize: context.getResponsiveSize(3.2),
                         color: context.colorPalette.goldDark,
                       ),
                     ),
@@ -1176,7 +1176,7 @@ class _SearchPageState extends State<SearchPage> {
               Text(
                 term,
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.2),
+                  fontSize: context.getResponsiveSize(3.2),
                   color: context.colorPalette.textColor,
                   fontWeight: FontWeight.w500,
                 ),
@@ -1186,7 +1186,7 @@ class _SearchPageState extends State<SearchPage> {
                 onTap: () => controller.removeRecentSearch(term),
                 child: Icon(
                   Icons.close_rounded,
-                  size: context.getFontSize(3.2),
+                  size: context.getResponsiveSize(3.2),
                   color: const Color(0xFF8D847A),
                 ),
               ),
@@ -1328,7 +1328,7 @@ class _SearchPageState extends State<SearchPage> {
                               Text(
                                 cleanedName,
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(2.8),
+                                  fontSize: context.getResponsiveSize(2.8),
                                   fontWeight: FontWeight.w600,
                                   color: context.colorPalette.textColor,
                                 ),
@@ -1340,7 +1340,7 @@ class _SearchPageState extends State<SearchPage> {
                                 Text(
                                   '$karatName • ${_getKaratPurity(karatName)}',
                                   style: TextStyle(
-                                    fontSize: context.getFontSize(2.2),
+                                    fontSize: context.getResponsiveSize(2.2),
                                     fontWeight: FontWeight.w500,
                                     color: context.colorPalette.goldDark,
                                   ),
@@ -1499,7 +1499,7 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Icon(
             Icons.search_off_rounded,
-            size: context.getFontSize(12),
+            size: context.getResponsiveSize(12),
             color: const Color(0xFF8D847A),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1507,7 +1507,7 @@ class _SearchPageState extends State<SearchPage> {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getFontSize(3.8),
+              fontSize: context.getResponsiveSize(3.8),
               color: context.colorPalette.subTitleColor,
             ),
           ),

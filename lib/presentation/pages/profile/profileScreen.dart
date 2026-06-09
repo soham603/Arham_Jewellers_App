@@ -82,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
           ),
         ),
         actions: [
@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           'Logout',
                           style: TextStyle(
-                            fontSize: context.getFontSize(4.5),
+                            fontSize: context.getResponsiveSize(4.5),
                             fontWeight: FontWeight.w700,
                             color: context.colorPalette.textColor,
                           ),
@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     content: Text(
                       'Are you sure you want to logout?',
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.8),
+                        fontSize: context.getResponsiveSize(3.8),
                         color: context.colorPalette.subTitleColor,
                       ),
                     ),
@@ -183,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Icon(
                   Icons.logout_rounded,
                   color: Colors.redAccent,
-                  size: context.getFontSize(6),
+                  size: context.getResponsiveSize(6),
                 ),
               ),
             ),
@@ -206,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     "Failed to load orders",
                     style: TextStyle(
                       color: AppColors.textDark,
-                      fontSize: context.getFontSize(4),
+                      fontSize: context.getResponsiveSize(4),
                     ),
                   ),
                 );
@@ -254,9 +254,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Row(
                             children: [
                               Container(
-                                width: context.getScreenWidth(18),
+                                width: context.getResponsiveSize(18),
 
-                                height: context.getScreenWidth(18),
+                                height: context.getResponsiveSize(18),
 
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
@@ -266,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Icon(
                                   Icons.person_rounded,
                                   color: Colors.white,
-                                  size: context.getFontSize(10),
+                                  size: context.getResponsiveSize(10),
                                 ),
                               ),
 
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
-                                        fontSize: context.getFontSize(5.3),
+                                        fontSize: context.getResponsiveSize(5.3),
                                       ),
                                     ),
 
@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       "Premium Jewellery Customer",
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.7),
-                                        fontSize: context.getFontSize(3.5),
+                                        fontSize: context.getResponsiveSize(3.5),
                                       ),
                                     ),
                                   ],
@@ -349,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Icon(
                                   Icons.workspace_premium,
                                   color: Colors.amber,
-                                  size: context.getFontSize(5),
+                                  size: context.getResponsiveSize(5),
                                 ),
 
                                 SizedBox(width: context.getScreenWidth(2)),
@@ -359,7 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     "Trusted Jewellery Buyer",
                                     style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: context.getFontSize(3.7),
+                                      fontSize: context.getResponsiveSize(3.7),
                                     ),
                                   ),
                                 ),
@@ -384,7 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Icon(
                                     Icons.store_rounded,
                                     color: const Color(0xFFD4AF37),
-                                    size: context.getFontSize(5),
+                                    size: context.getResponsiveSize(5),
                                   ),
                                   SizedBox(width: context.getScreenWidth(2)),
                                   Expanded(
@@ -392,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       "Retailer",
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: context.getFontSize(3.7),
+                                        fontSize: context.getResponsiveSize(3.7),
                                       ),
                                     ),
                                   ),
@@ -419,7 +419,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           "My Orders",
                           style: TextStyle(
-                            fontSize: context.getFontSize(6),
+                            fontSize: context.getResponsiveSize(6),
                             fontWeight: FontWeight.w700,
                             color: AppColors.textDark,
                           ),
@@ -429,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(
                             "View All",
                             style: TextStyle(
-                              fontSize: context.getFontSize(4),
+                              fontSize: context.getResponsiveSize(4),
                               fontWeight: FontWeight.w600,
                               color: AppColors.primaryGold,
                             ),
@@ -503,7 +503,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,
-                                      fontSize: context.getFontSize(4),
+                                      fontSize: context.getResponsiveSize(4),
                                     ),
                                   ),
                           ),
@@ -519,7 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       "Help & Info",
                       style: TextStyle(
-                        fontSize: context.getFontSize(6),
+                        fontSize: context.getResponsiveSize(6),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
                       ),
@@ -611,7 +611,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Icon(
                 Icons.auto_awesome_rounded,
                 color: AppColors.primaryGold,
-                size: context.getFontSize(5),
+                size: context.getResponsiveSize(5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -624,7 +624,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: context.getFontSize(4.2),
+                      fontSize: context.getResponsiveSize(4.2),
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
@@ -632,7 +632,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     'Browse jewellery, check rates, track orders',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.6),
-                      fontSize: context.getFontSize(3),
+                      fontSize: context.getResponsiveSize(3),
                     ),
                   ),
                 ],
@@ -641,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Icon(
               Icons.chevron_right_rounded,
               color: Colors.white.withOpacity(0.5),
-              size: context.getFontSize(5),
+              size: context.getResponsiveSize(5),
             ),
           ],
         ),
@@ -680,7 +680,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 icon,
                 color: AppColors.primaryGold,
-                size: context.getFontSize(5.5),
+                size: context.getResponsiveSize(5.5),
               ),
               SizedBox(width: context.getScreenWidth(3)),
               Expanded(
@@ -688,7 +688,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: context.getFontSize(4),
+                    fontSize: context.getResponsiveSize(4),
                     color: AppColors.textDark,
                   ),
                 ),
@@ -696,7 +696,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textMuted,
-                size: context.getFontSize(5),
+                size: context.getResponsiveSize(5),
               ),
             ],
           ),
@@ -722,7 +722,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w700,
-              fontSize: context.getFontSize(5),
+              fontSize: context.getResponsiveSize(5),
             ),
           ),
 
@@ -732,7 +732,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title,
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
-              fontSize: context.getFontSize(3.4),
+              fontSize: context.getResponsiveSize(3.4),
             ),
           ),
         ],
@@ -776,7 +776,7 @@ class _OrderCard extends StatelessWidget {
                         : 'Order #${order.id.substring(0, 8).toUpperCase()}',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: context.getFontSize(4),
+                      fontSize: context.getResponsiveSize(4),
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.4)),
@@ -784,7 +784,7 @@ class _OrderCard extends StatelessWidget {
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
                       color: AppColors.textMuted,
-                      fontSize: context.getFontSize(3),
+                      fontSize: context.getResponsiveSize(3),
                     ),
                   ),
                 ],
@@ -804,7 +804,7 @@ class _OrderCard extends StatelessWidget {
                 style: TextStyle(
                   color: statusInfo.color,
                   fontWeight: FontWeight.w700,
-                  fontSize: context.getFontSize(2.8),
+                  fontSize: context.getResponsiveSize(2.8),
                 ),
               ),
             ),
@@ -812,7 +812,7 @@ class _OrderCard extends StatelessWidget {
             Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textMuted,
-              size: context.getFontSize(5),
+              size: context.getResponsiveSize(5),
             ),
           ],
         ),
@@ -942,7 +942,7 @@ class _OrderImagesStack extends StatelessWidget {
                   "$totalItems",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getFontSize(3.2),
+                    fontSize: context.getResponsiveSize(3.2),
                     fontWeight: FontWeight.w700,
                   ),
                 ),

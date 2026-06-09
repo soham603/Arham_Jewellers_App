@@ -146,14 +146,14 @@ class _LoginPageState extends State<LoginPage> {
         Center(
           child: LogoWidget(
             logoSize: hasKeyboard
-                ? context.getFontSize(14)
-                : context.getFontSize(24),
+                ? context.getResponsiveSize(14)
+                : context.getResponsiveSize(24),
             nameFontSize: hasKeyboard
-                ? context.getFontSize(3.5)
-                : context.getFontSize(5.5),
+                ? context.getResponsiveSize(3.5)
+                : context.getResponsiveSize(5.5),
             subtitleFontSize: hasKeyboard
-                ? context.getFontSize(2.1)
-                : context.getFontSize(2.8),
+                ? context.getResponsiveSize(2.1)
+                : context.getResponsiveSize(2.8),
             iconColor: context.colorPalette.gold,
             nameColor: context.colorPalette.goldDeep,
             subtitleColor: context.colorPalette.goldDark,
@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
               isAdminLogin ? 'Admin Portal' : 'Welcome Back',
               key: ValueKey<bool>(isAdminLogin),
               style: TextStyle(
-                fontSize: context.getFontSize(5.5),
+                fontSize: context.getResponsiveSize(5.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                 ? 'Sign in with admin credentials'
                 : 'Sign in to access your gold account',
             style: TextStyle(
-              fontSize: context.getFontSize(3.3),
+              fontSize: context.getResponsiveSize(3.3),
               color: AppColors.textMuted,
             ),
           ),
@@ -234,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
               textStyle: TextStyle(
                 color: AppColors.textDark,
                 fontWeight: FontWeight.w600,
-                fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
+                fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
               ),
             ),
             validator: (value) {
@@ -259,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
                 color: Colors.grey.shade500,
-                size: context.getFontSize(5),
+                size: context.getResponsiveSize(5),
               ),
               onPressed: () {
                 setState(() {
@@ -362,7 +362,7 @@ class _LoginPageState extends State<LoginPage> {
                           isAdminLogin ? 'Sign In as Admin' : 'Sign In',
                           key: ValueKey<bool>(isAdminLogin),
                           style: TextStyle(
-                            fontSize: context.getFontSize(4.5),
+                            fontSize: context.getResponsiveSize(4.5),
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
@@ -382,7 +382,7 @@ class _LoginPageState extends State<LoginPage> {
               Text(
                 "New user? ",
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   color: AppColors.textMuted,
                 ),
               ),
@@ -391,7 +391,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text(
                   'Create Account',
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     color: AppColors.primaryGold,
                     fontWeight: FontWeight.w700,
                   ),
@@ -416,7 +416,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 'Change Handset ?',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.2),
+                  fontSize: context.getResponsiveSize(3.2),
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,
                 ),
@@ -452,7 +452,7 @@ class _LoginPageState extends State<LoginPage> {
                   isAdminLogin ? 'Sign in as User' : 'Admin Login',
                   key: ValueKey<bool>(isAdminLogin),
                   style: TextStyle(
-                    fontSize: context.getFontSize(3),
+                    fontSize: context.getResponsiveSize(3),
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                     decoration: TextDecoration.underline,
@@ -469,7 +469,7 @@ class _LoginPageState extends State<LoginPage> {
             TextSpan(
               text: 'By continuing you agree to our ',
               style: TextStyle(
-                fontSize: context.getFontSize(2.8),
+                fontSize: context.getResponsiveSize(2.8),
                 color: AppColors.textMuted,
               ),
               children: [

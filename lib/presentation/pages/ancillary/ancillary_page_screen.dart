@@ -52,7 +52,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
         title: Text(
           label,
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -84,7 +84,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 children: [
                   Icon(
                     Icons.error_outline_rounded,
-                    size: context.getFontSize(14),
+                    size: context.getResponsiveSize(14),
                     color: Colors.red.shade300,
                   ),
                   SizedBox(height: context.getScreenHeight(2)),
@@ -92,7 +92,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                     controller.error.isNotEmpty ? controller.error : 'Failed to load content',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.8),
+                      fontSize: context.getResponsiveSize(3.8),
                       color: Colors.red.shade400,
                     ),
                   ),
@@ -120,14 +120,14 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
               children: [
                 Icon(
                   Icons.article_outlined,
-                  size: context.getFontSize(14),
+                  size: context.getResponsiveSize(14),
                   color: AppColors.textMuted.withOpacity(0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
                 Text(
                   'No content available',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4),
+                    fontSize: context.getResponsiveSize(4),
                     color: AppColors.textMuted,
                   ),
                 ),
@@ -148,7 +148,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 Text(
                   page.title,
                   style: TextStyle(
-                    fontSize: context.getFontSize(6),
+                    fontSize: context.getResponsiveSize(6),
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),

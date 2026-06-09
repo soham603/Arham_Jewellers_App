@@ -836,7 +836,7 @@ class _KaratSection extends StatelessWidget {
                                 textAlign: TextAlign.center,
 
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(2.8),
+                                  fontSize: context.getResponsiveSize(2.8),
 
                                   color: isExpanded
                                       ? context.colorPalette.goldDeep
@@ -1813,8 +1813,8 @@ class _CategoryQuickAccess extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    width: context.getScreenWidth(20),
-                    height: context.getScreenWidth(20),
+                    width: context.getResponsiveSize(20),
+                    height: context.getResponsiveSize(20),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -1835,7 +1835,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                           .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                           .trim(),
                       style: TextStyle(
-                        fontSize: context.getFontSize(2.8),
+                        fontSize: context.getResponsiveSize(2.8),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDeep,
                       ),
@@ -1937,7 +1937,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                   "Bespoke Service",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getFontSize(2.6),
+                    fontSize: context.getResponsiveSize(2.6),
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -1963,7 +1963,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "BRING IDEAS TO LIFE",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: context.getFontSize(2.8),
+                            fontSize: context.getResponsiveSize(2.8),
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.2,
                           ),
@@ -1977,7 +1977,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                             color: const Color(
                               0xFF3E2723,
                             ), // Deep Espresso Brown
-                            fontSize: context.getFontSize(5.5),
+                            fontSize: context.getResponsiveSize(5.5),
                             fontWeight: FontWeight.w900,
                             height: 1.1,
                           ),
@@ -1986,7 +1986,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Dream Jewelry",
                           style: TextStyle(
                             color: const Color(0xFF3E2723).withOpacity(0.8),
-                            fontSize: context.getFontSize(4),
+                            fontSize: context.getResponsiveSize(4),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -2012,7 +2012,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Turn your unique inspirations into\nstunning gold masterpieces.",
                           style: TextStyle(
                             color: const Color(0xFF5D4037),
-                            fontSize: context.getFontSize(2.8),
+                            fontSize: context.getResponsiveSize(2.8),
                             fontWeight: FontWeight.w600,
                             height: 1.3,
                           ),
@@ -2049,7 +2049,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 "Start Designing",
                                 style: TextStyle(
                                   color: context.colorPalette.goldDeep,
-                                  fontSize: context.getFontSize(3),
+                                  fontSize: context.getResponsiveSize(3),
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -2057,7 +2057,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 color: context.colorPalette.goldDeep,
-                                size: context.getFontSize(3.5),
+                                size: context.getResponsiveSize(3.5),
                               ),
                             ],
                           ),
@@ -2070,7 +2070,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                   Expanded(
                     flex: 4,
                     child: Container(
-                      height: context.getScreenWidth(32),
+                      height: context.getResponsiveSize(32),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.7),
                         shape: BoxShape.circle,
@@ -2116,7 +2116,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       text,
       style: TextStyle(
         color: const Color(0xFF3E2723),
-        fontSize: context.getFontSize(2.6),
+        fontSize: context.getResponsiveSize(2.6),
         fontWeight: FontWeight.w800,
       ),
     );

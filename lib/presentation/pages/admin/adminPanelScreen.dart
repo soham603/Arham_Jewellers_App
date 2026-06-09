@@ -59,8 +59,8 @@ class AdminPanelScreen extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: context.getScreenWidth(18),
-                      height: context.getScreenWidth(18),
+                      width: context.getResponsiveSize(18),
+                      height: context.getResponsiveSize(18),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: AppColors.primaryGold,
@@ -68,7 +68,7 @@ class AdminPanelScreen extends StatelessWidget {
                       child: Icon(
                         Icons.admin_panel_settings_rounded,
                         color: Colors.white,
-                        size: context.getFontSize(10),
+                        size: context.getResponsiveSize(10),
                       ),
                     ),
                     SizedBox(width: context.getScreenWidth(4)),
@@ -83,7 +83,7 @@ class AdminPanelScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: context.getFontSize(5.3),
+                              fontSize: context.getResponsiveSize(5.3),
                             ),
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
@@ -101,7 +101,7 @@ class AdminPanelScreen extends StatelessWidget {
                               style: TextStyle(
                                 color: Colors.amber,
                                 fontWeight: FontWeight.w600,
-                                fontSize: context.getFontSize(3.2),
+                                fontSize: context.getResponsiveSize(3.2),
                               ),
                             ),
                           ),
@@ -126,7 +126,7 @@ class AdminPanelScreen extends StatelessWidget {
                       Icon(
                         Icons.shield_rounded,
                         color: AppColors.primaryGold,
-                        size: context.getFontSize(5),
+                        size: context.getResponsiveSize(5),
                       ),
                       SizedBox(width: context.getScreenWidth(2)),
                       Expanded(
@@ -134,7 +134,7 @@ class AdminPanelScreen extends StatelessWidget {
                           "Full access to manage app operations",
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: context.getFontSize(3.5),
+                            fontSize: context.getResponsiveSize(3.5),
                           ),
                         ),
                       ),
@@ -153,7 +153,7 @@ class AdminPanelScreen extends StatelessWidget {
           Text(
             "Management",
             style: TextStyle(
-              fontSize: context.getFontSize(6),
+              fontSize: context.getResponsiveSize(6),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
@@ -269,8 +269,8 @@ class AdminPanelScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: context.getScreenWidth(14),
-              height: context.getScreenWidth(14),
+              width: context.getResponsiveSize(14),
+              height: context.getResponsiveSize(14),
               decoration: const BoxDecoration(
                 color: Color(0xFFF5EFE7),
                 shape: BoxShape.circle,
@@ -278,7 +278,7 @@ class AdminPanelScreen extends StatelessWidget {
               child: Icon(
                 icon,
                 color: AppColors.primaryGold,
-                size: context.getFontSize(7),
+                size: context.getResponsiveSize(7),
               ),
             ),
             SizedBox(height: context.getScreenHeight(1.5)),
@@ -290,7 +290,7 @@ class AdminPanelScreen extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
-                fontSize: context.getFontSize(3.8),
+                fontSize: context.getResponsiveSize(3.8),
               ),
             ),
             SizedBox(height: context.getScreenHeight(0.4)),
@@ -301,7 +301,7 @@ class AdminPanelScreen extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.textMuted,
-                fontSize: context.getFontSize(3),
+                fontSize: context.getResponsiveSize(3),
               ),
             ),
           ],

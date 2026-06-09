@@ -57,7 +57,7 @@ class ToastUtils {
         message,
         style: TextStyle(
           color: context.colorPalette.reverseTextColor,
-          fontSize: context.getFontSize(3.25),
+          fontSize: context.getResponsiveSize(3.25),
           fontWeight: FontWeight.w500,
         ),
       ),

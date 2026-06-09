@@ -46,7 +46,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getFontSize(5),
+            fontSize: context.getResponsiveSize(5),
           ),
         ),
       ),
@@ -67,7 +67,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
               children: [
                 Icon(
                   Icons.error_outline_rounded,
-                  size: context.getFontSize(18),
+                  size: context.getResponsiveSize(18),
                   color: Colors.red.shade300,
                 ),
                 SizedBox(height: context.getScreenHeight(1.5)),
@@ -75,7 +75,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                   "Failed to load orders",
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: context.getFontSize(4.3),
+                    fontSize: context.getResponsiveSize(4.3),
                   ),
                 ),
               ],
@@ -140,15 +140,15 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                   child: Column(
                     children: [
                       Container(
-                        width: context.getScreenWidth(28),
-                        height: context.getScreenWidth(28),
+                        width: context.getResponsiveSize(28),
+                        height: context.getResponsiveSize(28),
                         decoration: const BoxDecoration(
                           color: Color(0xFFF6F7FB),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.shopping_bag_outlined,
-                          size: context.getFontSize(12),
+                          size: context.getResponsiveSize(12),
                           color: Colors.grey,
                         ),
                       ),
@@ -157,7 +157,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                         "No Orders Found",
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: context.getFontSize(5),
+                          fontSize: context.getResponsiveSize(5),
                         ),
                       ),
                       SizedBox(height: context.getScreenHeight(1)),
@@ -166,7 +166,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey.shade600,
-                          fontSize: context.getFontSize(3.5),
+                          fontSize: context.getResponsiveSize(3.5),
                         ),
                       ),
                     ],
@@ -216,7 +216,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
-                        fontSize: context.getFontSize(3.8),
+                        fontSize: context.getResponsiveSize(3.8),
                       ),
                     ),
                   ),
@@ -274,7 +274,7 @@ class _AdminOrderCard extends StatelessWidget {
                     "Order #${order.id.substring(0, 8)}",
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      fontSize: context.getFontSize(4.4),
+                      fontSize: context.getResponsiveSize(4.4),
                     ),
                   ),
                   if (order.isCustom) ...[
@@ -296,7 +296,7 @@ class _AdminOrderCard extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.primaryGold,
                           fontWeight: FontWeight.w800,
-                          fontSize: context.getFontSize(2.4),
+                          fontSize: context.getResponsiveSize(2.4),
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -307,7 +307,7 @@ class _AdminOrderCard extends StatelessWidget {
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
                       color: AppColors.textMuted,
-                      fontSize: context.getFontSize(3.4),
+                      fontSize: context.getResponsiveSize(3.4),
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(1)),
@@ -325,7 +325,7 @@ class _AdminOrderCard extends StatelessWidget {
                       style: TextStyle(
                         color: _orderStatusColor(order.status),
                         fontWeight: FontWeight.w700,
-                        fontSize: context.getFontSize(2.8),
+                        fontSize: context.getResponsiveSize(2.8),
                       ),
                     ),
                   ),
@@ -334,7 +334,7 @@ class _AdminOrderCard extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              size: context.getFontSize(3.5),
+              size: context.getResponsiveSize(3.5),
               color: AppColors.textMuted,
             ),
           ],
@@ -427,7 +427,7 @@ class _OrderImagesStack extends StatelessWidget {
                     "$totalItems",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.getFontSize(3.2),
+                      fontSize: context.getResponsiveSize(3.2),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -480,7 +480,7 @@ Widget _filterSegment(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: context.getFontSize(3),
+            fontSize: context.getResponsiveSize(3),
             fontWeight: FontWeight.w700,
             color: isActive ? Colors.white : color,
             letterSpacing: 0.5,

@@ -8,10 +8,10 @@ extension AppContextExtensions on BuildContext {
 
   double getScreenHeight(double percentage) => MediaQuery.of(this).size.height * (percentage / 100);
 
-  double getFontSize(double percentage, {double maxTabletWidth = 600, double minFontSize = 12.0}) {
+  double getResponsiveSize(double percentage, {double maxTabletWidth = 600, double minSize = 12.0}) {
     final effectiveWidth = MediaQuery.of(this).size.width.clamp(0.0, maxTabletWidth);
-    final fontSize = effectiveWidth * (percentage / 100);
-    return fontSize < minFontSize ? minFontSize : fontSize;
+    final size = effectiveWidth * (percentage / 100);
+    return size < minSize ? minSize : size;
   }
 
   double responsiveWidth(double phoneVal, {double? tabletVal}) =>

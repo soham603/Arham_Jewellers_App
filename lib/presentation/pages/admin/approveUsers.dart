@@ -57,7 +57,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         title: Text(
           'Access Requests',
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -80,7 +80,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 child: Text(
                   '${controller.total} total',
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.2),
+                    fontSize: context.getResponsiveSize(3.2),
                     fontWeight: FontWeight.w600,
                     color: _filterColor(controller.activeFilter),
                   ),
@@ -178,7 +178,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                         ? _selectedUser!.name[0].toUpperCase()
                         : '?',
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.5),
+                      fontSize: context.getResponsiveSize(3.5),
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -192,7 +192,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       Text(
                         _selectedUser!.name,
                         style: TextStyle(
-                          fontSize: context.getFontSize(3.8),
+                          fontSize: context.getResponsiveSize(3.8),
                           fontWeight: FontWeight.w700,
                           color: context.colorPalette.textColor,
                         ),
@@ -200,7 +200,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                       Text(
                         _selectedUser!.phoneNumber,
                         style: TextStyle(
-                          fontSize: context.getFontSize(3),
+                          fontSize: context.getResponsiveSize(3),
                           color: context.colorPalette.subTitleColor,
                         ),
                       ),
@@ -271,7 +271,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                           controller.searchMode == SearchMode.PHONE
                               ? Icons.phone_android_rounded
                               : Icons.person_rounded,
-                          size: context.getFontSize(5),
+                          size: context.getResponsiveSize(5),
                           color: Colors.white,
                         ),
                       ),
@@ -335,7 +335,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             child: Text(
               'No users found',
               style: TextStyle(
-                fontSize: context.getFontSize(3.5),
+                fontSize: context.getResponsiveSize(3.5),
                 color: context.colorPalette.subTitleColor,
               ),
             ),
@@ -423,7 +423,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     f,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3),
+                      fontSize: context.getResponsiveSize(3),
                       fontWeight: FontWeight.w700,
                       color: isActive ? Colors.white : color,
                       letterSpacing: 0.5,
@@ -529,7 +529,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               Text(
                 req.status == 'APPROVED' ? 'Extend Access' : 'Approve Access',
                 style: TextStyle(
-                  fontSize: context.getFontSize(4),
+                  fontSize: context.getResponsiveSize(4),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -545,7 +545,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     ? 'Extend access for ${req.user?.name ?? 'this user'} until:'
                     : 'Grant access to ${req.user?.name ?? 'this user'} until:',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.4),
+                  fontSize: context.getResponsiveSize(3.4),
                   color: context.colorPalette.textColor,
                 ),
               ),
@@ -571,7 +571,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     Text(
                       DateFormat('dd MMM yyyy').format(date),
                       style: TextStyle(
-                        fontSize: context.getFontSize(3),
+                        fontSize: context.getResponsiveSize(3),
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryGold,
                       ),
@@ -585,7 +585,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                   child: Text(
                     'Current access until: ${DateFormat('dd MMM yyyy').format(req.approvedTill!.toLocal())}',
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.6),
+                      fontSize: context.getResponsiveSize(2.6),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -606,7 +606,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 'Cancel',
                 style: TextStyle(
                   color: context.colorPalette.subTitleColor,
-                  fontSize: context.getFontSize(3.2),
+                  fontSize: context.getResponsiveSize(3.2),
                 ),
               ),
             ),
@@ -654,7 +654,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
-                          fontSize: context.getFontSize(3.2),
+                          fontSize: context.getResponsiveSize(3.2),
                         ),
                       ),
               ),
@@ -689,7 +689,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             Text(
               req.status == 'APPROVED' ? 'Revoke Access' : 'Reject Request',
               style: TextStyle(
-                fontSize: context.getFontSize(4.5),
+                fontSize: context.getResponsiveSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -701,7 +701,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               ? 'Are you sure you want to revoke access for ${req.user?.name ?? "this user"}? This will immediately remove their access.'
               : 'Are you sure you want to reject ${req.user?.name ?? "this user"}\'s access request?',
           style: TextStyle(
-            fontSize: context.getFontSize(3.8),
+            fontSize: context.getResponsiveSize(3.8),
             color: context.colorPalette.textColor,
           ),
         ),
@@ -789,7 +789,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             child: Text(
               'All requests loaded',
               style: TextStyle(
-                fontSize: context.getFontSize(3.2),
+                fontSize: context.getResponsiveSize(3.2),
                 color: context.colorPalette.subTitleColor,
               ),
             ),
@@ -870,14 +870,14 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         children: [
           Icon(
             Icons.wifi_off_rounded,
-            size: context.getFontSize(14),
+            size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
-              fontSize: context.getFontSize(4.5),
+              fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
               color: context.colorPalette.textColor,
             ),
@@ -887,7 +887,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             controller.error,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getFontSize(3.2),
+              fontSize: context.getResponsiveSize(3.2),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -914,7 +914,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         children: [
           Icon(
             Icons.inbox_rounded,
-            size: context.getFontSize(16),
+            size: context.getResponsiveSize(16),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -925,7 +925,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     ? 'No ${controller.activeFilter.toLowerCase()} requests for this user'
                     : 'No ${controller.activeFilter.toLowerCase()} requests',
             style: TextStyle(
-              fontSize: context.getFontSize(4.5),
+              fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
               color: context.colorPalette.textColor,
             ),
@@ -1036,8 +1036,8 @@ class _RequestCardState extends State<_RequestCard> {
                 children: [
                   // Avatar
                   Container(
-                    width: context.getScreenWidth(11),
-                    height: context.getScreenWidth(11),
+                    width: context.getResponsiveSize(11),
+                    height: context.getResponsiveSize(11),
                     decoration: BoxDecoration(
                       color: cardColor.withOpacity(0.12),
                       shape: BoxShape.circle,
@@ -1047,7 +1047,7 @@ class _RequestCardState extends State<_RequestCard> {
                         (user?.name?.isNotEmpty == true ? user!.name![0] : '?')
                             .toUpperCase(),
                         style: TextStyle(
-                          fontSize: context.getFontSize(5),
+                          fontSize: context.getResponsiveSize(5),
                           fontWeight: FontWeight.w700,
                           color: cardColor,
                         ),
@@ -1064,7 +1064,7 @@ class _RequestCardState extends State<_RequestCard> {
                         Text(
                           user?.name ?? 'Unknown User',
                           style: TextStyle(
-                            fontSize: context.getFontSize(4.2),
+                            fontSize: context.getResponsiveSize(4.2),
                             fontWeight: FontWeight.w700,
                             color: context.colorPalette.textColor,
                           ),
@@ -1073,7 +1073,7 @@ class _RequestCardState extends State<_RequestCard> {
                         Text(
                           user?.phoneNumber ?? user?.email ?? '—',
                           style: TextStyle(
-                            fontSize: context.getFontSize(3.2),
+                            fontSize: context.getResponsiveSize(3.2),
                             color: context.colorPalette.subTitleColor,
                           ),
                         ),
@@ -1099,7 +1099,7 @@ class _RequestCardState extends State<_RequestCard> {
                               child: Icon(
                                 Icons.store_rounded,
                                 color: const Color(0xFFD4AF37),
-                                size: context.getFontSize(3.2),
+                                size: context.getResponsiveSize(3.2),
                               ),
                             ),
                           Container(
@@ -1115,7 +1115,7 @@ class _RequestCardState extends State<_RequestCard> {
                               req.status,
                               style: TextStyle(
                                 color: statusColor,
-                                fontSize: context.getFontSize(2.8),
+                                fontSize: context.getResponsiveSize(2.8),
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
                               ),
@@ -1129,7 +1129,7 @@ class _RequestCardState extends State<_RequestCard> {
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
                         color: context.colorPalette.subTitleColor,
-                        size: context.getFontSize(5),
+                        size: context.getResponsiveSize(5),
                       ),
                     ],
                   ),
@@ -1200,7 +1200,7 @@ class _RequestCardState extends State<_RequestCard> {
                               Text(
                                 'Access approved until',
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(3),
+                                  fontSize: context.getResponsiveSize(3),
                                   color: context.colorPalette.subTitleColor,
                                 ),
                               ),
@@ -1209,7 +1209,7 @@ class _RequestCardState extends State<_RequestCard> {
                                   'dd MMMM yyyy',
                                 ).format(req.approvedTill!.toLocal()),
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(3.8),
+                                  fontSize: context.getResponsiveSize(3.8),
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryGold,
                                 ),
@@ -1225,7 +1225,7 @@ class _RequestCardState extends State<_RequestCard> {
                                         ? '$remaining days remaining'
                                         : 'Expired',
                                     style: TextStyle(
-                                      fontSize: context.getFontSize(2.8),
+                                      fontSize: context.getResponsiveSize(2.8),
                                       color: remaining > 0
                                           ? AppColors.primaryGold
                                           : Colors.red,
@@ -1265,7 +1265,7 @@ class _RequestCardState extends State<_RequestCard> {
                           Icon(
                             Icons.store_rounded,
                             color: _isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
-                            size: context.getFontSize(5),
+                            size: context.getResponsiveSize(5),
                           ),
                           SizedBox(width: context.getScreenWidth(3)),
                           Expanded(
@@ -1275,7 +1275,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   'Mark as Retailer',
                                   style: TextStyle(
-                                    fontSize: context.getFontSize(3.5),
+                                    fontSize: context.getResponsiveSize(3.5),
                                     fontWeight: FontWeight.w600,
                                     color: context.colorPalette.textColor,
                                   ),
@@ -1283,7 +1283,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 Text(
                                   'Grant retailer privileges',
                                   style: TextStyle(
-                                    fontSize: context.getFontSize(2.8),
+                                    fontSize: context.getResponsiveSize(2.8),
                                     color: context.colorPalette.subTitleColor,
                                   ),
                                 ),
@@ -1451,14 +1451,14 @@ class _RequestCardState extends State<_RequestCard> {
                   Icon(
                     icon,
                     color: outlined ? color : Colors.white,
-                    size: context.getFontSize(4),
+                    size: context.getResponsiveSize(4),
                   ),
                   SizedBox(width: context.getScreenWidth(1.5)),
                   Text(
                     label,
                     style: TextStyle(
                       color: outlined ? color : Colors.white,
-                      fontSize: context.getFontSize(3.5),
+                      fontSize: context.getResponsiveSize(3.5),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1503,7 +1503,7 @@ class _RequestCardState extends State<_RequestCard> {
             Text(
               newValue ? 'Enable Retailer' : 'Disable Retailer',
               style: TextStyle(
-                fontSize: context.getFontSize(4),
+                fontSize: context.getResponsiveSize(4),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -1515,7 +1515,7 @@ class _RequestCardState extends State<_RequestCard> {
               ? 'Grant retailer privileges to ${req.user?.name ?? 'this user'}?'
               : 'Remove retailer privileges from ${req.user?.name ?? 'this user'}?',
           style: TextStyle(
-            fontSize: context.getFontSize(3.4),
+            fontSize: context.getResponsiveSize(3.4),
             color: context.colorPalette.textColor,
           ),
         ),
@@ -1533,7 +1533,7 @@ class _RequestCardState extends State<_RequestCard> {
               'Cancel',
               style: TextStyle(
                 color: context.colorPalette.subTitleColor,
-                fontSize: context.getFontSize(3.2),
+                fontSize: context.getResponsiveSize(3.2),
               ),
             ),
           ),
@@ -1579,7 +1579,7 @@ class _RequestCardState extends State<_RequestCard> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
-                      fontSize: context.getFontSize(3.2),
+                      fontSize: context.getResponsiveSize(3.2),
                     ),
                   ),
             );
@@ -1614,7 +1614,7 @@ class _SearchResultTile extends StatelessWidget {
               child: Text(
                 user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.primaryColor,
                 ),
@@ -1628,7 +1628,7 @@ class _SearchResultTile extends StatelessWidget {
                   Text(
                     user.name,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.8),
+                      fontSize: context.getResponsiveSize(3.8),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.textColor,
                     ),
@@ -1636,7 +1636,7 @@ class _SearchResultTile extends StatelessWidget {
                   Text(
                     user.phoneNumber,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3),
+                      fontSize: context.getResponsiveSize(3),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -1655,7 +1655,7 @@ class _SearchResultTile extends StatelessWidget {
               child: Text(
                 user.accountStatus,
                 style: TextStyle(
-                  fontSize: context.getFontSize(2.5),
+                  fontSize: context.getResponsiveSize(2.5),
                   fontWeight: FontWeight.w600,
                   color: _getStatusColor(user.accountStatus),
                 ),
