@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -14,7 +15,9 @@ Future<void> main() async {
   Get.put(CartController());
   Get.put(AuthController());
   Get.put(GoldRateController());
-  await NotificationService().init();
+  if (!kIsWeb) {
+    await NotificationService().init();
+  }
   Get.put(NotificationController());
   runApp(const RatneshGoldApp());
 }

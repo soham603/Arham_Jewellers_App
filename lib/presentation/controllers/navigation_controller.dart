@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -20,7 +21,7 @@ class NavigationController extends GetxController {
     final now = DateTime.now();
     if (_lastBackPress != null &&
         now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
-      SystemNavigator.pop();
+      if (!kIsWeb) SystemNavigator.pop();
     } else {
       _lastBackPress = now;
       HapticFeedback.lightImpact();
