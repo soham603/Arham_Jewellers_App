@@ -931,7 +931,7 @@ class SearchProductController extends GetxController {
     if (goldRate == null || product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
       fineWeight:
-          product.karigarNetWt ?? product.netWeight ?? product.fineWeight ?? 0,
+          product.karigarNetWt ?? 0,
       ratePer10Gram: goldRate.rate,
     );
   }

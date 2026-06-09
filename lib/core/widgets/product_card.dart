@@ -71,7 +71,7 @@ class _ProductCardState extends State<ProductCard>
         final imageUrl = _cleanText(product.displayImageUrl);
         final categoryName = _cleanText(product.category?.name);
         final tagNo = _cleanText(product.tagNo);
-        final fineWeight = _formatValue(product.fineWeight);
+        final fineWeight = _formatValue(product.karigarNetWt);
         final touchData = _parseTouch(product.touch);
         final size = _cleanText(product.size);
 
@@ -365,7 +365,7 @@ class _ProductCardState extends State<ProductCard>
   }
 
   static bool _showRetailerPrice(ProductModel product) {
-    if (product.fineWeight == null) return false;
+    if (product.karigarNetWt == null) return false;
     try {
       final auth = Get.find<AuthController>();
       final isRetailer = auth.user?.isRetailer == true;
@@ -634,15 +634,12 @@ class _RetailerPrice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final goldRate = Get.find<GoldRateController>().currentRate;
-    if (goldRate == null || product.fineWeight == null) {
+    if (goldRate == null || product.karigarNetWt == null) {
       return const SizedBox.shrink();
     }
 
     final total = GoldRateController.calculatePrice(
-      fineWeight: product.karigarNetWt ??
-          product.netWeight ??
-          product.fineWeight ??
-          0,
+      fineWeight: product.karigarNetWt ?? 0,
       ratePer10Gram: goldRate.rate,
     )!;
 

@@ -22,7 +22,7 @@ class ShareListTile extends StatelessWidget {
     final displayName = _cleanText(product.name) ?? 'Untitled';
     final imageUrl = _cleanText(product.displayImageUrl);
     final categoryName = _cleanText(product.category?.name);
-    final fineWeight = _formatValue(product.fineWeight);
+    final fineWeight = _formatValue(product.karigarNetWt);
     final grossWeight = _formatValue(product.grossWeight);
     final touchData = _parseTouch(product.touch);
 
@@ -122,7 +122,7 @@ class ShareListTile extends StatelessWidget {
                       if (grossWeight != null)
                         _InfoChip(label: 'Wt: ${grossWeight}g'),
                       if (fineWeight != null && fineWeight != grossWeight)
-                        _InfoChip(label: 'Fine: ${fineWeight}g'),
+                        _InfoChip(label: 'Net Wt: ${fineWeight}g'),
                       if (touchData != null)
                         _InfoChip(label: touchData),
                     ],
