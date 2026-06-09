@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/chat/chat_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/wishlist/wishlist_page.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late final UserOrderController orderController;
   late final AuthController authController;
+  late final WishlistController wishlistController;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   Worker? _adminWorker;
@@ -45,6 +47,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       authController = Get.find<AuthController>();
     } else {
       authController = Get.put(AuthController());
+    }
+
+    if (Get.isRegistered<WishlistController>()) {
+      wishlistController = Get.find<WishlistController>();
+    } else {
+      wishlistController = Get.put(WishlistController());
     }
 
     _adminWorker = ever(authController.isAdminRx, (_) {
@@ -413,7 +421,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     _wishlistLink(context),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.getScreenHeight(1)),
 
                     // =====================================================
                     // MY ORDERS CARD
@@ -662,13 +670,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               SizedBox(width: context.getResponsiveSize(3)),
               Expanded(
-                child: Text(
-                  'Wishlist',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: context.getResponsiveSize(4),
-                    color: AppColors.textDark,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Wishlist',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: context.getResponsiveSize(4),
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: context.getScreenHeight(0.3)),
+                    Obx(
+                      () => Text(
+                        '${wishlistController.totalItems} item${wishlistController.totalItems != 1 ? 's' : ''}',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: context.getResponsiveSize(3),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Icon(
