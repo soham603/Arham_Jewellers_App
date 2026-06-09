@@ -40,9 +40,10 @@ class AdminOrderController extends GetxController {
   bool get hasMore => _hasMore;
 
   final _productImageCache = <String, String?>{}.obs;
+  RxMap<String, String?> get productImageCache => _productImageCache;
   final _imageCacheTimestamp = <String, DateTime>{};
   static const _cacheTTL = Duration(minutes: 5);
-  
+
   String? getProductImage(String productId) {
     final timestamp = _imageCacheTimestamp[productId];
     if (timestamp != null && DateTime.now().difference(timestamp) > _cacheTTL) {
