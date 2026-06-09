@@ -39,8 +39,8 @@ class ShareProductCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppColors.primaryGold.withOpacity(0.15)
-                  : Colors.black.withOpacity(0.06),
+                  ? AppColors.primaryGold.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.06),
               blurRadius: isSelected ? 12 : 8,
               offset: Offset(0, isSelected ? 4 : 2),
             ),
@@ -86,7 +86,7 @@ class ShareProductCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: isSelected
                             ? AppColors.primaryGold
-                            : Colors.black.withOpacity(0.3),
+                            : Colors.black.withValues(alpha: 0.3),
                         border: Border.all(
                           color: Colors.white,
                           width: 2,
@@ -215,7 +215,7 @@ class _WeightInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: 9,
-      color: AppColors.textDark.withOpacity(0.7),
+      color: AppColors.textDark.withValues(alpha: 0.7),
       fontWeight: FontWeight.w500,
       height: 1.3,
     );
@@ -254,7 +254,7 @@ class _PurityRow extends StatelessWidget {
       spans.add(TextSpan(
           text: '  •  ',
           style: style.copyWith(
-              color: AppColors.textDark.withOpacity(0.3))));
+              color: AppColors.textDark.withValues(alpha: 0.3))));
     }
     if (hasTouch) {
       spans.add(TextSpan(text: '${data.touchValue} Touch', style: style));

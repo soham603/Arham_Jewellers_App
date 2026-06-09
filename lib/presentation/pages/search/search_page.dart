@@ -354,7 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                               Row(
                                 children: [
                                   Text(
-                                    'Results (${_filteredCategoryCount})',
+                                    'Results ($_filteredCategoryCount)',
                                     style: TextStyle(
                                       fontSize: context.getResponsiveSize(4.2),
                                       fontWeight: FontWeight.w700,
@@ -490,7 +490,7 @@ class _SearchPageState extends State<SearchPage> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: context.colorPalette.gold.withOpacity(0.4),
+                                color: context.colorPalette.gold.withValues(alpha: 0.4),
                                 blurRadius: 6,
                                 offset: const Offset(0, 2),
                               ),
@@ -791,7 +791,7 @@ class _SearchPageState extends State<SearchPage> {
                       horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? context.colorPalette.gold.withOpacity(0.08)
+                        ? context.colorPalette.gold.withValues(alpha: 0.08)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -889,7 +889,7 @@ class _SearchPageState extends State<SearchPage> {
                 padding: EdgeInsets.only(left: context.getResponsiveSize(4)),
                 scrollDirection: Axis.horizontal,
                 itemCount: unique.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 4),
+                separatorBuilder: (_, _) => const SizedBox(width: 4),
                 itemBuilder: (_, index) {
                   final cat = unique[index];
                   final cleanedName = cat.name
@@ -920,7 +920,7 @@ class _SearchPageState extends State<SearchPage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: context.colorPalette.gold.withOpacity(0.5),
+                              color: context.colorPalette.gold.withValues(alpha: 0.5),
                               width: 1.5,
                             ),
                           ),
@@ -1303,7 +1303,7 @@ class _SearchPageState extends State<SearchPage> {
                               ? CachedNetworkImage(
                                   imageUrl: cat.imageUrl,
                                   fit: BoxFit.cover,
-                                  errorWidget: (_, __, ___) =>
+                                  errorWidget: (_, _, _) =>
                                       RatneshFallback.m(),
                                 )
                               : RatneshFallback.m(),
@@ -1526,7 +1526,7 @@ class _BrowseCategoryImage extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: cat.imageUrl,
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => const RatneshFallback.xs(),
+        errorWidget: (_, _, _) => const RatneshFallback.xs(),
       );
     }
 

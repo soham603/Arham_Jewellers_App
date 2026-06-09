@@ -449,8 +449,9 @@ class SearchProductController extends GetxController {
   }
 
   Future<void> loadMoreSearchResults() async {
-    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING)
+    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING) {
       return;
+    }
     await _runSearch(_searchQuery.value.trim(), isPagination: true);
   }
 
@@ -719,8 +720,9 @@ class SearchProductController extends GetxController {
   String? _currentFilterKarat;
 
   void loadMoreFilteredProducts() {
-    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING)
+    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING) {
       return;
+    }
     loadByCategoryWithKaratFilter(
       _currentFilterCategoryId!,
       _currentFilterKarat!,

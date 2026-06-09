@@ -271,11 +271,11 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: active
-              ? Colors.orange.withOpacity(0.12)
+              ? Colors.orange.withValues(alpha: 0.12)
               : const Color(0xFFF4F1EC),
           border: Border.all(
             color: active
-                ? Colors.orange.withOpacity(0.4)
+                ? Colors.orange.withValues(alpha: 0.4)
                 : const Color(0xFFCFC7BC),
           ),
         ),
@@ -326,7 +326,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: isInactive
-                    ? Colors.orange.withOpacity(0.3)
+                    ? Colors.orange.withValues(alpha: 0.3)
                     : context.colorPalette.boxColor,
               ),
             ),
@@ -347,10 +347,10 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                 imageUrl: product.displayImageUrl!,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
-                                placeholder: (_, __) => Container(
+                                placeholder: (_, _) => Container(
                                   color: context.colorPalette.shimmerBaseColor,
                                 ),
-                                errorWidget: (_, __, ___) =>
+                                errorWidget: (_, _, _) =>
                                     _noImagePlaceholder(context),
                               )
                             : _noImagePlaceholder(context),
@@ -411,7 +411,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.9),
+                        color: Colors.orange.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -432,7 +432,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   child: Container(
                     padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.45),
+                      color: Colors.black.withValues(alpha: 0.45),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -448,7 +448,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Center(
@@ -487,9 +487,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFFD4AF37).withOpacity(0.15),
+        color: const Color(0xFFD4AF37).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.4)),
+        border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.4)),
       ),
       child: Text(
         karat,
@@ -598,12 +598,12 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: isActive
-                                ? Colors.green.withOpacity(0.12)
-                                : Colors.orange.withOpacity(0.12),
+                                ? Colors.green.withValues(alpha: 0.12)
+                                : Colors.orange.withValues(alpha: 0.12),
                             border: Border.all(
                               color: isActive
-                                  ? Colors.green.withOpacity(0.4)
-                                  : Colors.orange.withOpacity(0.4),
+                                  ? Colors.green.withValues(alpha: 0.4)
+                                  : Colors.orange.withValues(alpha: 0.4),
                             ),
                           ),
                           child: Text(
@@ -641,7 +641,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                 : context.colorPalette.boxColor,
                             width: picked != null ? 2 : 1,
                           ),
-                          color: context.colorPalette.boxColor.withOpacity(0.3),
+                          color: context.colorPalette.boxColor.withValues(alpha: 0.3),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
@@ -684,7 +684,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                           ),
                                           Container(
                                             color:
-                                                Colors.black.withOpacity(0.3),
+                                                Colors.black.withValues(alpha: 0.3),
                                           ),
                                           Positioned(
                                             bottom: 8,
@@ -700,7 +700,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: Colors.red
-                                                      .withOpacity(0.85),
+                                                      .withValues(alpha: 0.85),
                                                   borderRadius:
                                                       BorderRadius.circular(8),
                                                 ),
@@ -905,7 +905,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                     'Updated',
                                     '${product.name} updated successfully',
                                     backgroundColor:
-                                        Colors.green.withOpacity(0.9),
+                                        Colors.green.withValues(alpha: 0.9),
                                     colorText: Colors.white,
                                     duration: const Duration(seconds: 2),
                                   );
@@ -914,7 +914,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                     'Failed',
                                     'Could not update product. Try again.',
                                     backgroundColor:
-                                        Colors.red.withOpacity(0.9),
+                                        Colors.red.withValues(alpha: 0.9),
                                     colorText: Colors.white,
                                   );
                                 }
@@ -1015,7 +1015,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         crossAxisSpacing: context.getResponsiveSize(2.5),
         childAspectRatio: 0.68,
       ),
-      itemBuilder: (_, __) => Container(
+      itemBuilder: (_, _) => Container(
         decoration: BoxDecoration(
           color: context.colorPalette.shimmerBaseColor,
           borderRadius: BorderRadius.circular(14),

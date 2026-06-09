@@ -141,7 +141,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
           vertical: context.getScreenHeight(2),
         ),
         itemCount: pages.length,
-        separatorBuilder: (_, __) => SizedBox(height: context.getScreenHeight(1.5)),
+        separatorBuilder: (_, _) => SizedBox(height: context.getScreenHeight(1.5)),
         itemBuilder: (context, index) {
           final key = pages[index];
           final label = labels[key] ?? key;
@@ -157,12 +157,12 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
                   color: hasContent
-                      ? AppColors.primaryGold.withOpacity(0.3)
+                      ? AppColors.primaryGold.withValues(alpha: 0.3)
                       : const Color(0xFFE7DED2),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -175,7 +175,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                     height: context.getResponsiveSize(12),
                     decoration: BoxDecoration(
                       color: hasContent
-                          ? AppColors.primaryGold.withOpacity(0.12)
+                          ? AppColors.primaryGold.withValues(alpha: 0.12)
                           : const Color(0xFFF5EFE7),
                       shape: BoxShape.circle,
                     ),
@@ -326,7 +326,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                 width: context.getResponsiveSize(10),
                 height: context.getScreenHeight(0.5),
                 decoration: BoxDecoration(
-                  color: AppColors.textMuted.withOpacity(0.3),
+                  color: AppColors.textMuted.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
@@ -434,7 +434,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryGold.withOpacity(0.3),
+                        color: AppColors.primaryGold.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

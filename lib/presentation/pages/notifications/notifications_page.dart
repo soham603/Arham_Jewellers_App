@@ -123,7 +123,7 @@ class _EmptyState extends StatelessWidget {
           Icon(
             Icons.notifications_none_rounded,
             size: context.getResponsiveSize(20),
-            color: AppColors.textMuted.withOpacity(0.5),
+            color: AppColors.textMuted.withValues(alpha: 0.5),
           ),
           SizedBox(height: context.getScreenHeight(2)),
           Text(
@@ -194,12 +194,12 @@ class _NotificationCard extends StatelessWidget {
         margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
         padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
-          color: notification.isRead ? Colors.white : AppColors.primaryGold.withOpacity(0.05),
+          color: notification.isRead ? Colors.white : AppColors.primaryGold.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
           border: Border.all(
             color: notification.isRead
                 ? AppColors.divider
-                : AppColors.primaryGold.withOpacity(0.3),
+                : AppColors.primaryGold.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -210,8 +210,8 @@ class _NotificationCard extends StatelessWidget {
               height: context.getResponsiveSize(10),
               decoration: BoxDecoration(
                 color: notification.isRead
-                    ? AppColors.textMuted.withOpacity(0.1)
-                    : AppColors.primaryGold.withOpacity(0.15),
+                    ? AppColors.textMuted.withValues(alpha: 0.1)
+                    : AppColors.primaryGold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
               ),
               child: Icon(
@@ -267,7 +267,7 @@ class _NotificationCard extends StatelessWidget {
                     timeAgo,
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(2.8),
-                      color: AppColors.textMuted.withOpacity(0.7),
+                      color: AppColors.textMuted.withValues(alpha: 0.7),
                     ),
                   ),
                 ],

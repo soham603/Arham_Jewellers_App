@@ -271,7 +271,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 20,
                         offset: const Offset(0, -5),
                       ),
@@ -291,8 +291,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: isInCart ? 0 : 2,
-                              shadowColor: AppColors.primaryGold.withOpacity(
-                                0.2,
+                              shadowColor: AppColors.primaryGold.withValues(
+                                alpha: 0.2,
                               ),
                               backgroundColor: isInCart
                                   ? Colors.grey.shade100
@@ -305,7 +305,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 side: BorderSide(
                                   color: isInCart
                                       ? Colors.grey.shade300
-                                      : AppColors.primaryGold.withOpacity(0.4),
+                                      : AppColors.primaryGold.withValues(alpha: 0.4),
                                   width: 1.2,
                                 ),
                               ),
@@ -333,8 +333,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: 6,
-                              shadowColor: AppColors.primaryGold.withOpacity(
-                                0.5,
+                              shadowColor: AppColors.primaryGold.withValues(
+                                alpha: 0.5,
                               ),
                               backgroundColor: AppColors.primaryGold,
                               foregroundColor: Colors.white,
@@ -475,7 +475,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 4,
                           ),
                         ],
@@ -528,11 +528,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         child: Container(
                           padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 4,
                               ),
                             ],
@@ -572,7 +572,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(2, 2),
                             ),
@@ -604,7 +604,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 4,
                                 offset: const Offset(2, 2),
                               ),
@@ -640,7 +640,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 6,
                             ),
                           ],
@@ -726,15 +726,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.primaryGold.withOpacity(0.1),
-                              AppColors.primaryGold.withOpacity(0.05),
+                              AppColors.primaryGold.withValues(alpha: 0.1),
+                              AppColors.primaryGold.withValues(alpha: 0.05),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: AppColors.primaryGold.withOpacity(0.2),
+                            color: AppColors.primaryGold.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -804,8 +804,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryGold,
                             elevation: 3,
-                            shadowColor: AppColors.primaryGold.withOpacity(
-                              0.4,
+                            shadowColor: AppColors.primaryGold.withValues(
+                              alpha: 0.4,
                             ),
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(4),
@@ -959,7 +959,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         color: const Color(0xFFF9F6F0),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: AppColors.primaryGold.withOpacity(0.1),
+                          color: AppColors.primaryGold.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Row(
@@ -1014,12 +1014,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGold.withOpacity(0.15),
+          color: AppColors.primaryGold.withValues(alpha: 0.15),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.06),
+            color: AppColors.primaryGold.withValues(alpha: 0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1029,7 +1029,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         children: [
           Icon(
             icon,
-            color: AppColors.primaryGold.withOpacity(0.8),
+            color: AppColors.primaryGold.withValues(alpha: 0.8),
             size: context.getResponsiveSize(6),
           ),
           SizedBox(width: context.getResponsiveSize(2.5)),
@@ -1072,7 +1072,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       children: [
         Icon(
           icon,
-          color: AppColors.primaryGold.withOpacity(0.7),
+          color: AppColors.primaryGold.withValues(alpha: 0.7),
           size: context.getResponsiveSize(5),
         ),
         SizedBox(width: context.getResponsiveSize(1.5)),

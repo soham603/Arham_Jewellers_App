@@ -70,7 +70,7 @@ class _WishlistPageState extends State<WishlistPage> {
               children: [
                 Icon(
                   Icons.favorite_border_rounded,
-                  color: AppColors.primaryGold.withOpacity(0.4),
+                  color: AppColors.primaryGold.withValues(alpha: 0.4),
                   size: 64,
                 ),
                 const SizedBox(height: 16),
@@ -86,7 +86,7 @@ class _WishlistPageState extends State<WishlistPage> {
                 Text(
                   'Tap the heart icon on any product to save it here',
                   style: TextStyle(
-                    color: AppColors.textMuted.withOpacity(0.6),
+                    color: AppColors.textMuted.withValues(alpha: 0.6),
                     fontSize: context.getResponsiveSize(3.2),
                   ),
                 ),

@@ -1,21 +1,49 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/constants/admin_constants.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/animated_text_field.dart';
 import '../../../core/widgets/logo_widget.dart';
+import '../../../presentation/controllers/AuthController.dart';
+import '../../../utils/Enums.dart';
 
-class ForgotPasswordPage extends StatelessWidget {
+class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
 
-  Future<void> _launchCall() async {
-    final uri = Uri(scheme: 'tel', path: AdminConstants.adminPhone);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final AuthController authController = Get.put(AuthController());
+  final TextEditingController phoneController = TextEditingController();
+  String selectedCountryCode = "+91";
+  bool _isFormValid = false;
+
+  void _validateForm() {
+    setState(() {
+      _isFormValid = phoneController.text.trim().isNotEmpty &&
+          phoneController.text.trim().length >= 10;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    phoneController.addListener(_validateForm);
+  }
+
+  @override
+  void dispose() {
+    phoneController.removeListener(_validateForm);
+    phoneController.dispose();
+    super.dispose();
   }
 
   Future<void> _launchWhatsApp() async {
@@ -58,8 +86,9 @@ class ForgotPasswordPage extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.getScreenHeight(0.2)),
 
                     // ── Logo ──
                     Center(
@@ -76,7 +105,7 @@ class ForgotPasswordPage extends StatelessWidget {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(4)),
+                    SizedBox(height: context.getScreenHeight(5)),
 
                     // ── Title ──
                     Text(
@@ -92,8 +121,7 @@ class ForgotPasswordPage extends StatelessWidget {
 
                     // ── Subtitle ──
                     Text(
-                      'Please contact us. We will verify your details and provide you with new password.',
-                      textAlign: TextAlign.center,
+                      "No worries! Enter your registered mobile number and we'll contact you with new password.",
                       style: TextStyle(
                         fontSize: context.getResponsiveSize(3.3),
                         color: AppColors.textMuted,
@@ -103,162 +131,234 @@ class ForgotPasswordPage extends StatelessWidget {
 
                     SizedBox(height: context.getScreenHeight(4)),
 
-                    // ── Contact Card ──
-                    _buildContactCard(context),
+                    // ── Phone Input ──
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Mobile Number',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.2),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(0.8)),
+
+                    AnimatedTextField(
+                      controller: phoneController,
+                      hintText: 'Enter Mobile Number',
+                      keyboardType: TextInputType.phone,
+                      maxLength: 10,
+                      prefixIcon: CountryCodePicker(
+                        onChanged: (countryCode) {
+                          setState(() {
+                            selectedCountryCode = countryCode.dialCode ?? "+91";
+                          });
+                        },
+                        initialSelection: 'IN',
+                        favorite: const ['+91', 'IN'],
+                        showCountryOnly: false,
+                        showOnlyCountryWhenClosed: false,
+                        showDropDownButton: false,
+                        showFlag: false,
+                        alignLeft: false,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        textStyle: TextStyle(
+                          color: AppColors.textDark,
+                          fontWeight: FontWeight.w600,
+                          fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Phone number is required";
+                        }
+                        if (value.trim().length < 10) {
+                          return "Enter valid phone number";
+                        }
+                        return null;
+                      },
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(1.5)),
+
+                    // ── Send Reset Link Button ──
+                    Obx(() {
+                      final isLoading =
+                          authController.forgotPasswordState == CurrentAppState.LOADING;
+
+                      return SizedBox(
+                        width: double.infinity,
+                        height: context.getScreenHeight(6),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return AppColors.primaryGold.withValues(alpha: 0.35);
+                              }
+                              return AppColors.primaryGold;
+                            }),
+                            elevation: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return 0;
+                              }
+                              return 2;
+                            }),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  context.getResponsiveSize(2.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                          onPressed: (!_isFormValid || isLoading)
+                              ? null
+                              : () async {
+                                  final fullPhoneNumber =
+                                      '$selectedCountryCode${phoneController.text.trim()}';
+                                  await authController.forgotPassword(
+                                    phoneNumber: fullPhoneNumber,
+                                    context: context,
+                                    onSuccess: () {
+                                      phoneController.clear();
+                                    },
+                                  );
+                                },
+                          child: isLoading
+                              ? SizedBox(
+                                  height: context.getResponsiveSize(5),
+                                  width: context.getResponsiveSize(5),
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Text(
+                                  'Send Reset Link',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(4.5),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                        ),
+                      );
+                    }),
+
+                    SizedBox(height: context.getScreenHeight(2.5)),
+
+                    // ── OR Divider ──
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  AppColors.primaryGold.withValues(alpha: 0.4),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getResponsiveSize(3),
+                          ),
+                          child: Text(
+                            'or',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(3.2),
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primaryGold.withValues(alpha: 0.4),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(2.5)),
+
+                    // ── Back to Sign In ──
+                    SizedBox(
+                      width: double.infinity,
+                      height: context.getScreenHeight(6),
+                      child: OutlinedButton(
+                        style: ButtonStyle(
+                          side: WidgetStateProperty.all(
+                            BorderSide(color: AppColors.primaryGold),
+                          ),
+                          shape: WidgetStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                context.getResponsiveSize(2.5),
+                              ),
+                            ),
+                          ),
+                        ),
+                        onPressed: () => Get.toNamed(AppRoutes.login),
+                        child: Text(
+                          'Back to Sign In',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(4.5),
+                            color: AppColors.primaryGold,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(6)),
+
+                    // ── Support Section ──
+                    Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Need help? ',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(3.2),
+                            color: AppColors.textMuted,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Contact Us',
+                              style: TextStyle(
+                                color: AppColors.primaryGold,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = _launchWhatsApp,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: context.getScreenHeight(2)),
                   ],
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getResponsiveSize(4)),
-      decoration: BoxDecoration(
-        color: AppColors.pageBg,
-        borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Column(
-        children: [
-          // ── Icon + Text ──
-          Container(
-            width: context.getResponsiveSize(14),
-            height: context.getResponsiveSize(14),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryGold.withValues(alpha: 0.15),
-                  AppColors.primaryGold.withValues(alpha: 0.05),
-                ],
-              ),
-            ),
-            child: Icon(
-              Icons.headset_mic_rounded,
-              color: AppColors.primaryGold,
-              size: context.getResponsiveSize(6),
-            ),
-          ),
-
-          SizedBox(height: context.getScreenHeight(2)),
-
-          Text(
-            'Contact Us',
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(4.5),
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-
-          SizedBox(height: context.getScreenHeight(0.5)),
-
-          Text(
-            AdminConstants.adminPhone,
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(3.5),
-              color: AppColors.textMuted,
-            ),
-          ),
-
-          SizedBox(height: context.getScreenHeight(2.5)),
-
-          // ── Buttons ──
-          Row(
-            children: [
-              Expanded(
-                child: _ContactButton(
-                  icon: Icon(
-                    Icons.phone_rounded,
-                    color: AppColors.primaryGold,
-                    size: context.getResponsiveSize(4.5),
-                  ),
-                  label: 'Call Us',
-                  color: AppColors.primaryGold,
-                  onTap: _launchCall,
-                ),
-              ),
-              SizedBox(width: context.getResponsiveSize(3)),
-              Expanded(
-                child: _ContactButton(
-                  icon: FaIcon(
-                    FontAwesomeIcons.whatsapp,
-                    color: const Color(0xFF25D366),
-                    size: context.getResponsiveSize(4.5),
-                  ),
-                  label: 'WhatsApp',
-                  color: const Color(0xFF25D366),
-                  onTap: _launchWhatsApp,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Reusable Contact Button ─────────────────────────────────────────────────
-
-class _ContactButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ContactButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withValues(alpha: 0.1),
-                color.withValues(alpha: 0.04),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withValues(alpha: 0.2)),
-          ),
-          padding: EdgeInsets.symmetric(
-            vertical: context.getScreenHeight(1.6),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              SizedBox(width: context.getResponsiveSize(2)),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(3.8),
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
-              ),
-            ],
           ),
         ),
       ),

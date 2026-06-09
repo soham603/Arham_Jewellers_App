@@ -23,7 +23,7 @@ class CategoryDivider extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    context.colorPalette.gold.withOpacity(0.4),
+                    context.colorPalette.gold.withValues(alpha: 0.4),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -36,7 +36,7 @@ class CategoryDivider extends StatelessWidget {
             width: 4,
             height: 4,
             decoration: BoxDecoration(
-              color: context.colorPalette.gold.withOpacity(0.5),
+              color: context.colorPalette.gold.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
           ),
@@ -47,7 +47,7 @@ class CategoryDivider extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    context.colorPalette.gold.withOpacity(0.4),
+                    context.colorPalette.gold.withValues(alpha: 0.4),
                     Colors.transparent,
                   ],
                   begin: Alignment.centerLeft,
@@ -84,7 +84,7 @@ class CollectionsDivider extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    context.colorPalette.gold.withOpacity(0.8),
+                    context.colorPalette.gold.withValues(alpha: 0.8),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -120,7 +120,7 @@ class CollectionsDivider extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    context.colorPalette.gold.withOpacity(0.8),
+                    context.colorPalette.gold.withValues(alpha: 0.8),
                     Colors.transparent,
                   ],
                   begin: Alignment.centerLeft,
@@ -159,7 +159,7 @@ class JewelleryDivider extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Colors.transparent,
-                    context.colorPalette.gold.withOpacity(0.6),
+                    context.colorPalette.gold.withValues(alpha: 0.6),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -211,7 +211,7 @@ class JewelleryDivider extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    context.colorPalette.gold.withOpacity(0.6),
+                    context.colorPalette.gold.withValues(alpha: 0.6),
                     Colors.transparent,
                   ],
                   begin: Alignment.centerLeft,
@@ -233,7 +233,7 @@ class JewelleryDivider extends StatelessWidget {
         width: 4.5,
         height: 4.5,
         decoration: BoxDecoration(
-          color: context.colorPalette.gold.withOpacity(0.7),
+          color: context.colorPalette.gold.withValues(alpha: 0.7),
         ),
       ),
     );

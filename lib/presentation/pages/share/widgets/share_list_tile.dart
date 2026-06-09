@@ -42,8 +42,8 @@ class ShareListTile extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppColors.primaryGold.withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
+                  ? AppColors.primaryGold.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.04),
               blurRadius: isSelected ? 10 : 6,
               offset: Offset(0, isSelected ? 3 : 1),
             ),
@@ -140,7 +140,7 @@ class ShareListTile extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: isSelected
                     ? AppColors.primaryGold
-                    : Colors.black.withOpacity(0.08),
+                    : Colors.black.withValues(alpha: 0.08),
                 border: Border.all(
                   color: isSelected ? AppColors.primaryGold : const Color(0xFFE7E2DB),
                   width: 1.5,
@@ -203,7 +203,7 @@ class _InfoChip extends StatelessWidget {
         label,
         style: TextStyle(
           fontSize: 10,
-          color: AppColors.textDark.withOpacity(0.7),
+          color: AppColors.textDark.withValues(alpha: 0.7),
           fontWeight: FontWeight.w500,
         ),
       ),

@@ -68,7 +68,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                   vertical: context.getScreenHeight(0.5),
                 ),
                 decoration: BoxDecoration(
-                  color: _filterColor(controller.activeFilter).withOpacity(0.12),
+                  color: _filterColor(controller.activeFilter).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -180,7 +180,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                     vertical: context.getScreenHeight(0.8),
                   ),
                   decoration: BoxDecoration(
-                    color: isActive ? color : color.withOpacity(0.08),
+                    color: isActive ? color : color.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -244,9 +244,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 5,
-      separatorBuilder: (_, __) =>
+      separatorBuilder: (_, _) =>
           SizedBox(height: context.getScreenHeight(1.5)),
-      itemBuilder: (_, __) => _shimmerCard(context),
+      itemBuilder: (_, _) => _shimmerCard(context),
     );
   }
 
@@ -428,10 +428,10 @@ class _RequestCardState extends State<_RequestCard> {
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cardColor.withOpacity(0.25)),
+        border: Border.all(color: cardColor.withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -451,7 +451,7 @@ class _RequestCardState extends State<_RequestCard> {
                     width: context.getResponsiveSize(11),
                     height: context.getResponsiveSize(11),
                     decoration: BoxDecoration(
-                      color: cardColor.withOpacity(0.12),
+                      color: cardColor.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -499,7 +499,7 @@ class _RequestCardState extends State<_RequestCard> {
                           vertical: context.getScreenHeight(0.4),
                         ),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.12),
+                          color: statusColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -544,10 +544,10 @@ class _RequestCardState extends State<_RequestCard> {
                       width: double.infinity,
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
-                        color: context.colorPalette.gold.withOpacity(0.08),
+                        color: context.colorPalette.gold.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: context.colorPalette.gold.withOpacity(0.2),
+                          color: context.colorPalette.gold.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -665,9 +665,9 @@ class _RequestCardState extends State<_RequestCard> {
                       width: double.infinity,
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.07),
+                        color: Colors.red.withValues(alpha: 0.07),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.red.withOpacity(0.2)),
+                        border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -763,7 +763,7 @@ class _RequestCardState extends State<_RequestCard> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.primaryGold.withOpacity(0.1),
+                color: AppColors.primaryGold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(
@@ -855,7 +855,7 @@ class _RequestCardState extends State<_RequestCard> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Icon(

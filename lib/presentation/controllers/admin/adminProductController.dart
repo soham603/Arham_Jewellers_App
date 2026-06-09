@@ -176,8 +176,9 @@ class AdminProductController extends GetxController {
   }
 
   Future<void> loadMoreSearch() async {
-    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING)
+    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING) {
       return;
+    }
     await runSearch(isPagination: true);
   }
 
@@ -240,9 +241,9 @@ class AdminProductController extends GetxController {
       final Map<String, dynamic> data = {
         if (name != null && name.trim().isNotEmpty) "name": name.trim(),
 
-        if (karat != null) "karat": karat,
+        "karat": ?karat,
 
-        if (categoryId != null) "categoryId": categoryId,
+        "categoryId": ?categoryId,
 
         if (isActive != null) "isActive": isActive.toString(),
 

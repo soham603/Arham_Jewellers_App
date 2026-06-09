@@ -374,7 +374,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       width: 32,
       height: 3,
       decoration: BoxDecoration(
-        color: context.colorPalette.goldDark.withOpacity(0.3),
+        color: context.colorPalette.goldDark.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(1.5),
       ),
     );

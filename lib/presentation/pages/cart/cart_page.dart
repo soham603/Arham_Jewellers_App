@@ -473,7 +473,7 @@ class _CartPageState extends State<CartPage> {
                     fontSize: context.getResponsiveSize(4),
                     color: hasItems
                         ? AppColors.primaryGold
-                        : AppColors.primaryGold.withOpacity(0.45),
+                        : AppColors.primaryGold.withValues(alpha: 0.45),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -489,7 +489,7 @@ class _CartPageState extends State<CartPage> {
                   elevation: 0,
                   backgroundColor: AppColors.primaryGold,
                   disabledBackgroundColor:
-                      AppColors.primaryGold.withOpacity(0.45),
+                      AppColors.primaryGold.withValues(alpha: 0.45),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),

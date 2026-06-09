@@ -11,7 +11,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/customOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/customOrderSuccessPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class CustomiseOrderPage extends StatefulWidget {
   final ProductModel? product;
@@ -280,7 +279,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryGold.withOpacity(0.08),
+                color: AppColors.primaryGold.withValues(alpha: 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, -8),
               ),
@@ -303,7 +302,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     elevation: 6,
-                    shadowColor: AppColors.primaryGold.withOpacity(0.4),
+                    shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
                     backgroundColor: AppColors.primaryGold,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -465,7 +464,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color:
-                                    AppColors.primaryGold.withOpacity(0.25),
+                                    AppColors.primaryGold.withValues(alpha: 0.25),
                                 width: 1.5,
                               ),
                             ),
@@ -756,12 +755,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.primaryGold.withOpacity(0.12),
+          color: AppColors.primaryGold.withValues(alpha: 0.12),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.06),
+            color: AppColors.primaryGold.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -899,7 +898,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: hasImage
-                  ? AppColors.primaryGold.withOpacity(0.4)
+                  ? AppColors.primaryGold.withValues(alpha: 0.4)
                   : AppColors.divider,
               width: hasImage ? 1.5 : 1,
             ),
@@ -921,7 +920,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
+                              color: Colors.black.withValues(alpha: 0.5),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -960,7 +959,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
+                                  color: Colors.black.withValues(alpha: 0.5),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -979,7 +978,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                       children: [
                         Icon(
                           Icons.add_photo_alternate_outlined,
-                          color: AppColors.primaryGold.withOpacity(0.6),
+                          color: AppColors.primaryGold.withValues(alpha: 0.6),
                           size: 24,
                         ),
                         SizedBox(height: 4),
@@ -1021,7 +1020,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primaryGold.withOpacity(0.25),
+                    color: AppColors.primaryGold.withValues(alpha: 0.25),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),

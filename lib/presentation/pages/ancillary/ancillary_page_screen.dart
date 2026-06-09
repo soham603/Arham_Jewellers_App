@@ -121,7 +121,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 Icon(
                   Icons.article_outlined,
                   size: context.getResponsiveSize(14),
-                  color: AppColors.textMuted.withOpacity(0.4),
+                  color: AppColors.textMuted.withValues(alpha: 0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
                 Text(

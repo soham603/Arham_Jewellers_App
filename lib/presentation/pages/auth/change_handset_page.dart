@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
+import '../../../core/constants/admin_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/animated_text_field.dart';
 import '../../../core/widgets/logo_widget.dart';
@@ -52,11 +55,21 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
     super.dispose();
   }
 
+  Future<void> _launchWhatsApp() async {
+    final phone = AdminConstants.adminPhone.replaceAll('+', '');
+    final message = Uri.encodeComponent(
+      'Hi, I need help changing my handset. Please assist me.',
+    );
+    final uri = Uri.parse('https://wa.me/$phone?text=$message');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -72,269 +85,299 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getResponsiveSize(5),
-                        vertical: context.getScreenHeight(1),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.getResponsiveSize(5),
+              vertical: context.getScreenHeight(1),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: context.getScreenHeight(0.2)),
+
+                      // ── Logo ──
+                      Center(
+                        child: LogoWidget(
+                          logoSize: context.getResponsiveSize(16),
+                          nameFontSize: context.getResponsiveSize(4),
+                          subtitleFontSize: context.getResponsiveSize(2),
+                          iconColor: context.colorPalette.gold,
+                          nameColor: context.colorPalette.goldDeep,
+                          subtitleColor: context.colorPalette.goldDark,
+                          nameLetterSpacing: 2.0,
+                          iconNameSpacing: context.getScreenHeight(0.8),
+                          nameSubtitleSpacing: context.getScreenHeight(0.2),
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          SizedBox(height: context.getScreenHeight(5)),
-                          // 1. Logo (Smaller as requested)
-                          Center(
-                            child: LogoWidget(
-                              logoSize: context.getResponsiveSize(16),
-                              nameFontSize: context.getResponsiveSize(4),
-                              subtitleFontSize: context.getResponsiveSize(2),
-                              iconColor: context.colorPalette.gold,
-                              nameColor: context.colorPalette.goldDeep,
-                              subtitleColor: context.colorPalette.goldDark,
-                              nameLetterSpacing: 2.0,
-                              iconNameSpacing: context.getScreenHeight(0.8),
-                              nameSubtitleSpacing: context.getScreenHeight(0.2),
-                            ),
+
+                      SizedBox(height: context.getScreenHeight(5)),
+
+                      // ── Title ──
+                      Text(
+                        'Change Handset',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(5.5),
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1)),
+
+                      // ── Subtitle ──
+                      Text(
+                        'Verify your identity to link this new device to your account securely.',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.3),
+                          color: AppColors.textMuted,
+                          height: 1.5,
+                        ),
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(4)),
+
+                      // ── Mobile Number Label ──
+                      Text(
+                        'Registered Mobile Number',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.2),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(0.8)),
+
+                      // ── Phone Input ──
+                      AnimatedTextField(
+                        controller: phoneController,
+                        hintText: 'Registered Mobile Number',
+                        keyboardType: TextInputType.phone,
+                        maxLength: 10,
+                        prefixIcon: CountryCodePicker(
+                          onChanged: (countryCode) {
+                            setState(() {
+                              selectedCountryCode = countryCode.dialCode ?? "+91";
+                            });
+                          },
+                          initialSelection: 'IN',
+                          favorite: const ['+91', 'IN'],
+                          showCountryOnly: false,
+                          showOnlyCountryWhenClosed: false,
+                          showDropDownButton: false,
+                          showFlag: false,
+                          alignLeft: false,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          textStyle: TextStyle(
+                            color: AppColors.textDark,
+                            fontWeight: FontWeight.w600,
+                            fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
                           ),
-                          SizedBox(height: context.getScreenHeight(2)),
-                          // 2. Form Section
-                          Expanded(
-                            child: Center(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: 400),
-                                child: Form(
-                                  key: _formKey,
-                                  child: _buildCenterForm(context),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Phone number is required";
+                          }
+                          if (value.trim().length < 10) {
+                            return "Enter valid phone number";
+                          }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1)),
+
+                      // ── Password Label ──
+                      Text(
+                        'Password',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.2),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(0.8)),
+
+                      // ── Password Input ──
+                      AnimatedTextField(
+                        controller: passwordController,
+                        hintText: 'Enter Password',
+                        obscureText: _obscurePassword,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: Colors.grey.shade500,
+                            size: context.getResponsiveSize(5),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return "Password is required";
+                          }
+                          if (value.length < 4) {
+                            return "Password too short";
+                          }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.5)),
+
+                      // ── Verify & Change Handset Button ──
+                      SizedBox(
+                        width: double.infinity,
+                        height: context.getScreenHeight(6),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return AppColors.primaryGold.withValues(alpha: 0.35);
+                              }
+                              return AppColors.primaryGold;
+                            }),
+                            elevation: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return 0;
+                              }
+                              return 2;
+                            }),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  context.getResponsiveSize(2.5),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: context.getScreenHeight(2)),
-                          // 3. Button (Anchored at the bottom)
-                          ConstrainedBox(
-                            constraints: BoxConstraints(maxWidth: 400),
-                            child: _buildBottomButton(context),
-                          ),
-                          SizedBox(height: context.getScreenHeight(2)),
-                        ],
+                          onPressed: (!isFormValid || _isLoading)
+                              ? null
+                              : () async {
+                                  if (!_formKey.currentState!.validate()) {
+                                    ToastUtils.showError(context, "Please fix the errors");
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+
+                                  final newDeviceID = await getDeviceId();
+                                  final newDeviceName = await getDeviceName();
+                                  final fullPhoneNumber =
+                                      '$selectedCountryCode${phoneController.text.trim()}';
+
+                                  try {
+                                    final response = await httpClient.post(
+                                      '/api/v1/auth/device-change-request',
+                                      options: Options(extra: {'requiresAuth': false}),
+                                      data: {
+                                        'phoneNumber': fullPhoneNumber,
+                                        'password': passwordController.text.trim(),
+                                        'newDeviceId': newDeviceID,
+                                        'newDeviceName': newDeviceName,
+                                      },
+                                    );
+
+                                    if (response.statusCode == 200 || response.statusCode == 201) {
+                                      ToastUtils.showSuccess(
+                                        context,
+                                        response.data['message'] ??
+                                            "Handset change request submitted. Please wait for admin approval.",
+                                      );
+                                      Get.back();
+                                    } else {
+                                      ToastUtils.showError(
+                                        context,
+                                        response.data['message'] ?? "Request failed",
+                                      );
+                                    }
+                                  } on DioException catch (e) {
+                                    String msg = "Something went wrong";
+                                    if (e.response?.data != null) {
+                                      msg = e.response!.data['error']?['message'] ??
+                                          e.response!.data['message'] ??
+                                          msg;
+                                    }
+                                    ToastUtils.showError(context, msg);
+                                  } catch (e) {
+                                    ToastUtils.showError(context, e.toString());
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    }
+                                  }
+                                },
+                          child: _isLoading
+                              ? SizedBox(
+                                  height: context.getResponsiveSize(5),
+                                  width: context.getResponsiveSize(5),
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2.5,
+                                  ),
+                                )
+                              : Text(
+                                  'Verify & Change Handset',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(4.2),
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ); // <- Changed here: correctly closed SingleChildScrollView return statement
-            },
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _buildCenterForm(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Change Handset',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(5.5),
-            fontWeight: FontWeight.w800,
-            color: AppColors.textDark,
-          ),
-        ),
+                      SizedBox(height: context.getScreenHeight(6)),
 
-        SizedBox(height: context.getScreenHeight(0.5)),
+                      // ── Support Section ──
+                      Center(
+                        child: Text.rich(
+                          TextSpan(
+                            text: 'Need help? ',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(3.2),
+                              color: AppColors.textMuted,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Contact Us',
+                                style: TextStyle(
+                                  color: AppColors.primaryGold,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = _launchWhatsApp,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-        Text(
-          'Verify your identity to link this new device to your account securely.',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3.3),
-            color: AppColors.textMuted,
-            height: 1.4,
-          ),
-        ),
-
-        SizedBox(height: context.getScreenHeight(3)),
-
-        AnimatedTextField(
-          controller: phoneController,
-          hintText: 'Registered Mobile Number',
-          keyboardType: TextInputType.phone,
-          maxLength: 10,
-          prefixIcon: CountryCodePicker(
-            onChanged: (countryCode) {
-              setState(() {
-                selectedCountryCode = countryCode.dialCode ?? "+91";
-              });
-            },
-            initialSelection: 'IN',
-            favorite: const ['+91', 'IN'],
-            showCountryOnly: false,
-            showOnlyCountryWhenClosed: false,
-            showDropDownButton: false,
-            showFlag: false,
-            alignLeft: false,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            textStyle: TextStyle(
-              color: AppColors.textDark,
-              fontWeight: FontWeight.w600,
-              fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return "Phone number is required";
-            }
-            if (value.trim().length < 10) {
-              return "Enter valid phone number";
-            }
-            return null;
-          },
-        ),
-
-        AnimatedTextField(
-          controller: passwordController,
-          hintText: 'Enter Password',
-          obscureText: _obscurePassword,
-          paddingBottom: context.getScreenHeight(0.5),
-          suffixIcon: IconButton(
-            icon: Icon(
-              _obscurePassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined,
-              color: Colors.grey.shade500,
-              size: context.getResponsiveSize(5),
-            ),
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
-          ),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return "Password is required";
-            }
-            if (value.length < 4) {
-              return "Password too short";
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: context.getScreenHeight(6),
-      child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.disabled)) {
-              return AppColors.primaryGold.withValues(alpha: 0.35);
-            }
-            return AppColors.primaryGold;
-          }),
-          elevation: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.disabled)) {
-              return 0;
-            }
-            return 2;
-          }),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-            ),
-          ),
-        ),
-        onPressed: (!isFormValid || _isLoading)
-            ? null
-            : () async {
-                if (!_formKey.currentState!.validate()) {
-                  ToastUtils.showError(context, "Please fix the errors");
-                  return;
-                }
-
-                setState(() {
-                  _isLoading = true;
-                });
-
-                final newDeviceID = await getDeviceId();
-                final newDeviceName = await getDeviceName();
-                final fullPhoneNumber =
-                    '$selectedCountryCode${phoneController.text.trim()}';
-
-                try {
-                  final response = await httpClient.post(
-                    '/api/v1/auth/device-change-request',
-                    options: Options(extra: {'requiresAuth': false}),
-                    data: {
-                      'phoneNumber': fullPhoneNumber,
-                      'password': passwordController.text.trim(),
-                      'newDeviceId': newDeviceID,
-                      'newDeviceName': newDeviceName,
-                    },
-                  );
-
-                  if (response.statusCode == 200 || response.statusCode == 201) {
-                    ToastUtils.showSuccess(
-                      context,
-                      response.data['message'] ??
-                          "Handset change request submitted. Please wait for admin approval.",
-                    );
-                    Get.back();
-                  } else {
-                    ToastUtils.showError(
-                      context,
-                      response.data['message'] ?? "Request failed",
-                    );
-                  }
-                } on DioException catch (e) {
-                  String msg = "Something went wrong";
-                  if (e.response?.data != null) {
-                    msg = e.response!.data['error']?['message'] ??
-                        e.response!.data['message'] ??
-                        msg;
-                  }
-                  ToastUtils.showError(context, msg);
-                } catch (e) {
-                  ToastUtils.showError(context, e.toString());
-                } finally {
-                  if (mounted) {
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  }
-                }
-              },
-        child: _isLoading
-            ? SizedBox(
-                height: context.getResponsiveSize(5),
-                width: context.getResponsiveSize(5),
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              )
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Text(
-                  'Verify & Change Handset',
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(4.2),
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
+                      SizedBox(height: context.getScreenHeight(2)),
+                    ],
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
       ),
     );
   }

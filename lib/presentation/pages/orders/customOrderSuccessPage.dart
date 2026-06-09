@@ -22,7 +22,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                   height: context.getResponsiveSize(28),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primaryGold.withOpacity(0.12),
+                    color: AppColors.primaryGold.withValues(alpha: 0.12),
                   ),
                   child: Icon(
                     Icons.check_circle_outline_rounded,

@@ -383,7 +383,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: Duration(milliseconds: 600 + (index * 200)),
-      builder: (_, value, __) {
+      builder: (_, value, _) {
         return Container(width: 8, height: 8, decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.3 + (value * 0.7)), shape: BoxShape.circle));
       },
     );

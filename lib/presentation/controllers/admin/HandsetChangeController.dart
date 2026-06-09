@@ -123,6 +123,7 @@ class HandsetChangeController extends GetxController {
     await fetchRequests(isPagination: true);
   }
 
+  @override
   Future<void> refresh() async {
     _page = 1;
     _hasMore = true;

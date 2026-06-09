@@ -511,7 +511,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: hasDate ? AppColors.primaryGold.withOpacity(0.06) : AppColors.tileBg,
+          color: hasDate ? AppColors.primaryGold.withValues(alpha: 0.06) : AppColors.tileBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: hasDate ? AppColors.primaryGold : AppColors.divider,
@@ -565,7 +565,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.divider.withOpacity(0.5))),
+        border: Border(top: BorderSide(color: AppColors.divider.withValues(alpha: 0.5))),
       ),
       child: SafeArea(
         top: false,
@@ -597,7 +597,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                 onPressed: canApply ? _apply : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGold,
-                  disabledBackgroundColor: AppColors.primaryGold.withOpacity(0.4),
+                  disabledBackgroundColor: AppColors.primaryGold.withValues(alpha: 0.4),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

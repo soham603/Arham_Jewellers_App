@@ -91,7 +91,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -121,7 +121,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     color: const Color(0xFFFFF3E0),
                     borderRadius: BorderRadius.circular(100),
                     border: Border.all(
-                      color: AppColors.primaryGold.withOpacity(0.3),
+                      color: AppColors.primaryGold.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
@@ -143,7 +143,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               vertical: context.getScreenHeight(0.3),
             ),
             decoration: BoxDecoration(
-              color: _orderStatusColor(order.status).withOpacity(0.12),
+              color: _orderStatusColor(order.status).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
@@ -183,7 +183,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -210,13 +210,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected
-                      ? Colors.red.withOpacity(0.05)
+                      ? Colors.red.withValues(alpha: 0.05)
                       : const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: item.isRejected
-                        ? Colors.red.withOpacity(0.2)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.red.withValues(alpha: 0.2)
+                        : Colors.grey.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
@@ -262,7 +262,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     vertical: context.getScreenHeight(0.2),
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.1),
+                                    color: Colors.red.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                   child: Text(
@@ -338,7 +338,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         vertical: context.getScreenHeight(0.2),
       ),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -364,7 +364,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -375,7 +375,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Container(
             padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.1),
+              color: AppColors.primaryGold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -419,7 +419,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -548,7 +548,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -580,13 +580,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             padding: EdgeInsets.all(context.getResponsiveSize(3)),
             decoration: BoxDecoration(
               color: order.status == "REJECTED"
-                  ? Colors.red.withOpacity(0.05)
-                  : AppColors.primaryGold.withOpacity(0.05),
+                  ? Colors.red.withValues(alpha: 0.05)
+                  : AppColors.primaryGold.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: order.status == "REJECTED"
-                    ? Colors.red.withOpacity(0.15)
-                    : AppColors.primaryGold.withOpacity(0.15),
+                    ? Colors.red.withValues(alpha: 0.15)
+                    : AppColors.primaryGold.withValues(alpha: 0.15),
               ),
             ),
             child: Text(
@@ -626,7 +626,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: ElevatedButton.styleFrom(
               elevation: 0,
               backgroundColor: Colors.green,
-              disabledBackgroundColor: Colors.green.withOpacity(0.5),
+              disabledBackgroundColor: Colors.green.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
                 vertical: context.getScreenHeight(1.5),
               ),
@@ -662,7 +662,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: ElevatedButton.styleFrom(
               elevation: 0,
               backgroundColor: Colors.red,
-              disabledBackgroundColor: Colors.red.withOpacity(0.5),
+              disabledBackgroundColor: Colors.red.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
                 vertical: context.getScreenHeight(1.5),
               ),

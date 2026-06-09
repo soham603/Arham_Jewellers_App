@@ -176,13 +176,13 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected
-                      ? Colors.red.withOpacity(0.05)
+                      ? Colors.red.withValues(alpha: 0.05)
                       : const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: item.isRejected
-                        ? Colors.red.withOpacity(0.2)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.red.withValues(alpha: 0.2)
+                        : Colors.grey.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
@@ -228,7 +228,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                     vertical: context.getScreenHeight(0.2),
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.1),
+                                    color: Colors.red.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                   child: Text(
@@ -277,7 +277,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         vertical: context.getScreenHeight(0.2),
       ),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -308,7 +308,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           Container(
             padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
             decoration: BoxDecoration(
-              color: AppColors.primaryGold.withOpacity(0.1),
+              color: AppColors.primaryGold.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -378,13 +378,13 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             padding: EdgeInsets.all(context.getResponsiveSize(3)),
             decoration: BoxDecoration(
               color: isRejected
-                  ? Colors.red.withOpacity(0.05)
-                  : AppColors.primaryGold.withOpacity(0.05),
+                  ? Colors.red.withValues(alpha: 0.05)
+                  : AppColors.primaryGold.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isRejected
-                    ? Colors.red.withOpacity(0.15)
-                    : AppColors.primaryGold.withOpacity(0.15),
+                    ? Colors.red.withValues(alpha: 0.15)
+                    : AppColors.primaryGold.withValues(alpha: 0.15),
               ),
             ),
             child: Text(

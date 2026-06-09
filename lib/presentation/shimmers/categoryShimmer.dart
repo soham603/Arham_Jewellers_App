@@ -13,9 +13,9 @@ class CategoryShimmer extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: 6,
-        separatorBuilder: (_, __) =>
+        separatorBuilder: (_, _) =>
             SizedBox(width: context.getResponsiveSize(3)),
-        itemBuilder: (_, __) {
+        itemBuilder: (_, _) {
           return Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,

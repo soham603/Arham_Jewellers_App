@@ -46,8 +46,8 @@ class ProductListTile extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppColors.primaryGold.withOpacity(0.15)
-                  : Colors.black.withOpacity(0.04),
+                  ? AppColors.primaryGold.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.04),
               blurRadius: isSelected ? 10 : 6,
               offset: const Offset(0, 1),
             ),
@@ -91,7 +91,7 @@ class ProductListTile extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 3,
                           ),
                         ],
@@ -116,7 +116,7 @@ class ProductListTile extends StatelessWidget {
                       tagNo,
                       style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textDark.withOpacity(0.5),
+                        color: AppColors.textDark.withValues(alpha: 0.5),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -173,7 +173,7 @@ class ProductListTile extends StatelessWidget {
             const SizedBox(width: 8),
             Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textDark.withOpacity(0.3),
+              color: AppColors.textDark.withValues(alpha: 0.3),
               size: 24,
             ),
           ],
@@ -229,7 +229,7 @@ class _InfoChip extends StatelessWidget {
         label,
         style: TextStyle(
           fontSize: 10,
-          color: AppColors.textDark.withOpacity(0.7),
+          color: AppColors.textDark.withValues(alpha: 0.7),
           fontWeight: FontWeight.w500,
         ),
       ),

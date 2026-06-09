@@ -197,7 +197,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 margin: const EdgeInsets.only(top: 2),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: context.colorPalette.gold.withOpacity(0.10),
+                  color: context.colorPalette.gold.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -506,7 +506,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     ),
                     decoration: BoxDecoration(
                       color: _hasActiveFilter
-                          ? context.colorPalette.gold.withOpacity(0.08)
+                          ? context.colorPalette.gold.withValues(alpha: 0.08)
                           : Colors.white,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
@@ -605,7 +605,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? context.colorPalette.gold.withOpacity(0.08)
+              ? context.colorPalette.gold.withValues(alpha: 0.08)
               : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
@@ -844,7 +844,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? context.colorPalette.gold.withOpacity(0.08)
+                        ? context.colorPalette.gold.withValues(alpha: 0.08)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -898,7 +898,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         border: Border(top: BorderSide(color: context.colorPalette.border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, -4),
           ),
@@ -1035,7 +1035,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                   hintText: 'e.g. New Collection 2024',
                   hintStyle: TextStyle(
-                    color: context.colorPalette.subTitleColor.withOpacity(0.5),
+                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.5),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -1112,7 +1112,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Container(
               padding: EdgeInsets.all(context.getResponsiveSize(2)),
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

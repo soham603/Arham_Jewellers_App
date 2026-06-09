@@ -219,17 +219,17 @@ class _AnimatedHero extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.success.withOpacity(0.15),
-                AppColors.success.withOpacity(0.05),
+                AppColors.success.withValues(alpha: 0.15),
+                AppColors.success.withValues(alpha: 0.05),
               ],
             ),
             border: Border.all(
-              color: AppColors.success.withOpacity(0.25),
+              color: AppColors.success.withValues(alpha: 0.25),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.success.withOpacity(0.12),
+                color: AppColors.success.withValues(alpha: 0.12),
                 blurRadius: 30,
                 spreadRadius: 5,
               ),
@@ -251,7 +251,7 @@ class _AnimatedHero extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.success.withOpacity(0.3),
+                    color: AppColors.success.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -494,7 +494,7 @@ class _OrderDetailCard extends StatelessWidget {
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -611,13 +611,13 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: _copied
-              ? Colors.green.withOpacity(0.08)
-              : AppColors.primaryGold.withOpacity(0.06),
+              ? Colors.green.withValues(alpha: 0.08)
+              : AppColors.primaryGold.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: _copied
-                ? Colors.green.withOpacity(0.2)
-                : AppColors.primaryGold.withOpacity(0.15),
+                ? Colors.green.withValues(alpha: 0.2)
+                : AppColors.primaryGold.withValues(alpha: 0.15),
           ),
         ),
         child: Row(
@@ -707,7 +707,7 @@ class _NextStepsCard extends StatelessWidget {
                             boxShadow: [
                               BoxShadow(
                                 color:
-                                    AppColors.primaryGold.withOpacity(0.2),
+                                    AppColors.primaryGold.withValues(alpha: 0.2),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -735,8 +735,8 @@ class _NextStepsCard extends StatelessWidget {
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  AppColors.primaryGold.withOpacity(0.3),
-                                  AppColors.primaryGold.withOpacity(0.08),
+                                  AppColors.primaryGold.withValues(alpha: 0.3),
+                                  AppColors.primaryGold.withValues(alpha: 0.08),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(1),
@@ -828,8 +828,8 @@ class _ContactAdminCard extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primaryGold.withOpacity(0.15),
-                      AppColors.primaryGold.withOpacity(0.05),
+                      AppColors.primaryGold.withValues(alpha: 0.15),
+                      AppColors.primaryGold.withValues(alpha: 0.05),
                     ],
                   ),
                 ),
@@ -925,13 +925,13 @@ class _ContactButton extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.04),
+                color.withValues(alpha: 0.1),
+                color.withValues(alpha: 0.04),
               ],
             ),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
             ),
           ),
           padding: EdgeInsets.symmetric(
@@ -989,7 +989,7 @@ class _PrimaryButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryGold.withOpacity(0.3),
+                  color: AppColors.primaryGold.withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -1029,7 +1029,7 @@ class _SecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           side: BorderSide(
-            color: AppColors.primaryGold.withOpacity(0.4),
+            color: AppColors.primaryGold.withValues(alpha: 0.4),
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
@@ -1065,15 +1065,15 @@ class _CardContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE7DED2).withOpacity(0.6)),
+        border: Border.all(color: const Color(0xFFE7DED2).withValues(alpha: 0.6)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
           BoxShadow(
-            color: AppColors.primaryGold.withOpacity(0.04),
+            color: AppColors.primaryGold.withValues(alpha: 0.04),
             blurRadius: 24,
             offset: const Offset(0, 2),
           ),
@@ -1094,9 +1094,9 @@ class _Divider extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.divider.withOpacity(0),
+            AppColors.divider.withValues(alpha: 0),
             AppColors.divider,
-            AppColors.divider.withOpacity(0),
+            AppColors.divider.withValues(alpha: 0),
           ],
         ),
       ),
