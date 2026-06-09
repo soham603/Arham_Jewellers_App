@@ -9,6 +9,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
@@ -175,6 +176,13 @@ class AdminPanelScreen extends StatelessWidget {
                 title: "Approve Users",
                 subtitle: "Manage access",
                 onTap: () => Get.to(() => const ApproveUsersScreen()),
+              ),
+              _adminTile(
+                context,
+                icon: Icons.people_alt_rounded,
+                title: "User Management",
+                subtitle: "All users",
+                onTap: () => Get.to(() => const UserManagementScreen()),
               ),
               _adminTile(
                 context,

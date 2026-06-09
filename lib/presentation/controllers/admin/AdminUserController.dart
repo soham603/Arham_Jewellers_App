@@ -422,6 +422,9 @@ class UserSearchModel {
   final DateTime? enableAccessTill;
   final DateTime createdAt;
   final List<AccessRequestRef>? accessRequests;
+  final String? deviceId;
+  final String? deviceName;
+  final bool? isRetailer;
 
   UserSearchModel({
     required this.id,
@@ -437,6 +440,9 @@ class UserSearchModel {
     this.enableAccessTill,
     required this.createdAt,
     this.accessRequests,
+    this.deviceId,
+    this.deviceName,
+    this.isRetailer,
   });
 
   factory UserSearchModel.fromJson(Map<String, dynamic> json) {
@@ -462,6 +468,9 @@ class UserSearchModel {
               .map((e) => AccessRequestRef.fromJson(e))
               .toList()
           : null,
+      deviceId: json['deviceId'],
+      deviceName: json['deviceName'],
+      isRetailer: json['retailUser'] ?? false,
     );
   }
 
@@ -480,6 +489,9 @@ class UserSearchModel {
       'enableAccessTill': enableAccessTill?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
       'accessRequests': accessRequests?.map((e) => e.toJson()).toList(),
+      'deviceId': deviceId,
+      'deviceName': deviceName,
+      'retailUser': isRetailer,
     };
   }
 
@@ -497,6 +509,9 @@ class UserSearchModel {
     DateTime? enableAccessTill,
     DateTime? createdAt,
     List<AccessRequestRef>? accessRequests,
+    String? deviceId,
+    String? deviceName,
+    bool? isRetailer,
   }) {
     return UserSearchModel(
       id: id ?? this.id,
@@ -512,6 +527,9 @@ class UserSearchModel {
       enableAccessTill: enableAccessTill ?? this.enableAccessTill,
       createdAt: createdAt ?? this.createdAt,
       accessRequests: accessRequests ?? this.accessRequests,
+      deviceId: deviceId ?? this.deviceId,
+      deviceName: deviceName ?? this.deviceName,
+      isRetailer: isRetailer ?? this.isRetailer,
     );
   }
 }
