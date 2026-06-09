@@ -411,113 +411,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.getScreenHeight(2)),
 
+                    _wishlistLink(context),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
                     // =====================================================
-                    // TITLE
+                    // MY ORDERS CARD
                     // =====================================================
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "My Orders",
-                          style: TextStyle(
-                            fontSize: context.getResponsiveSize(6),
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
-                          ),
+                    GestureDetector(
+                      onTap: () => Get.to(() => const MyOrdersPage()),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(4),
+                          vertical: context.getScreenHeight(1.5),
                         ),
-                        GestureDetector(
-                          onTap: () => Get.to(() => const MyOrdersPage()),
-                          child: Text(
-                            "View All",
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(4),
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryGold,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGold.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(
+                                Icons.receipt_long_rounded,
+                                color: AppColors.primaryGold,
+                                size: context.getResponsiveSize(5),
+                              ),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(3)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'My Orders',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: context.getResponsiveSize(4),
+                                      color: AppColors.textDark,
+                                    ),
+                                  ),
+                                  SizedBox(height: context.getScreenHeight(0.3)),
+                                  Obx(
+                                    () => Text(
+                                      '${orderController.totalOrders} order${orderController.totalOrders != 1 ? 's' : ''}',
+                                      style: TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: context.getResponsiveSize(3),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: AppColors.textMuted,
+                              size: context.getResponsiveSize(5),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
                     SizedBox(height: context.getScreenHeight(2)),
 
-                    // =====================================================
-                    // ORDERS
-                    // =====================================================
-                    ...List.generate(orderController.userOrders.length, (
-                      index,
-                    ) {
-                      final order = orderController.userOrders[index];
-
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: context.getScreenHeight(1.5),
-                        ),
-
-                        child: _OrderCard(
-                          order: order,
-                          controller: orderController,
-                        ),
-                      );
-                    }),
-
-                    if (orderController.hasMoreOrders)
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: context.getScreenHeight(1),
-                          bottom: context.getScreenHeight(3),
-                        ),
-
-                        child: Center(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: AppColors.primaryGold,
-
-                              padding: EdgeInsets.symmetric(
-                                horizontal: context.getResponsiveSize(8),
-                                vertical: context.getScreenHeight(1.4),
-                              ),
-
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-
-                            onPressed: orderController.isFetchingOrders
-                                ? null
-                                : () {
-                                    orderController.loadMoreOrders();
-                                  },
-
-                            child: orderController.isFetchingOrders
-                                ? SizedBox(
-                                    width: context.getResponsiveSize(4),
-                                    height: context.getResponsiveSize(4),
-                                    child: const CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    "Load More",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: context.getResponsiveSize(4),
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-
-                    SizedBox(height: context.getScreenHeight(2)),
-
                     Divider(color: Colors.grey.shade300),
-
-                    SizedBox(height: context.getScreenHeight(2)),
-
-                    _wishlistLink(context),
 
                     SizedBox(height: context.getScreenHeight(2)),
 

@@ -50,11 +50,10 @@ class AppBottomNav extends StatelessWidget {
     );
 
     final barHeight = context.getResponsiveSize(11);
-    final iconContainerSize = context.getResponsiveSize(6);
-    final iconSize = context.getResponsiveSize(3.5);
+    final iconContainerSize = context.getResponsiveSize(10);
+    final iconSize = context.getResponsiveSize(6);
     final labelFontSize = context.getResponsiveSize(2);
     final itemVerticalPadding = context.getResponsiveSize(1.2);
-    final iconLabelSpacing = context.getResponsiveSize(0.8);
     final inkwellBorderRadius = context.getResponsiveSize(2.5);
 
     return Container(
@@ -85,7 +84,6 @@ class AppBottomNav extends StatelessWidget {
               iconSize: iconSize,
               labelFontSize: labelFontSize,
               itemVerticalPadding: itemVerticalPadding,
-              iconLabelSpacing: iconLabelSpacing,
               inkwellBorderRadius: inkwellBorderRadius,
             ),
           ),
@@ -105,7 +103,6 @@ class _NavItemTile extends StatelessWidget {
     required this.iconSize,
     required this.labelFontSize,
     required this.itemVerticalPadding,
-    required this.iconLabelSpacing,
     required this.inkwellBorderRadius,
   });
 
@@ -117,7 +114,6 @@ class _NavItemTile extends StatelessWidget {
   final double iconSize;
   final double labelFontSize;
   final double itemVerticalPadding;
-  final double iconLabelSpacing;
   final double inkwellBorderRadius;
 
   @override
@@ -147,7 +143,7 @@ class _NavItemTile extends StatelessWidget {
                   containerSize: iconContainerSize,
                   iconSize: iconSize,
                 ),
-                SizedBox(height: iconLabelSpacing),
+                const SizedBox(height: 6),
                 _AnimatedLabel(
                   label: item.label,
                   isSelected: isSelected,
