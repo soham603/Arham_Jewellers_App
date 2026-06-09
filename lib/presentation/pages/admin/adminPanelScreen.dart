@@ -164,7 +164,7 @@ class AdminPanelScreen extends StatelessWidget {
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
+            crossAxisCount: context.gridColumns(),
             crossAxisSpacing: context.getResponsiveSize(3),
             mainAxisSpacing: context.getScreenHeight(1.5),
             childAspectRatio: 1.0,
