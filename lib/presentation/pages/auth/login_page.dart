@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: IntrinsicHeight(
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(5),
+                          horizontal: context.getResponsiveSize(5),
                           vertical: context.getScreenHeight(2),
                         ),
                         child: Column(
@@ -305,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
                   shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
-                        context.getScreenWidth(2.5),
+                        context.getResponsiveSize(2.5),
                       ),
                     ),
                   ),
@@ -349,8 +349,8 @@ class _LoginPageState extends State<LoginPage> {
                       },
                 child: isLoading
                     ? SizedBox(
-                        height: context.getScreenWidth(5),
-                        width: context.getScreenWidth(5),
+                        height: context.getResponsiveSize(5),
+                        width: context.getResponsiveSize(5),
                         child: const CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 2.5,
@@ -443,7 +443,7 @@ class _LoginPageState extends State<LoginPage> {
             },
             child: Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(3),
+                horizontal: context.getResponsiveSize(3),
                 vertical: context.getScreenHeight(0.5),
               ),
               child: AnimatedSwitcher(

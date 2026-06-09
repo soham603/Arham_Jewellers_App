@@ -271,9 +271,9 @@ class _SearchPageState extends State<SearchPage> {
               if (categoryIds.isEmpty) return const SizedBox.shrink();
               return Container(
                 padding: EdgeInsets.fromLTRB(
-                  context.getScreenWidth(4),
+                  context.getResponsiveSize(4),
                   context.getScreenHeight(0.4),
-                  context.getScreenWidth(4),
+                  context.getResponsiveSize(4),
                   0,
                 ),
                 child: Align(
@@ -343,9 +343,9 @@ class _SearchPageState extends State<SearchPage> {
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
-                            context.getScreenWidth(4),
+                            context.getResponsiveSize(4),
                             context.getScreenHeight(0.4),
-                            context.getScreenWidth(4),
+                            context.getResponsiveSize(4),
                             context.getScreenHeight(0.8),
                           ),
                           child: Row(
@@ -362,7 +362,7 @@ class _SearchPageState extends State<SearchPage> {
                                     ),
                                   ),
                                   if (controller.selectedKarats.isNotEmpty) ...[
-                                    SizedBox(width: context.getScreenWidth(2)),
+                                    SizedBox(width: context.getResponsiveSize(2)),
                                     Text(
                                       '— ${controller.selectedKarats.join(", ")}',
                                       style: TextStyle(
@@ -437,9 +437,9 @@ class _SearchPageState extends State<SearchPage> {
     ];
     return Container(
       padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(0.4),
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         0,
       ),
       child: Obx(() {
@@ -450,7 +450,7 @@ class _SearchPageState extends State<SearchPage> {
             final isSelected = controller.selectedKarats.contains(karat);
             return Expanded(
               child: Padding(
-                padding: EdgeInsets.only(right: karatOptions.last != option ? context.getScreenWidth(2) : 0),
+                padding: EdgeInsets.only(right: karatOptions.last != option ? context.getResponsiveSize(2) : 0),
                 child: GestureDetector(
                   onTap: () {
                     controller.toggleKaratFilter(karat);
@@ -473,14 +473,14 @@ class _SearchPageState extends State<SearchPage> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(2),
+                      horizontal: context.getResponsiveSize(2),
                       vertical: context.getScreenHeight(0.8),
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? context.colorPalette.gold
                           : context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
+                      borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
                       border: Border.all(
                         color: isSelected
                             ? context.colorPalette.gold
@@ -526,9 +526,9 @@ class _SearchPageState extends State<SearchPage> {
 
       return Container(
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           0,
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           0,
         ),
         child: Column(
@@ -680,7 +680,7 @@ class _SearchPageState extends State<SearchPage> {
                             size: context.getResponsiveSize(3),
                             color: context.colorPalette.goldDark,
                           ),
-                          SizedBox(width: context.getScreenWidth(0.8)),
+                          SizedBox(width: context.getResponsiveSize(0.8)),
                           Text(
                             'Clear',
                             style: TextStyle(
@@ -868,9 +868,9 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Padding(
               padding: EdgeInsets.fromLTRB(
-                context.getScreenWidth(4),
+                context.getResponsiveSize(4),
                 context.getScreenHeight(1.5),
-                context.getScreenWidth(4),
+                context.getResponsiveSize(4),
                 context.getScreenHeight(0.8),
               ),
               child: Text(
@@ -884,9 +884,9 @@ class _SearchPageState extends State<SearchPage> {
             ),
             SizedBox(height: context.getScreenHeight(0.6)),
             SizedBox(
-              height: context.getScreenWidth(16) + 5 + context.getScreenWidth(2.4) * 3.2,
+              height: context.getResponsiveSize(16) + 5 + context.getResponsiveSize(2.4) * 3.2,
               child: ListView.separated(
-                padding: EdgeInsets.only(left: context.getScreenWidth(4)),
+                padding: EdgeInsets.only(left: context.getResponsiveSize(4)),
                 scrollDirection: Axis.horizontal,
                 itemCount: unique.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 4),
@@ -932,7 +932,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         const SizedBox(height: 5),
                         SizedBox(
-                          width: context.getScreenWidth(20),
+                          width: context.getResponsiveSize(20),
                           child: Column(
                             children: [
                               Text(
@@ -975,9 +975,9 @@ class _SearchPageState extends State<SearchPage> {
         if (state == CurrentAppState.LOADING && categories.isEmpty) {
           return Padding(
             padding: EdgeInsets.fromLTRB(
-              context.getScreenWidth(4),
+              context.getResponsiveSize(4),
               context.getScreenHeight(1.5),
-              context.getScreenWidth(4),
+              context.getResponsiveSize(4),
               0,
             ),
             child: Column(
@@ -993,12 +993,12 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 SizedBox(height: context.getScreenHeight(0.8)),
                 Wrap(
-                  spacing: context.getScreenWidth(2),
+                  spacing: context.getResponsiveSize(2),
                   runSpacing: context.getScreenHeight(0.6),
                   children: List.generate(
                     6,
                     (_) => Container(
-                      width: context.getScreenWidth(22),
+                      width: context.getResponsiveSize(22),
                       height: context.getScreenHeight(3.2),
                       decoration: BoxDecoration(
                         color: context.colorPalette.shimmerBaseColor,
@@ -1016,9 +1016,9 @@ class _SearchPageState extends State<SearchPage> {
 
         return Padding(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.5),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             0,
           ),
           child: Column(
@@ -1034,7 +1034,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
               SizedBox(height: context.getScreenHeight(0.8)),
               Wrap(
-                spacing: context.getScreenWidth(2),
+                spacing: context.getResponsiveSize(2),
                 runSpacing: context.getScreenHeight(0.6),
                 children: categories.map((cat) {
                   final cleanedName = cat.name
@@ -1065,7 +1065,7 @@ class _SearchPageState extends State<SearchPage> {
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(3),
+                        horizontal: context.getResponsiveSize(3),
                         vertical: context.getScreenHeight(0.6),
                       ),
                       decoration: BoxDecoration(
@@ -1102,9 +1102,9 @@ class _SearchPageState extends State<SearchPage> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           context.getScreenHeight(1.5),
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           0,
         ),
         child: Column(
@@ -1136,7 +1136,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             SizedBox(height: context.getScreenHeight(0.8)),
             Wrap(
-              spacing: context.getScreenWidth(2),
+              spacing: context.getResponsiveSize(2),
               runSpacing: context.getScreenHeight(0.6),
               children: visible.map((term) => _buildSearchChip(context, term)).toList(),
             ),
@@ -1165,8 +1165,8 @@ class _SearchPageState extends State<SearchPage> {
         borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: EdgeInsets.only(
-            left: context.getScreenWidth(2.5),
-            right: context.getScreenWidth(1),
+            left: context.getResponsiveSize(2.5),
+            right: context.getResponsiveSize(1),
             top: context.getScreenHeight(0.45),
             bottom: context.getScreenHeight(0.45),
           ),
@@ -1181,7 +1181,7 @@ class _SearchPageState extends State<SearchPage> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(width: context.getScreenWidth(1)),
+              SizedBox(width: context.getResponsiveSize(1)),
               GestureDetector(
                 onTap: () => controller.removeRecentSearch(term),
                 child: Icon(
@@ -1253,7 +1253,7 @@ class _SearchPageState extends State<SearchPage> {
         : _sortCategories(filtered, controller.sortBy);
 
     return SliverPadding(
-      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
       sliver: SliverGrid(
         delegate: SliverChildBuilderDelegate(
           (context, index) {
@@ -1318,7 +1318,7 @@ class _SearchPageState extends State<SearchPage> {
                       Expanded(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: context.getScreenWidth(2),
+                            horizontal: context.getResponsiveSize(2),
                             vertical: context.getScreenHeight(0.3),
                           ),
                           child: Column(
@@ -1360,8 +1360,8 @@ class _SearchPageState extends State<SearchPage> {
         ),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-          mainAxisSpacing: context.getScreenWidth(2),
-          crossAxisSpacing: context.getScreenWidth(2),
+          mainAxisSpacing: context.getResponsiveSize(2),
+          crossAxisSpacing: context.getResponsiveSize(2),
           childAspectRatio: 0.75,
         ),
       ),
@@ -1423,15 +1423,15 @@ class _SearchPageState extends State<SearchPage> {
   // ── Shimmer Placeholder ───────────────────────────────────────────────────
   Widget _gridShimmer(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: 6,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-        mainAxisSpacing: context.getScreenWidth(2),
-        crossAxisSpacing: context.getScreenWidth(2),
+        mainAxisSpacing: context.getResponsiveSize(2),
+        crossAxisSpacing: context.getResponsiveSize(2),
         childAspectRatio: context.isTablet ? 0.55 : 0.488,
       ),
         itemBuilder: (context, _) => _shimmerCard(context),
@@ -1461,7 +1461,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(2)),
+              padding: EdgeInsets.all(context.getResponsiveSize(2)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1476,7 +1476,7 @@ class _SearchPageState extends State<SearchPage> {
                   SizedBox(height: context.getScreenHeight(0.5)),
                   Container(
                     height: context.getScreenHeight(1),
-                    width: context.getScreenWidth(20),
+                    width: context.getResponsiveSize(20),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
@@ -1529,19 +1529,19 @@ class _BrowseCategoryImage extends StatelessWidget {
     if (cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: cat.imageUrl,
-        width: context.getScreenWidth(16),
-        height: context.getScreenWidth(16),
+        width: context.getResponsiveSize(16),
+        height: context.getResponsiveSize(16),
         fit: BoxFit.cover,
         errorWidget: (_, __, ___) => RatneshFallback.xs(
-          width: context.getScreenWidth(16),
-          height: context.getScreenWidth(16),
+          width: context.getResponsiveSize(16),
+          height: context.getResponsiveSize(16),
         ),
       );
     }
 
     return RatneshFallback.xs(
-      width: context.getScreenWidth(16),
-      height: context.getScreenWidth(16),
+      width: context.getResponsiveSize(16),
+      height: context.getResponsiveSize(16),
     );
   }
 }

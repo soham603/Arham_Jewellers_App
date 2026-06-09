@@ -154,9 +154,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: IntrinsicHeight(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
-                      context.getScreenWidth(5),
+                      context.getResponsiveSize(5),
                       context.getScreenHeight(1),
-                      context.getScreenWidth(5),
+                      context.getResponsiveSize(5),
                       MediaQuery.of(context).viewInsets.bottom +
                           context.getScreenHeight(2),
                     ),
@@ -324,7 +324,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       maxHeight: 200,
                                       maxWidth:
                                           MediaQuery.of(context).size.width -
-                                          context.getScreenWidth(10),
+                                          context.getResponsiveSize(10),
                                     ),
                                     child: ListView.builder(
                                       padding: EdgeInsets.zero,
@@ -338,14 +338,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                               onTap: () => onSelected(option),
                                               child: Padding(
                                                 padding: EdgeInsets.all(
-                                                  context.getScreenWidth(4),
+                                                  context.getResponsiveSize(4),
                                                 ),
                                                 child: Text(
                                                   option,
                                                   style: TextStyle(
                                                     color: AppColors.textDark,
                                                     fontSize: context
-                                                        .getScreenWidth(3.5),
+                                                        .getResponsiveSize(3.5),
                                                   ),
                                                 ),
                                               ),
@@ -410,7 +410,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       maxHeight: 200,
                                       maxWidth:
                                           MediaQuery.of(context).size.width -
-                                          context.getScreenWidth(10),
+                                          context.getResponsiveSize(10),
                                     ),
                                     child: ListView.builder(
                                       padding: EdgeInsets.zero,
@@ -424,14 +424,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                               onTap: () => onSelected(option),
                                               child: Padding(
                                                 padding: EdgeInsets.all(
-                                                  context.getScreenWidth(4),
+                                                  context.getResponsiveSize(4),
                                                 ),
                                                 child: Text(
                                                   option,
                                                   style: TextStyle(
                                                     color: AppColors.textDark,
                                                     fontSize: context
-                                                        .getScreenWidth(3.5),
+                                                        .getResponsiveSize(3.5),
                                                   ),
                                                 ),
                                               ),
@@ -515,7 +515,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   shape: WidgetStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
-                                        context.getScreenWidth(2.5),
+                                        context.getResponsiveSize(2.5),
                                       ),
                                     ),
                                   ),
@@ -570,8 +570,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       },
                                 child: isLoading
                                     ? SizedBox(
-                                        height: context.getScreenWidth(5),
-                                        width: context.getScreenWidth(5),
+                                        height: context.getResponsiveSize(5),
+                                        width: context.getResponsiveSize(5),
                                         child: const CircularProgressIndicator(
                                           color: Colors.white,
                                           strokeWidth: 2.5,

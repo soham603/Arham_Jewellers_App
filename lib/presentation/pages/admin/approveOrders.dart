@@ -84,7 +84,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
         }
 
         return SingleChildScrollView(
-          padding: EdgeInsets.all(context.getScreenWidth(4)),
+          padding: EdgeInsets.all(context.getResponsiveSize(4)),
           child: Column(
             children: [
               // SEARCH BAR
@@ -112,7 +112,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                       color: const Color(0xFFD4AF37),
                       onTap: () => controller.changeStatus('PENDING'),
                     ),
-                    SizedBox(width: context.getScreenWidth(1)),
+                    SizedBox(width: context.getResponsiveSize(1)),
                     _filterSegment(
                       context,
                       label: 'APPROVED',
@@ -120,7 +120,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                       color: Colors.green,
                       onTap: () => controller.changeStatus('APPROVED'),
                     ),
-                    SizedBox(width: context.getScreenWidth(1)),
+                    SizedBox(width: context.getResponsiveSize(1)),
                     _filterSegment(
                       context,
                       label: 'REJECTED',
@@ -207,7 +207,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                         borderRadius: BorderRadius.circular(18),
                       ),
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(9),
+                        horizontal: context.getResponsiveSize(9),
                         vertical: context.getScreenHeight(1.5),
                       ),
                     ),
@@ -246,7 +246,7 @@ class _AdminOrderCard extends StatelessWidget {
         }
       },
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -265,7 +265,7 @@ class _AdminOrderCard extends StatelessWidget {
               order: order,
               controller: controller,
             ),
-            SizedBox(width: context.getScreenWidth(4)),
+            SizedBox(width: context.getResponsiveSize(4)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +281,7 @@ class _AdminOrderCard extends StatelessWidget {
                     SizedBox(height: context.getScreenHeight(0.4)),
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(2),
+                        horizontal: context.getResponsiveSize(2),
                         vertical: context.getScreenHeight(0.2),
                       ),
                       decoration: BoxDecoration(
@@ -313,7 +313,7 @@ class _AdminOrderCard extends StatelessWidget {
                   SizedBox(height: context.getScreenHeight(1)),
                   Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(2.5),
+                      horizontal: context.getResponsiveSize(2.5),
                       vertical: context.getScreenHeight(0.3),
                     ),
                     decoration: BoxDecoration(
@@ -355,7 +355,7 @@ class _OrderImagesStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.getScreenWidth(20);
+    final size = context.getResponsiveSize(20);
 
     return Obx(() {
       final images = order.orderItems
@@ -470,7 +470,7 @@ Widget _filterSegment(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: EdgeInsets.symmetric(horizontal: context.getScreenWidth(0.5)),
+        margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(0.5)),
         padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
         decoration: BoxDecoration(
           color: isActive ? color : color.withOpacity(0.08),

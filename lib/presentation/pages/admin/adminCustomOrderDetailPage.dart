@@ -77,10 +77,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
             color: AppColors.textDark,
           ),
         ),
-        titleSpacing: context.getScreenWidth(4),
+        titleSpacing: context.getResponsiveSize(4),
         actions: [
           Container(
-            margin: EdgeInsets.only(right: context.getScreenWidth(4)),
+            margin: EdgeInsets.only(right: context.getResponsiveSize(4)),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: statusInfo.bgColor,
@@ -96,7 +96,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
       body: ResponsiveWrapper(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1.5),
           ),
           child: Column(
@@ -217,19 +217,19 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 _buildSectionTitle(context, 'Reference Images'),
                 SizedBox(height: context.getScreenHeight(1)),
                 SizedBox(
-                  height: context.getScreenWidth(25),
+                  height: context.getResponsiveSize(25),
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: order.referenceImages.length,
-                    separatorBuilder: (_, __) => SizedBox(width: context.getScreenWidth(3)),
+                    separatorBuilder: (_, __) => SizedBox(width: context.getResponsiveSize(3)),
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () => _showImageZoom(context, order.referenceImages[index]),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Container(
-                            width: context.getScreenWidth(25),
-                            height: context.getScreenWidth(25),
+                            width: context.getResponsiveSize(25),
+                            height: context.getResponsiveSize(25),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(14),
@@ -256,7 +256,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.getScreenHeight(1)),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.all(context.getScreenWidth(4)),
+                  padding: EdgeInsets.all(context.getResponsiveSize(4)),
                   decoration: BoxDecoration(
                     color: order.status.toUpperCase() == 'REJECTED'
                         ? const Color(0xFFFEE2E2).withValues(alpha: 0.5)
@@ -389,9 +389,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         builder: (context, setDialogState) {
           return Dialog(
             backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+            insetPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
             child: Container(
-              padding: EdgeInsets.all(context.getScreenWidth(5)),
+              padding: EdgeInsets.all(context.getResponsiveSize(5)),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
               child: SingleChildScrollView(
                 child: Column(
@@ -406,7 +406,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     Obx(() {
                       final craftsmen = _craftsmanController.craftsmen;
                       return Container(
-                        padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(3)),
+                        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(3)),
                         decoration: BoxDecoration(
                           color: AppColors.pageBg,
                           borderRadius: BorderRadius.circular(12),
@@ -501,9 +501,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
+        insetPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
         child: Container(
-          padding: EdgeInsets.all(context.getScreenWidth(5)),
+          padding: EdgeInsets.all(context.getResponsiveSize(5)),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -543,7 +543,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ),
                     ),
                   ),
-                  SizedBox(width: context.getScreenWidth(3)),
+                  SizedBox(width: context.getResponsiveSize(3)),
                   Expanded(
                     child: SizedBox(
                       height: context.getScreenHeight(5),
@@ -581,9 +581,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         builder: (context, setDialogState) {
           return Dialog(
             backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
+            insetPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
             child: Container(
-              padding: EdgeInsets.all(context.getScreenWidth(5)),
+              padding: EdgeInsets.all(context.getResponsiveSize(5)),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
               child: SingleChildScrollView(
                 child: Column(
@@ -736,7 +736,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Text(
               "Connect on WhatsApp",
               style: TextStyle(
@@ -765,7 +765,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   Widget _buildInfoCard(BuildContext context, {required List<Widget> children}) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -785,7 +785,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: context.getScreenWidth(28),
+            width: context.getResponsiveSize(28),
             child: Text(label, style: TextStyle(fontSize: context.getResponsiveSize(3.2), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
           ),
           Expanded(

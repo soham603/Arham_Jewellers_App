@@ -438,7 +438,7 @@ GestureDetector(
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(width: 12),
                                 itemBuilder: (_, __) {
-                                  final cardWidth = context.getScreenWidth(50);
+                          final cardWidth = context.getScreenWidth(50);
                                   return Shimmer.fromColors(
                                     baseColor:
                                         context.colorPalette.shimmerBaseColor,
@@ -765,7 +765,7 @@ class _KaratSection extends StatelessWidget {
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 220),
 
-                        width: context.getScreenWidth(20),
+                        width: context.getResponsiveSize(20),
 
                         decoration: BoxDecoration(
                           color: isExpanded
@@ -796,7 +796,7 @@ class _KaratSection extends StatelessWidget {
 
                           children: [
                             Container(
-                              width: context.getScreenWidth(12),
+                              width: context.getResponsiveSize(12),
                               height: context.getScreenHeight(6),
 
                               decoration: BoxDecoration(
@@ -812,7 +812,7 @@ class _KaratSection extends StatelessWidget {
                                   fit: BoxFit.cover,
 
                                   errorWidget: (_, __, ___) => RatneshFallback(
-                                    logoSize: context.getScreenWidth(5),
+                                    logoSize: context.getResponsiveSize(5),
                                   ),
                                 ),
                               ),
@@ -1198,7 +1198,7 @@ class _TrendingPlaceholder extends StatelessWidget {
 
         itemBuilder: (_, i) {
           return Container(
-            width: context.getScreenWidth(33.5),
+            width: context.getResponsiveSize(33.5),
 
             decoration: BoxDecoration(
               color: context.colorPalette.cardBg,
@@ -1753,7 +1753,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
       if (unique.isEmpty) {
         return SizedBox(
-          height: context.getScreenWidth(20) + 7 + context.getScreenHeight(3),
+          height: context.getResponsiveSize(20) + 7 + context.getScreenHeight(3),
           child: Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,
@@ -1766,8 +1766,8 @@ class _CategoryQuickAccess extends StatelessWidget {
                 return Column(
                   children: [
                     Container(
-                      width: context.getScreenWidth(20),
-                      height: context.getScreenWidth(20),
+                      width: context.getResponsiveSize(20),
+                      height: context.getResponsiveSize(20),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
@@ -1775,7 +1775,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Container(
-                      width: context.getScreenWidth(16),
+                      width: context.getResponsiveSize(16),
                       height: context.getScreenHeight(1.5),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -1791,7 +1791,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
 
       return SizedBox(
-        height: context.getScreenWidth(20) + 7 + context.getScreenHeight(3),
+        height: context.getResponsiveSize(20) + 7 + context.getScreenHeight(3),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
@@ -1828,7 +1828,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                   ),
                   const SizedBox(height: 7),
                   SizedBox(
-                    width: context.getScreenWidth(24),
+                    width: context.getResponsiveSize(24),
                     child: Text(
                       cat.name
                           .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
@@ -1866,8 +1866,8 @@ class _CategoryQuickAccessImage extends StatelessWidget {
     if (cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: cat.imageUrl,
-        width: context.getScreenWidth(20),
-        height: context.getScreenWidth(20),
+        width: context.getResponsiveSize(20),
+        height: context.getResponsiveSize(20),
         fit: BoxFit.cover,
         errorWidget: (_, __, ___) => const RatneshFallback.s(),
       );
@@ -1888,7 +1888,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(1),
         ),
         decoration: BoxDecoration(
@@ -1923,7 +1923,7 @@ class CustomiseOrderBanner extends StatelessWidget {
               right: 0,
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
+                  horizontal: context.getResponsiveSize(3),
                   vertical: context.getScreenHeight(0.6),
                 ),
                 decoration: BoxDecoration(
@@ -1949,7 +1949,7 @@ class CustomiseOrderBanner extends StatelessWidget {
             // Main Content Layout
             // ==========================================
             Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(5)),
+              padding: EdgeInsets.all(context.getResponsiveSize(5)),
               child: Row(
                 children: [
                   // Left Side: Text Content
@@ -2023,7 +2023,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                         // CTA Button
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: context.getScreenWidth(3.5),
+                            horizontal: context.getResponsiveSize(3.5),
                             vertical: context.getScreenHeight(0.8),
                           ),
                           decoration: BoxDecoration(
@@ -2053,7 +2053,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
-                              SizedBox(width: context.getScreenWidth(1.5)),
+                              SizedBox(width: context.getResponsiveSize(1.5)),
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 color: context.colorPalette.goldDeep,
@@ -2085,8 +2085,8 @@ class CustomiseOrderBanner extends StatelessWidget {
                             ),
                             child: Image.asset(
                               'assets/images/bespoke-icon.png',
-                              width: context.getScreenWidth(22),
-                              height: context.getScreenWidth(22),
+                              width: context.getResponsiveSize(22),
+                              height: context.getResponsiveSize(22),
                               fit: BoxFit.contain,
                             ),
                           ),

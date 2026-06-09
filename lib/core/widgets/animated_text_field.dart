@@ -84,7 +84,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
+          borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
           boxShadow: _focusNode.hasFocus
               ? [
                   BoxShadow(
@@ -119,27 +119,27 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.suffixIcon,
             contentPadding: EdgeInsets.symmetric(
-              horizontal: context.getScreenWidth(3.5).clamp(14.0, 20.0),
+              horizontal: context.getResponsiveSize(3.5).clamp(14.0, 20.0),
               vertical: context.getScreenHeight(1.5).clamp(10.0, 16.0),
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
               borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
               borderSide: const BorderSide(color: Colors.redAccent),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
               borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
             ),
           ),

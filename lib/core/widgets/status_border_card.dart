@@ -157,8 +157,8 @@ class StatusBorderCard extends StatelessWidget {
               if (showBadge)
                 Padding(
                   padding: EdgeInsets.only(
-                    top: context.getScreenWidth(3),
-                    right: context.getScreenWidth(4),
+                    top: context.getResponsiveSize(3),
+                    right: context.getResponsiveSize(4),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,

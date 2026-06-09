@@ -13,7 +13,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(8)),
+            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(8)),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

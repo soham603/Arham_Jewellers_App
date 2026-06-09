@@ -65,8 +65,8 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
         if (state == CurrentAppState.LOADING && page == null) {
           return Center(
             child: SizedBox(
-              width: context.getScreenWidth(8),
-              height: context.getScreenWidth(8),
+              width: context.getResponsiveSize(8),
+              height: context.getResponsiveSize(8),
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
                 color: AppColors.primaryGold,
@@ -78,7 +78,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
         if (state == CurrentAppState.ERROR && page == null) {
           return Center(
             child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(8)),
+              padding: EdgeInsets.all(context.getResponsiveSize(8)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -138,7 +138,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
 
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(2),
           ),
           child: Column(
@@ -159,20 +159,20 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 data: page.content,
                 style: {
                   'body': Style(
-                    fontSize: FontSize(context.getScreenWidth(3.8)),
+                    fontSize: FontSize(context.getResponsiveSize(3.8)),
                     color: AppColors.textDark,
                     lineHeight: LineHeight.em(1.6),
                   ),
                   'h1': Style(
-                    fontSize: FontSize(context.getScreenWidth(5.5)),
+                    fontSize: FontSize(context.getResponsiveSize(5.5)),
                     fontWeight: FontWeight.w700,
                   ),
                   'h2': Style(
-                    fontSize: FontSize(context.getScreenWidth(5)),
+                    fontSize: FontSize(context.getResponsiveSize(5)),
                     fontWeight: FontWeight.w700,
                   ),
                   'h3': Style(
-                    fontSize: FontSize(context.getScreenWidth(4.5)),
+                    fontSize: FontSize(context.getResponsiveSize(4.5)),
                     fontWeight: FontWeight.w600,
                   ),
                   'p': Style(

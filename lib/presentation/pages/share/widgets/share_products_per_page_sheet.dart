@@ -96,7 +96,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
       onTap: () => setState(() => _selectedValue = value),
       child: Container(
         margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
-        padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
         decoration: BoxDecoration(
           color: isSelected
               ? context.colorPalette.gold.withOpacity(0.08)
@@ -134,7 +134,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                     )
                   : null,
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

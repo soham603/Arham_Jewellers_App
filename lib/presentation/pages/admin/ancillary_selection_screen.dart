@@ -40,7 +40,7 @@ class AncillarySelectionScreen extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
@@ -53,7 +53,7 @@ class AncillarySelectionScreen extends StatelessWidget {
             ),
             child: ListTile(
               contentPadding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(4),
+                horizontal: context.getResponsiveSize(4),
                 vertical: context.getScreenHeight(0.5),
               ),
               title: Text(

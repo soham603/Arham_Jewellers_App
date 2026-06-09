@@ -80,7 +80,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(5),
+                        horizontal: context.getResponsiveSize(5),
                         vertical: context.getScreenHeight(1),
                       ),
                       child: Center(
@@ -91,9 +91,9 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                           // 1. Logo (Smaller as requested)
                           Center(
                             child: LogoWidget(
-                              logoSize: context.getScreenWidth(16),
-                              nameFontSize: context.getScreenWidth(4),
-                              subtitleFontSize: context.getScreenWidth(2),
+                              logoSize: context.getResponsiveSize(16),
+                              nameFontSize: context.getResponsiveSize(4),
+                              subtitleFontSize: context.getResponsiveSize(2),
                               iconColor: context.colorPalette.gold,
                               nameColor: context.colorPalette.goldDeep,
                               subtitleColor: context.colorPalette.goldDark,
@@ -245,7 +245,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
           }),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
             ),
           ),
         ),
@@ -311,8 +311,8 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
               },
         child: _isLoading
             ? SizedBox(
-                height: context.getScreenWidth(5),
-                width: context.getScreenWidth(5),
+                height: context.getResponsiveSize(5),
+                width: context.getResponsiveSize(5),
                 child: const CircularProgressIndicator(
                   color: Colors.white,
                   strokeWidth: 2.5,

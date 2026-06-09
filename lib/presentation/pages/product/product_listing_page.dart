@@ -1081,7 +1081,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
         decoration: BoxDecoration(
           color: context.colorPalette.cardBg,
           borderRadius: BorderRadius.circular(12),
@@ -1090,7 +1090,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(context.getScreenWidth(2)),
+              padding: EdgeInsets.all(context.getResponsiveSize(2)),
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -1101,7 +1101,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 size: context.getResponsiveSize(5.5),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1187,7 +1187,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         canPop: false,
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            padding: EdgeInsets.all(context.getResponsiveSize(6)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),

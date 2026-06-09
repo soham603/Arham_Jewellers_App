@@ -62,7 +62,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
             color: AppColors.textDark,
           ),
         ),
-        titleSpacing: context.getScreenWidth(4),
+        titleSpacing: context.getResponsiveSize(4),
       ),
       body: ResponsiveWrapper(
         child: Column(
@@ -72,9 +72,9 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
             // ── Search bar ──
             Padding(
               padding: EdgeInsets.fromLTRB(
-                context.getScreenWidth(4),
+                context.getResponsiveSize(4),
                 context.getScreenHeight(1.5),
-                context.getScreenWidth(4),
+                context.getResponsiveSize(4),
                 0,
               ),
               child: TextField(
@@ -110,10 +110,10 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
             SizedBox(
               height: context.getScreenHeight(4.5),
               child: ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+                padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                 scrollDirection: Axis.horizontal,
                 itemCount: _statusFilters.length,
-                separatorBuilder: (_, __) => SizedBox(width: context.getScreenWidth(2)),
+                separatorBuilder: (_, __) => SizedBox(width: context.getResponsiveSize(2)),
                 itemBuilder: (context, index) {
                   final status = _statusFilters[index];
                   return Obx(() {
@@ -122,7 +122,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                       onTap: () => _controller.changeStatus(status),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+                        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                         decoration: BoxDecoration(
                           color: isSelected ? AppColors.primaryGold : Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -196,9 +196,9 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                   child: ListView.separated(
                     controller: _scrollController,
                     padding: EdgeInsets.fromLTRB(
-                      context.getScreenWidth(4),
+                      context.getResponsiveSize(4),
                       0,
-                      context.getScreenWidth(4),
+                      context.getResponsiveSize(4),
                       context.getScreenHeight(2),
                     ),
                     itemCount: orders.length + (_controller.hasMore ? 1 : 0),
@@ -242,7 +242,7 @@ class _AdminCustomOrderCard extends StatelessWidget {
       status: order.status,
       onTap: onTap,
       child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -270,7 +270,7 @@ class _AdminCustomOrderCard extends StatelessWidget {
                             color: statusInfo.color,
                             bgColor: statusInfo.bgColor,
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Icon(Icons.arrow_forward_ios_rounded, size: context.getResponsiveSize(3), color: AppColors.textMuted),
                         ],
                       ),
@@ -315,9 +315,9 @@ class _AdminOrderShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         0,
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(2),
       ),
       itemCount: 4,

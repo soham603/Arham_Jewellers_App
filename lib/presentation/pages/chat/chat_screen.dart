@@ -134,7 +134,7 @@ class _ChatScreenState extends State<ChatScreen> {
           icon: Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: context.getResponsiveSize(6)),
           onPressed: () => setState(() => _chatService.clearHistory()),
         ),
-        SizedBox(width: context.getScreenWidth(2)),
+        SizedBox(width: context.getResponsiveSize(2)),
       ],
     );
   }
@@ -143,13 +143,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Center(
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(context.getScreenWidth(8)),
+          padding: EdgeInsets.all(context.getResponsiveSize(8)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: EdgeInsets.all(context.getScreenWidth(5)),
+                padding: EdgeInsets.all(context.getResponsiveSize(5)),
                 decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
                 child: Icon(Icons.chat_bubble_outline_rounded, size: context.getResponsiveSize(12), color: AppColors.primaryGold),
               ),
@@ -174,13 +174,13 @@ class _ChatScreenState extends State<ChatScreen> {
       child: GestureDetector(
         onTap: () { _controller.text = text; _sendMessage(); },
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.2)),
+          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.2)),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.divider)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.auto_awesome_rounded, size: context.getResponsiveSize(4), color: AppColors.primaryGold),
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               Text(text, style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: AppColors.textDark, fontWeight: FontWeight.w500)),
             ],
           ),
@@ -194,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final msgCount = messages.length;
     return ListView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1)),
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1)),
       itemCount: msgCount + (_isStreaming ? 1 : 0) + (_toolStatus != null ? 1 : 0),
       itemBuilder: (context, index) {
         final totalMessages = msgCount;
@@ -224,13 +224,13 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
       child: Row(
         children: [
-          SizedBox(width: context.getScreenWidth(8)),
+          SizedBox(width: context.getResponsiveSize(8)),
           SizedBox(
-            width: context.getScreenWidth(3),
-            height: context.getScreenWidth(3),
+            width: context.getResponsiveSize(3),
+            height: context.getResponsiveSize(3),
             child: CircularProgressIndicator(strokeWidth: 1.5, color: AppColors.primaryGold),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
           Text(label, style: TextStyle(fontSize: context.getResponsiveSize(3.2), color: AppColors.textMuted, fontStyle: FontStyle.italic)),
         ],
       ),
@@ -248,10 +248,10 @@ class _ChatScreenState extends State<ChatScreen> {
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
             child: Icon(Icons.auto_awesome_rounded, size: context.getResponsiveSize(3.5), color: AppColors.primaryGold),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
           Flexible(
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.5)),
+              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.5)),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(18), topRight: Radius.circular(18), bottomLeft: Radius.circular(4), bottomRight: Radius.circular(18)),
@@ -266,7 +266,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   codeblockDecoration: BoxDecoration(color: AppColors.pageBg, borderRadius: BorderRadius.circular(8)),
                   tableHead: TextStyle(fontSize: context.getResponsiveSize(2.8), color: AppColors.textDark, fontWeight: FontWeight.w600, height: 1.4),
                   tableBody: TextStyle(fontSize: context.getResponsiveSize(2.8), color: AppColors.textDark, height: 1.4),
-                  tableCellsPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(1.5), vertical: context.getScreenHeight(0.4)),
+                  tableCellsPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(1.5), vertical: context.getScreenHeight(0.4)),
                 ),
               ),
             ),
@@ -287,7 +287,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: GestureDetector(
               onLongPress: () => Clipboard.setData(ClipboardData(text: text)),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.5)),
+                padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.5)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
                   borderRadius: const BorderRadius.only(topLeft: Radius.circular(18), topRight: Radius.circular(18), bottomLeft: Radius.circular(18), bottomRight: Radius.circular(4)),
@@ -296,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
@@ -318,7 +318,7 @@ class _ChatScreenState extends State<ChatScreen> {
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
             child: Icon(Icons.auto_awesome_rounded, size: context.getResponsiveSize(3.5), color: AppColors.primaryGold),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
           Flexible(
             child: GestureDetector(
               onLongPress: () {
@@ -328,7 +328,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 );
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.5)),
+                padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.5)),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: const BorderRadius.only(topLeft: Radius.circular(18), topRight: Radius.circular(18), bottomLeft: Radius.circular(4), bottomRight: Radius.circular(18)),
@@ -343,7 +343,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     codeblockDecoration: BoxDecoration(color: AppColors.pageBg, borderRadius: BorderRadius.circular(8)),
                     tableHead: TextStyle(fontSize: context.getResponsiveSize(2.8), color: AppColors.textDark, fontWeight: FontWeight.w600, height: 1.4),
                     tableBody: TextStyle(fontSize: context.getResponsiveSize(2.8), color: AppColors.textDark, height: 1.4),
-                    tableCellsPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(1.5), vertical: context.getScreenHeight(0.4)),
+                    tableCellsPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(1.5), vertical: context.getScreenHeight(0.4)),
                   ),
                 ),
               ),
@@ -365,9 +365,9 @@ class _ChatScreenState extends State<ChatScreen> {
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
             child: Icon(Icons.auto_awesome_rounded, size: context.getResponsiveSize(3.5), color: AppColors.primaryGold),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.5)),
+            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.5)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: const BorderRadius.only(topLeft: Radius.circular(18), topRight: Radius.circular(18), bottomLeft: Radius.circular(4), bottomRight: Radius.circular(18)),
@@ -391,7 +391,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildInputBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1)),
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1)),
       decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, -2))]),
       child: SafeArea(
         top: false,
@@ -410,16 +410,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     hintText: 'Ask about jewellery, gold rates...',
                     hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getResponsiveSize(3.5)),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4), vertical: context.getScreenHeight(1.5)),
+                    contentPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1.5)),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             GestureDetector(
               onTap: _isStreaming ? null : _sendMessage,
               child: Container(
-                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(color: _isStreaming ? AppColors.textMuted : AppColors.primaryGold, borderRadius: BorderRadius.circular(14)),
                 child: Icon(Icons.send_rounded, color: Colors.white, size: context.getResponsiveSize(5)),
               ),

@@ -14,13 +14,13 @@ class CategoryShimmer extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: 6,
         separatorBuilder: (_, __) =>
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
         itemBuilder: (_, __) {
           return Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,
             child: Container(
-              width: context.getScreenWidth(18),
+              width: context.getResponsiveSize(18),
               padding: EdgeInsets.symmetric(
                 vertical: context.getScreenHeight(0.8),
               ),
@@ -31,7 +31,7 @@ class CategoryShimmer extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    width: context.getScreenWidth(11),
+                    width: context.getResponsiveSize(11),
                     height: context.getScreenHeight(5),
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -40,7 +40,7 @@ class CategoryShimmer extends StatelessWidget {
                   ),
                   SizedBox(height: context.getScreenHeight(0.6)),
                   Container(
-                    width: context.getScreenWidth(10),
+                    width: context.getResponsiveSize(10),
                     height: context.getScreenHeight(1.2),
                     color: Colors.white,
                   ),

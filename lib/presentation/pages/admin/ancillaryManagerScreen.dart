@@ -93,7 +93,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
   Widget _buildError(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(context.getScreenWidth(8)),
+        padding: EdgeInsets.all(context.getResponsiveSize(8)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -137,7 +137,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
       color: AppColors.primaryGold,
       child: ListView.separated(
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(2),
         ),
         itemCount: pages.length,
@@ -151,7 +151,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
           return GestureDetector(
             onTap: () => _openPageDetail(context, key, label),
             child: Container(
-              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(18),
@@ -185,7 +185,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                       size: context.getResponsiveSize(6),
                     ),
                   ),
-                  SizedBox(width: context.getScreenWidth(4)),
+                  SizedBox(width: context.getResponsiveSize(4)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,9 +309,9 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
       child: Container(
         height: MediaQuery.of(context).size.height * 0.85,
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(5),
+          context.getResponsiveSize(5),
           context.getScreenHeight(2),
-          context.getScreenWidth(5),
+          context.getResponsiveSize(5),
           context.getScreenHeight(3),
         ),
         decoration: BoxDecoration(
@@ -323,7 +323,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
           children: [
             Center(
               child: Container(
-                width: context.getScreenWidth(10),
+                width: context.getResponsiveSize(10),
                 height: context.getScreenHeight(0.5),
                 decoration: BoxDecoration(
                   color: AppColors.textMuted.withOpacity(0.3),
@@ -443,8 +443,8 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                   child: isLoading
                       ? Center(
                           child: SizedBox(
-                            width: context.getScreenWidth(5),
-                            height: context.getScreenWidth(5),
+                            width: context.getResponsiveSize(5),
+                            height: context.getResponsiveSize(5),
                             child: const CircularProgressIndicator(
                               strokeWidth: 2,
                               color: Colors.white,

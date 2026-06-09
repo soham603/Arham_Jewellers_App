@@ -103,8 +103,8 @@ class _Level1Tab extends StatelessWidget {
         color: context.colorPalette.primaryColor,
         child: ListView.builder(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4), context.getScreenHeight(1),
-            context.getScreenWidth(4), context.getScreenHeight(8),
+            context.getResponsiveSize(4), context.getScreenHeight(1),
+            context.getResponsiveSize(4), context.getScreenHeight(8),
           ),
           itemCount: items.length,
           itemBuilder: (_, i) {
@@ -243,8 +243,8 @@ class _ParentPickerList extends StatelessWidget {
       color: context.colorPalette.primaryColor,
       child: ListView.builder(
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(4), context.getScreenHeight(1),
-          context.getScreenWidth(4), context.getScreenHeight(8),
+          context.getResponsiveSize(4), context.getScreenHeight(1),
+          context.getResponsiveSize(4), context.getScreenHeight(8),
         ),
         itemCount: parents.length,
         itemBuilder: (_, i) => _ParentTile(cat: parents[i], onTap: () => onSelect(parents[i])),
@@ -293,7 +293,7 @@ class _DrillDownList extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
           ),
           color: context.colorPalette.boxColor.withOpacity(0.4),
@@ -305,14 +305,14 @@ class _DrillDownList extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.arrow_back_ios_rounded, size: context.getResponsiveSize(3.5), color: context.colorPalette.primaryColor),
-                    SizedBox(width: context.getScreenWidth(1)),
+                    SizedBox(width: context.getResponsiveSize(1)),
                     Text('Back', style: TextStyle(fontSize: context.getResponsiveSize(3.3), color: context.colorPalette.primaryColor, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
-              SizedBox(width: context.getScreenWidth(3)),
+              SizedBox(width: context.getResponsiveSize(3)),
               Icon(Icons.chevron_right_rounded, size: context.getResponsiveSize(4), color: context.colorPalette.subTitleColor),
-              SizedBox(width: context.getScreenWidth(1.5)),
+              SizedBox(width: context.getResponsiveSize(1.5)),
               Expanded(
                 child: Text(
                   breadcrumb, maxLines: 1, overflow: TextOverflow.ellipsis,
@@ -323,13 +323,13 @@ class _DrillDownList extends StatelessWidget {
                 GestureDetector(
                   onTap: onAddNew,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2.5), vertical: context.getScreenHeight(0.6)),
+                    padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2.5), vertical: context.getScreenHeight(0.6)),
                     decoration: BoxDecoration(color: context.colorPalette.primaryColor, borderRadius: BorderRadius.circular(8)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.add, color: Colors.white, size: context.getResponsiveSize(3.5)),
-                        SizedBox(width: context.getScreenWidth(1)),
+                        SizedBox(width: context.getResponsiveSize(1)),
                         Text('New', style: TextStyle(color: Colors.white, fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w600)),
                       ],
                     ),
@@ -348,8 +348,8 @@ class _DrillDownList extends StatelessWidget {
                   color: context.colorPalette.primaryColor,
                   child: ListView.builder(
                     padding: EdgeInsets.fromLTRB(
-                      context.getScreenWidth(4), context.getScreenHeight(1),
-                      context.getScreenWidth(4), context.getScreenHeight(8),
+                      context.getResponsiveSize(4), context.getScreenHeight(1),
+                      context.getResponsiveSize(4), context.getScreenHeight(8),
                     ),
                     itemCount: items.length,
                     itemBuilder: (_, i) {
@@ -390,7 +390,7 @@ class _GroupedL1Tile extends StatelessWidget {
       onTap: () => _showL1GroupSheet(context, ctrl, cat),
       child: Container(
         margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
-        padding: EdgeInsets.all(context.getScreenWidth(3)),
+        padding: EdgeInsets.all(context.getResponsiveSize(3)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(12),
@@ -398,7 +398,7 @@ class _GroupedL1Tile extends StatelessWidget {
         child: Row(
           children: [
             _Thumb(cat: cat, size: 12),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,14 +414,14 @@ class _GroupedL1Tile extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: context.getScreenHeight(0.4)),
+              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: context.getScreenHeight(0.4)),
               decoration: BoxDecoration(
                 color: context.colorPalette.primaryColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text('$count', style: TextStyle(fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
             ),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getResponsiveSize(5)),
           ],
         ),
@@ -462,7 +462,7 @@ class _L1GroupSheet extends StatelessWidget {
         children: [
           Container(
             margin: EdgeInsets.only(top: context.getScreenHeight(1)),
-            width: context.getScreenWidth(10),
+            width: context.getResponsiveSize(10),
             height: 4,
             decoration: BoxDecoration(color: context.colorPalette.subTitleColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
           ),
@@ -472,7 +472,7 @@ class _L1GroupSheet extends StatelessWidget {
           SizedBox(height: context.getScreenHeight(1.5)),
           Expanded(
             child: ListView.separated(
-              padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(4)),
+              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
               itemCount: parents.length,
               separatorBuilder: (_, __) => Divider(height: 1, color: context.colorPalette.boxColor),
               itemBuilder: (_, i) {
@@ -519,7 +519,7 @@ class _ParentTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
-        padding: EdgeInsets.all(context.getScreenWidth(3)),
+        padding: EdgeInsets.all(context.getResponsiveSize(3)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(12),
@@ -527,7 +527,7 @@ class _ParentTile extends StatelessWidget {
         child: Row(
           children: [
             _Thumb(cat: cat, size: 12),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -597,7 +597,7 @@ class _CategoryTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+              padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
               child: _Thumb(cat: cat),
             ),
             Expanded(
@@ -611,9 +611,9 @@ class _CategoryTile extends StatelessWidget {
                       children: [
                         _LevelBadge(level: cat.level, color: levelColor),
                         if (isDeleted) ...[
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
+                            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
                             decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
                             child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getResponsiveSize(2.5), fontWeight: FontWeight.w600)),
                           ),
@@ -640,11 +640,11 @@ class _CategoryTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(right: context.getScreenWidth(2), top: context.getScreenHeight(0.8), bottom: context.getScreenHeight(0.8)),
+              padding: EdgeInsets.only(right: context.getResponsiveSize(2), top: context.getScreenHeight(0.8), bottom: context.getScreenHeight(0.8)),
               child: Obx(() {
                 final isLoading = ctrl.actionLoadingId == cat.id;
                 if (isLoading) {
-                  return SizedBox(width: context.getScreenWidth(5), height: context.getScreenWidth(5),
+                  return SizedBox(width: context.getResponsiveSize(5), height: context.getResponsiveSize(5),
                     child: CircularProgressIndicator(strokeWidth: 2, color: context.colorPalette.primaryColor));
                 }
                 if (isDeleted && onRestore != null) {
@@ -677,7 +677,7 @@ class _Thumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = context.getScreenWidth(size);
+    final s = context.getResponsiveSize(size);
     return Container(
       width: s, height: s,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: context.colorPalette.backgroundColor),
@@ -713,7 +713,7 @@ class _LevelBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
       decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
       child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getResponsiveSize(2.5), color: color, fontWeight: FontWeight.w700)),
     );
@@ -731,7 +731,7 @@ class _CircleBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
         decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
         child: Icon(icon, size: context.getResponsiveSize(3.5), color: color),
       ),
@@ -903,11 +903,11 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             child: ListView(
               controller: scrollCtrl,
               padding: EdgeInsets.fromLTRB(
-                context.getScreenWidth(5), context.getScreenHeight(1.5),
-                context.getScreenWidth(5), context.getScreenHeight(3),
+                context.getResponsiveSize(5), context.getScreenHeight(1.5),
+                context.getResponsiveSize(5), context.getScreenHeight(3),
               ),
               children: [
-                Center(child: Container(width: context.getScreenWidth(10), height: 4,
+                Center(child: Container(width: context.getResponsiveSize(10), height: 4,
                   decoration: BoxDecoration(color: context.colorPalette.boxColor, borderRadius: BorderRadius.circular(2)))),
                 SizedBox(height: context.getScreenHeight(2)),
                 Text(
@@ -1011,7 +1011,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
 InputDecoration _inputDec(BuildContext context, String hint) {
   return InputDecoration(
     isDense: true,
-    contentPadding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(3.5), vertical: context.getScreenHeight(1.3)),
+    contentPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(3.5), vertical: context.getScreenHeight(1.3)),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.primaryColor)),
