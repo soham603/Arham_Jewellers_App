@@ -561,10 +561,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                           context: context,
                                           onSuccess: () {
                                             Get.offNamed(AppRoutes.login);
-                                            ToastUtils.showSuccess(
-                                              context,
-                                              "Registration Successful! Please login.",
-                                            );
                                           },
                                         );
                                       },

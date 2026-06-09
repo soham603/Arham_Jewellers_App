@@ -95,10 +95,6 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
                 setState(() => isSaving = false);
 
                 if (success) {
-                  ToastUtils.showSuccess(
-                    context,
-                    "Successfully updated ${widget.category}",
-                  );
                   Get.back();
                 } else {
                   ToastUtils.showError(

@@ -8,8 +8,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserControl
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
-import '../../../core/theme/app_colors.dart';
-
 class ApproveUsersScreen extends StatefulWidget {
   const ApproveUsersScreen({super.key});
 
@@ -615,18 +613,13 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 onPressed: controller.actionState == CurrentAppState.LOADING
                     ? null
                     : () async {
-                        final ok = await controller.approveRequest(
+                        await controller.approveRequest(
                           requestId: req.id,
                           approvedTillDate: date,
                           isRetailer: isRetailer,
                         );
                         if (context.mounted) {
                           Get.back();
-                          _snack(
-                            context,
-                            ok ? 'Access ${req.status == 'APPROVED' ? 'extended' : 'approved'} ✅' : controller.error,
-                            isError: !ok,
-                          );
                         }
                       },
                 style: ElevatedButton.styleFrom(
@@ -718,20 +711,11 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               onPressed: controller.actionState == CurrentAppState.LOADING
                   ? null
                   : () async {
-                      final ok = await controller.rejectRequest(
+                      await controller.rejectRequest(
                         requestId: req.id,
                       );
                       if (context.mounted) {
                         Get.back();
-                        _snack(
-                          context,
-                          ok
-                              ? req.status == 'APPROVED'
-                                  ? 'Access revoked'
-                                  : 'Request rejected'
-                              : controller.error,
-                          isError: !ok,
-                        );
                       }
                     },
               style: ElevatedButton.styleFrom(
@@ -960,17 +944,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       default:
         return AppColors.primaryGold;
     }
-  }
-
-  void _snack(BuildContext context, String msg, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: isError ? Colors.red : AppColors.primaryGold,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 }
 
