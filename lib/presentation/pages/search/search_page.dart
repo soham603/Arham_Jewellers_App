@@ -194,10 +194,10 @@ class _SearchPageState extends State<SearchPage> {
                   controller.loadInitialProducts();
                   setState(() {});
                 } else {
-                  try {
-                    Get.find<NavigationController>().switchTab(0);
-                  } catch (_) {
+                  if (Get.previousRoute.isNotEmpty) {
                     Get.back();
+                  } else {
+                    Get.find<NavigationController>().switchTab(0);
                   }
                 }
               },
