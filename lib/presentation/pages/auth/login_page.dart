@@ -278,6 +278,23 @@ class _LoginPageState extends State<LoginPage> {
             },
           ),
 
+          SizedBox(height: context.getScreenHeight(0.5)),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () => Get.toNamed(AppRoutes.forgotPassword),
+              child: Text(
+                'Forgot Password?',
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3.2),
+                  color: AppColors.primaryGold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
           SizedBox(height: context.getScreenHeight(2)),
 
           Obx(() {

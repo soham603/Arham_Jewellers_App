@@ -996,11 +996,19 @@ class _RequestCard extends StatefulWidget {
 class _RequestCardState extends State<_RequestCard> {
   bool _expanded = false;
   late bool _isRetailer;
+  final TextEditingController _newPasswordController = TextEditingController();
+  bool _obscureNewPassword = true;
 
   @override
   void initState() {
     super.initState();
     _isRetailer = widget.request.isRetailer;
+  }
+
+  @override
+  void dispose() {
+    _newPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -1312,6 +1320,64 @@ class _RequestCardState extends State<_RequestCard> {
                   if (req.status == 'PENDING' || req.status == 'APPROVED')
                     SizedBox(height: context.getScreenHeight(1.5)),
 
+                  if (req.status == 'APPROVED')
+                    GestureDetector(
+                      onTap: () => _showResetPasswordDialog(context, req),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(3),
+                          vertical: context.getScreenHeight(1),
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGold.withOpacity(0.06),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.primaryGold.withOpacity(0.2),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.lock_reset_rounded,
+                              color: AppColors.primaryGold,
+                              size: context.getResponsiveSize(5),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(3)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Reset Password',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(3.5),
+                                      fontWeight: FontWeight.w600,
+                                      color: context.colorPalette.textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Set a new password for this user',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(2.8),
+                                      color: context.colorPalette.subTitleColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: context.colorPalette.subTitleColor,
+                              size: context.getResponsiveSize(5),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  if (req.status == 'APPROVED')
+                    SizedBox(height: context.getScreenHeight(1.5)),
+
                   Obx(() {
                     final isLoading = widget.controller.actionState == CurrentAppState.LOADING && 
                                      widget.controller.actioningId == req.id;
@@ -1585,6 +1651,197 @@ class _RequestCardState extends State<_RequestCard> {
             );
           }),
         ],
+      ),
+    );
+  }
+
+  void _showResetPasswordDialog(BuildContext context, AccessRequestModel req) {
+    _newPasswordController.clear();
+    _obscureNewPassword = true;
+
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final hasPassword = _newPasswordController.text.trim().isNotEmpty;
+
+          return AlertDialog(
+            backgroundColor: context.colorPalette.backgroundColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            contentPadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(5),
+              context.getResponsiveSize(4),
+              context.getResponsiveSize(5),
+              0,
+            ),
+            actionsPadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(2),
+              0,
+              context.getResponsiveSize(3),
+              context.getScreenHeight(1),
+            ),
+            titlePadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(5),
+              context.getResponsiveSize(4),
+              context.getResponsiveSize(5),
+              context.getScreenHeight(1),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGold.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.lock_reset_rounded,
+                    color: AppColors.primaryGold,
+                    size: 16,
+                  ),
+                ),
+                SizedBox(width: context.getResponsiveSize(2)),
+                Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Set a new password for ${req.user?.name ?? 'this user'}',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.4),
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                TextField(
+                  controller: _newPasswordController,
+                  obscureText: _obscureNewPassword,
+                  onChanged: (_) => setDialogState(() {}),
+                  style: TextStyle(
+                    color: AppColors.textDark,
+                    fontSize: context.getResponsiveSize(3.5),
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'New Password',
+                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    prefixIcon: Icon(
+                      Icons.lock_outline_rounded,
+                      color: context.colorPalette.subTitleColor,
+                      size: context.getResponsiveSize(4.5),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureNewPassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey.shade500,
+                        size: context.getResponsiveSize(4.5),
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          _obscureNewPassword = !_obscureNewPassword;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor: context.colorPalette.boxColor,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.getScreenHeight(1.2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withOpacity(0.2),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withOpacity(0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppColors.primaryGold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(3),
+                    vertical: context.getScreenHeight(0.6),
+                  ),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: context.colorPalette.subTitleColor,
+                    fontSize: context.getResponsiveSize(3.2),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: hasPassword
+                    ? () {
+                        Get.back();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Password reset for ${req.user?.name ?? 'user'}',
+                            ),
+                            backgroundColor: AppColors.primaryGold,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryGold,
+                  disabledBackgroundColor: AppColors.primaryGold.withOpacity(0.35),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(3),
+                    vertical: context.getScreenHeight(0.6),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: context.getResponsiveSize(3.2),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

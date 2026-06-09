@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../presentation/controllers/navigation_controller.dart';
 import '../../presentation/pages/admin/handsetChangeScreen.dart';
 import '../../presentation/pages/auth/change_handset_page.dart';
+import '../../presentation/pages/auth/forgot_password_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/checkout/checkout_page.dart';
@@ -44,6 +45,7 @@ abstract class AppPages {
     GetPage(name: AppRoutes.register, page: RegisterPage.new),
     GetPage(name: AppRoutes.notifications, page: NotificationsPage.new),
     GetPage(name: AppRoutes.changeHandset, page: ChangeHandsetPage.new),
+    GetPage(name: AppRoutes.forgotPassword, page: ForgotPasswordPage.new),
     GetPage(name: AppRoutes.handsetRequests, page: HandsetChangeScreen.new),
     GetPage(name: AppRoutes.share, page: SharePage.new),
     GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),
