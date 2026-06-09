@@ -259,7 +259,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w800,
-            fontSize: context.getFontSize(5),
+            fontSize: context.getResponsiveSize(5),
             letterSpacing: 0.5,
           ),
         ),
@@ -292,7 +292,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               Text(
                 "By continuing you agree to our Terms & Privacy Policy",
                 style: TextStyle(
-                  fontSize: context.getFontSize(2.8),
+                  fontSize: context.getResponsiveSize(2.8),
                   color: AppColors.textMuted,
                 ),
               ),
@@ -392,7 +392,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                               Text(
                                 _isEditMode ? 'Updating...' : 'Submitting...',
                                 style: TextStyle(
-                                  fontSize: context.getFontSize(4.2),
+                                  fontSize: context.getResponsiveSize(4.2),
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.5,
                                 ),
@@ -402,7 +402,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         : Text(
                             _isEditMode ? 'Update Custom Order' : 'Confirm Custom Order',
                             style: TextStyle(
-                              fontSize: context.getFontSize(4.2),
+                              fontSize: context.getResponsiveSize(4.2),
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.5,
                             ),
@@ -572,7 +572,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                             child: Text(
                               "Remove existing images",
                               style: TextStyle(
-                                fontSize: context.getFontSize(3.2),
+                                fontSize: context.getResponsiveSize(3.2),
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textMuted,
                               ),
@@ -736,7 +736,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           Text(
             title,
             style: TextStyle(
-              fontSize: context.getFontSize(4),
+              fontSize: context.getResponsiveSize(4),
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
               letterSpacing: 0.2,
@@ -782,7 +782,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: context.getFontSize(3),
+                fontSize: context.getResponsiveSize(3),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textMuted,
               ),
@@ -792,7 +792,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             child: Text(
               value.isNotEmpty ? value : '—',
               style: TextStyle(
-                fontSize: context.getFontSize(3.3),
+                fontSize: context.getResponsiveSize(3.3),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -811,7 +811,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     return Text(
       text,
       style: TextStyle(
-        fontSize: context.getFontSize(3.2),
+        fontSize: context.getResponsiveSize(3.2),
         fontWeight: FontWeight.w700,
         color: AppColors.textMuted,
       ),
@@ -834,7 +834,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           Text(
             controller.text,
             style: TextStyle(
-              fontSize: context.getFontSize(3.5),
+              fontSize: context.getResponsiveSize(3.5),
               color: AppColors.textDark,
               fontWeight: FontWeight.w600,
             ),
@@ -853,7 +853,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           keyboardType: keyboardType,
           maxLines: maxLines,
           style: TextStyle(
-            fontSize: context.getFontSize(3.3),
+            fontSize: context.getResponsiveSize(3.3),
             color: AppColors.textDark,
             fontWeight: FontWeight.w500,
           ),
@@ -1034,7 +1034,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.textMuted,
             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-            fontSize: context.getFontSize(3.2),
+            fontSize: context.getResponsiveSize(3.2),
             letterSpacing: 0.2,
           ),
         ),

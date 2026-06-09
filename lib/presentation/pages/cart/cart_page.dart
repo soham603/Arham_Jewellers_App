@@ -47,7 +47,7 @@ class _CartPageState extends State<CartPage> {
         title: Text(
           'Cart',
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -60,7 +60,7 @@ class _CartPageState extends State<CartPage> {
                 child: Text(
                   '${cartController.totalItems} item${cartController.totalItems != 1 ? 's' : ''}',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4),
+                    fontSize: context.getResponsiveSize(4),
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
@@ -116,7 +116,7 @@ class _CartPageState extends State<CartPage> {
                             child: Icon(
                               Icons.delete_outline_rounded,
                               color: Colors.white,
-                              size: context.getFontSize(6),
+                              size: context.getResponsiveSize(6),
                             ),
                           ),
                           child: GestureDetector(
@@ -348,7 +348,7 @@ class _CartPageState extends State<CartPage> {
           Text(
             '$quantity',
             style: TextStyle(
-              fontSize: context.getFontSize(3.8),
+              fontSize: context.getResponsiveSize(3.8),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
@@ -371,15 +371,15 @@ class _CartPageState extends State<CartPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: context.getScreenWidth(6),
-        height: context.getScreenWidth(6),
+        width: context.getResponsiveSize(6),
+        height: context.getResponsiveSize(6),
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          size: context.getFontSize(3.2),
+          size: context.getResponsiveSize(3.2),
           color: AppColors.textDark,
         ),
       ),
@@ -406,7 +406,7 @@ class _CartPageState extends State<CartPage> {
             Text(
               'Price Breakdown',
               style: TextStyle(
-                fontSize: context.getFontSize(5.1),
+                fontSize: context.getResponsiveSize(5.1),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -471,7 +471,7 @@ class _CartPageState extends State<CartPage> {
                 child: Text(
                   'Enquire',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4),
+                    fontSize: context.getResponsiveSize(4),
                     color: hasItems
                         ? AppColors.primaryGold
                         : AppColors.primaryGold.withOpacity(0.45),
@@ -503,7 +503,7 @@ class _CartPageState extends State<CartPage> {
                 child: Text(
                   'Checkout',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4),
+                    fontSize: context.getResponsiveSize(4),
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
@@ -549,7 +549,7 @@ class _CartPageState extends State<CartPage> {
                 Text(
                   message,
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w500,
                     color: AppColors.textDark,
                   ),
@@ -601,7 +601,7 @@ class _CartPageState extends State<CartPage> {
             Text(
               'PDF Ready',
               style: TextStyle(
-                fontSize: context.getFontSize(4.5),
+                fontSize: context.getResponsiveSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -611,7 +611,7 @@ class _CartPageState extends State<CartPage> {
         content: Text(
           'Your enquiry PDF has been saved to your Downloads folder. Share it with us on WhatsApp so we can assist you with pricing and availability.',
           style: TextStyle(
-            fontSize: context.getFontSize(3.8),
+            fontSize: context.getResponsiveSize(3.8),
             color: AppColors.textMuted,
             height: 1.4,
           ),
@@ -665,15 +665,15 @@ class _CartPageState extends State<CartPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: context.getScreenWidth(26),
-              height: context.getScreenWidth(26),
+              width: context.getResponsiveSize(26),
+              height: context.getResponsiveSize(26),
               decoration: BoxDecoration(
                 color: const Color(0xFFF4EFE6),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.shopping_bag_outlined,
-                size: context.getFontSize(12),
+                size: context.getResponsiveSize(12),
                 color: AppColors.primaryGold,
               ),
             ),
@@ -681,7 +681,7 @@ class _CartPageState extends State<CartPage> {
             Text(
               "Your cart is empty",
               style: TextStyle(
-                fontSize: context.getFontSize(5.5),
+                fontSize: context.getResponsiveSize(5.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -691,7 +691,7 @@ class _CartPageState extends State<CartPage> {
               "Add items to your cart to continue to checkout.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: context.getFontSize(3.8),
+                fontSize: context.getResponsiveSize(3.8),
                 color: AppColors.textMuted,
                 height: 1.4,
               ),
@@ -714,7 +714,7 @@ class _CartPageState extends State<CartPage> {
                 child: Text(
                   'Browse Products',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.5),
+                    fontSize: context.getResponsiveSize(4.5),
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
@@ -742,7 +742,7 @@ class _CartPageState extends State<CartPage> {
             child: Text(
               left,
               style: TextStyle(
-                fontSize: context.getFontSize(bold ? 4.3 : 4),
+                fontSize: context.getResponsiveSize(bold ? 4.3 : 4),
                 color: bold ? AppColors.textDark : AppColors.textMuted,
                 fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
               ),
@@ -752,7 +752,7 @@ class _CartPageState extends State<CartPage> {
           Text(
             right,
             style: TextStyle(
-              fontSize: context.getFontSize(bold ? 4.8 : 4.2),
+              fontSize: context.getResponsiveSize(bold ? 4.8 : 4.2),
               color: bold ? AppColors.primaryGold : AppColors.textDark,
               fontWeight: FontWeight.w700,
             ),

@@ -45,7 +45,7 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
         title: Text(
           'Categories',
           style: TextStyle(
-            fontSize: context.getFontSize(5),
+            fontSize: context.getResponsiveSize(5),
             fontWeight: FontWeight.w700,
             color: context.colorPalette.textColor,
           ),
@@ -58,8 +58,8 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
             unselectedLabelColor: context.colorPalette.subTitleColor,
             indicatorColor: context.colorPalette.primaryColor,
             indicatorWeight: 3,
-            labelStyle: TextStyle(fontSize: context.getFontSize(3.5), fontWeight: FontWeight.w600),
-            unselectedLabelStyle: TextStyle(fontSize: context.getFontSize(3.5), fontWeight: FontWeight.w400),
+            labelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w600),
+            unselectedLabelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w400),
             tabs: const [
               Tab(text: 'Level 1'),
               Tab(text: 'Level 2'),
@@ -304,19 +304,19 @@ class _DrillDownList extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.arrow_back_ios_rounded, size: context.getFontSize(3.5), color: context.colorPalette.primaryColor),
+                    Icon(Icons.arrow_back_ios_rounded, size: context.getResponsiveSize(3.5), color: context.colorPalette.primaryColor),
                     SizedBox(width: context.getScreenWidth(1)),
-                    Text('Back', style: TextStyle(fontSize: context.getFontSize(3.3), color: context.colorPalette.primaryColor, fontWeight: FontWeight.w600)),
+                    Text('Back', style: TextStyle(fontSize: context.getResponsiveSize(3.3), color: context.colorPalette.primaryColor, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
               SizedBox(width: context.getScreenWidth(3)),
-              Icon(Icons.chevron_right_rounded, size: context.getFontSize(4), color: context.colorPalette.subTitleColor),
+              Icon(Icons.chevron_right_rounded, size: context.getResponsiveSize(4), color: context.colorPalette.subTitleColor),
               SizedBox(width: context.getScreenWidth(1.5)),
               Expanded(
                 child: Text(
                   breadcrumb, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: context.getFontSize(3.5), fontWeight: FontWeight.w600, color: context.colorPalette.textColor),
+                  style: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w600, color: context.colorPalette.textColor),
                 ),
               ),
               if (onAddNew != null)
@@ -328,9 +328,9 @@ class _DrillDownList extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.add, color: Colors.white, size: context.getFontSize(3.5)),
+                        Icon(Icons.add, color: Colors.white, size: context.getResponsiveSize(3.5)),
                         SizedBox(width: context.getScreenWidth(1)),
-                        Text('New', style: TextStyle(color: Colors.white, fontSize: context.getFontSize(3), fontWeight: FontWeight.w600)),
+                        Text('New', style: TextStyle(color: Colors.white, fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -404,11 +404,11 @@ class _GroupedL1Tile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: context.getFontSize(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
                   if (cat.nameSlug.isNotEmpty) ...[
                     SizedBox(height: 2),
                     Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: context.getFontSize(2.8), color: context.colorPalette.subTitleColor)),
+                      style: TextStyle(fontSize: context.getResponsiveSize(2.8), color: context.colorPalette.subTitleColor)),
                   ],
                 ],
               ),
@@ -419,10 +419,10 @@ class _GroupedL1Tile extends StatelessWidget {
                 color: context.colorPalette.primaryColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text('$count', style: TextStyle(fontSize: context.getFontSize(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
+              child: Text('$count', style: TextStyle(fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
             ),
             SizedBox(width: context.getScreenWidth(2)),
-            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getFontSize(5)),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getResponsiveSize(5)),
           ],
         ),
       ),
@@ -468,7 +468,7 @@ class _L1GroupSheet extends StatelessWidget {
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('${cat.name} — ${parents.length} parents, ${l2Items.length} sub-categories',
-            style: TextStyle(fontSize: context.getFontSize(3.8), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+            style: TextStyle(fontSize: context.getResponsiveSize(3.8), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
           SizedBox(height: context.getScreenHeight(1.5)),
           Expanded(
             child: ListView.separated(
@@ -482,17 +482,17 @@ class _L1GroupSheet extends StatelessWidget {
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   leading: _Thumb(cat: p, size: 8),
-                  title: Text(p.name, style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
-                  subtitle: Text('$childCount sub-categories', style: TextStyle(fontSize: context.getFontSize(2.7), color: context.colorPalette.subTitleColor)),
+                  title: Text(p.name, style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                  subtitle: Text('$childCount sub-categories', style: TextStyle(fontSize: context.getResponsiveSize(2.7), color: context.colorPalette.subTitleColor)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.edit_rounded, size: context.getFontSize(4.5), color: context.colorPalette.primaryColor),
+                        icon: Icon(Icons.edit_rounded, size: context.getResponsiveSize(4.5), color: context.colorPalette.primaryColor),
                         onPressed: () { Navigator.pop(context); _showEditSheet(context, ctrl, p); },
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete_rounded, size: context.getFontSize(4.5), color: Colors.red),
+                        icon: Icon(Icons.delete_rounded, size: context.getResponsiveSize(4.5), color: Colors.red),
                         onPressed: () { Navigator.pop(context); _confirmDelete(context, ctrl, p); },
                       ),
                     ],
@@ -533,16 +533,16 @@ class _ParentTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: context.getFontSize(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), fontWeight: FontWeight.w600, color: context.colorPalette.textColor)),
                   if (cat.nameSlug.isNotEmpty) ...[
                     SizedBox(height: 2),
                     Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: context.getFontSize(2.8), color: context.colorPalette.subTitleColor)),
+                      style: TextStyle(fontSize: context.getResponsiveSize(2.8), color: context.colorPalette.subTitleColor)),
                   ],
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getFontSize(5)),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getResponsiveSize(5)),
           ],
         ),
       ),
@@ -615,7 +615,7 @@ class _CategoryTile extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
                             decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                            child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getFontSize(2.5), fontWeight: FontWeight.w600)),
+                            child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getResponsiveSize(2.5), fontWeight: FontWeight.w600)),
                           ),
                         ],
                       ],
@@ -624,7 +624,7 @@ class _CategoryTile extends StatelessWidget {
                     Text(
                       cat.name, maxLines: 2, overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.6), fontWeight: FontWeight.w600,
+                        fontSize: context.getResponsiveSize(3.6), fontWeight: FontWeight.w600,
                         color: context.colorPalette.textColor,
                         decoration: isDeleted ? TextDecoration.lineThrough : null,
                         height: 1.3,
@@ -633,7 +633,7 @@ class _CategoryTile extends StatelessWidget {
                     if (cat.nameSlug.isNotEmpty) ...[
                       SizedBox(height: 2),
                       Text(cat.nameSlug, maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: context.getFontSize(2.6), color: context.colorPalette.subTitleColor)),
+                        style: TextStyle(fontSize: context.getResponsiveSize(2.6), color: context.colorPalette.subTitleColor)),
                     ],
                   ],
                 ),
@@ -700,7 +700,7 @@ class _Thumb extends StatelessWidget {
   Widget _noImg(BuildContext context) {
     return Container(
       color: context.colorPalette.backgroundColor,
-      child: Icon(Icons.category_outlined, size: context.getFontSize(5), color: context.colorPalette.subTitleColor),
+      child: Icon(Icons.category_outlined, size: context.getResponsiveSize(5), color: context.colorPalette.subTitleColor),
     );
   }
 }
@@ -715,7 +715,7 @@ class _LevelBadge extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(2), vertical: 2),
       decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
-      child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getFontSize(2.5), color: color, fontWeight: FontWeight.w700)),
+      child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getResponsiveSize(2.5), color: color, fontWeight: FontWeight.w700)),
     );
   }
 }
@@ -733,7 +733,7 @@ class _CircleBtn extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(context.getScreenWidth(1.5)),
         decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-        child: Icon(icon, size: context.getFontSize(3.5), color: color),
+        child: Icon(icon, size: context.getResponsiveSize(3.5), color: color),
       ),
     );
   }
@@ -912,7 +912,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                 SizedBox(height: context.getScreenHeight(2)),
                 Text(
                   isEditing ? 'Edit Category' : 'New Level ${widget.level} Category',
-                  style: TextStyle(fontSize: context.getFontSize(5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor),
+                  style: TextStyle(fontSize: context.getResponsiveSize(5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor),
                 ),
                 SizedBox(height: context.getScreenHeight(2.5)),
 
@@ -920,7 +920,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                 SizedBox(height: context.getScreenHeight(0.6)),
                 TextFormField(
                   controller: _nameCtrl,
-                  style: TextStyle(fontSize: context.getFontSize(3.8), color: context.colorPalette.textColor),
+                  style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
                   decoration: _inputDec(context, 'Enter name'),
                   validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
@@ -930,7 +930,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                 SizedBox(height: context.getScreenHeight(0.6)),
                 TextFormField(
                   controller: _descCtrl,
-                  style: TextStyle(fontSize: context.getFontSize(3.8), color: context.colorPalette.textColor),
+                  style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
                   maxLines: 3,
                   decoration: _inputDec(context, 'Brief description...'),
                 ),
@@ -970,7 +970,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                     child: _submitting
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : Text(isEditing ? 'Save' : 'Create',
-                            style: TextStyle(fontSize: context.getFontSize(4), fontWeight: FontWeight.w600, color: Colors.white)),
+                            style: TextStyle(fontSize: context.getResponsiveSize(4), fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
                 ),
               ],
@@ -982,7 +982,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   }
 
   Widget _label(String text) {
-    return Text(text, style: TextStyle(fontSize: context.getFontSize(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor));
+    return Text(text, style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: context.colorPalette.textColor));
   }
 
   Widget _imagePlaceholder(BuildContext context) {
@@ -993,17 +993,17 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
           CachedNetworkImage(imageUrl: widget.existing!.imageUrl, fit: BoxFit.cover),
           Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getFontSize(6)),
+            Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getResponsiveSize(6)),
             SizedBox(height: context.getScreenHeight(0.3)),
-            Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: context.getFontSize(3))),
+            Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: context.getResponsiveSize(3))),
           ])),
         ]),
       );
     }
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(Icons.add_photo_alternate_outlined, size: context.getFontSize(8), color: context.colorPalette.subTitleColor),
+      Icon(Icons.add_photo_alternate_outlined, size: context.getResponsiveSize(8), color: context.colorPalette.subTitleColor),
       SizedBox(height: context.getScreenHeight(0.5)),
-      Text('Tap to pick image', style: TextStyle(fontSize: context.getFontSize(3.3), color: context.colorPalette.subTitleColor)),
+      Text('Tap to pick image', style: TextStyle(fontSize: context.getResponsiveSize(3.3), color: context.colorPalette.subTitleColor)),
     ]);
   }
 }
@@ -1016,7 +1016,7 @@ InputDecoration _inputDec(BuildContext context, String hint) {
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.primaryColor)),
     hintText: hint,
-    hintStyle: TextStyle(fontSize: context.getFontSize(3.3), color: context.colorPalette.subTitleColor),
+    hintStyle: TextStyle(fontSize: context.getResponsiveSize(3.3), color: context.colorPalette.subTitleColor),
   );
 }
 
@@ -1029,8 +1029,8 @@ void _confirmDelete(BuildContext context, CategoryManagerController ctrl, Catego
     builder: (_) => AlertDialog(
       backgroundColor: context.colorPalette.backgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text('Delete "${cat.name}"?', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
-      content: Text('You can restore it later.', style: TextStyle(fontSize: context.getFontSize(3.5), color: context.colorPalette.subTitleColor)),
+      title: Text('Delete "${cat.name}"?', style: TextStyle(fontSize: context.getResponsiveSize(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+      content: Text('You can restore it later.', style: TextStyle(fontSize: context.getResponsiveSize(3.5), color: context.colorPalette.subTitleColor)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor))),
         Obx(() => TextButton(
@@ -1054,8 +1054,8 @@ void _confirmRestore(BuildContext context, CategoryManagerController ctrl, Categ
     builder: (_) => AlertDialog(
       backgroundColor: context.colorPalette.backgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text('Restore "${cat.name}"?', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
-      content: Text('Move back to active.', style: TextStyle(fontSize: context.getFontSize(3.5), color: context.colorPalette.subTitleColor)),
+      title: Text('Restore "${cat.name}"?', style: TextStyle(fontSize: context.getResponsiveSize(4.5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
+      content: Text('Move back to active.', style: TextStyle(fontSize: context.getResponsiveSize(3.5), color: context.colorPalette.subTitleColor)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor))),
         TextButton(

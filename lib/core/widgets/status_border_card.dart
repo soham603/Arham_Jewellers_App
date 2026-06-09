@@ -105,7 +105,7 @@ class StatusBadge extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: context.getFontSize(3),
+          fontSize: context.getResponsiveSize(3),
           fontWeight: FontWeight.w600,
           color: color,
         ),

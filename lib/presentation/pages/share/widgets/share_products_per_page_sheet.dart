@@ -44,7 +44,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
           Text(
             'Products per Page',
             style: TextStyle(
-              fontSize: context.getFontSize(4.5),
+              fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w700,
               color: context.colorPalette.textColor,
             ),
@@ -53,7 +53,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
           Text(
             'Select how many products to show on each page',
             style: TextStyle(
-              fontSize: context.getFontSize(3),
+              fontSize: context.getResponsiveSize(3),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -77,7 +77,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               child: Text(
                 'Generate PDF',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.8),
+                  fontSize: context.getResponsiveSize(3.8),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -112,8 +112,8 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: context.getScreenWidth(5),
-              height: context.getScreenWidth(5),
+              width: context.getResponsiveSize(5),
+              height: context.getResponsiveSize(5),
               decoration: BoxDecoration(
                 color: isSelected
                     ? context.colorPalette.gold
@@ -129,7 +129,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               child: isSelected
                   ? Icon(
                       Icons.check,
-                      size: context.getFontSize(2.5),
+                      size: context.getResponsiveSize(2.5),
                       color: Colors.white,
                     )
                   : null,
@@ -142,7 +142,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.5),
+                      fontSize: context.getResponsiveSize(3.5),
                       fontWeight: FontWeight.w600,
                       color: isSelected
                           ? context.colorPalette.goldDeep
@@ -153,7 +153,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),

@@ -64,7 +64,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getFontSize(5),
+            size: context.getResponsiveSize(5),
           ),
           onPressed: () => Get.back(),
         ),
@@ -137,7 +137,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
         Text(
           'Change Handset',
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w800,
             color: AppColors.textDark,
           ),
@@ -148,7 +148,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
         Text(
           'Verify your identity to link this new device to your account securely.',
           style: TextStyle(
-            fontSize: context.getFontSize(3.3),
+            fontSize: context.getResponsiveSize(3.3),
             color: AppColors.textMuted,
             height: 1.4,
           ),
@@ -178,7 +178,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
             textStyle: TextStyle(
               color: AppColors.textDark,
               fontWeight: FontWeight.w600,
-              fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
+              fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
             ),
           ),
           validator: (value) {
@@ -203,7 +203,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
               color: Colors.grey.shade500,
-              size: context.getFontSize(5),
+              size: context.getResponsiveSize(5),
             ),
             onPressed: () {
               setState(() {
@@ -323,7 +323,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 child: Text(
                   'Verify & Change Handset',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.2),
+                    fontSize: context.getResponsiveSize(4.2),
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,

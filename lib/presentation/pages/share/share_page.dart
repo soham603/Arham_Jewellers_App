@@ -39,7 +39,7 @@ class _SharePageState extends State<SharePage> {
         title: Text(
           'Share Categories',
           style: TextStyle(
-            fontSize: context.getFontSize(4.5),
+            fontSize: context.getResponsiveSize(4.5),
             fontWeight: FontWeight.w700,
             color: context.colorPalette.goldDeep,
           ),
@@ -117,7 +117,7 @@ class _SharePageState extends State<SharePage> {
                       '$karat ($percent)',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.2),
+                        fontSize: context.getResponsiveSize(3.2),
                         fontWeight: FontWeight.w700,
                         color: isSelected
                             ? Colors.white
@@ -161,14 +161,14 @@ class _SharePageState extends State<SharePage> {
               children: [
                 Icon(
                   Icons.arrow_back_ios_rounded,
-                  size: context.getFontSize(4),
+                  size: context.getResponsiveSize(4),
                   color: Colors.white,
                 ),
                 SizedBox(width: context.getScreenWidth(1.5)),
                 Text(
                   'Back',
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
@@ -248,7 +248,7 @@ class _SharePageState extends State<SharePage> {
                           Text(
                             _cleanCategoryName(cat.name),
                             style: TextStyle(
-                              fontSize: context.getFontSize(3.8),
+                              fontSize: context.getResponsiveSize(3.8),
                               fontWeight: FontWeight.w600,
                               color: context.colorPalette.textColor,
                             ),
@@ -258,7 +258,7 @@ class _SharePageState extends State<SharePage> {
                             Text(
                               '$selectedCount style${selectedCount == 1 ? '' : 's'} selected',
                               style: TextStyle(
-                                fontSize: context.getFontSize(2.8),
+                                fontSize: context.getResponsiveSize(2.8),
                                 color: context.colorPalette.goldDark,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -270,7 +270,7 @@ class _SharePageState extends State<SharePage> {
                     Icon(
                       Icons.chevron_right_rounded,
                       color: context.colorPalette.subTitleColor,
-                      size: context.getFontSize(5),
+                      size: context.getResponsiveSize(5),
                     ),
                   ],
                 ),
@@ -306,7 +306,7 @@ class _SharePageState extends State<SharePage> {
               Text(
                 _cleanCategoryName(controller.currentLevel2?.name ?? ''),
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.textColor,
                 ),
@@ -342,14 +342,14 @@ class _SharePageState extends State<SharePage> {
                           allSelected
                               ? Icons.deselect_rounded
                               : Icons.select_all_rounded,
-                          size: context.getFontSize(3.5),
+                          size: context.getResponsiveSize(3.5),
                           color: allSelected ? Colors.white : context.colorPalette.goldDark,
                         ),
                         SizedBox(width: context.getScreenWidth(1)),
                         Text(
                           allSelected ? 'Deselect All' : 'Select All',
                           style: TextStyle(
-                            fontSize: context.getFontSize(2.8),
+                            fontSize: context.getResponsiveSize(2.8),
                             fontWeight: FontWeight.w600,
                             color: allSelected ? Colors.white : context.colorPalette.goldDark,
                           ),
@@ -411,7 +411,7 @@ class _SharePageState extends State<SharePage> {
                           child: isSelected
                               ? Icon(
                                   Icons.check,
-                                  size: context.getFontSize(3),
+                                  size: context.getResponsiveSize(3),
                                   color: Colors.white,
                                 )
                               : null,
@@ -421,7 +421,7 @@ class _SharePageState extends State<SharePage> {
                           child: Text(
                             cat.name,
                             style: TextStyle(
-                              fontSize: context.getFontSize(3.5),
+                              fontSize: context.getResponsiveSize(3.5),
                               fontWeight: FontWeight.w500,
                               color: isSelected
                                   ? context.colorPalette.goldDeep
@@ -448,7 +448,7 @@ class _SharePageState extends State<SharePage> {
                             ),
                             child: Icon(
                               Icons.visibility_outlined,
-                              size: context.getFontSize(4),
+                              size: context.getResponsiveSize(4),
                               color: context.colorPalette.goldDark,
                             ),
                           ),
@@ -477,12 +477,12 @@ class _SharePageState extends State<SharePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: context.getFontSize(12), color: context.colorPalette.subTitleColor),
+          Icon(icon, size: context.getResponsiveSize(12), color: context.colorPalette.subTitleColor),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text(
             message,
             style: TextStyle(
-              fontSize: context.getFontSize(3.5),
+              fontSize: context.getResponsiveSize(3.5),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -624,7 +624,7 @@ class _SharePageState extends State<SharePage> {
             Text(
               'Share ${controller.selectedCount} categor${controller.selectedCount == 1 ? 'y' : 'ies'}',
               style: TextStyle(
-                fontSize: context.getFontSize(4.5),
+                fontSize: context.getResponsiveSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: context.colorPalette.textColor,
               ),
@@ -633,7 +633,7 @@ class _SharePageState extends State<SharePage> {
             Text(
               controller.selectedCategoriesInfo,
               style: TextStyle(
-                fontSize: context.getFontSize(2.8),
+                fontSize: context.getResponsiveSize(2.8),
                 color: context.colorPalette.subTitleColor,
               ),
               maxLines: 3,
@@ -707,7 +707,7 @@ class _SharePageState extends State<SharePage> {
                 color: effectiveIconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: effectiveIconColor, size: context.getFontSize(6)),
+              child: Icon(icon, color: effectiveIconColor, size: context.getResponsiveSize(6)),
             ),
             SizedBox(width: context.getScreenWidth(3)),
             Expanded(
@@ -717,7 +717,7 @@ class _SharePageState extends State<SharePage> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.8),
+                      fontSize: context.getResponsiveSize(3.8),
                       fontWeight: FontWeight.w600,
                       color: effectiveTextColor,
                     ),
@@ -726,7 +726,7 @@ class _SharePageState extends State<SharePage> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       color: effectiveSubtitleColor,
                     ),
                   ),
@@ -736,7 +736,7 @@ class _SharePageState extends State<SharePage> {
             Icon(
               disabled ? Icons.lock_outline_rounded : Icons.chevron_right_rounded,
               color: effectiveSubtitleColor,
-              size: context.getFontSize(5),
+              size: context.getResponsiveSize(5),
             ),
           ],
         ),
@@ -815,7 +815,7 @@ class _SharePageState extends State<SharePage> {
                 Text(
                   message,
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w500,
                     color: context.colorPalette.textColor,
                   ),

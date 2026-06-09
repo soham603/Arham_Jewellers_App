@@ -52,7 +52,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         title: Text(
           'Carousel Manager',
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -76,14 +76,14 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     Icon(
                       Icons.add,
                       color: Colors.white,
-                      size: context.getFontSize(4.5),
+                      size: context.getResponsiveSize(4.5),
                     ),
                     SizedBox(width: context.getScreenWidth(1.5)),
                     Text(
                       'Add New',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: context.getFontSize(3.5),
+                        fontSize: context.getResponsiveSize(3.5),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -99,7 +99,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           unselectedLabelColor: context.colorPalette.subTitleColor,
           indicatorColor: context.colorPalette.primaryColor,
           labelStyle: TextStyle(
-            fontSize: context.getFontSize(3.8),
+            fontSize: context.getResponsiveSize(3.8),
             fontWeight: FontWeight.w600,
           ),
           tabs: const [
@@ -260,7 +260,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     '#${index + 1}',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.getFontSize(3.2),
+                      fontSize: context.getResponsiveSize(3.2),
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -285,7 +285,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     item.isActive ? 'Active' : 'Inactive',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -304,7 +304,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   child: Icon(
                     Icons.drag_handle_rounded,
                     color: Colors.white,
-                    size: context.getFontSize(4),
+                    size: context.getResponsiveSize(4),
                   ),
                 ),
               ),
@@ -321,7 +321,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   Text(
                     item.title,
                     style: TextStyle(
-                      fontSize: context.getFontSize(4.2),
+                      fontSize: context.getResponsiveSize(4.2),
                       fontWeight: FontWeight.w700,
                       color: context.colorPalette.textColor,
                     ),
@@ -333,7 +333,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.2),
+                      fontSize: context.getResponsiveSize(3.2),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -468,7 +468,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           'Deleted',
                           style: TextStyle(
                             color: Colors.red,
-                            fontSize: context.getFontSize(2.8),
+                            fontSize: context.getResponsiveSize(2.8),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -481,7 +481,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.8),
+                      fontSize: context.getResponsiveSize(3.8),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.textColor,
                     ),
@@ -531,7 +531,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                         Icon(
                                           Icons.restore_rounded,
                                           color: Colors.white,
-                                          size: context.getFontSize(4),
+                                          size: context.getResponsiveSize(4),
                                         ),
                                         SizedBox(
                                           width: context.getScreenWidth(1.5),
@@ -540,7 +540,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                           'Restore',
                                           style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: context.getFontSize(
+                                            fontSize: context.getResponsiveSize(
                                               3.2,
                                             ),
                                             fontWeight: FontWeight.w600,
@@ -569,7 +569,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           child: Icon(
                             Icons.add_photo_alternate_rounded,
                             color: context.colorPalette.primaryColor,
-                            size: context.getFontSize(5),
+                            size: context.getResponsiveSize(5),
                           ),
                         ),
                       ),
@@ -697,7 +697,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               Text(
                 'Restore with New Image',
                 style: TextStyle(
-                  fontSize: context.getFontSize(5),
+                  fontSize: context.getResponsiveSize(5),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -706,7 +706,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               Text(
                 'Optionally replace the image before restoring',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.2),
+                  fontSize: context.getResponsiveSize(3.2),
                   color: context.colorPalette.subTitleColor,
                 ),
               ),
@@ -743,7 +743,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           children: [
                             Icon(
                               Icons.add_photo_alternate_rounded,
-                              size: context.getFontSize(10),
+                              size: context.getResponsiveSize(10),
                               color: context.colorPalette.subTitleColor,
                             ),
                             SizedBox(height: context.getScreenHeight(0.8)),
@@ -751,7 +751,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                               'Tap to select image (optional)',
                               style: TextStyle(
                                 color: context.colorPalette.subTitleColor,
-                                fontSize: context.getFontSize(3.2),
+                                fontSize: context.getResponsiveSize(3.2),
                               ),
                             ),
                           ],
@@ -820,7 +820,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                             'Restore Carousel',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: context.getFontSize(4),
+                              fontSize: context.getResponsiveSize(4),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -844,7 +844,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         title: Text(
           'Delete Carousel?',
           style: TextStyle(
-            fontSize: context.getFontSize(4.5),
+            fontSize: context.getResponsiveSize(4.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -852,7 +852,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         content: Text(
           'This will soft-delete the carousel. You can restore it later from the Deleted tab.',
           style: TextStyle(
-            fontSize: context.getFontSize(3.5),
+            fontSize: context.getResponsiveSize(3.5),
             color: context.colorPalette.subTitleColor,
           ),
         ),
@@ -930,13 +930,13 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: color, size: context.getFontSize(3.8)),
+                  Icon(icon, color: color, size: context.getResponsiveSize(3.8)),
                   SizedBox(width: context.getScreenWidth(1.2)),
                   Text(
                     label,
                     style: TextStyle(
                       color: color,
-                      fontSize: context.getFontSize(3),
+                      fontSize: context.getResponsiveSize(3),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -969,14 +969,14 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         children: [
           Icon(
             Icons.wifi_off_rounded,
-            size: context.getFontSize(14),
+            size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
-              fontSize: context.getFontSize(4.5),
+              fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
               color: context.colorPalette.textColor,
             ),
@@ -1004,7 +1004,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         children: [
           Icon(
             Icons.image_not_supported_rounded,
-            size: context.getFontSize(14),
+            size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1012,7 +1012,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             msg,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getFontSize(4),
+              fontSize: context.getResponsiveSize(4),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -1127,7 +1127,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               Text(
                 isEdit ? 'Edit Carousel' : 'New Carousel',
                 style: TextStyle(
-                  fontSize: context.getFontSize(5.5),
+                  fontSize: context.getResponsiveSize(5.5),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -1180,7 +1180,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                     Icon(
                                       Icons.edit_rounded,
                                       color: Colors.white,
-                                      size: context.getFontSize(8),
+                                      size: context.getResponsiveSize(8),
                                     ),
                                     SizedBox(
                                       height: context.getScreenHeight(0.5),
@@ -1189,7 +1189,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                       'Tap to change image',
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontSize: context.getFontSize(3.2),
+                                        fontSize: context.getResponsiveSize(3.2),
                                       ),
                                     ),
                                   ],
@@ -1203,7 +1203,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                           children: [
                             Icon(
                               Icons.add_photo_alternate_rounded,
-                              size: context.getFontSize(12),
+                              size: context.getResponsiveSize(12),
                               color: context.colorPalette.subTitleColor,
                             ),
                             SizedBox(height: context.getScreenHeight(0.8)),
@@ -1211,7 +1211,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                               'Tap to select image',
                               style: TextStyle(
                                 color: context.colorPalette.subTitleColor,
-                                fontSize: context.getFontSize(3.5),
+                                fontSize: context.getResponsiveSize(3.5),
                               ),
                             ),
                             if (!isEdit) ...[
@@ -1220,7 +1220,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 '* Required',
                                 style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: context.getFontSize(3),
+                                  fontSize: context.getResponsiveSize(3),
                                 ),
                               ),
                             ],
@@ -1234,7 +1234,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
-                    size: context.getFontSize(3.5),
+                    size: context.getResponsiveSize(3.5),
                     color: context.colorPalette.subTitleColor,
                   ),
                   SizedBox(width: context.getScreenWidth(1.5)),
@@ -1243,7 +1243,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                       'Recommended: 2:1 ratio (e.g. 1920x960) for best results',
                       style: TextStyle(
                         color: context.colorPalette.subTitleColor,
-                        fontSize: context.getFontSize(2.8),
+                        fontSize: context.getResponsiveSize(2.8),
                       ),
                     ),
                   ),
@@ -1301,7 +1301,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             Icon(
                               Icons.error_outline,
                               color: Colors.red,
-                              size: context.getFontSize(4.5),
+                              size: context.getResponsiveSize(4.5),
                             ),
                             SizedBox(width: context.getScreenWidth(2)),
                             Expanded(
@@ -1309,7 +1309,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 _formError.value,
                                 style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: context.getFontSize(3.2),
+                                  fontSize: context.getResponsiveSize(3.2),
                                 ),
                               ),
                             ),
@@ -1326,7 +1326,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   Text(
                     'Show on homepage',
                     style: TextStyle(
-                      fontSize: context.getFontSize(4),
+                      fontSize: context.getResponsiveSize(4),
                       color: context.colorPalette.textColor,
                       fontWeight: FontWeight.w500,
                     ),
@@ -1395,7 +1395,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                           isEdit ? 'Save Changes' : 'Create Carousel',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: context.getFontSize(4.2),
+                            fontSize: context.getResponsiveSize(4.2),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -1420,14 +1420,14 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
       maxLines: maxLines,
       keyboardType: keyboardType,
       style: TextStyle(
-        fontSize: context.getFontSize(3.8),
+        fontSize: context.getResponsiveSize(3.8),
         color: context.colorPalette.textColor,
       ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
           color: context.colorPalette.subTitleColor,
-          fontSize: context.getFontSize(3.5),
+          fontSize: context.getResponsiveSize(3.5),
         ),
         filled: true,
         fillColor: context.colorPalette.boxColor,

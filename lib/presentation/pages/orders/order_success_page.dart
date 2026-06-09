@@ -110,7 +110,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                         Text(
                           'Booking Confirmed!',
                           style: TextStyle(
-                            fontSize: context.getFontSize(6),
+                            fontSize: context.getResponsiveSize(6),
                             fontWeight: FontWeight.w800,
                             color: AppColors.textDark,
                             letterSpacing: -0.3,
@@ -125,7 +125,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                               ? message
                               : 'Your booking has been received.\nOur team will contact you shortly.',
                           style: TextStyle(
-                            fontSize: context.getFontSize(3.8),
+                            fontSize: context.getResponsiveSize(3.8),
                             color: AppColors.textMuted,
                             height: 1.6,
                           ),
@@ -211,8 +211,8 @@ class _AnimatedHero extends StatelessWidget {
       child: ScaleTransition(
         scale: scale,
         child: Container(
-          width: context.getScreenWidth(22),
-          height: context.getScreenWidth(22),
+          width: context.getResponsiveSize(22),
+          height: context.getResponsiveSize(22),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -237,8 +237,8 @@ class _AnimatedHero extends StatelessWidget {
           ),
           child: Center(
             child: Container(
-              width: context.getScreenWidth(12),
-              height: context.getScreenWidth(12),
+              width: context.getResponsiveSize(12),
+              height: context.getResponsiveSize(12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -260,7 +260,7 @@ class _AnimatedHero extends StatelessWidget {
               child: Icon(
                 Icons.check_rounded,
                 color: Colors.white,
-                size: context.getFontSize(6),
+                size: context.getResponsiveSize(6),
               ),
             ),
           ),
@@ -308,7 +308,7 @@ class _OrderDetailCard extends StatelessWidget {
                     Text(
                       'Booking Received',
                       style: TextStyle(
-                        fontSize: context.getFontSize(4.8),
+                        fontSize: context.getResponsiveSize(4.8),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
                       ),
@@ -317,7 +317,7 @@ class _OrderDetailCard extends StatelessWidget {
                     Text(
                       'Your booking has been received',
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.4),
+                        fontSize: context.getResponsiveSize(3.4),
                         color: AppColors.textMuted,
                       ),
                     ),
@@ -371,7 +371,7 @@ class _OrderDetailCard extends StatelessWidget {
                     child: Text(
                       '${itemNames[i]}  x${itemQuantities[i]}',
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.6),
+                        fontSize: context.getResponsiveSize(3.6),
                         color: AppColors.textDark,
                         fontWeight: FontWeight.w500,
                       ),
@@ -381,7 +381,7 @@ class _OrderDetailCard extends StatelessWidget {
                   Text(
                     '₹${itemPrices[i].toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.6),
+                      fontSize: context.getResponsiveSize(3.6),
                       color: AppColors.textDark,
                       fontWeight: FontWeight.w600,
                     ),
@@ -401,7 +401,7 @@ class _OrderDetailCard extends StatelessWidget {
                 Text(
                   'Total',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.5),
+                    fontSize: context.getResponsiveSize(4.5),
                     fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
                   ),
@@ -410,7 +410,7 @@ class _OrderDetailCard extends StatelessWidget {
                 Text(
                   '₹${total.toStringAsFixed(0)}',
                   style: TextStyle(
-                    fontSize: context.getFontSize(4.5),
+                    fontSize: context.getResponsiveSize(4.5),
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryGold,
                   ),
@@ -450,7 +450,7 @@ class _OrderDetailCard extends StatelessWidget {
           child: Icon(
             Icons.shopping_bag_outlined,
             color: AppColors.primaryGold,
-            size: context.getFontSize(9),
+            size: context.getResponsiveSize(9),
           ),
         ),
       );
@@ -532,7 +532,7 @@ class _OrderDetailCard extends StatelessWidget {
                   "+${images.length - displayImages.length}",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getFontSize(2.5),
+                    fontSize: context.getResponsiveSize(2.5),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -555,7 +555,7 @@ class _OrderDetailCard extends StatelessWidget {
         Text(
           value ?? '',
           style: TextStyle(
-            fontSize: context.getFontSize(3.8),
+            fontSize: context.getResponsiveSize(3.8),
             color: valueColor ?? AppColors.textDark,
             fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
           ),
@@ -569,7 +569,7 @@ class _OrderDetailCard extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: context.getFontSize(3.8),
+            fontSize: context.getResponsiveSize(3.8),
             color: AppColors.textMuted,
             fontWeight: FontWeight.w500,
           ),
@@ -628,7 +628,7 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
               child: Icon(
                 _copied ? Icons.check_circle : Icons.copy_rounded,
                 key: ValueKey(_copied),
-                size: context.getFontSize(3.8),
+                size: context.getResponsiveSize(3.8),
                 color: _copied ? Colors.green : AppColors.textMuted,
               ),
             ),
@@ -639,7 +639,7 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.8),
+                  fontSize: context.getResponsiveSize(3.8),
                   color: AppColors.primaryGold,
                   fontWeight: FontWeight.w700,
                 ),
@@ -673,7 +673,7 @@ class _NextStepsCard extends StatelessWidget {
           Text(
             "What happens next?",
             style: TextStyle(
-              fontSize: context.getFontSize(4.8),
+              fontSize: context.getResponsiveSize(4.8),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
@@ -692,8 +692,8 @@ class _NextStepsCard extends StatelessWidget {
                     Column(
                       children: [
                         Container(
-                          width: context.getScreenWidth(9),
-                          height: context.getScreenWidth(9),
+                          width: context.getResponsiveSize(9),
+                          height: context.getResponsiveSize(9),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
@@ -718,7 +718,7 @@ class _NextStepsCard extends StatelessWidget {
                               '${idx + 1}',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: context.getFontSize(3.8),
+                                fontSize: context.getResponsiveSize(3.8),
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -755,7 +755,7 @@ class _NextStepsCard extends StatelessWidget {
                             Text(
                               title,
                               style: TextStyle(
-                                fontSize: context.getFontSize(4.2),
+                                fontSize: context.getResponsiveSize(4.2),
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textDark,
                               ),
@@ -765,7 +765,7 @@ class _NextStepsCard extends StatelessWidget {
                             Text(
                               subtitle,
                               style: TextStyle(
-                                fontSize: context.getFontSize(3.3),
+                                fontSize: context.getResponsiveSize(3.3),
                                 color: AppColors.textMuted,
                                 height: 1.4,
                               ),
@@ -820,8 +820,8 @@ class _ContactAdminCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: context.getScreenWidth(10),
-                height: context.getScreenWidth(10),
+                width: context.getResponsiveSize(10),
+                height: context.getResponsiveSize(10),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
@@ -836,7 +836,7 @@ class _ContactAdminCard extends StatelessWidget {
                 child: Icon(
                   Icons.headset_mic_rounded,
                   color: AppColors.primaryGold,
-                  size: context.getFontSize(5),
+                  size: context.getResponsiveSize(5),
                 ),
               ),
               SizedBox(width: context.getScreenWidth(3)),
@@ -847,7 +847,7 @@ class _ContactAdminCard extends StatelessWidget {
                     Text(
                       'Need Help?',
                       style: TextStyle(
-                        fontSize: context.getFontSize(4.8),
+                        fontSize: context.getResponsiveSize(4.8),
                         fontWeight: FontWeight.w700,
                         color: AppColors.textDark,
                       ),
@@ -856,7 +856,7 @@ class _ContactAdminCard extends StatelessWidget {
                     Text(
                       'Have questions about your order?',
                       style: TextStyle(
-                        fontSize: context.getFontSize(3.3),
+                        fontSize: context.getResponsiveSize(3.3),
                         color: AppColors.textMuted,
                         height: 1.4,
                       ),
@@ -873,7 +873,7 @@ class _ContactAdminCard extends StatelessWidget {
                 child: _ContactButton(
                   icon: Icon(Icons.phone_rounded,
                       color: AppColors.primaryGold,
-                      size: context.getFontSize(4.5)),
+                      size: context.getResponsiveSize(4.5)),
                   label: 'Call Us',
                   color: AppColors.primaryGold,
                   onTap: _launchCall,
@@ -945,7 +945,7 @@ class _ContactButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.8),
+                  fontSize: context.getResponsiveSize(3.8),
                   fontWeight: FontWeight.w600,
                   color: color,
                 ),
@@ -999,7 +999,7 @@ class _PrimaryButton extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: context.getFontSize(4.5),
+                  fontSize: context.getResponsiveSize(4.5),
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                   letterSpacing: 0.3,
@@ -1041,7 +1041,7 @@ class _SecondaryButton extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: context.getFontSize(4.5),
+            fontSize: context.getResponsiveSize(4.5),
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -1128,7 +1128,7 @@ class _StatusBadge extends StatelessWidget {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: context.getFontSize(3.2),
+          fontSize: context.getResponsiveSize(3.2),
           fontWeight: FontWeight.w600,
           color: color,
         ),

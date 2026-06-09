@@ -34,7 +34,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         title: Text(
           'Gold Rate',
           style: TextStyle(
-            fontSize: context.getFontSize(5.5),
+            fontSize: context.getResponsiveSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -61,7 +61,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               Text(
                 'Rate History',
                 style: TextStyle(
-                  fontSize: context.getFontSize(5),
+                  fontSize: context.getResponsiveSize(5),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -97,7 +97,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             children: [
               Icon(
                 Icons.wifi_off_rounded,
-                size: context.getFontSize(10),
+                size: context.getResponsiveSize(10),
                 color: Colors.red.shade300,
               ),
               SizedBox(height: context.getScreenHeight(1)),
@@ -105,7 +105,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 controller.error.isNotEmpty ? controller.error : 'Failed to load rate',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   color: Colors.red.shade400,
                 ),
               ),
@@ -149,8 +149,8 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         child: Row(
           children: [
             Container(
-              width: context.getScreenWidth(10),
-              height: context.getScreenWidth(10),
+              width: context.getResponsiveSize(10),
+              height: context.getResponsiveSize(10),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primaryGold,
@@ -158,7 +158,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               child: Icon(
                 Icons.monetization_on_rounded,
                 color: Colors.white,
-                size: context.getFontSize(5),
+                size: context.getResponsiveSize(5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -171,7 +171,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                     'Current Rate',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: context.getFontSize(3.2),
+                      fontSize: context.getResponsiveSize(3.2),
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
@@ -183,7 +183,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
-                                fontSize: context.getFontSize(7),
+                                fontSize: context.getResponsiveSize(7),
                                 height: 1.1,
                               ),
                             ),
@@ -192,7 +192,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontWeight: FontWeight.w400,
-                                fontSize: context.getFontSize(3),
+                                fontSize: context.getResponsiveSize(3),
                                 height: 1.1,
                               ),
                             ),
@@ -221,14 +221,14 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                       rate!.source!,
                       style: TextStyle(
                         color: Colors.white54,
-                        fontSize: context.getFontSize(2.2),
+                        fontSize: context.getResponsiveSize(2.2),
                       ),
                     ),
                     Text(
                       DateFormat('dd MMM, hh:mm a').format(rate.timestamp.toLocal()),
                       style: TextStyle(
                         color: Colors.white54,
-                        fontSize: context.getFontSize(2),
+                        fontSize: context.getResponsiveSize(2),
                       ),
                     ),
                   ],
@@ -281,7 +281,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
-                        fontSize: context.getFontSize(4),
+                        fontSize: context.getResponsiveSize(4),
                       ),
                     ),
                   ],
@@ -335,7 +335,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               Text(
                 'Set Gold Rate',
                 style: TextStyle(
-                  fontSize: context.getFontSize(5),
+                  fontSize: context.getResponsiveSize(5),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
@@ -344,7 +344,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               Text(
                 'Enter the new gold rate per 10 g',
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.5),
+                  fontSize: context.getResponsiveSize(3.5),
                   color: context.colorPalette.subTitleColor,
                 ),
               ),
@@ -354,14 +354,14 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 autofocus: true,
                 style: TextStyle(
-                  fontSize: context.getFontSize(5),
+                  fontSize: context.getResponsiveSize(5),
                   fontWeight: FontWeight.w700,
                   color: AppColors.textDark,
                 ),
                 decoration: InputDecoration(
                   prefixText: '₹ ',
                   prefixStyle: TextStyle(
-                    fontSize: context.getFontSize(5),
+                    fontSize: context.getResponsiveSize(5),
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGold,
                   ),
@@ -425,7 +425,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: context.getFontSize(4.2),
+                              fontSize: context.getResponsiveSize(4.2),
                             ),
                           ),
                   ),
@@ -460,7 +460,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
           child: Text(
             controller.error.isNotEmpty ? controller.error : 'No history available',
             style: TextStyle(
-              fontSize: context.getFontSize(3.5),
+              fontSize: context.getResponsiveSize(3.5),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -475,14 +475,14 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
               children: [
                 Icon(
                   Icons.history_rounded,
-                  size: context.getFontSize(12),
+                  size: context.getResponsiveSize(12),
                   color: context.colorPalette.subTitleColor.withOpacity(0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
                 Text(
                   'No rate history yet',
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.8),
+                    fontSize: context.getResponsiveSize(3.8),
                     color: context.colorPalette.subTitleColor,
                   ),
                 ),
@@ -530,8 +530,8 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
       child: Row(
         children: [
           Container(
-            width: context.getScreenWidth(10),
-            height: context.getScreenWidth(10),
+            width: context.getResponsiveSize(10),
+            height: context.getResponsiveSize(10),
             decoration: BoxDecoration(
               color: isFirst
                   ? AppColors.primaryGold.withOpacity(0.12)
@@ -542,7 +542,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                 child: Text(
                   DateFormat('dd').format(rate.timestamp.toLocal()),
                 style: TextStyle(
-                  fontSize: context.getFontSize(3.2),
+                  fontSize: context.getResponsiveSize(3.2),
                   fontWeight: FontWeight.w700,
                   color: isFirst ? AppColors.primaryGold : context.colorPalette.subTitleColor,
                 ),
@@ -557,7 +557,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                 Text(
                   DateFormat('dd MMMM yyyy').format(rate.timestamp.toLocal()),
                   style: TextStyle(
-                    fontSize: context.getFontSize(3.5),
+                    fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.textColor,
                   ),
@@ -566,7 +566,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                   Text(
                     'Set by ${rate.source}',
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -579,7 +579,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
               Text(
                 '₹${rate.rate.toStringAsFixed(0)}',
                 style: TextStyle(
-                  fontSize: context.getFontSize(4.2),
+                  fontSize: context.getResponsiveSize(4.2),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.textColor,
                 ),
@@ -601,14 +601,14 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                     children: [
                       Icon(
                         isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                        size: context.getFontSize(2.5),
+                        size: context.getResponsiveSize(2.5),
                         color: isUp ? Colors.green : Colors.red,
                       ),
                       SizedBox(width: 2),
                       Text(
                         '₹${diff.abs().toStringAsFixed(0)}',
                         style: TextStyle(
-                          fontSize: context.getFontSize(2.5),
+                          fontSize: context.getResponsiveSize(2.5),
                           fontWeight: FontWeight.w600,
                           color: isUp ? Colors.green : Colors.red,
                         ),

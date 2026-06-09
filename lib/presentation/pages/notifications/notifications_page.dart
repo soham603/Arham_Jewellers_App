@@ -37,13 +37,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getFontSize(5),
+            size: context.getResponsiveSize(5),
           ),
         ),
         title: Text(
           'Notifications',
           style: TextStyle(
-            fontSize: context.getFontSize(6),
+            fontSize: context.getResponsiveSize(6),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -58,7 +58,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               icon: Icon(
                 Icons.delete_outline_rounded,
                 color: AppColors.primaryGold,
-                size: context.getFontSize(6),
+                size: context.getResponsiveSize(6),
               ),
             );
           }),
@@ -122,14 +122,14 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(
             Icons.notifications_none_rounded,
-            size: context.getFontSize(20),
+            size: context.getResponsiveSize(20),
             color: AppColors.textMuted.withOpacity(0.5),
           ),
           SizedBox(height: context.getScreenHeight(2)),
           Text(
             'No notifications yet',
             style: TextStyle(
-              fontSize: context.getFontSize(4.5),
+              fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -139,7 +139,7 @@ class _EmptyState extends StatelessWidget {
             'You\'ll receive notifications about\norders, offers, and updates',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: context.getFontSize(3.5),
+              fontSize: context.getResponsiveSize(3.5),
               color: AppColors.textMuted,
             ),
           ),
@@ -216,7 +216,7 @@ class _NotificationCard extends StatelessWidget {
               ),
               child: Icon(
                 Icons.notifications_none_rounded,
-                size: context.getFontSize(5),
+                size: context.getResponsiveSize(5),
                 color: notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
               ),
             ),
@@ -232,7 +232,7 @@ class _NotificationCard extends StatelessWidget {
                         child: Text(
                           notification.title,
                           style: TextStyle(
-                            fontSize: context.getFontSize(3.8),
+                            fontSize: context.getResponsiveSize(3.8),
                             fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w700,
                             color: AppColors.textDark,
                           ),
@@ -242,8 +242,8 @@ class _NotificationCard extends StatelessWidget {
                       ),
                       if (!notification.isRead)
                         Container(
-                          width: context.getScreenWidth(2),
-                          height: context.getScreenWidth(2),
+                          width: context.getResponsiveSize(2),
+                          height: context.getResponsiveSize(2),
                           margin: EdgeInsets.only(left: context.getScreenWidth(2)),
                           decoration: BoxDecoration(
                             color: AppColors.primaryGold,
@@ -256,7 +256,7 @@ class _NotificationCard extends StatelessWidget {
                   Text(
                     notification.body,
                     style: TextStyle(
-                      fontSize: context.getFontSize(3.3),
+                      fontSize: context.getResponsiveSize(3.3),
                       color: AppColors.textMuted,
                     ),
                     maxLines: 2,
@@ -266,7 +266,7 @@ class _NotificationCard extends StatelessWidget {
                   Text(
                     timeAgo,
                     style: TextStyle(
-                      fontSize: context.getFontSize(2.8),
+                      fontSize: context.getResponsiveSize(2.8),
                       color: AppColors.textMuted.withOpacity(0.7),
                     ),
                   ),
