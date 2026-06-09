@@ -344,7 +344,7 @@ class _AdminOrderCard extends StatelessWidget {
   }
 }
 
-class _OrderImagesStack extends StatelessWidget {
+class _OrderImagesStack extends StatefulWidget {
   const _OrderImagesStack({
     required this.order,
     required this.controller,
@@ -354,89 +354,108 @@ class _OrderImagesStack extends StatelessWidget {
   final AdminOrderController controller;
 
   @override
+  State<_OrderImagesStack> createState() => _OrderImagesStackState();
+}
+
+class _OrderImagesStackState extends State<_OrderImagesStack> {
+  late final Worker _worker;
+
+  @override
+  void initState() {
+    super.initState();
+    _worker = ever(widget.controller.productImageCache, (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _worker.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = context.getResponsiveSize(20);
 
-    return Obx(() {
-      final images = order.orderItems
-          .map((item) => controller.getProductImage(item.product.id))
-          .where((url) => url != null && url.isNotEmpty)
-          .toList();
+    final images = widget.order.orderItems
+        .map((item) => widget.controller.getProductImage(item.product.id))
+        .where((url) => url != null && url.isNotEmpty)
+        .toList();
 
-      if (images.isEmpty) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: RatneshFallback.s(width: size, height: size),
-        );
-      }
-
-      final displayImages = images.take(3).toList();
-      final totalItems = order.orderItems.length;
-
-      return SizedBox(
-        width: size,
-        height: size,
-        child: Stack(
-          children: [
-            for (int i = displayImages.length - 1; i >= 0; i--)
-              Positioned(
-                top: i * 3.0,
-                left: i * 3.0,
-                child: Container(
-                  width: size - (displayImages.length - 1) * 3.0,
-                  height: size - (displayImages.length - 1) * 3.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: displayImages[i]!,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => Container(
-                        color: const Color(0xFFF6F7FB),
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (_, _, _) => RatneshFallback.s(),
-                    ),
-                  ),
-                ),
-              ),
-            if (totalItems > 1)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGold,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: Text(
-                    "$totalItems",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: context.getResponsiveSize(3.2),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+    if (images.isEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: RatneshFallback.s(width: size, height: size),
       );
-    });
+    }
+
+    final displayImages = images.take(3).toList();
+    final totalItems = widget.order.orderItems.length;
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        children: [
+          for (int i = displayImages.length - 1; i >= 0; i--)
+            Positioned(
+              top: i * 3.0,
+              left: i * 3.0,
+              child: Container(
+                width: size - (displayImages.length - 1) * 3.0,
+                height: size - (displayImages.length - 1) * 3.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: displayImages[i]!,
+                    fit: BoxFit.cover,
+                    placeholder: (_, _) => Container(
+                      color: const Color(0xFFF6F7FB),
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                    errorWidget: (_, _, _) => RatneshFallback.s(),
+                  ),
+                ),
+              ),
+            ),
+          if (totalItems > 1)
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Text(
+                  "$totalItems",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.getResponsiveSize(3.2),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
