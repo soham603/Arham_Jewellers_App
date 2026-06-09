@@ -61,10 +61,10 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         actions: [
           Obx(
             () => Padding(
-              padding: EdgeInsets.only(right: context.getScreenWidth(4)),
+              padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(3),
+                  horizontal: context.getResponsiveSize(3),
                   vertical: context.getScreenHeight(0.5),
                 ),
                 decoration: BoxDecoration(
@@ -88,9 +88,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(
-              context.getScreenWidth(4),
+              context.getResponsiveSize(4),
               context.getScreenHeight(1),
-              context.getScreenWidth(4),
+              context.getResponsiveSize(4),
               0,
             ),
             child: SearchBarWidget(
@@ -129,9 +129,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                 child: ListView.separated(
                   controller: _scroll,
                   padding: EdgeInsets.fromLTRB(
-                    context.getScreenWidth(4),
+                    context.getResponsiveSize(4),
                     context.getScreenHeight(1.5),
-                    context.getScreenWidth(4),
+                    context.getResponsiveSize(4),
                     context.getScreenHeight(3),
                   ),
                   itemCount: list.length + 1,
@@ -159,9 +159,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     return Obx(
       () => Container(
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           context.getScreenHeight(0.5),
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           context.getScreenHeight(1),
         ),
         child: Row(
@@ -174,7 +174,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   margin: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(1),
+                    horizontal: context.getResponsiveSize(1),
                   ),
                   padding: EdgeInsets.symmetric(
                     vertical: context.getScreenHeight(0.8),
@@ -211,8 +211,8 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
           padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
           child: Center(
             child: SizedBox(
-              width: context.getScreenWidth(6),
-              height: context.getScreenWidth(6),
+              width: context.getResponsiveSize(6),
+              height: context.getResponsiveSize(6),
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: context.colorPalette.primaryColor,
@@ -242,7 +242,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   // ── Shimmer ───────────────────────────────────────────────────────────────
   Widget _shimmerList(BuildContext context) {
     return ListView.separated(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 5,
       separatorBuilder: (_, __) =>
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -257,26 +257,26 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: context.getScreenWidth(10),
-                height: context.getScreenWidth(10),
+                width: context.getResponsiveSize(10),
+                height: context.getResponsiveSize(10),
                 decoration: BoxDecoration(
                   color: context.colorPalette.shimmerHighLightColor,
                   shape: BoxShape.circle,
                 ),
               ),
-              SizedBox(width: context.getScreenWidth(3)),
+              SizedBox(width: context.getResponsiveSize(3)),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: context.getScreenWidth(35),
+                    width: context.getResponsiveSize(35),
                     height: context.getScreenHeight(1.5),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
@@ -285,7 +285,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                   ),
                   SizedBox(height: context.getScreenHeight(0.6)),
                   Container(
-                    width: context.getScreenWidth(25),
+                    width: context.getResponsiveSize(25),
                     height: context.getScreenHeight(1.2),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
@@ -444,7 +444,7 @@ class _RequestCardState extends State<_RequestCard> {
             onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Row(
                 children: [
                   Container(
@@ -466,7 +466,7 @@ class _RequestCardState extends State<_RequestCard> {
                       ),
                     ),
                   ),
-                  SizedBox(width: context.getScreenWidth(3)),
+                  SizedBox(width: context.getResponsiveSize(3)),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,7 +495,7 @@ class _RequestCardState extends State<_RequestCard> {
                     children: [
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(2.5),
+                          horizontal: context.getResponsiveSize(2.5),
                           vertical: context.getScreenHeight(0.4),
                         ),
                         decoration: BoxDecoration(
@@ -532,17 +532,17 @@ class _RequestCardState extends State<_RequestCard> {
             Divider(
               height: 1,
               color: context.colorPalette.boxColor,
-              indent: context.getScreenWidth(4),
-              endIndent: context.getScreenWidth(4),
+              indent: context.getResponsiveSize(4),
+              endIndent: context.getResponsiveSize(4),
             ),
             Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Column(
                 children: [
                   if (req.oldDeviceName != null || req.oldDeviceId != null)
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(context.getScreenWidth(3)),
+                      padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
                         color: context.colorPalette.gold.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(12),
@@ -588,7 +588,7 @@ class _RequestCardState extends State<_RequestCard> {
                           // Arrow
                           Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(2),
+                              horizontal: context.getResponsiveSize(2),
                             ),
                             child: Icon(
                               Icons.arrow_forward_rounded,
@@ -663,7 +663,7 @@ class _RequestCardState extends State<_RequestCard> {
                     SizedBox(height: context.getScreenHeight(1)),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(context.getScreenWidth(3)),
+                      padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.07),
                         borderRadius: BorderRadius.circular(10),
@@ -677,7 +677,7 @@ class _RequestCardState extends State<_RequestCard> {
                             color: Colors.red,
                             size: context.getResponsiveSize(4),
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -726,7 +726,7 @@ class _RequestCardState extends State<_RequestCard> {
                               onTap: () => _showApproveConfirm(context, req),
                             ),
                           ),
-                          SizedBox(width: context.getScreenWidth(3)),
+                          SizedBox(width: context.getResponsiveSize(3)),
                           Expanded(
                             child: _actionButton(
                               context,
@@ -772,7 +772,7 @@ class _RequestCardState extends State<_RequestCard> {
                 size: 20,
               ),
             ),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Text(
               'Approve Request',
               style: TextStyle(
@@ -867,7 +867,7 @@ class _RequestCardState extends State<_RequestCard> {
                 size: 20,
               ),
             ),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Text(
               'Reject Request',
               style: TextStyle(
@@ -909,7 +909,7 @@ class _RequestCardState extends State<_RequestCard> {
                   borderSide:
                       BorderSide(color: Colors.red, width: 1.5),
                 ),
-                contentPadding: EdgeInsets.all(context.getScreenWidth(3)),
+                contentPadding: EdgeInsets.all(context.getResponsiveSize(3)),
               ),
             ),
           ],
@@ -980,14 +980,14 @@ class _RequestCardState extends State<_RequestCard> {
       children: [
         Icon(
           icon,
-          size: ctx.getScreenWidth(4),
+          size: ctx.getResponsiveSize(4),
           color: ctx.colorPalette.subTitleColor,
         ),
-        SizedBox(width: ctx.getScreenWidth(2)),
+        SizedBox(width: ctx.getResponsiveSize(2)),
         Text(
           '$label: ',
           style: TextStyle(
-            fontSize: ctx.getScreenWidth(3.2),
+            fontSize: ctx.getResponsiveSize(3.2),
             color: ctx.colorPalette.subTitleColor,
           ),
         ),
@@ -997,7 +997,7 @@ class _RequestCardState extends State<_RequestCard> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: ctx.getScreenWidth(3.2),
+              fontSize: ctx.getResponsiveSize(3.2),
               fontWeight: FontWeight.w600,
               color: ctx.colorPalette.textColor,
             ),
@@ -1028,8 +1028,8 @@ class _RequestCardState extends State<_RequestCard> {
         child: isLoading
             ? Center(
                 child: SizedBox(
-                  width: context.getScreenWidth(4.5),
-                  height: context.getScreenWidth(4.5),
+                  width: context.getResponsiveSize(4.5),
+                  height: context.getResponsiveSize(4.5),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: outlined ? color : Colors.white,
@@ -1044,7 +1044,7 @@ class _RequestCardState extends State<_RequestCard> {
                     color: outlined ? color : Colors.white,
                     size: context.getResponsiveSize(4),
                   ),
-                  SizedBox(width: context.getScreenWidth(1.5)),
+                  SizedBox(width: context.getResponsiveSize(1.5)),
                   Text(
                     label,
                     style: TextStyle(

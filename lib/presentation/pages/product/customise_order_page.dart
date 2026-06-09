@@ -271,9 +271,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.2),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.2),
           ),
           decoration: BoxDecoration(
@@ -418,7 +418,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
           ),
           child: Column(
@@ -778,7 +778,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: context.getScreenWidth(28),
+            width: context.getResponsiveSize(28),
             child: Text(
               label,
               style: TextStyle(

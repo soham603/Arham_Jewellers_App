@@ -55,7 +55,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -85,7 +85,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildOrderHeader(BuildContext context, AdminOrderModel order) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -114,7 +114,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               if (order.isCustom)
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(2.5),
+                    horizontal: context.getResponsiveSize(2.5),
                     vertical: context.getScreenHeight(0.3),
                   ),
                   decoration: BoxDecoration(
@@ -139,7 +139,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1)),
           Container(
             padding: EdgeInsets.symmetric(
-              horizontal: context.getScreenWidth(2.5),
+              horizontal: context.getResponsiveSize(2.5),
               vertical: context.getScreenHeight(0.3),
             ),
             decoration: BoxDecoration(
@@ -177,7 +177,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildOrderItems(BuildContext context, AdminOrderModel order) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -207,7 +207,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
               child: Container(
-                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected
                       ? Colors.red.withOpacity(0.05)
@@ -224,8 +224,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: SizedBox(
-                        width: context.getScreenWidth(14),
-                        height: context.getScreenWidth(14),
+                        width: context.getResponsiveSize(14),
+                        height: context.getResponsiveSize(14),
                         child: imageUrl != null && imageUrl.isNotEmpty
                             ? CachedNetworkImage(
                                 imageUrl: imageUrl,
@@ -239,7 +239,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             : const RatneshFallback.xs(),
                       ),
                     ),
-                    SizedBox(width: context.getScreenWidth(3)),
+                    SizedBox(width: context.getResponsiveSize(3)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,7 +258,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               if (item.isRejected)
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: context.getScreenWidth(1.5),
+                                    horizontal: context.getResponsiveSize(1.5),
                                     vertical: context.getScreenHeight(0.2),
                                   ),
                                   decoration: BoxDecoration(
@@ -286,7 +286,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   label: "Qty: ${item.quantity}",
                                 ),
                                 if (item.price > 0) ...[
-                                  SizedBox(width: context.getScreenWidth(2)),
+                                  SizedBox(width: context.getResponsiveSize(2)),
                                   _itemDetailChip(
                                     context,
                                     label: "₹${item.price.toStringAsFixed(2)}",
@@ -300,7 +300,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   final weight = netWtVal ?? fineWtVal;
                                   if (weight != null) {
                                     final isFallback = netWtVal == null;
-                                    chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                    chips.add(SizedBox(width: context.getResponsiveSize(2)));
                                     chips.add(_itemDetailChip(
                                       context,
                                       label: "${isFallback ? 'Fine' : 'Net'}: ${weight.toStringAsFixed(2)}g",
@@ -308,7 +308,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   }
                                   final sizeVal = rawData?['Size1']?.toString();
                                   if (sizeVal != null && sizeVal.isNotEmpty) {
-                                    chips.add(SizedBox(width: context.getScreenWidth(2)));
+                                    chips.add(SizedBox(width: context.getResponsiveSize(2)));
                                     chips.add(_itemDetailChip(
                                       context,
                                       label: "Size: $sizeVal",
@@ -336,7 +336,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _itemDetailChip(BuildContext context, {required String label}) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(2),
+        horizontal: context.getResponsiveSize(2),
         vertical: context.getScreenHeight(0.2),
       ),
       decoration: BoxDecoration(
@@ -360,7 +360,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -375,7 +375,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+            padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
             decoration: BoxDecoration(
               color: AppColors.primaryGold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -386,7 +386,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               size: context.getResponsiveSize(5),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(3)),
+          SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: Text(
               "Total Amount",
@@ -415,7 +415,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -483,7 +483,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Row(
       children: [
         Icon(icon, size: context.getResponsiveSize(4.5), color: AppColors.textMuted),
-        SizedBox(width: context.getScreenWidth(2.5)),
+        SizedBox(width: context.getResponsiveSize(2.5)),
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -520,7 +520,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Row(
       children: [
         Icon(icon, size: context.getResponsiveSize(4), color: AppColors.textMuted),
-        SizedBox(width: context.getScreenWidth(2)),
+        SizedBox(width: context.getResponsiveSize(2)),
         Text(
           "$label: ",
           style: TextStyle(
@@ -544,7 +544,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildAdminMessage(BuildContext context, AdminOrderModel order) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -566,7 +566,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 color: order.status == "REJECTED" ? Colors.red : AppColors.primaryGold,
                 size: context.getResponsiveSize(4.5),
               ),
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               Text(
                 order.status == "REJECTED" ? "Rejection Reason" : "Admin Message",
                 style: TextStyle(
@@ -579,7 +579,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1)),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(context.getScreenWidth(3)),
+            padding: EdgeInsets.all(context.getResponsiveSize(3)),
             decoration: BoxDecoration(
               color: order.status == "REJECTED"
                   ? Colors.red.withOpacity(0.05)
@@ -655,7 +655,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   )),
           ),
         ),
-        SizedBox(width: context.getScreenWidth(3)),
+        SizedBox(width: context.getResponsiveSize(3)),
         Expanded(
           child: ElevatedButton(
             onPressed: controller.isActionLoading
@@ -706,7 +706,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Text(
               "Connect on WhatsApp",
               style: TextStyle(
@@ -765,7 +765,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                   filled: true,
                   fillColor: const Color(0xFFF9FAFB),
-                  contentPadding: EdgeInsets.all(context.getScreenWidth(3)),
+                  contentPadding: EdgeInsets.all(context.getResponsiveSize(3)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(color: Colors.grey.shade200),
@@ -795,7 +795,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: context.getScreenWidth(3)),
+                  SizedBox(width: context.getResponsiveSize(3)),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {

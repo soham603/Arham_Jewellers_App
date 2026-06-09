@@ -202,9 +202,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ],
                   ),
                   padding: EdgeInsets.fromLTRB(
-                    context.getScreenWidth(4),
+                    context.getResponsiveSize(4),
                     context.getScreenHeight(1.5),
-                    context.getScreenWidth(4),
+                    context.getResponsiveSize(4),
                     context.getScreenHeight(1.5),
                   ),
                   child: Row(
@@ -250,7 +250,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                       ),
 
-                      SizedBox(width: context.getScreenWidth(3)),
+                      SizedBox(width: context.getResponsiveSize(3)),
                       Expanded(
                         child: SizedBox(
                           height: context.getScreenHeight(6.2),
@@ -338,11 +338,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // Top Left: Back Button Only
                   Positioned(
                     top: context.getScreenHeight(2),
-                    left: context.getScreenWidth(4),
+                    left: context.getResponsiveSize(4),
                     child: GestureDetector(
                       onTap: () => Get.back(),
                       child: Container(
-                        padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                        padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
@@ -374,9 +374,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             bottom: context.getScreenHeight(0.8),
                           ),
                           padding: EdgeInsets.fromLTRB(
-                            context.getScreenWidth(4),
+                            context.getResponsiveSize(4),
                             context.getScreenHeight(0.6),
-                            context.getScreenWidth(3),
+                            context.getResponsiveSize(3),
                             context.getScreenHeight(0.6),
                           ),
                           decoration: BoxDecoration(
@@ -406,9 +406,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         if (netWeight != null)
                           Container(
                             padding: EdgeInsets.fromLTRB(
-                              context.getScreenWidth(4),
+                              context.getResponsiveSize(4),
                               context.getScreenHeight(0.6),
-                              context.getScreenWidth(3),
+                              context.getResponsiveSize(3),
                               context.getScreenHeight(0.6),
                             ),
                             decoration: BoxDecoration(
@@ -442,14 +442,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   if (widget.product.imageUrl != null)
                     Positioned(
                       bottom: context.getScreenHeight(8),
-                      right: context.getScreenWidth(4),
+                      right: context.getResponsiveSize(4),
                       child: GestureDetector(
                         onTap: () => showImageZoomDialog(
                           context,
                           widget.product.imageUrl!,
                         ),
                         child: Container(
-                          padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                          padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
@@ -485,9 +485,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 ),
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(
-                    context.getScreenWidth(5),
+                    context.getResponsiveSize(5),
                     context.getScreenHeight(2),
-                    context.getScreenWidth(5),
+                    context.getResponsiveSize(5),
                     context.getScreenHeight(3),
                   ),
                   child: Column(
@@ -534,7 +534,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(
-                            horizontal: context.getScreenWidth(4),
+                            horizontal: context.getResponsiveSize(4),
                             vertical: context.getScreenHeight(0.8),
                           ),
                           decoration: BoxDecoration(
@@ -624,7 +624,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 0.4,
                               ),
                               padding: EdgeInsets.symmetric(
-                                horizontal: context.getScreenWidth(4),
+                                horizontal: context.getResponsiveSize(4),
                                 vertical: context.getScreenHeight(0.8),
                               ),
                               shape: RoundedRectangleBorder(
@@ -651,7 +651,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                               ),
                             if (netWeight != null && displayGrossWeight != null)
-                              SizedBox(width: context.getScreenWidth(3)),
+                              SizedBox(width: context.getResponsiveSize(3)),
                             if (displayGrossWeight != null)
                               Expanded(
                                 child: _buildSpecBox(
@@ -676,7 +676,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                               ),
                             if (netWeight != null && displayGrossWeight != null)
-                              SizedBox(width: context.getScreenWidth(3)),
+                              SizedBox(width: context.getResponsiveSize(3)),
                             if (displayGrossWeight != null)
                               Expanded(
                                 child: _buildSpecBox(
@@ -700,7 +700,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 purity,
                               ),
                             ),
-                            SizedBox(width: context.getScreenWidth(3)),
+                            SizedBox(width: context.getResponsiveSize(3)),
                             Expanded(
                               child: _buildSpecBox(
                                 context,
@@ -824,7 +824,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(3),
+        horizontal: context.getResponsiveSize(3),
         vertical: context.getScreenHeight(1),
       ),
       decoration: BoxDecoration(
@@ -849,7 +849,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             color: AppColors.primaryGold.withOpacity(0.8),
             size: context.getResponsiveSize(6),
           ),
-          SizedBox(width: context.getScreenWidth(2.5)),
+          SizedBox(width: context.getResponsiveSize(2.5)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -892,7 +892,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           color: AppColors.primaryGold.withOpacity(0.7),
           size: context.getResponsiveSize(5),
         ),
-        SizedBox(width: context.getScreenWidth(1.5)),
+        SizedBox(width: context.getResponsiveSize(1.5)),
         Text(
           text,
           style: TextStyle(

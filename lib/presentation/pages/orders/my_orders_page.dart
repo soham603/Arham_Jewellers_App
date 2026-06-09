@@ -94,9 +94,9 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         child: ListView.separated(
           controller: _scrollController,
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(2),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(2),
           ),
           itemCount: orders.length +
@@ -182,7 +182,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
               size: context.getResponsiveSize(6),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -240,7 +240,7 @@ class _OrderCard extends StatelessWidget {
         Get.to(() => UserOrderDetailScreen(order: order));
       },
       child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(4)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -279,7 +279,7 @@ class _OrderCard extends StatelessWidget {
                             color: statusInfo.color,
                             bgColor: statusInfo.bgColor,
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Icon(
                             Icons.arrow_forward_ios_rounded,
                             size: context.getResponsiveSize(3),
@@ -299,7 +299,7 @@ class _OrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _OrderImagesStack(order: order, controller: controller),
-                      SizedBox(width: context.getScreenWidth(3)),
+                      SizedBox(width: context.getResponsiveSize(3)),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +327,7 @@ class _OrderCard extends StatelessWidget {
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
                                                 fontSize:
-                                                    context.getScreenWidth(3.8),
+                                                    context.getResponsiveSize(3.8),
                                                 fontWeight: FontWeight.w600,
                                                 color: AppColors.textDark,
                                               ),
@@ -365,7 +365,7 @@ class _OrderCard extends StatelessWidget {
                     SizedBox(height: context.getScreenHeight(1.5)),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(context.getScreenWidth(3)),
+                      padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
                         color: AppColors.tileBg,
                         borderRadius: BorderRadius.circular(12),
@@ -378,7 +378,7 @@ class _OrderCard extends StatelessWidget {
                             size: context.getResponsiveSize(4),
                             color: AppColors.primaryGold,
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Expanded(
                             child: Text(
                               order.adminMessage!,
@@ -463,9 +463,9 @@ class _OrdersShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(2),
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(2),
       ),
       itemCount: 4,
@@ -533,7 +533,7 @@ class _EmptyOrdersView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(10)),
+        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(10)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -654,7 +654,7 @@ class _OrderImagesStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.getScreenWidth(20);
+    final size = context.getResponsiveSize(20);
     final items = order.items;
     final images = items
         .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))

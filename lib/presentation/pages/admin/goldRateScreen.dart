@@ -46,9 +46,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.5),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(3),
           ),
           child: Column(
@@ -87,7 +87,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
       if (rateState == CurrentAppState.ERROR && rate == null) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(context.getScreenWidth(5)),
+          padding: EdgeInsets.all(context.getResponsiveSize(5)),
           decoration: BoxDecoration(
             color: Colors.red.withOpacity(0.06),
             borderRadius: BorderRadius.circular(20),
@@ -128,7 +128,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(1.5),
         ),
         decoration: BoxDecoration(
@@ -161,7 +161,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 size: context.getResponsiveSize(5),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -263,8 +263,8 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           child: isLoading
               ? Center(
                   child: SizedBox(
-                    width: context.getScreenWidth(5),
-                    height: context.getScreenWidth(5),
+                    width: context.getResponsiveSize(5),
+                    height: context.getResponsiveSize(5),
                     child: const CircularProgressIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
@@ -275,7 +275,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.edit_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: context.getScreenWidth(2)),
+                    SizedBox(width: context.getResponsiveSize(2)),
                     Text(
                       'Set New Rate',
                       style: TextStyle(
@@ -308,9 +308,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         ),
         child: Container(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(5),
+            context.getResponsiveSize(5),
             context.getScreenHeight(2),
-            context.getScreenWidth(5),
+            context.getResponsiveSize(5),
             context.getScreenHeight(3),
           ),
           decoration: BoxDecoration(
@@ -323,7 +323,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             children: [
               Center(
                 child: Container(
-                  width: context.getScreenWidth(10),
+                  width: context.getResponsiveSize(10),
                   height: context.getScreenHeight(0.5),
                   decoration: BoxDecoration(
                     color: context.colorPalette.subTitleColor.withOpacity(0.3),
@@ -411,8 +411,8 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                     child: isLoading
                         ? Center(
                             child: SizedBox(
-                              width: context.getScreenWidth(5),
-                              height: context.getScreenWidth(5),
+                              width: context.getResponsiveSize(5),
+                              height: context.getResponsiveSize(5),
                               child: const CircularProgressIndicator(
                                 strokeWidth: 2,
                                 color: Colors.white,
@@ -519,7 +519,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
     final isUp = diff > 0;
 
     return Container(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(14),
@@ -549,7 +549,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
               ),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(3)),
+          SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -587,7 +587,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
               if (!isFirst && diff != 0)
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(1.5),
+                    horizontal: context.getResponsiveSize(1.5),
                     vertical: context.getScreenHeight(0.2),
                   ),
                   decoration: BoxDecoration(

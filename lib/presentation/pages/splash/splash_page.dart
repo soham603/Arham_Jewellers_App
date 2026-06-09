@@ -121,7 +121,7 @@ class _SplashPageState extends State<SplashPage>
         backgroundColor: palette.pageBackgroundColor,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(6)),
+            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
             child: Column(
               children: [
               const Spacer(flex: 2),
@@ -142,8 +142,8 @@ class _SplashPageState extends State<SplashPage>
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: context.getScreenWidth(28),
-                        height: context.getScreenWidth(28),
+                        width: context.getResponsiveSize(28),
+                        height: context.getResponsiveSize(28),
                         child: Image.asset(
                           'assets/images/arham-logo.png',
                           fit: BoxFit.contain,
@@ -157,9 +157,9 @@ class _SplashPageState extends State<SplashPage>
                           return Container(
                             width: 1,
                             height:
-                                context.getScreenWidth(20) * _dividerHeight.value,
+                                context.getResponsiveSize(20) * _dividerHeight.value,
                             margin: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(6),
+                              horizontal: context.getResponsiveSize(6),
                             ),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -178,13 +178,13 @@ class _SplashPageState extends State<SplashPage>
                         },
                       ),
                       LogoWidget(
-                        logoSize: context.getScreenWidth(14),
+                        logoSize: context.getResponsiveSize(14),
                         iconColor: context.colorPalette.gold,
                         nameColor: context.colorPalette.goldDark,
-                        nameFontSize: context.getScreenWidth(3.2),
+                        nameFontSize: context.getResponsiveSize(3.2),
                         nameLetterSpacing: 1,
                         subtitleColor: palette.subTitleColor,
-                        subtitleFontSize: context.getScreenWidth(2.2),
+                        subtitleFontSize: context.getResponsiveSize(2.2),
                         iconNameSpacing: context.getScreenHeight(0.8),
                         nameSubtitleSpacing: context.getScreenHeight(0.5),
                       ),

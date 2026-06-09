@@ -42,9 +42,9 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.5),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(3),
           ),
           child: Column(
@@ -78,7 +78,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
       if (rateState == CurrentAppState.ERROR && rate == null) {
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(context.getScreenWidth(5)),
+          padding: EdgeInsets.all(context.getResponsiveSize(5)),
           decoration: BoxDecoration(
             color: Colors.red.withOpacity(0.06),
             borderRadius: BorderRadius.circular(20),
@@ -119,7 +119,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(2),
         ),
         decoration: BoxDecoration(
@@ -152,7 +152,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 size: context.getResponsiveSize(5.5),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +180,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                           height: 1.0,
                         ),
                       ),
-                      SizedBox(width: context.getScreenWidth(1.5)),
+                      SizedBox(width: context.getResponsiveSize(1.5)),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 2.0),
                         child: Text(
@@ -200,7 +200,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             if (rate != null)
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(2.5),
+                  horizontal: context.getResponsiveSize(2.5),
                   vertical: context.getScreenHeight(0.6),
                 ),
                 decoration: BoxDecoration(
@@ -294,9 +294,9 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         width: double.infinity,
         height: context.getScreenHeight(25),
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(2),
+          context.getResponsiveSize(2),
           context.getScreenHeight(2.5),
-          context.getScreenWidth(4),
+          context.getResponsiveSize(4),
           context.getScreenHeight(1.5),
         ),
         decoration: BoxDecoration(
@@ -310,7 +310,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(left: context.getScreenWidth(2.5)),
+              padding: EdgeInsets.only(left: context.getResponsiveSize(2.5)),
               child: Text(
                 'Gold Price Graph',
                 style: TextStyle(
@@ -344,7 +344,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: context.getScreenWidth(13), // Expanded to prevent clipping
+                        reservedSize: context.getResponsiveSize(13), // Expanded to prevent clipping
                         interval: stepY,
                         getTitlesWidget: (value, meta) {
                           // Format cleanly (e.g. 152k instead of 152.0k)
@@ -402,7 +402,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       getTooltipColor: (_) => const Color(0xFF1E1E1E),
                       tooltipRoundedRadius: 12,
                       tooltipPadding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(3),
+                        horizontal: context.getResponsiveSize(3),
                         vertical: context.getScreenHeight(0.8),
                       ),
                       getTooltipItems: (touchedSpots) {
@@ -497,13 +497,13 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   final isSelected = controller.activeFilterType == 'period' &&
                       controller.selectedPeriod == p;
                   return Padding(
-                    padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+                    padding: EdgeInsets.only(right: context.getResponsiveSize(2)),
                     child: GestureDetector(
                       onTap: () => controller.selectPeriod(p),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(3.5),
+                          horizontal: context.getResponsiveSize(3.5),
                           vertical: context.getScreenHeight(1),
                         ),
                         decoration: BoxDecoration(
@@ -553,7 +553,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(3.5),
+                      horizontal: context.getResponsiveSize(3.5),
                       vertical: context.getScreenHeight(1),
                     ),
                     decoration: BoxDecoration(
@@ -577,7 +577,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                               ? Colors.white
                               : context.colorPalette.textColor,
                         ),
-                        SizedBox(width: context.getScreenWidth(1.5)),
+                        SizedBox(width: context.getResponsiveSize(1.5)),
                         Text(
                           'Custom',
                           style: TextStyle(
@@ -589,7 +589,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                           ),
                         ),
                         if (isCustom) ...[
-                          SizedBox(width: context.getScreenWidth(1.5)),
+                          SizedBox(width: context.getResponsiveSize(1.5)),
                           GestureDetector(
                             onTap: controller.clearDateRange,
                             child: Icon(
@@ -618,7 +618,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             child: Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(3.5),
+                horizontal: context.getResponsiveSize(3.5),
                 vertical: context.getScreenHeight(1),
               ),
               decoration: BoxDecoration(
@@ -635,7 +635,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     size: context.getResponsiveSize(3.5),
                     color: AppColors.primaryGold,
                   ),
-                  SizedBox(width: context.getScreenWidth(2)),
+                  SizedBox(width: context.getResponsiveSize(2)),
                   Expanded(
                     child: Text(
                       'Showing: ${controller.dateRangeLabel}',
@@ -679,7 +679,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
 
       return Container(
         width: double.infinity,
-        padding: EdgeInsets.all(context.getScreenWidth(5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(5)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(20),
@@ -720,7 +720,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                           size: context.getResponsiveSize(5),
                           color: trendColor,
                         ),
-                        SizedBox(width: context.getScreenWidth(1.5)),
+                        SizedBox(width: context.getResponsiveSize(1.5)),
                         Text(
                           stats.overallTrend.toUpperCase(),
                           style: TextStyle(
@@ -735,7 +735,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(3.5),
+                    horizontal: context.getResponsiveSize(3.5),
                     vertical: context.getScreenHeight(0.8),
                   ),
                   decoration: BoxDecoration(
@@ -785,7 +785,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: context.getResponsiveSize(3), color: color),
-            SizedBox(width: context.getScreenWidth(1)),
+            SizedBox(width: context.getResponsiveSize(1)),
             Text(
               label,
               style: TextStyle(
@@ -890,7 +890,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
     final isUp = diff > 0;
 
     return Container(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(14),
@@ -920,7 +920,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               ),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(3)),
+          SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -958,7 +958,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               if (!isFirst && diff != 0)
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(1.5),
+                    horizontal: context.getResponsiveSize(1.5),
                     vertical: context.getScreenHeight(0.2),
                   ),
                   decoration: BoxDecoration(

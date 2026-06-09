@@ -57,7 +57,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -85,7 +85,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -109,7 +109,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(2.5),
+                  horizontal: context.getResponsiveSize(2.5),
                   vertical: context.getScreenHeight(0.3),
                 ),
                 decoration: BoxDecoration(
@@ -149,7 +149,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   Widget _buildOrderItems(BuildContext context, UserOrderModel order) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -173,7 +173,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
               child: Container(
-                padding: EdgeInsets.all(context.getScreenWidth(3)),
+                padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected
                       ? Colors.red.withOpacity(0.05)
@@ -190,8 +190,8 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: SizedBox(
-                        width: context.getScreenWidth(14),
-                        height: context.getScreenWidth(14),
+                        width: context.getResponsiveSize(14),
+                        height: context.getResponsiveSize(14),
                         child: imageUrl != null && imageUrl.isNotEmpty
                             ? CachedNetworkImage(
                                 imageUrl: imageUrl,
@@ -205,7 +205,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             : const RatneshFallback.xs(),
                       ),
                     ),
-                    SizedBox(width: context.getScreenWidth(3)),
+                    SizedBox(width: context.getResponsiveSize(3)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +224,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                               if (item.isRejected)
                                 Container(
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: context.getScreenWidth(1.5),
+                                    horizontal: context.getResponsiveSize(1.5),
                                     vertical: context.getScreenHeight(0.2),
                                   ),
                                   decoration: BoxDecoration(
@@ -249,7 +249,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                 context,
                                 label: "Qty: ${item.quantity}",
                               ),
-                              SizedBox(width: context.getScreenWidth(2)),
+                              SizedBox(width: context.getResponsiveSize(2)),
                               _itemDetailChip(
                                 context,
                                 label: "₹${item.price.toStringAsFixed(2)}",
@@ -273,7 +273,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   Widget _itemDetailChip(BuildContext context, {required String label}) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(2),
+        horizontal: context.getResponsiveSize(2),
         vertical: context.getScreenHeight(0.2),
       ),
       decoration: BoxDecoration(
@@ -297,7 +297,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -306,7 +306,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+            padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
             decoration: BoxDecoration(
               color: AppColors.primaryGold.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -317,7 +317,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               size: context.getResponsiveSize(5),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(3)),
+          SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: Text(
               "Total Amount",
@@ -346,7 +346,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -362,7 +362,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 color: isRejected ? Colors.red : AppColors.primaryGold,
                 size: context.getResponsiveSize(4.5),
               ),
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               Text(
                 isRejected ? "Rejection Reason" : "Message",
                 style: TextStyle(
@@ -375,7 +375,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1)),
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(context.getScreenWidth(3)),
+            padding: EdgeInsets.all(context.getResponsiveSize(3)),
             decoration: BoxDecoration(
               color: isRejected
                   ? Colors.red.withOpacity(0.05)
@@ -426,7 +426,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             ),
           ),
         ),
-        SizedBox(width: context.getScreenWidth(3)),
+        SizedBox(width: context.getResponsiveSize(3)),
         Expanded(
           child: SizedBox(
             height: context.getScreenHeight(5),
@@ -512,7 +512,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         canPop: false,
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            padding: EdgeInsets.all(context.getResponsiveSize(6)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -652,7 +652,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     return Row(
       children: [
         Icon(icon, size: context.getResponsiveSize(4), color: AppColors.textMuted),
-        SizedBox(width: context.getScreenWidth(2)),
+        SizedBox(width: context.getResponsiveSize(2)),
         Text(
           "$label: ",
           style: TextStyle(

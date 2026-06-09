@@ -43,7 +43,7 @@ class _CartPageState extends State<CartPage> {
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: AppColors.pageBg,
-        titleSpacing: context.getScreenWidth(4),
+        titleSpacing: context.getResponsiveSize(4),
         title: Text(
           'Cart',
           style: TextStyle(
@@ -55,7 +55,7 @@ class _CartPageState extends State<CartPage> {
         actions: [
           Obx(
             () => Padding(
-              padding: EdgeInsets.only(right: context.getScreenWidth(4)),
+              padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
               child: Center(
                 child: Text(
                   '${cartController.totalItems} item${cartController.totalItems != 1 ? 's' : ''}',
@@ -73,9 +73,9 @@ class _CartPageState extends State<CartPage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(1.5),
           ),
           child: Column(
@@ -106,7 +106,7 @@ class _CartPageState extends State<CartPage> {
                               bottom: context.getScreenHeight(0.8),
                             ),
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(5),
+                              horizontal: context.getResponsiveSize(5),
                             ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFE85D4F),
@@ -131,7 +131,7 @@ class _CartPageState extends State<CartPage> {
                                 bottom: context.getScreenHeight(0.8),
                               ),
                               padding: EdgeInsets.all(
-                                context.getScreenWidth(2.5),
+                                context.getResponsiveSize(2.5),
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -146,8 +146,8 @@ class _CartPageState extends State<CartPage> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Container(
-                                      width: context.getScreenWidth(20),
-                                      height: context.getScreenWidth(20),
+                                      width: context.getResponsiveSize(20),
+                                      height: context.getResponsiveSize(20),
                                       color: const Color(0xFFF7F3EC),
                                       child: imageURL != null &&
                                               imageURL.trim().isNotEmpty &&
@@ -176,7 +176,7 @@ class _CartPageState extends State<CartPage> {
                                                     color:
                                                         Colors.grey.shade500,
                                                     size:
-                                                        context.getScreenWidth(
+                                                        context.getResponsiveSize(
                                                             6),
                                                   ),
                                                 );
@@ -188,12 +188,12 @@ class _CartPageState extends State<CartPage> {
                                                 color:
                                                     const Color(0xFF8C7E68),
                                                 size:
-                                                    context.getScreenWidth(6),
+                                                    context.getResponsiveSize(6),
                                               ),
                                             ),
                                     ),
                                   ),
-                                  SizedBox(width: context.getScreenWidth(2.5)),
+                                  SizedBox(width: context.getResponsiveSize(2.5)),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -205,7 +205,7 @@ class _CartPageState extends State<CartPage> {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize:
-                                                context.getScreenWidth(3.8),
+                                                context.getResponsiveSize(3.8),
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.textDark,
                                             height: 1.2,
@@ -219,7 +219,7 @@ class _CartPageState extends State<CartPage> {
                                             item.product.touch!,
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.0),
+                                                  context.getResponsiveSize(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -233,7 +233,7 @@ class _CartPageState extends State<CartPage> {
                                             'Gross Wt: ${item.product.grossWeight}g',
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.0),
+                                                  context.getResponsiveSize(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -248,7 +248,7 @@ class _CartPageState extends State<CartPage> {
                                             'Net Wt: ${item.product.netWeight ?? item.product.fineWeight}g',
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.0),
+                                                  context.getResponsiveSize(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -261,7 +261,7 @@ class _CartPageState extends State<CartPage> {
                                             item.product.size!,
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(3.0),
+                                                  context.getResponsiveSize(3.0),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -274,7 +274,7 @@ class _CartPageState extends State<CartPage> {
                                             "₹${_formatPrice(price)}",
                                             style: TextStyle(
                                               fontSize:
-                                                  context.getScreenWidth(4.2),
+                                                  context.getResponsiveSize(4.2),
                                               color: AppColors.primaryGold,
                                               fontWeight: FontWeight.w700,
                                             ),
@@ -283,7 +283,7 @@ class _CartPageState extends State<CartPage> {
                                       ],
                                     ),
                                   ),
-                                  SizedBox(width: context.getScreenWidth(2)),
+                                  SizedBox(width: context.getResponsiveSize(2)),
                                   _quantityControls(
                                     context,
                                     quantity: item.quantity,
@@ -331,7 +331,7 @@ class _CartPageState extends State<CartPage> {
     required VoidCallback onIncrement,
   }) {
     return Container(
-      width: context.getScreenWidth(28),
+      width: context.getResponsiveSize(28),
       height: context.getScreenHeight(3.8),
       decoration: BoxDecoration(
         color: const Color(0xFFF3EEDF),
@@ -394,7 +394,7 @@ class _CartPageState extends State<CartPage> {
 
       return Container(
         width: double.infinity,
-        padding: EdgeInsets.all(context.getScreenWidth(5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(5)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -481,7 +481,7 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
           ),
-          SizedBox(width: context.getScreenWidth(3)),
+          SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: SizedBox(
               height: context.getScreenHeight(5),
@@ -529,7 +529,7 @@ class _CartPageState extends State<CartPage> {
         canPop: false,
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            padding: EdgeInsets.all(context.getResponsiveSize(6)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -660,7 +660,7 @@ class _CartPageState extends State<CartPage> {
   Widget _emptyCart(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(8)),
+        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(8)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

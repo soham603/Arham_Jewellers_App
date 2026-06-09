@@ -26,7 +26,7 @@ class AdminPanelScreen extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(4),
+        horizontal: context.getResponsiveSize(4),
         vertical: context.getScreenHeight(1),
       ),
       child: Column(
@@ -37,7 +37,7 @@ class AdminPanelScreen extends StatelessWidget {
           // =====================================================
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(context.getScreenWidth(5)),
+            padding: EdgeInsets.all(context.getResponsiveSize(5)),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(28),
               gradient: const LinearGradient(
@@ -71,7 +71,7 @@ class AdminPanelScreen extends StatelessWidget {
                         size: context.getResponsiveSize(10),
                       ),
                     ),
-                    SizedBox(width: context.getScreenWidth(4)),
+                    SizedBox(width: context.getResponsiveSize(4)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,7 @@ class AdminPanelScreen extends StatelessWidget {
                           SizedBox(height: context.getScreenHeight(0.5)),
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(3),
+                              horizontal: context.getResponsiveSize(3),
                               vertical: context.getScreenHeight(0.4),
                             ),
                             decoration: BoxDecoration(
@@ -114,7 +114,7 @@ class AdminPanelScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(4),
+                    horizontal: context.getResponsiveSize(4),
                     vertical: context.getScreenHeight(1.2),
                   ),
                   decoration: BoxDecoration(
@@ -128,7 +128,7 @@ class AdminPanelScreen extends StatelessWidget {
                         color: AppColors.primaryGold,
                         size: context.getResponsiveSize(5),
                       ),
-                      SizedBox(width: context.getScreenWidth(2)),
+                      SizedBox(width: context.getResponsiveSize(2)),
                       Expanded(
                         child: Text(
                           "Full access to manage app operations",
@@ -165,7 +165,7 @@ class AdminPanelScreen extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            crossAxisSpacing: context.getScreenWidth(3),
+            crossAxisSpacing: context.getResponsiveSize(3),
             mainAxisSpacing: context.getScreenHeight(1.5),
             childAspectRatio: 1.0,
             children: [
@@ -252,7 +252,7 @@ class AdminPanelScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(22),

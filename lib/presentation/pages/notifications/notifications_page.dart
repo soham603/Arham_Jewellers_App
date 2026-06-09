@@ -62,7 +62,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               ),
             );
           }),
-          SizedBox(width: context.getScreenWidth(2)),
+          SizedBox(width: context.getResponsiveSize(2)),
         ],
       ),
       body: ResponsiveWrapper(
@@ -158,7 +158,7 @@ class _NotificationList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(4),
+        horizontal: context.getResponsiveSize(4),
         vertical: context.getScreenHeight(1),
       ),
       itemCount: controller.notifications.length,
@@ -192,10 +192,10 @@ class _NotificationCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
           color: notification.isRead ? Colors.white : AppColors.primaryGold.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(context.getScreenWidth(3)),
+          borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
           border: Border.all(
             color: notification.isRead
                 ? AppColors.divider
@@ -206,13 +206,13 @@ class _NotificationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: context.getScreenWidth(10),
-              height: context.getScreenWidth(10),
+              width: context.getResponsiveSize(10),
+              height: context.getResponsiveSize(10),
               decoration: BoxDecoration(
                 color: notification.isRead
                     ? AppColors.textMuted.withOpacity(0.1)
                     : AppColors.primaryGold.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(context.getScreenWidth(2)),
+                borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
               ),
               child: Icon(
                 Icons.notifications_none_rounded,
@@ -220,7 +220,7 @@ class _NotificationCard extends StatelessWidget {
                 color: notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
               ),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +244,7 @@ class _NotificationCard extends StatelessWidget {
                         Container(
                           width: context.getResponsiveSize(2),
                           height: context.getResponsiveSize(2),
-                          margin: EdgeInsets.only(left: context.getScreenWidth(2)),
+                          margin: EdgeInsets.only(left: context.getResponsiveSize(2)),
                           decoration: BoxDecoration(
                             color: AppColors.primaryGold,
                             shape: BoxShape.circle,

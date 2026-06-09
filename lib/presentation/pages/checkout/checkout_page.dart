@@ -59,14 +59,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
             color: AppColors.textDark,
           ),
         ),
-        titleSpacing: context.getScreenWidth(4),
+        titleSpacing: context.getResponsiveSize(4),
       ),
 
       body: SafeArea(
         child: ResponsiveWrapper(
           child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
           ),
 
@@ -114,7 +114,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     margin: EdgeInsets.only(
                       bottom: context.getScreenHeight(0.8),
                     ),
-                    padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                    padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -125,8 +125,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Container(
-                            width: context.getScreenWidth(18),
-                            height: context.getScreenWidth(18),
+                            width: context.getResponsiveSize(18),
+                            height: context.getResponsiveSize(18),
                             color: const Color(0xFFF7F3EC),
                             child: imageURL != null &&
                                     imageURL.trim().isNotEmpty &&
@@ -166,7 +166,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ),
                           ),
                         ),
-                        SizedBox(width: context.getScreenWidth(2)),
+                        SizedBox(width: context.getResponsiveSize(2)),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +256,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 if (_isRetailer)
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.all(context.getScreenWidth(3)),
+                    padding: EdgeInsets.all(context.getResponsiveSize(3)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
@@ -304,9 +304,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(0.8),
-            context.getScreenWidth(4),
+            context.getResponsiveSize(4),
             context.getScreenHeight(0.8),
           ),
 
@@ -336,11 +336,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   Dialog(
                     backgroundColor: Colors.transparent,
                     insetPadding: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(6),
+                      horizontal: context.getResponsiveSize(6),
                     ),
 
                     child: Container(
-                      padding: EdgeInsets.all(context.getScreenWidth(5)),
+                      padding: EdgeInsets.all(context.getResponsiveSize(5)),
 
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -427,7 +427,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
 
-                              SizedBox(width: context.getScreenWidth(3)),
+                              SizedBox(width: context.getResponsiveSize(3)),
 
                               Expanded(
                                 child: SizedBox(
@@ -480,8 +480,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                            width: context.getScreenWidth(4.5),
-                            height: context.getScreenWidth(4.5),
+                            width: context.getResponsiveSize(4.5),
+                            height: context.getResponsiveSize(4.5),
 
                             child: const CircularProgressIndicator(
                               strokeWidth: 2.5,
@@ -489,7 +489,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ),
 
-                          SizedBox(width: context.getScreenWidth(3)),
+                          SizedBox(width: context.getResponsiveSize(3)),
 
                           Text(
                             "Booking...",

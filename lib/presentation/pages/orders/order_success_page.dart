@@ -92,7 +92,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(5),
+                    horizontal: context.getResponsiveSize(5),
                   ),
                   child: Obx(() {
                     final orderId = orderController.createdOrderId;
@@ -300,7 +300,7 @@ class _OrderDetailCard extends StatelessWidget {
           Row(
             children: [
               _buildThumbnail(context),
-              SizedBox(width: context.getScreenWidth(4)),
+              SizedBox(width: context.getResponsiveSize(4)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +435,7 @@ class _OrderDetailCard extends StatelessWidget {
   }
 
   Widget _buildThumbnail(BuildContext context) {
-    final size = context.getScreenWidth(18);
+    final size = context.getResponsiveSize(18);
     final displayImages = images.take(3).toList();
 
     if (displayImages.isEmpty) {
@@ -632,7 +632,7 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
                 color: _copied ? Colors.green : AppColors.textMuted,
               ),
             ),
-            SizedBox(width: context.getScreenWidth(1.5)),
+            SizedBox(width: context.getResponsiveSize(1.5)),
             Flexible(
               child: Text(
                 '#${widget.orderId}',
@@ -744,7 +744,7 @@ class _NextStepsCard extends StatelessWidget {
                           ),
                       ],
                     ),
-                    SizedBox(width: context.getScreenWidth(3)),
+                    SizedBox(width: context.getResponsiveSize(3)),
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.only(
@@ -839,7 +839,7 @@ class _ContactAdminCard extends StatelessWidget {
                   size: context.getResponsiveSize(5),
                 ),
               ),
-              SizedBox(width: context.getScreenWidth(3)),
+              SizedBox(width: context.getResponsiveSize(3)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -879,7 +879,7 @@ class _ContactAdminCard extends StatelessWidget {
                   onTap: _launchCall,
                 ),
               ),
-              SizedBox(width: context.getScreenWidth(3)),
+              SizedBox(width: context.getResponsiveSize(3)),
               Expanded(
                 child: _ContactButton(
                   icon: FaIcon(FontAwesomeIcons.whatsapp,
@@ -941,7 +941,7 @@ class _ContactButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               icon,
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               Text(
                 label,
                 style: TextStyle(
@@ -1061,7 +1061,7 @@ class _CardContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(context.getScreenWidth(5)),
+      padding: EdgeInsets.all(context.getResponsiveSize(5)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),

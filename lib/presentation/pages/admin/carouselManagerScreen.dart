@@ -59,12 +59,12 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: context.getScreenWidth(4)),
+            padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
             child: GestureDetector(
               onTap: () => _showCreateSheet(context),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(4),
+                  horizontal: context.getResponsiveSize(4),
                   vertical: context.getScreenHeight(0.8),
                 ),
                 decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       color: Colors.white,
                       size: context.getResponsiveSize(4.5),
                     ),
-                    SizedBox(width: context.getScreenWidth(1.5)),
+                    SizedBox(width: context.getResponsiveSize(1.5)),
                     Text(
                       'Add New',
                       style: TextStyle(
@@ -140,7 +140,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         onRefresh: controller.fetchAdminCarousels,
         color: context.colorPalette.primaryColor,
         child: ReorderableListView.builder(
-          padding: EdgeInsets.all(context.getScreenWidth(4)),
+          padding: EdgeInsets.all(context.getResponsiveSize(4)),
           itemCount: list.length,
           onReorder: (oldIndex, newIndex) {
             if (newIndex > oldIndex) newIndex--;
@@ -183,7 +183,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         onRefresh: controller.fetchDeletedCarousels,
         color: context.colorPalette.primaryColor,
         child: ListView.separated(
-          padding: EdgeInsets.all(context.getScreenWidth(4)),
+          padding: EdgeInsets.all(context.getResponsiveSize(4)),
           itemCount: list.length,
           separatorBuilder: (_, __) =>
               SizedBox(height: context.getScreenHeight(1.5)),
@@ -246,10 +246,10 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               // Position badge
               Positioned(
                 top: context.getScreenHeight(1),
-                left: context.getScreenWidth(3),
+                left: context.getResponsiveSize(3),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(2.5),
+                    horizontal: context.getResponsiveSize(2.5),
                     vertical: context.getScreenHeight(0.4),
                   ),
                   decoration: BoxDecoration(
@@ -269,10 +269,10 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               // Active badge
               Positioned(
                 top: context.getScreenHeight(1),
-                right: context.getScreenWidth(3),
+                right: context.getResponsiveSize(3),
                 child: Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getScreenWidth(2.5),
+                    horizontal: context.getResponsiveSize(2.5),
                     vertical: context.getScreenHeight(0.4),
                   ),
                   decoration: BoxDecoration(
@@ -294,9 +294,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               // Drag handle
               Positioned(
                 bottom: context.getScreenHeight(1),
-                right: context.getScreenWidth(3),
+                right: context.getResponsiveSize(3),
                 child: Container(
-                  padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+                  padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(6),
@@ -313,7 +313,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
 
           // ── Info ──────────────────────────────────────────────────────────
           Padding(
-            padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+            padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -380,7 +380,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         },
                       ),
                     ),
-                    SizedBox(width: context.getScreenWidth(2)),
+                    SizedBox(width: context.getResponsiveSize(2)),
 
                     // Edit
                     _actionChip(
@@ -390,7 +390,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       color: context.colorPalette.primaryColor,
                       onTap: () => _showEditSheet(context, item),
                     ),
-                    SizedBox(width: context.getScreenWidth(2)),
+                    SizedBox(width: context.getResponsiveSize(2)),
 
                     // Delete
                     Obx(
@@ -431,7 +431,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ),
             child: CachedNetworkImage(
               imageUrl: item.imageUrl,
-              width: context.getScreenWidth(28),
+              width: context.getResponsiveSize(28),
               height: context.getScreenHeight(12),
               fit: BoxFit.cover,
               placeholder: (_, __) =>
@@ -449,7 +449,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           // Info
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(context.getScreenWidth(3)),
+              padding: EdgeInsets.all(context.getResponsiveSize(3)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -457,7 +457,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     children: [
                       Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(2),
+                          horizontal: context.getResponsiveSize(2),
                           vertical: context.getScreenHeight(0.3),
                         ),
                         decoration: BoxDecoration(
@@ -516,8 +516,8 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                   controller.restoreLoadingId == item.id
                                   ? Center(
                                       child: SizedBox(
-                                        width: context.getScreenWidth(4),
-                                        height: context.getScreenWidth(4),
+                                        width: context.getResponsiveSize(4),
+                                        height: context.getResponsiveSize(4),
                                         child: const CircularProgressIndicator(
                                           strokeWidth: 2,
                                           color: Colors.white,
@@ -534,7 +534,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                           size: context.getResponsiveSize(4),
                                         ),
                                         SizedBox(
-                                          width: context.getScreenWidth(1.5),
+                                          width: context.getResponsiveSize(1.5),
                                         ),
                                         Text(
                                           'Restore',
@@ -552,13 +552,13 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           ),
                         ),
                       ),
-                      SizedBox(width: context.getScreenWidth(2)),
+                      SizedBox(width: context.getResponsiveSize(2)),
                       GestureDetector(
                         onTap: () => _showRestoreWithImageSheet(context, item),
                         child: Container(
                           padding: EdgeInsets.symmetric(
                             vertical: context.getScreenHeight(0.8),
-                            horizontal: context.getScreenWidth(3),
+                            horizontal: context.getResponsiveSize(3),
                           ),
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -670,9 +670,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setInner) => Container(
           padding: EdgeInsets.fromLTRB(
-            context.getScreenWidth(5),
+            context.getResponsiveSize(5),
             context.getScreenHeight(2),
-            context.getScreenWidth(5),
+            context.getResponsiveSize(5),
             context.getScreenHeight(4),
           ),
           decoration: BoxDecoration(
@@ -685,7 +685,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             children: [
               Center(
                 child: Container(
-                  width: context.getScreenWidth(10),
+                  width: context.getResponsiveSize(10),
                   height: 4,
                   decoration: BoxDecoration(
                     color: context.colorPalette.boxColor,
@@ -885,8 +885,8 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       },
               child: controller.deleteLoadingId == item.id
                   ? SizedBox(
-                      width: context.getScreenWidth(4),
-                      height: context.getScreenWidth(4),
+                      width: context.getResponsiveSize(4),
+                      height: context.getResponsiveSize(4),
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Colors.red,
@@ -913,7 +913,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       onTap: isLoading ? null : onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(2.5),
+          horizontal: context.getResponsiveSize(2.5),
           vertical: context.getScreenHeight(0.6),
         ),
         decoration: BoxDecoration(
@@ -923,15 +923,15 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         ),
         child: isLoading
             ? SizedBox(
-                width: context.getScreenWidth(4),
-                height: context.getScreenWidth(4),
+                width: context.getResponsiveSize(4),
+                height: context.getResponsiveSize(4),
                 child: CircularProgressIndicator(strokeWidth: 2, color: color),
               )
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(icon, color: color, size: context.getResponsiveSize(3.8)),
-                  SizedBox(width: context.getScreenWidth(1.2)),
+                  SizedBox(width: context.getResponsiveSize(1.2)),
                   Text(
                     label,
                     style: TextStyle(
@@ -948,7 +948,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
 
   Widget _loadingList(BuildContext context) {
     return ListView.separated(
-      padding: EdgeInsets.all(context.getScreenWidth(4)),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 3,
       separatorBuilder: (_, __) =>
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1098,9 +1098,9 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
       ),
       child: Container(
         padding: EdgeInsets.fromLTRB(
-          context.getScreenWidth(5),
+          context.getResponsiveSize(5),
           context.getScreenHeight(2),
-          context.getScreenWidth(5),
+          context.getResponsiveSize(5),
           context.getScreenHeight(4),
         ),
         decoration: BoxDecoration(
@@ -1115,7 +1115,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               // Handle
               Center(
                 child: Container(
-                  width: context.getScreenWidth(10),
+                  width: context.getResponsiveSize(10),
                   height: 4,
                   decoration: BoxDecoration(
                     color: context.colorPalette.boxColor,
@@ -1237,7 +1237,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     size: context.getResponsiveSize(3.5),
                     color: context.colorPalette.subTitleColor,
                   ),
-                  SizedBox(width: context.getScreenWidth(1.5)),
+                  SizedBox(width: context.getResponsiveSize(1.5)),
                   Expanded(
                     child: Text(
                       'Recommended: 2:1 ratio (e.g. 1920x960) for best results',
@@ -1283,7 +1283,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     ? Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
-                          horizontal: context.getScreenWidth(3),
+                          horizontal: context.getResponsiveSize(3),
                           vertical: context.getScreenHeight(1),
                         ),
                         margin: EdgeInsets.only(
@@ -1303,7 +1303,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                               color: Colors.red,
                               size: context.getResponsiveSize(4.5),
                             ),
-                            SizedBox(width: context.getScreenWidth(2)),
+                            SizedBox(width: context.getResponsiveSize(2)),
                             Expanded(
                               child: Text(
                                 _formError.value,
@@ -1436,7 +1436,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
           borderSide: BorderSide.none,
         ),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(1.4),
         ),
       ),

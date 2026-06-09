@@ -68,9 +68,9 @@ class _SharePageState extends State<SharePage> {
     ];
     return Container(
       padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(0.8),
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(0.6),
       ),
       child: Row(
@@ -80,7 +80,7 @@ class _SharePageState extends State<SharePage> {
           return Expanded(
             child: Padding(
               padding: EdgeInsets.only(
-                right: karatOptions.last != option ? context.getScreenWidth(2) : 0,
+                right: karatOptions.last != option ? context.getResponsiveSize(2) : 0,
               ),
               child: GestureDetector(
                 onTap: () => controller.selectKarat(karat),
@@ -89,14 +89,14 @@ class _SharePageState extends State<SharePage> {
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(2),
+                      horizontal: context.getResponsiveSize(2),
                       vertical: context.getScreenHeight(0.8),
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? context.colorPalette.gold
                           : context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(context.getScreenWidth(2.5)),
+                      borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
                       border: Border.all(
                         color: isSelected
                             ? context.colorPalette.gold
@@ -144,12 +144,12 @@ class _SharePageState extends State<SharePage> {
           onTap: () => controller.goBackToLevel2(),
           child: Container(
             margin: EdgeInsets.only(
-              left: context.getScreenWidth(4),
+              left: context.getResponsiveSize(4),
               top: context.getScreenHeight(1),
               bottom: context.getScreenHeight(0.6),
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: context.getScreenWidth(4),
+              horizontal: context.getResponsiveSize(4),
               vertical: context.getScreenHeight(1),
             ),
             decoration: BoxDecoration(
@@ -164,7 +164,7 @@ class _SharePageState extends State<SharePage> {
                   size: context.getResponsiveSize(4),
                   color: Colors.white,
                 ),
-                SizedBox(width: context.getScreenWidth(1.5)),
+                SizedBox(width: context.getResponsiveSize(1.5)),
                 Text(
                   'Back',
                   style: TextStyle(
@@ -230,10 +230,10 @@ class _SharePageState extends State<SharePage> {
 
               return Container(
                 margin: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(4),
+                  horizontal: context.getResponsiveSize(4),
                   vertical: context.getScreenHeight(0.4),
                 ),
-                padding: EdgeInsets.all(context.getScreenWidth(4)),
+                padding: EdgeInsets.all(context.getResponsiveSize(4)),
                 decoration: BoxDecoration(
                   color: context.colorPalette.cardBg,
                   borderRadius: BorderRadius.circular(14),
@@ -298,7 +298,7 @@ class _SharePageState extends State<SharePage> {
         // Level 2 name + Select all button
         Container(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(0.6),
           ),
           child: Row(
@@ -345,7 +345,7 @@ class _SharePageState extends State<SharePage> {
                           size: context.getResponsiveSize(3.5),
                           color: allSelected ? Colors.white : context.colorPalette.goldDark,
                         ),
-                        SizedBox(width: context.getScreenWidth(1)),
+                        SizedBox(width: context.getResponsiveSize(1)),
                         Text(
                           allSelected ? 'Deselect All' : 'Select All',
                           style: TextStyle(
@@ -375,10 +375,10 @@ class _SharePageState extends State<SharePage> {
                   onTap: () => controller.toggleLevel3Selection(cat),
                   child: Container(
                     margin: EdgeInsets.symmetric(
-                      horizontal: context.getScreenWidth(4),
+                      horizontal: context.getResponsiveSize(4),
                       vertical: context.getScreenHeight(0.3),
                     ),
-                    padding: EdgeInsets.all(context.getScreenWidth(3.5)),
+                    padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? context.colorPalette.gold.withValues(alpha: 0.08)
@@ -394,13 +394,13 @@ class _SharePageState extends State<SharePage> {
                       children: [
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: context.getScreenWidth(5.5),
-                          height: context.getScreenWidth(5.5),
+                          width: context.getResponsiveSize(5.5),
+                          height: context.getResponsiveSize(5.5),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? context.colorPalette.gold
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(context.getScreenWidth(1.2)),
+                            borderRadius: BorderRadius.circular(context.getResponsiveSize(1.2)),
                             border: Border.all(
                               color: isSelected
                                   ? context.colorPalette.gold
@@ -416,7 +416,7 @@ class _SharePageState extends State<SharePage> {
                                 )
                               : null,
                         ),
-                        SizedBox(width: context.getScreenWidth(3)),
+                        SizedBox(width: context.getResponsiveSize(3)),
                         Expanded(
                           child: Text(
                             cat.name,
@@ -441,7 +441,7 @@ class _SharePageState extends State<SharePage> {
                             ),
                           ),
                           child: Container(
-                            padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+                            padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
                             decoration: BoxDecoration(
                               color: context.colorPalette.gold.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -693,7 +693,7 @@ class _SharePageState extends State<SharePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
           color: effectiveBgColor,
           borderRadius: BorderRadius.circular(12),
@@ -702,14 +702,14 @@ class _SharePageState extends State<SharePage> {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+              padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
               decoration: BoxDecoration(
                 color: effectiveIconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: effectiveIconColor, size: context.getResponsiveSize(6)),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -795,7 +795,7 @@ class _SharePageState extends State<SharePage> {
         canPop: false,
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(context.getScreenWidth(6)),
+            padding: EdgeInsets.all(context.getResponsiveSize(6)),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),

@@ -76,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         leading: const SizedBox.shrink(),
         leadingWidth: 0,
         centerTitle: false, // 🔥 Forces title to the left
-        titleSpacing: context.getScreenWidth(4),
+        titleSpacing: context.getResponsiveSize(4),
         title: Text(
           isAdmin ? "Admin Panel" : "Profile",
           style: TextStyle(
@@ -87,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: context.getScreenWidth(2)),
+            padding: EdgeInsets.only(right: context.getResponsiveSize(2)),
             child: GestureDetector(
               onTap: () {
                 showDialog(
@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             size: 20,
                           ),
                         ),
-                        SizedBox(width: context.getScreenWidth(2)),
+                        SizedBox(width: context.getResponsiveSize(2)),
                         Text(
                           'Logout',
                           style: TextStyle(
@@ -168,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               },
               child: Container(
-                padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+                padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
@@ -214,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               return SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getScreenWidth(4),
+                  horizontal: context.getResponsiveSize(4),
                   vertical: context.getScreenHeight(1),
                 ),
 
@@ -227,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Container(
                       width: double.infinity,
 
-                      padding: EdgeInsets.all(context.getScreenWidth(5)),
+                      padding: EdgeInsets.all(context.getResponsiveSize(5)),
 
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(28),
@@ -270,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
 
-                              SizedBox(width: context.getScreenWidth(4)),
+                              SizedBox(width: context.getResponsiveSize(4)),
 
                               Expanded(
                                 child: Column(
@@ -317,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
 
-                              SizedBox(width: context.getScreenWidth(3)),
+                              SizedBox(width: context.getResponsiveSize(3)),
 
                               Expanded(
                                 child: _profileStat(
@@ -334,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.getScreenWidth(4),
+                              horizontal: context.getResponsiveSize(4),
                               vertical: context.getScreenHeight(1.2),
                             ),
 
@@ -352,7 +352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   size: context.getResponsiveSize(5),
                                 ),
 
-                                SizedBox(width: context.getScreenWidth(2)),
+                                SizedBox(width: context.getResponsiveSize(2)),
 
                                 Expanded(
                                   child: Text(
@@ -372,7 +372,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Container(
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
-                                horizontal: context.getScreenWidth(4),
+                                horizontal: context.getResponsiveSize(4),
                                 vertical: context.getScreenHeight(1.2),
                               ),
                               decoration: BoxDecoration(
@@ -386,7 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: const Color(0xFFD4AF37),
                                     size: context.getResponsiveSize(5),
                                   ),
-                                  SizedBox(width: context.getScreenWidth(2)),
+                                  SizedBox(width: context.getResponsiveSize(2)),
                                   Expanded(
                                     child: Text(
                                       "Retailer",
@@ -474,7 +474,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: AppColors.primaryGold,
 
                               padding: EdgeInsets.symmetric(
-                                horizontal: context.getScreenWidth(8),
+                                horizontal: context.getResponsiveSize(8),
                                 vertical: context.getScreenHeight(1.4),
                               ),
 
@@ -491,8 +491,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                             child: orderController.isFetchingOrders
                                 ? SizedBox(
-                                    width: context.getScreenWidth(4),
-                                    height: context.getScreenWidth(4),
+                                    width: context.getResponsiveSize(4),
+                                    height: context.getResponsiveSize(4),
                                     child: const CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,
@@ -582,7 +582,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(1.5),
         ),
         decoration: BoxDecoration(
@@ -614,7 +614,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 size: context.getResponsiveSize(5),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,7 +661,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: () => Get.to(() => const AncillaryPageScreen(), arguments: pageKey),
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: context.getScreenWidth(4),
+            horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1.5),
           ),
           decoration: BoxDecoration(
@@ -682,7 +682,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: AppColors.primaryGold,
                 size: context.getResponsiveSize(5.5),
               ),
-              SizedBox(width: context.getScreenWidth(3)),
+              SizedBox(width: context.getResponsiveSize(3)),
               Expanded(
                 child: Text(
                   label,
@@ -756,7 +756,7 @@ class _OrderCard extends StatelessWidget {
         Get.to(() => UserOrderDetailScreen(order: order));
       },
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(4)),
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -765,7 +765,7 @@ class _OrderCard extends StatelessWidget {
         child: Row(
           children: [
             _OrderImagesStack(order: order, controller: controller),
-            SizedBox(width: context.getScreenWidth(3)),
+            SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -792,7 +792,7 @@ class _OrderCard extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.symmetric(
-                horizontal: context.getScreenWidth(2.5),
+                horizontal: context.getResponsiveSize(2.5),
                 vertical: context.getScreenHeight(0.3),
               ),
               decoration: BoxDecoration(
@@ -808,7 +808,7 @@ class _OrderCard extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: context.getScreenWidth(2)),
+            SizedBox(width: context.getResponsiveSize(2)),
             Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textMuted,
@@ -881,7 +881,7 @@ class _OrderImagesStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = context.getScreenWidth(20);
+    final size = context.getResponsiveSize(20);
     final items = order.items;
     final images = items
         .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))

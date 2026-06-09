@@ -63,7 +63,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         ),
         actions: [
           Obx(() => Padding(
-                padding: EdgeInsets.only(right: context.getScreenWidth(4)),
+                padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
                 child: Center(
                   child: Text(
                     '${ctrl.total} total',
@@ -103,12 +103,12 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                 color: context.colorPalette.primaryColor,
                 child: GridView.builder(
                   controller: _scrollController,
-                  padding: EdgeInsets.all(context.getScreenWidth(3)),
+                  padding: EdgeInsets.all(context.getResponsiveSize(3)),
                   itemCount: list.length + 1,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: context.getScreenWidth(2.5),
-                    crossAxisSpacing: context.getScreenWidth(2.5),
+                    mainAxisSpacing: context.getResponsiveSize(2.5),
+                    crossAxisSpacing: context.getResponsiveSize(2.5),
                     childAspectRatio: 0.68,
                   ),
                   itemBuilder: (context, index) {
@@ -131,9 +131,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     return Container(
       color: context.colorPalette.backgroundColor,
       padding: EdgeInsets.fromLTRB(
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(1.2),
-        context.getScreenWidth(4),
+        context.getResponsiveSize(4),
         context.getScreenHeight(1),
       ),
       child: Column(
@@ -200,9 +200,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           Row(
             children: [
               Expanded(child: _buildKaratDropdown(context)),
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               Obx(() => _buildInactiveToggle(context)),
-              SizedBox(width: context.getScreenWidth(2)),
+              SizedBox(width: context.getResponsiveSize(2)),
               _buildClearBtn(context),
             ],
           ),
@@ -214,7 +214,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   Widget _buildKaratDropdown(BuildContext context) {
     return Obx(() => Container(
           height: context.getScreenHeight(5),
-          padding: EdgeInsets.symmetric(horizontal: context.getScreenWidth(3)),
+          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(3)),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFFCFC7BC)),
@@ -265,7 +265,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
       onTap: () => ctrl.setShowInactive(!active),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(2.5),
+          horizontal: context.getResponsiveSize(2.5),
           vertical: context.getScreenHeight(1.2),
         ),
         decoration: BoxDecoration(
@@ -296,7 +296,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         ctrl.clearFilters();
       },
       child: Container(
-        padding: EdgeInsets.all(context.getScreenWidth(2.5)),
+        padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: const Color(0xFFCFC7BC)),
@@ -361,7 +361,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                       flex: 2,
                       child: Padding(
                         padding:
-                            EdgeInsets.all(context.getScreenWidth(2.5)),
+                            EdgeInsets.all(context.getResponsiveSize(2.5)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -407,7 +407,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                     left: 8,
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(2),
+                        horizontal: context.getResponsiveSize(2),
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
@@ -430,7 +430,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   top: 6,
                   right: 6,
                   child: Container(
-                    padding: EdgeInsets.all(context.getScreenWidth(1.5)),
+                    padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.45),
                       borderRadius: BorderRadius.circular(8),
@@ -483,7 +483,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   Widget _karatBadge(BuildContext context, String karat) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: context.getScreenWidth(2),
+        horizontal: context.getResponsiveSize(2),
         vertical: 2,
       ),
       decoration: BoxDecoration(
@@ -540,9 +540,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
               child: ListView(
                 controller: scrollCtrl,
                 padding: EdgeInsets.fromLTRB(
-                  context.getScreenWidth(5),
+                  context.getResponsiveSize(5),
                   0,
-                  context.getScreenWidth(5),
+                  context.getResponsiveSize(5),
                   context.getScreenHeight(4),
                 ),
                 children: [
@@ -551,7 +551,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                     child: Container(
                       margin: EdgeInsets.symmetric(
                           vertical: context.getScreenHeight(1.5)),
-                      width: context.getScreenWidth(10),
+                      width: context.getResponsiveSize(10),
                       height: 4,
                       decoration: BoxDecoration(
                         color: context.colorPalette.boxColor,
@@ -592,7 +592,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                         onTap: () => setSheet(() => isActive = !isActive),
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: context.getScreenWidth(3),
+                            horizontal: context.getResponsiveSize(3),
                             vertical: context.getScreenHeight(0.8),
                           ),
                           decoration: BoxDecoration(
@@ -695,7 +695,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
                                                   horizontal:
-                                                      context.getScreenWidth(3),
+                                                      context.getResponsiveSize(3),
                                                   vertical: 4,
                                                 ),
                                                 decoration: BoxDecoration(
@@ -709,7 +709,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: context
-                                                        .getScreenWidth(3),
+                                                        .getResponsiveSize(3),
                                                   ),
                                                 ),
                                               ),
@@ -723,13 +723,13 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                                 Icon(Icons.edit,
                                                     color: Colors.white,
                                                     size:
-                                                        context.getScreenWidth(
+                                                        context.getResponsiveSize(
                                                             5)),
                                                 Text('Tap to change',
                                                     style: TextStyle(
                                                         color: Colors.white,
                                                         fontSize: context
-                                                            .getScreenWidth(3))),
+                                                            .getResponsiveSize(3))),
                                               ],
                                             ),
                                           ),
@@ -754,7 +754,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                                   : 'Tap to add image',
                                               style: TextStyle(
                                                 fontSize:
-                                                    context.getScreenWidth(3.2),
+                                                    context.getResponsiveSize(3.2),
                                                 color: context
                                                     .colorPalette.subTitleColor,
                                               ),
@@ -778,7 +778,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   SizedBox(height: context.getScreenHeight(0.8)),
                   Container(
                     padding: EdgeInsets.symmetric(
-                        horizontal: context.getScreenWidth(4)),
+                        horizontal: context.getResponsiveSize(4)),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       border:
@@ -848,12 +848,12 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                             child: _textField(
                                 context, entry.key, 'Key'),
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           Expanded(
                             child: _textField(
                                 context, entry.value, 'Value'),
                           ),
-                          SizedBox(width: context.getScreenWidth(2)),
+                          SizedBox(width: context.getResponsiveSize(2)),
                           GestureDetector(
                             onTap: () =>
                                 setSheet(() => rawEntries.removeAt(i)),
@@ -984,7 +984,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           color: context.colorPalette.subTitleColor,
         ),
         contentPadding: EdgeInsets.symmetric(
-          horizontal: context.getScreenWidth(4),
+          horizontal: context.getResponsiveSize(4),
           vertical: context.getScreenHeight(1.5),
         ),
         border: OutlineInputBorder(
@@ -1007,12 +1007,12 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   // ── Shimmer grid ──────────────────────────────────────────────────────────
   Widget _buildShimmerGrid(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.all(context.getScreenWidth(3)),
+      padding: EdgeInsets.all(context.getResponsiveSize(3)),
       itemCount: 10,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisSpacing: context.getScreenWidth(2.5),
-        crossAxisSpacing: context.getScreenWidth(2.5),
+        mainAxisSpacing: context.getResponsiveSize(2.5),
+        crossAxisSpacing: context.getResponsiveSize(2.5),
         childAspectRatio: 0.68,
       ),
       itemBuilder: (_, __) => Container(
@@ -1033,7 +1033,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     if (loading) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(context.getScreenWidth(4)),
+          padding: EdgeInsets.all(context.getResponsiveSize(4)),
           child: CircularProgressIndicator(
             strokeWidth: 2,
             color: context.colorPalette.primaryColor,
@@ -1045,7 +1045,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     if (noMore) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(context.getScreenWidth(4)),
+          padding: EdgeInsets.all(context.getResponsiveSize(4)),
           child: Text(
             'All products loaded',
             style: TextStyle(
