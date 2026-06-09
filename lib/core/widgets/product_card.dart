@@ -22,6 +22,7 @@ class ProductCard extends StatefulWidget {
     this.onAddToCart,
     this.onLongPress,
     this.isSelected = false,
+    this.showWishlistRemoveAlert = false,
   });
 
   final ProductModel product;
@@ -30,6 +31,7 @@ class ProductCard extends StatefulWidget {
   final VoidCallback? onAddToCart;
   final VoidCallback? onLongPress;
   final bool isSelected;
+  final bool showWishlistRemoveAlert;
 
   @override
   State<ProductCard> createState() => _ProductCardState();
@@ -243,30 +245,28 @@ class _ProductCardState extends State<ProductCard>
                             return GestureDetector(
                               onTap: () {
                                 if (isWishlisted) {
-                                  WishlistController.instance.removeFromWishlist(product.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('${product.name} removed from wishlist'),
-                                      duration: const Duration(seconds: 3),
-                                      behavior: SnackBarBehavior.floating,
-                                      action: SnackBarAction(
-                                        label: 'Undo',
-                                        textColor: AppColors.primaryGold,
-                                        onPressed: () {
-                                          WishlistController.instance.addToWishlist(product);
-                                        },
+                                  if (widget.showWishlistRemoveAlert) {
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    WishlistController.instance.removeFromWishlist(product.id);
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text('${product.name} removed from wishlist'),
+                                        duration: const Duration(seconds: 3),
+                                        behavior: SnackBarBehavior.floating,
+                                        action: SnackBarAction(
+                                          label: 'Undo',
+                                          textColor: AppColors.primaryGold,
+                                          onPressed: () {
+                                            WishlistController.instance.addToWishlist(product);
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  );
+                                    );
+                                  } else {
+                                    WishlistController.instance.removeFromWishlist(product.id);
+                                  }
                                 } else {
                                   WishlistController.instance.addToWishlist(product);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('${product.name} added to wishlist'),
-                                      duration: const Duration(seconds: 2),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
                                 }
                               },
                               child: Container(
