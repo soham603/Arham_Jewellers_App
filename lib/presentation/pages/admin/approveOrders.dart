@@ -67,7 +67,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
               children: [
                 Icon(
                   Icons.error_outline_rounded,
-                  size: context.getScreenWidth(18),
+                  size: context.getFontSize(18),
                   color: Colors.red.shade300,
                 ),
                 SizedBox(height: context.getScreenHeight(1.5)),
@@ -148,7 +148,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                         ),
                         child: Icon(
                           Icons.shopping_bag_outlined,
-                          size: context.getScreenWidth(12),
+                          size: context.getFontSize(12),
                           color: Colors.grey,
                         ),
                       ),
@@ -334,7 +334,7 @@ class _AdminOrderCard extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              size: context.getScreenWidth(3.5),
+              size: context.getFontSize(3.5),
               color: AppColors.textMuted,
             ),
           ],

@@ -76,7 +76,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     Icon(
                       Icons.add,
                       color: Colors.white,
-                      size: context.getScreenWidth(4.5),
+                      size: context.getFontSize(4.5),
                     ),
                     SizedBox(width: context.getScreenWidth(1.5)),
                     Text(
@@ -304,7 +304,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   child: Icon(
                     Icons.drag_handle_rounded,
                     color: Colors.white,
-                    size: context.getScreenWidth(4),
+                    size: context.getFontSize(4),
                   ),
                 ),
               ),
@@ -531,7 +531,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                                         Icon(
                                           Icons.restore_rounded,
                                           color: Colors.white,
-                                          size: context.getScreenWidth(4),
+                                          size: context.getFontSize(4),
                                         ),
                                         SizedBox(
                                           width: context.getScreenWidth(1.5),
@@ -569,7 +569,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           child: Icon(
                             Icons.add_photo_alternate_rounded,
                             color: context.colorPalette.primaryColor,
-                            size: context.getScreenWidth(5),
+                            size: context.getFontSize(5),
                           ),
                         ),
                       ),
@@ -743,7 +743,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           children: [
                             Icon(
                               Icons.add_photo_alternate_rounded,
-                              size: context.getScreenWidth(10),
+                              size: context.getFontSize(10),
                               color: context.colorPalette.subTitleColor,
                             ),
                             SizedBox(height: context.getScreenHeight(0.8)),
@@ -930,7 +930,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, color: color, size: context.getScreenWidth(3.8)),
+                  Icon(icon, color: color, size: context.getFontSize(3.8)),
                   SizedBox(width: context.getScreenWidth(1.2)),
                   Text(
                     label,
@@ -969,7 +969,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         children: [
           Icon(
             Icons.wifi_off_rounded,
-            size: context.getScreenWidth(14),
+            size: context.getFontSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1004,7 +1004,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         children: [
           Icon(
             Icons.image_not_supported_rounded,
-            size: context.getScreenWidth(14),
+            size: context.getFontSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1180,7 +1180,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                     Icon(
                                       Icons.edit_rounded,
                                       color: Colors.white,
-                                      size: context.getScreenWidth(8),
+                                      size: context.getFontSize(8),
                                     ),
                                     SizedBox(
                                       height: context.getScreenHeight(0.5),
@@ -1203,7 +1203,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                           children: [
                             Icon(
                               Icons.add_photo_alternate_rounded,
-                              size: context.getScreenWidth(12),
+                              size: context.getFontSize(12),
                               color: context.colorPalette.subTitleColor,
                             ),
                             SizedBox(height: context.getScreenHeight(0.8)),
@@ -1234,7 +1234,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
-                    size: context.getScreenWidth(3.5),
+                    size: context.getFontSize(3.5),
                     color: context.colorPalette.subTitleColor,
                   ),
                   SizedBox(width: context.getScreenWidth(1.5)),
@@ -1301,7 +1301,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             Icon(
                               Icons.error_outline,
                               color: Colors.red,
-                              size: context.getScreenWidth(4.5),
+                              size: context.getFontSize(4.5),
                             ),
                             SizedBox(width: context.getScreenWidth(2)),
                             Expanded(

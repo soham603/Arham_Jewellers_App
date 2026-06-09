@@ -88,7 +88,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             children: [
               Icon(
                 Icons.wifi_off_rounded,
-                size: context.getScreenWidth(10),
+                size: context.getFontSize(10),
                 color: Colors.red.shade300,
               ),
               SizedBox(height: context.getScreenHeight(1)),
@@ -149,7 +149,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               child: Icon(
                 Icons.monetization_on_rounded,
                 color: Colors.white,
-                size: context.getScreenWidth(5.5),
+                size: context.getFontSize(5.5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -254,7 +254,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             children: [
               Icon(
                 Icons.show_chart_rounded,
-                size: context.getScreenWidth(12),
+                size: context.getFontSize(12),
                 color: context.colorPalette.subTitleColor.withOpacity(0.4),
               ),
               SizedBox(height: context.getScreenHeight(1)),
@@ -572,7 +572,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       children: [
                         Icon(
                           Icons.date_range_rounded,
-                          size: context.getScreenWidth(3.5),
+                          size: context.getFontSize(3.5),
                           color: isCustom
                               ? Colors.white
                               : context.colorPalette.textColor,
@@ -594,7 +594,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                             onTap: controller.clearDateRange,
                             child: Icon(
                               Icons.close_rounded,
-                              size: context.getScreenWidth(3.2),
+                              size: context.getFontSize(3.2),
                               color: Colors.white70,
                             ),
                           ),
@@ -632,7 +632,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
-                    size: context.getScreenWidth(3.5),
+                    size: context.getFontSize(3.5),
                     color: AppColors.primaryGold,
                   ),
                   SizedBox(width: context.getScreenWidth(2)),
@@ -717,7 +717,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       children: [
                         Icon(
                           isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                          size: context.getScreenWidth(5),
+                          size: context.getFontSize(5),
                           color: trendColor,
                         ),
                         SizedBox(width: context.getScreenWidth(1.5)),
@@ -784,7 +784,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: context.getScreenWidth(3), color: color),
+            Icon(icon, size: context.getFontSize(3), color: color),
             SizedBox(width: context.getScreenWidth(1)),
             Text(
               label,
@@ -846,7 +846,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               children: [
                 Icon(
                   Icons.history_rounded,
-                  size: context.getScreenWidth(12),
+                  size: context.getFontSize(12),
                   color: context.colorPalette.subTitleColor.withOpacity(0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
@@ -972,7 +972,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     children: [
                       Icon(
                         isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                        size: context.getScreenWidth(2.5),
+                        size: context.getFontSize(2.5),
                         color: isUp ? Colors.green : Colors.red,
                       ),
                       const SizedBox(width: 2),

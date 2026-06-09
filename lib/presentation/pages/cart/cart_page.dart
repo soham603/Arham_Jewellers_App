@@ -116,7 +116,7 @@ class _CartPageState extends State<CartPage> {
                             child: Icon(
                               Icons.delete_outline_rounded,
                               color: Colors.white,
-                              size: context.getScreenWidth(6),
+                              size: context.getFontSize(6),
                             ),
                           ),
                           child: GestureDetector(
@@ -379,7 +379,7 @@ class _CartPageState extends State<CartPage> {
         ),
         child: Icon(
           icon,
-          size: context.getScreenWidth(3.2),
+          size: context.getFontSize(3.2),
           color: AppColors.textDark,
         ),
       ),
@@ -673,7 +673,7 @@ class _CartPageState extends State<CartPage> {
               ),
               child: Icon(
                 Icons.shopping_bag_outlined,
-                size: context.getScreenWidth(12),
+                size: context.getFontSize(12),
                 color: AppColors.primaryGold,
               ),
             ),

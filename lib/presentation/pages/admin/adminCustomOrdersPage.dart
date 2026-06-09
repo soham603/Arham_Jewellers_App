@@ -52,7 +52,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
         backgroundColor: AppColors.pageBg,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getScreenWidth(5)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getFontSize(5)),
         ),
         title: Text(
           'Custom Orders',
@@ -84,7 +84,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                 decoration: InputDecoration(
                   hintText: 'Search by party name or phone...',
                   hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
-                  prefixIcon: Icon(Icons.search_rounded, color: AppColors.textMuted, size: context.getScreenWidth(5)),
+                  prefixIcon: Icon(Icons.search_rounded, color: AppColors.textMuted, size: context.getFontSize(5)),
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
@@ -163,7 +163,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error_outline_rounded, size: context.getScreenWidth(12), color: AppColors.textMuted),
+                        Icon(Icons.error_outline_rounded, size: context.getFontSize(12), color: AppColors.textMuted),
                         SizedBox(height: context.getScreenHeight(2)),
                         Text('Failed to load orders', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
                         SizedBox(height: context.getScreenHeight(1)),
@@ -181,7 +181,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.inbox_outlined, size: context.getScreenWidth(14), color: AppColors.textMuted),
+                        Icon(Icons.inbox_outlined, size: context.getFontSize(14), color: AppColors.textMuted),
                         SizedBox(height: context.getScreenHeight(2)),
                         Text('No custom orders found', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
                       ],
@@ -271,7 +271,7 @@ class _AdminCustomOrderCard extends StatelessWidget {
                             bgColor: statusInfo.bgColor,
                           ),
                           SizedBox(width: context.getScreenWidth(2)),
-                          Icon(Icons.arrow_forward_ios_rounded, size: context.getScreenWidth(3), color: AppColors.textMuted),
+                          Icon(Icons.arrow_forward_ios_rounded, size: context.getFontSize(3), color: AppColors.textMuted),
                         ],
                       ),
                     ],

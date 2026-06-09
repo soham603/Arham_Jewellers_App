@@ -259,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
                 color: Colors.grey.shade500,
-                size: context.getScreenWidth(5),
+                size: context.getFontSize(5),
               ),
               onPressed: () {
                 setState(() {

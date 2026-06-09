@@ -64,7 +64,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getScreenWidth(5),
+            size: context.getFontSize(5),
           ),
           onPressed: () => Get.back(),
         ),
@@ -203,7 +203,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                   ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
               color: Colors.grey.shade500,
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
             onPressed: () {
               setState(() {

@@ -319,7 +319,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             errorWidget: (context, url, error) => Center(
                               child: Icon(
                                 Icons.image_not_supported_outlined,
-                                size: context.getScreenWidth(12),
+                                size: context.getFontSize(12),
                                 color: Colors.grey,
                               ),
                             ),
@@ -355,7 +355,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         ),
                         child: Icon(
                           Icons.arrow_back,
-                          size: context.getScreenWidth(5),
+                          size: context.getFontSize(5),
                           color: AppColors.textDark,
                         ),
                       ),
@@ -462,7 +462,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           child: Icon(
                             Icons.open_in_full,
-                            size: context.getScreenWidth(5),
+                            size: context.getFontSize(5),
                             color: AppColors.textDark,
                           ),
                         ),
@@ -606,7 +606,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             },
                             icon: Icon(
                               Icons.tune,
-                              size: context.getScreenWidth(4),
+                              size: context.getFontSize(4),
                               color: Colors.white,
                             ),
                             label: Text(
@@ -847,7 +847,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           Icon(
             icon,
             color: AppColors.primaryGold.withOpacity(0.8),
-            size: context.getScreenWidth(6),
+            size: context.getFontSize(6),
           ),
           SizedBox(width: context.getScreenWidth(2.5)),
           Expanded(
@@ -890,7 +890,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         Icon(
           icon,
           color: AppColors.primaryGold.withOpacity(0.7),
-          size: context.getScreenWidth(5),
+          size: context.getFontSize(5),
         ),
         SizedBox(width: context.getScreenWidth(1.5)),
         Text(

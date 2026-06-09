@@ -183,7 +183,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Icon(
                   Icons.logout_rounded,
                   color: Colors.redAccent,
-                  size: context.getScreenWidth(6),
+                  size: context.getFontSize(6),
                 ),
               ),
             ),
@@ -266,7 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Icon(
                                   Icons.person_rounded,
                                   color: Colors.white,
-                                  size: context.getScreenWidth(10),
+                                  size: context.getFontSize(10),
                                 ),
                               ),
 
@@ -349,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Icon(
                                   Icons.workspace_premium,
                                   color: Colors.amber,
-                                  size: context.getScreenWidth(5),
+                                  size: context.getFontSize(5),
                                 ),
 
                                 SizedBox(width: context.getScreenWidth(2)),
@@ -384,7 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Icon(
                                     Icons.store_rounded,
                                     color: const Color(0xFFD4AF37),
-                                    size: context.getScreenWidth(5),
+                                    size: context.getFontSize(5),
                                   ),
                                   SizedBox(width: context.getScreenWidth(2)),
                                   Expanded(
@@ -611,7 +611,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Icon(
                 Icons.auto_awesome_rounded,
                 color: AppColors.primaryGold,
-                size: context.getScreenWidth(5),
+                size: context.getFontSize(5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -641,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Icon(
               Icons.chevron_right_rounded,
               color: Colors.white.withOpacity(0.5),
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
           ],
         ),
@@ -680,7 +680,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 icon,
                 color: AppColors.primaryGold,
-                size: context.getScreenWidth(5.5),
+                size: context.getFontSize(5.5),
               ),
               SizedBox(width: context.getScreenWidth(3)),
               Expanded(
@@ -696,7 +696,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 Icons.chevron_right_rounded,
                 color: AppColors.textMuted,
-                size: context.getScreenWidth(5),
+                size: context.getFontSize(5),
               ),
             ],
           ),
@@ -812,7 +812,7 @@ class _OrderCard extends StatelessWidget {
             Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textMuted,
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
           ],
         ),

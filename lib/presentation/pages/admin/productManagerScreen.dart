@@ -165,7 +165,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                 ),
                 prefixIcon: Icon(
                   Icons.search,
-                  size: context.getScreenWidth(4.5),
+                  size: context.getFontSize(4.5),
                   color: const Color(0xFF8D847A),
                 ),
                 suffixIcon: _searchTextCtrl.text.isNotEmpty
@@ -177,7 +177,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                         },
                         child: Icon(
                           Icons.close,
-                          size: context.getScreenWidth(4),
+                          size: context.getFontSize(4),
                           color: const Color(0xFF8D847A),
                         ),
                       )
@@ -233,7 +233,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
               ),
               icon: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                size: context.getScreenWidth(4.5),
+                size: context.getFontSize(4.5),
                 color: const Color(0xFF8D847A),
               ),
               style: TextStyle(
@@ -281,7 +281,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         ),
         child: Icon(
           active ? Icons.visibility : Icons.visibility_off_outlined,
-          size: context.getScreenWidth(4.5),
+          size: context.getFontSize(4.5),
           color: active ? Colors.orange : const Color(0xFF8D847A),
         ),
       ),
@@ -304,7 +304,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         ),
         child: Icon(
           Icons.refresh_rounded,
-          size: context.getScreenWidth(4.5),
+          size: context.getFontSize(4.5),
           color: const Color(0xFF8D847A),
         ),
       ),
@@ -437,7 +437,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                     ),
                     child: Icon(
                       Icons.edit_outlined,
-                      size: context.getScreenWidth(4),
+                      size: context.getFontSize(4),
                       color: Colors.white,
                     ),
                   ),
@@ -473,7 +473,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
       child: Center(
         child: Icon(
           Icons.image_outlined,
-          size: context.getScreenWidth(8),
+          size: context.getFontSize(8),
           color: context.colorPalette.subTitleColor,
         ),
       ),
@@ -666,7 +666,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(Icons.close,
-                                            size: context.getScreenWidth(4),
+                                            size: context.getFontSize(4),
                                             color: Colors.white),
                                       ),
                                     ),
@@ -740,7 +740,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                           children: [
                                             Icon(
                                               Icons.add_photo_alternate_outlined,
-                                              size: context.getScreenWidth(8),
+                                              size: context.getFontSize(8),
                                               color: context
                                                   .colorPalette.subTitleColor,
                                             ),
@@ -829,7 +829,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                         }),
                         child: Icon(
                           Icons.add_circle_outline,
-                          size: context.getScreenWidth(5),
+                          size: context.getFontSize(5),
                           color: context.colorPalette.primaryColor,
                         ),
                       ),
@@ -860,7 +860,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                             child: Icon(
                               Icons.remove_circle_outline,
                               color: Colors.red,
-                              size: context.getScreenWidth(5),
+                              size: context.getFontSize(5),
                             ),
                           ),
                         ],
@@ -1066,7 +1066,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline,
-              size: context.getScreenWidth(12), color: Colors.red),
+              size: context.getFontSize(12), color: Colors.red),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('Failed to load products',
               style: TextStyle(
@@ -1094,7 +1094,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.inventory_2_outlined,
-              size: context.getScreenWidth(12),
+              size: context.getFontSize(12),
               color: context.colorPalette.subTitleColor),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('No products found',

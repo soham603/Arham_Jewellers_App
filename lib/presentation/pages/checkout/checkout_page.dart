@@ -47,7 +47,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getScreenWidth(5),
+            size: context.getFontSize(5),
           ),
         ),
 
@@ -152,7 +152,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           Icons
                                               .image_not_supported_outlined,
                                           color: Colors.grey.shade500,
-                                          size: context.getScreenWidth(6),
+                                          size: context.getFontSize(6),
                                         ),
                                       );
                                     },
@@ -161,7 +161,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     child: Icon(
                                       Icons.image_outlined,
                                       color: const Color(0xFF8C7E68),
-                                      size: context.getScreenWidth(6),
+                                      size: context.getFontSize(6),
                                     ),
                                   ),
                           ),
@@ -362,7 +362,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             child: Icon(
                               Icons.shopping_bag_outlined,
                               color: AppColors.primaryGold,
-                              size: context.getScreenWidth(8),
+                              size: context.getFontSize(8),
                             ),
                           ),
 

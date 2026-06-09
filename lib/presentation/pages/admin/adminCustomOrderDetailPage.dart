@@ -67,7 +67,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         backgroundColor: AppColors.pageBg,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getScreenWidth(5)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getFontSize(5)),
         ),
         title: Text(
           'Order #${order.id.substring(0, 8).toUpperCase()}',
@@ -512,7 +512,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 width: context.getScreenWidth(16),
                 height: context.getScreenWidth(16),
                 decoration: const BoxDecoration(color: Color(0xFFFEE2E2), shape: BoxShape.circle),
-                child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getScreenWidth(7)),
+                child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getFontSize(7)),
               ),
               SizedBox(height: context.getScreenHeight(2)),
               Text("Reject Order", style: TextStyle(fontSize: context.getFontSize(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),

@@ -129,7 +129,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               child: isSelected
                   ? Icon(
                       Icons.check,
-                      size: context.getScreenWidth(2.5),
+                      size: context.getFontSize(2.5),
                       color: Colors.white,
                     )
                   : null,

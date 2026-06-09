@@ -2057,7 +2057,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 color: context.colorPalette.goldDeep,
-                                size: context.getScreenWidth(3.5),
+                                size: context.getFontSize(3.5),
                               ),
                             ],
                           ),

@@ -37,7 +37,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getScreenWidth(5),
+            size: context.getFontSize(5),
           ),
         ),
         title: Text(
@@ -58,7 +58,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
               icon: Icon(
                 Icons.delete_outline_rounded,
                 color: AppColors.primaryGold,
-                size: context.getScreenWidth(6),
+                size: context.getFontSize(6),
               ),
             );
           }),
@@ -122,7 +122,7 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(
             Icons.notifications_none_rounded,
-            size: context.getScreenWidth(20),
+            size: context.getFontSize(20),
             color: AppColors.textMuted.withOpacity(0.5),
           ),
           SizedBox(height: context.getScreenHeight(2)),
@@ -216,7 +216,7 @@ class _NotificationCard extends StatelessWidget {
               ),
               child: Icon(
                 Icons.notifications_none_rounded,
-                size: context.getScreenWidth(5),
+                size: context.getFontSize(5),
                 color: notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
               ),
             ),

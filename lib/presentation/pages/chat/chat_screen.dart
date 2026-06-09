@@ -131,7 +131,7 @@ class _ChatScreenState extends State<ChatScreen> {
       title: Text('AI Assistant', style: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w700, fontSize: context.getFontSize(5))),
       actions: [
         IconButton(
-          icon: Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: context.getScreenWidth(6)),
+          icon: Icon(Icons.delete_outline_rounded, color: AppColors.textMuted, size: context.getFontSize(6)),
           onPressed: () => setState(() => _chatService.clearHistory()),
         ),
         SizedBox(width: context.getScreenWidth(2)),
@@ -151,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> {
               Container(
                 padding: EdgeInsets.all(context.getScreenWidth(5)),
                 decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
-                child: Icon(Icons.chat_bubble_outline_rounded, size: context.getScreenWidth(12), color: AppColors.primaryGold),
+                child: Icon(Icons.chat_bubble_outline_rounded, size: context.getFontSize(12), color: AppColors.primaryGold),
               ),
               SizedBox(height: context.getScreenHeight(3)),
               Text('Arham Jewellers', style: TextStyle(fontSize: context.getFontSize(6), fontWeight: FontWeight.w700, color: AppColors.textDark)),
@@ -179,7 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.auto_awesome_rounded, size: context.getScreenWidth(4), color: AppColors.primaryGold),
+              Icon(Icons.auto_awesome_rounded, size: context.getFontSize(4), color: AppColors.primaryGold),
               SizedBox(width: context.getScreenWidth(2)),
               Text(text, style: TextStyle(fontSize: context.getFontSize(3.8), color: AppColors.textDark, fontWeight: FontWeight.w500)),
             ],
@@ -246,7 +246,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: Icon(Icons.auto_awesome_rounded, size: context.getScreenWidth(3.5), color: AppColors.primaryGold),
+            child: Icon(Icons.auto_awesome_rounded, size: context.getFontSize(3.5), color: AppColors.primaryGold),
           ),
           SizedBox(width: context.getScreenWidth(2)),
           Flexible(
@@ -300,7 +300,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: Icon(Icons.person_rounded, size: context.getScreenWidth(3.5), color: AppColors.primaryGold),
+            child: Icon(Icons.person_rounded, size: context.getFontSize(3.5), color: AppColors.primaryGold),
           ),
         ],
       ),
@@ -316,7 +316,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: Icon(Icons.auto_awesome_rounded, size: context.getScreenWidth(3.5), color: AppColors.primaryGold),
+            child: Icon(Icons.auto_awesome_rounded, size: context.getFontSize(3.5), color: AppColors.primaryGold),
           ),
           SizedBox(width: context.getScreenWidth(2)),
           Flexible(
@@ -363,7 +363,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(color: AppColors.primaryGold.withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: Icon(Icons.auto_awesome_rounded, size: context.getScreenWidth(3.5), color: AppColors.primaryGold),
+            child: Icon(Icons.auto_awesome_rounded, size: context.getFontSize(3.5), color: AppColors.primaryGold),
           ),
           SizedBox(width: context.getScreenWidth(2)),
           Container(
@@ -421,7 +421,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Container(
                 padding: EdgeInsets.all(context.getScreenWidth(3)),
                 decoration: BoxDecoration(color: _isStreaming ? AppColors.textMuted : AppColors.primaryGold, borderRadius: BorderRadius.circular(14)),
-                child: Icon(Icons.send_rounded, color: Colors.white, size: context.getScreenWidth(5)),
+                child: Icon(Icons.send_rounded, color: Colors.white, size: context.getFontSize(5)),
               ),
             ),
           ],

@@ -304,14 +304,14 @@ class _DrillDownList extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.arrow_back_ios_rounded, size: context.getScreenWidth(3.5), color: context.colorPalette.primaryColor),
+                    Icon(Icons.arrow_back_ios_rounded, size: context.getFontSize(3.5), color: context.colorPalette.primaryColor),
                     SizedBox(width: context.getScreenWidth(1)),
                     Text('Back', style: TextStyle(fontSize: context.getFontSize(3.3), color: context.colorPalette.primaryColor, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
               SizedBox(width: context.getScreenWidth(3)),
-              Icon(Icons.chevron_right_rounded, size: context.getScreenWidth(4), color: context.colorPalette.subTitleColor),
+              Icon(Icons.chevron_right_rounded, size: context.getFontSize(4), color: context.colorPalette.subTitleColor),
               SizedBox(width: context.getScreenWidth(1.5)),
               Expanded(
                 child: Text(
@@ -328,7 +328,7 @@ class _DrillDownList extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.add, color: Colors.white, size: context.getScreenWidth(3.5)),
+                        Icon(Icons.add, color: Colors.white, size: context.getFontSize(3.5)),
                         SizedBox(width: context.getScreenWidth(1)),
                         Text('New', style: TextStyle(color: Colors.white, fontSize: context.getFontSize(3), fontWeight: FontWeight.w600)),
                       ],
@@ -422,7 +422,7 @@ class _GroupedL1Tile extends StatelessWidget {
               child: Text('$count', style: TextStyle(fontSize: context.getFontSize(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
             ),
             SizedBox(width: context.getScreenWidth(2)),
-            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getFontSize(5)),
           ],
         ),
       ),
@@ -488,11 +488,11 @@ class _L1GroupSheet extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.edit_rounded, size: context.getScreenWidth(4.5), color: context.colorPalette.primaryColor),
+                        icon: Icon(Icons.edit_rounded, size: context.getFontSize(4.5), color: context.colorPalette.primaryColor),
                         onPressed: () { Navigator.pop(context); _showEditSheet(context, ctrl, p); },
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete_rounded, size: context.getScreenWidth(4.5), color: Colors.red),
+                        icon: Icon(Icons.delete_rounded, size: context.getFontSize(4.5), color: Colors.red),
                         onPressed: () { Navigator.pop(context); _confirmDelete(context, ctrl, p); },
                       ),
                     ],
@@ -542,7 +542,7 @@ class _ParentTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getScreenWidth(5)),
+            Icon(Icons.chevron_right_rounded, color: context.colorPalette.subTitleColor, size: context.getFontSize(5)),
           ],
         ),
       ),
@@ -700,7 +700,7 @@ class _Thumb extends StatelessWidget {
   Widget _noImg(BuildContext context) {
     return Container(
       color: context.colorPalette.backgroundColor,
-      child: Icon(Icons.category_outlined, size: context.getScreenWidth(5), color: context.colorPalette.subTitleColor),
+      child: Icon(Icons.category_outlined, size: context.getFontSize(5), color: context.colorPalette.subTitleColor),
     );
   }
 }
@@ -733,7 +733,7 @@ class _CircleBtn extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(context.getScreenWidth(1.5)),
         decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-        child: Icon(icon, size: context.getScreenWidth(3.5), color: color),
+        child: Icon(icon, size: context.getFontSize(3.5), color: color),
       ),
     );
   }
@@ -993,7 +993,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
           CachedNetworkImage(imageUrl: widget.existing!.imageUrl, fit: BoxFit.cover),
           Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getScreenWidth(6)),
+            Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getFontSize(6)),
             SizedBox(height: context.getScreenHeight(0.3)),
             Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: context.getFontSize(3))),
           ])),
@@ -1001,7 +1001,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
       );
     }
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(Icons.add_photo_alternate_outlined, size: context.getScreenWidth(8), color: context.colorPalette.subTitleColor),
+      Icon(Icons.add_photo_alternate_outlined, size: context.getFontSize(8), color: context.colorPalette.subTitleColor),
       SizedBox(height: context.getScreenHeight(0.5)),
       Text('Tap to pick image', style: TextStyle(fontSize: context.getFontSize(3.3), color: context.colorPalette.subTitleColor)),
     ]);

@@ -309,7 +309,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         children: [
           Icon(
             Icons.wifi_off_rounded,
-            size: context.getScreenWidth(14),
+            size: context.getFontSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -353,7 +353,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
         children: [
           Icon(
             Icons.inbox_rounded,
-            size: context.getScreenWidth(16),
+            size: context.getFontSize(16),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -518,7 +518,7 @@ class _RequestCardState extends State<_RequestCard> {
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
                         color: context.colorPalette.subTitleColor,
-                        size: context.getScreenWidth(5),
+                        size: context.getFontSize(5),
                       ),
                     ],
                   ),
@@ -593,7 +593,7 @@ class _RequestCardState extends State<_RequestCard> {
                             child: Icon(
                               Icons.arrow_forward_rounded,
                               color: context.colorPalette.gold,
-                              size: context.getScreenWidth(5),
+                              size: context.getFontSize(5),
                             ),
                           ),
                           // New device
@@ -675,7 +675,7 @@ class _RequestCardState extends State<_RequestCard> {
                           Icon(
                             Icons.info_outline_rounded,
                             color: Colors.red,
-                            size: context.getScreenWidth(4),
+                            size: context.getFontSize(4),
                           ),
                           SizedBox(width: context.getScreenWidth(2)),
                           Expanded(
@@ -1042,7 +1042,7 @@ class _RequestCardState extends State<_RequestCard> {
                   Icon(
                     icon,
                     color: outlined ? color : Colors.white,
-                    size: context.getScreenWidth(4),
+                    size: context.getFontSize(4),
                   ),
                   SizedBox(width: context.getScreenWidth(1.5)),
                   Text(

@@ -677,7 +677,7 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           Icon(
                             Icons.close,
-                            size: context.getScreenWidth(3),
+                            size: context.getFontSize(3),
                             color: context.colorPalette.goldDark,
                           ),
                           SizedBox(width: context.getScreenWidth(0.8)),
@@ -1186,7 +1186,7 @@ class _SearchPageState extends State<SearchPage> {
                 onTap: () => controller.removeRecentSearch(term),
                 child: Icon(
                   Icons.close_rounded,
-                  size: context.getScreenWidth(3.2),
+                  size: context.getFontSize(3.2),
                   color: const Color(0xFF8D847A),
                 ),
               ),
@@ -1499,7 +1499,7 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Icon(
             Icons.search_off_rounded,
-            size: context.getScreenWidth(12),
+            size: context.getFontSize(12),
             color: const Color(0xFF8D847A),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),

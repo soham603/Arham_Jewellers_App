@@ -97,7 +97,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             children: [
               Icon(
                 Icons.wifi_off_rounded,
-                size: context.getScreenWidth(10),
+                size: context.getFontSize(10),
                 color: Colors.red.shade300,
               ),
               SizedBox(height: context.getScreenHeight(1)),
@@ -158,7 +158,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               child: Icon(
                 Icons.monetization_on_rounded,
                 color: Colors.white,
-                size: context.getScreenWidth(5),
+                size: context.getFontSize(5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -475,7 +475,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
               children: [
                 Icon(
                   Icons.history_rounded,
-                  size: context.getScreenWidth(12),
+                  size: context.getFontSize(12),
                   color: context.colorPalette.subTitleColor.withOpacity(0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
@@ -601,7 +601,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                     children: [
                       Icon(
                         isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                        size: context.getScreenWidth(2.5),
+                        size: context.getFontSize(2.5),
                         color: isUp ? Colors.green : Colors.red,
                       ),
                       SizedBox(width: 2),
