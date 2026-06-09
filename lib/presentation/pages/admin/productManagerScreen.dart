@@ -56,7 +56,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
         title: Text(
           'Product Manager',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5),
+            fontSize: context.getFontSize(5),
             fontWeight: FontWeight.w700,
             color: context.colorPalette.textColor,
           ),
@@ -68,7 +68,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   child: Text(
                     '${ctrl.total} total',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.2),
+                      fontSize: context.getFontSize(3.2),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -149,7 +149,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
             child: TextField(
               controller: _searchTextCtrl,
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
                 color: context.colorPalette.textColor,
               ),
               decoration: InputDecoration(
@@ -160,7 +160,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                 ),
                 hintText: 'Search by name, tag...',
                 hintStyle: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: const Color(0xFFA29A90),
                 ),
                 prefixIcon: Icon(
@@ -227,7 +227,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
               hint: Text(
                 'All Karats',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.3),
+                  fontSize: context.getFontSize(3.3),
                   color: const Color(0xFFA29A90),
                 ),
               ),
@@ -237,20 +237,20 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                 color: const Color(0xFF8D847A),
               ),
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.5),
+                fontSize: context.getFontSize(3.5),
                 color: context.colorPalette.textColor,
               ),
               items: [
                 DropdownMenuItem<String?>(
                   value: null,
                   child: Text('All Karats',
-                      style: TextStyle(fontSize: context.getScreenWidth(3.3))),
+                      style: TextStyle(fontSize: context.getFontSize(3.3))),
                 ),
                 ...['18K', '20K', '22K'].map((k) => DropdownMenuItem<String?>(
                       value: k,
                       child: Text(k,
                           style: TextStyle(
-                              fontSize: context.getScreenWidth(3.3))),
+                              fontSize: context.getFontSize(3.3))),
                     )),
               ],
               onChanged: ctrl.setKaratFilter,
@@ -370,7 +370,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(3.2),
+                                fontSize: context.getFontSize(3.2),
                                 fontWeight: FontWeight.w600,
                                 color: context.colorPalette.textColor,
                               ),
@@ -386,7 +386,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                   Text(
                                     '#${product.tagNo}',
                                     style: TextStyle(
-                                      fontSize: context.getScreenWidth(2.8),
+                                      fontSize: context.getFontSize(2.8),
                                       color:
                                           context.colorPalette.subTitleColor,
                                     ),
@@ -417,7 +417,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                       child: Text(
                         'INACTIVE',
                         style: TextStyle(
-                          fontSize: context.getScreenWidth(2.2),
+                          fontSize: context.getFontSize(2.2),
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
@@ -494,7 +494,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
       child: Text(
         karat,
         style: TextStyle(
-          fontSize: context.getScreenWidth(2.5),
+          fontSize: context.getFontSize(2.5),
           color: const Color(0xFF8B6914),
           fontWeight: FontWeight.w700,
         ),
@@ -570,7 +570,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                             Text(
                               'Edit Product',
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(5),
+                                fontSize: context.getFontSize(5),
                                 fontWeight: FontWeight.w700,
                                 color: context.colorPalette.textColor,
                               ),
@@ -580,7 +580,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                   ? '#${product.tagNo}'
                                   : product.id.substring(0, 8),
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(3.2),
+                                fontSize: context.getFontSize(3.2),
                                 color: context.colorPalette.subTitleColor,
                               ),
                             ),
@@ -609,7 +609,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                           child: Text(
                             isActive ? 'Active' : 'Inactive',
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(3.2),
+                              fontSize: context.getFontSize(3.2),
                               fontWeight: FontWeight.w600,
                               color: isActive ? Colors.green : Colors.orange,
                             ),
@@ -790,14 +790,14 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                         isExpanded: true,
                         hint: Text('Select karat',
                             style: TextStyle(
-                                fontSize: context.getScreenWidth(3.8),
+                                fontSize: context.getFontSize(3.8),
                                 color: context.colorPalette.subTitleColor)),
                         items: [
                           DropdownMenuItem<String?>(
                             value: null,
                             child: Text('None',
                                 style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.8),
+                                    fontSize: context.getFontSize(3.8),
                                     color: context.colorPalette.textColor)),
                           ),
                           ...['18K', '20K', '22K'].map((k) =>
@@ -805,7 +805,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                 value: k,
                                 child: Text(k,
                                     style: TextStyle(
-                                        fontSize: context.getScreenWidth(3.8),
+                                        fontSize: context.getFontSize(3.8),
                                         color: context.colorPalette.textColor)),
                               )),
                         ],
@@ -936,7 +936,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                             : Text(
                                 'Save Changes',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(4.2),
+                                  fontSize: context.getFontSize(4.2),
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
@@ -958,7 +958,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     return Text(
       label,
       style: TextStyle(
-        fontSize: context.getScreenWidth(3.8),
+        fontSize: context.getFontSize(3.8),
         fontWeight: FontWeight.w600,
         color: context.colorPalette.textColor,
       ),
@@ -973,14 +973,14 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     return TextField(
       controller: ctrl,
       style: TextStyle(
-        fontSize: context.getScreenWidth(3.8),
+        fontSize: context.getFontSize(3.8),
         color: context.colorPalette.textColor,
       ),
       decoration: InputDecoration(
         isDense: true,
         hintText: hint,
         hintStyle: TextStyle(
-          fontSize: context.getScreenWidth(3.5),
+          fontSize: context.getFontSize(3.5),
           color: context.colorPalette.subTitleColor,
         ),
         contentPadding: EdgeInsets.symmetric(
@@ -1049,7 +1049,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           child: Text(
             'All products loaded',
             style: TextStyle(
-              fontSize: context.getScreenWidth(3.2),
+              fontSize: context.getFontSize(3.2),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -1070,7 +1070,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('Failed to load products',
               style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                   color: context.colorPalette.textColor)),
           SizedBox(height: context.getScreenHeight(2)),
           ElevatedButton(
@@ -1099,7 +1099,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('No products found',
               style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                   color: context.colorPalette.subTitleColor)),
         ],
       ),

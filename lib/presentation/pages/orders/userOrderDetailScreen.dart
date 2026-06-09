@@ -52,7 +52,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
-            fontSize: context.getScreenWidth(5),
+            fontSize: context.getFontSize(5),
           ),
         ),
       ),
@@ -103,7 +103,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                       : 'Order #${order.id.substring(0, 8).toUpperCase()}',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: context.getScreenWidth(5),
+                    fontSize: context.getFontSize(5),
                   ),
                 ),
               ),
@@ -121,7 +121,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                   style: TextStyle(
                     color: statusInfo.color,
                     fontWeight: FontWeight.w700,
-                    fontSize: context.getScreenWidth(3),
+                    fontSize: context.getFontSize(3),
                   ),
                 ),
               ),
@@ -162,7 +162,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             "Order Items",
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: context.getScreenWidth(4.4),
+              fontSize: context.getFontSize(4.4),
             ),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -217,7 +217,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                   item.product.name,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: context.getScreenWidth(3.8),
+                                    fontSize: context.getFontSize(3.8),
                                   ),
                                 ),
                               ),
@@ -236,7 +236,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                     style: TextStyle(
                                       color: Colors.red,
                                       fontWeight: FontWeight.w700,
-                                      fontSize: context.getScreenWidth(2.2),
+                                      fontSize: context.getFontSize(2.2),
                                     ),
                                   ),
                                 ),
@@ -284,7 +284,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         label,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: context.getScreenWidth(2.8),
+          fontSize: context.getFontSize(2.8),
           color: AppColors.textDark,
         ),
       ),
@@ -323,7 +323,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               "Total Amount",
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: context.getScreenWidth(4),
+                fontSize: context.getFontSize(4),
                 color: AppColors.textMuted,
               ),
             ),
@@ -332,7 +332,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             "₹${_formatAmount(total)}",
             style: TextStyle(
               fontWeight: FontWeight.w800,
-              fontSize: context.getScreenWidth(5),
+              fontSize: context.getFontSize(5),
               color: AppColors.primaryGold,
             ),
           ),
@@ -367,7 +367,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 isRejected ? "Rejection Reason" : "Message",
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  fontSize: context.getScreenWidth(4.4),
+                  fontSize: context.getFontSize(4.4),
                 ),
               ),
             ],
@@ -390,7 +390,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             child: Text(
               order.adminMessage!,
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.4),
+                fontSize: context.getFontSize(3.4),
                 color: AppColors.textDark,
                 height: 1.5,
               ),
@@ -418,7 +418,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               child: Text(
                 'Enquire',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                   color: AppColors.primaryGold,
                   fontWeight: FontWeight.w600,
                 ),
@@ -453,7 +453,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               label: Text(
                 'WhatsApp',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4),
+                  fontSize: context.getFontSize(4),
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                 ),
@@ -532,7 +532,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 Text(
                   message,
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.5),
+                    fontSize: context.getFontSize(3.5),
                     fontWeight: FontWeight.w500,
                     color: AppColors.textDark,
                   ),
@@ -570,7 +570,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             Text(
               'PDF Ready',
               style: TextStyle(
-                fontSize: context.getScreenWidth(4.5),
+                fontSize: context.getFontSize(4.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -580,7 +580,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         content: Text(
           'Order $displayId PDF has been saved to your Downloads folder. Share it with us on WhatsApp for any queries.',
           style: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
+            fontSize: context.getFontSize(3.8),
             color: AppColors.textMuted,
             height: 1.4,
           ),
@@ -657,7 +657,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           "$label: ",
           style: TextStyle(
             color: AppColors.textMuted,
-            fontSize: context.getScreenWidth(3.2),
+            fontSize: context.getFontSize(3.2),
           ),
         ),
         Expanded(
@@ -665,7 +665,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             value,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: context.getScreenWidth(3.2),
+              fontSize: context.getFontSize(3.2),
             ),
           ),
         ),

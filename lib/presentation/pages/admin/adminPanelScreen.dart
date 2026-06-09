@@ -83,7 +83,7 @@ class AdminPanelScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                              fontSize: context.getScreenWidth(5.3),
+                              fontSize: context.getFontSize(5.3),
                             ),
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
@@ -101,7 +101,7 @@ class AdminPanelScreen extends StatelessWidget {
                               style: TextStyle(
                                 color: Colors.amber,
                                 fontWeight: FontWeight.w600,
-                                fontSize: context.getScreenWidth(3.2),
+                                fontSize: context.getFontSize(3.2),
                               ),
                             ),
                           ),
@@ -134,7 +134,7 @@ class AdminPanelScreen extends StatelessWidget {
                           "Full access to manage app operations",
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: context.getScreenWidth(3.5),
+                            fontSize: context.getFontSize(3.5),
                           ),
                         ),
                       ),
@@ -153,7 +153,7 @@ class AdminPanelScreen extends StatelessWidget {
           Text(
             "Management",
             style: TextStyle(
-              fontSize: context.getScreenWidth(6),
+              fontSize: context.getFontSize(6),
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
             ),
@@ -290,7 +290,7 @@ class AdminPanelScreen extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
               ),
             ),
             SizedBox(height: context.getScreenHeight(0.4)),
@@ -301,7 +301,7 @@ class AdminPanelScreen extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.textMuted,
-                fontSize: context.getScreenWidth(3),
+                fontSize: context.getFontSize(3),
               ),
             ),
           ],

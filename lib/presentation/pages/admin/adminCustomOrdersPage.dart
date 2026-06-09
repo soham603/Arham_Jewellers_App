@@ -57,7 +57,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
         title: Text(
           'Custom Orders',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -80,10 +80,10 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
               child: TextField(
                 controller: _controller.searchController,
                 onChanged: _controller.onSearchChanged,
-                style: TextStyle(fontSize: context.getScreenWidth(3.5), color: AppColors.textDark),
+                style: TextStyle(fontSize: context.getFontSize(3.5), color: AppColors.textDark),
                 decoration: InputDecoration(
                   hintText: 'Search by party name or phone...',
-                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getScreenWidth(3.3)),
+                  hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getFontSize(3.3)),
                   prefixIcon: Icon(Icons.search_rounded, color: AppColors.textMuted, size: context.getScreenWidth(5)),
                   filled: true,
                   fillColor: Colors.white,
@@ -134,7 +134,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                         child: Text(
                           status[0] + status.substring(1).toLowerCase(),
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.3),
+                            fontSize: context.getFontSize(3.3),
                             fontWeight: FontWeight.w600,
                             color: isSelected ? Colors.white : AppColors.textMuted,
                           ),
@@ -165,11 +165,11 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                       children: [
                         Icon(Icons.error_outline_rounded, size: context.getScreenWidth(12), color: AppColors.textMuted),
                         SizedBox(height: context.getScreenHeight(2)),
-                        Text('Failed to load orders', style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                        Text('Failed to load orders', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
                         SizedBox(height: context.getScreenHeight(1)),
                         TextButton(
                           onPressed: () => _controller.fetchOrders(),
-                          child: Text('Tap to retry', style: TextStyle(fontSize: context.getScreenWidth(4), color: AppColors.primaryGold, fontWeight: FontWeight.w600)),
+                          child: Text('Tap to retry', style: TextStyle(fontSize: context.getFontSize(4), color: AppColors.primaryGold, fontWeight: FontWeight.w600)),
                         ),
                       ],
                     ),
@@ -183,7 +183,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                       children: [
                         Icon(Icons.inbox_outlined, size: context.getScreenWidth(14), color: AppColors.textMuted),
                         SizedBox(height: context.getScreenHeight(2)),
-                        Text('No custom orders found', style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
+                        Text('No custom orders found', style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w600, color: AppColors.textDark)),
                       ],
                     ),
                   );
@@ -254,12 +254,12 @@ class _AdminCustomOrderCard extends StatelessWidget {
                         children: [
                           Text(
                             'Order #${order.id.substring(0, 8).toUpperCase()}',
-                            style: TextStyle(fontSize: context.getScreenWidth(4.5), fontWeight: FontWeight.w700, color: AppColors.textDark),
+                            style: TextStyle(fontSize: context.getFontSize(4.5), fontWeight: FontWeight.w700, color: AppColors.textDark),
                           ),
                           SizedBox(height: context.getScreenHeight(0.4)),
                           Text(
                             _formatDate(order.createdAt),
-                            style: TextStyle(fontSize: context.getScreenWidth(3.2), color: AppColors.textMuted),
+                            style: TextStyle(fontSize: context.getFontSize(3.2), color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -286,14 +286,14 @@ class _AdminCustomOrderCard extends StatelessWidget {
                         item.product.name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: context.getScreenWidth(3.8), fontWeight: FontWeight.w600, color: AppColors.textDark),
+                        style: TextStyle(fontSize: context.getFontSize(3.8), fontWeight: FontWeight.w600, color: AppColors.textDark),
                       ),
                     ),
                   ),
                   if (order.orderItems.length > 2)
                     Text(
                       '+${order.orderItems.length - 2} more',
-                      style: TextStyle(fontSize: context.getScreenWidth(3.2), color: AppColors.primaryGold, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: context.getFontSize(3.2), color: AppColors.primaryGold, fontWeight: FontWeight.w500),
                     ),
                 ],
               ),

@@ -173,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Text(
                             'Register',
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(6),
+                              fontSize: context.getFontSize(6),
                               fontWeight: FontWeight.w700,
                               color: AppColors.textDark,
                             ),
@@ -182,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Text(
                             'Create an account to continue',
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(3.5),
+                              fontSize: context.getFontSize(3.5),
                               color: AppColors.textMuted,
                             ),
                           ),
@@ -252,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               textStyle: TextStyle(
                                 color: AppColors.textDark,
                                 fontWeight: FontWeight.w600,
-                                fontSize: context.getScreenWidth(3.5),
+                                fontSize: context.getFontSize(3.5).clamp(14.0, 28.0),
                               ),
                             ),
                             validator: (value) =>
@@ -580,7 +580,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     : Text(
                                         'Register',
                                         style: TextStyle(
-                                          fontSize: context.getScreenWidth(4),
+                                          fontSize: context.getFontSize(4),
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,
                                           letterSpacing: 0.5,
@@ -599,7 +599,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               Text(
                                 'Already have an account? ',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.5),
+                                  fontSize: context.getFontSize(3.5),
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -608,7 +608,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 child: Text(
                                   'Sign In',
                                   style: TextStyle(
-                                    fontSize: context.getScreenWidth(3.5),
+                                    fontSize: context.getFontSize(3.5),
                                     color: AppColors.primaryGold,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -623,7 +623,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Text(
                               'By continuing you agree to our Terms & Privacy Policy',
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(3),
+                                fontSize: context.getFontSize(3),
                                 color: const Color(0xFFA8A099),
                               ),
                               textAlign: TextAlign.center,

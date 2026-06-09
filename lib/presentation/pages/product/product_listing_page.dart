@@ -1000,7 +1000,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               Text(
                 'Share ${selectedProducts.length} product${selectedProducts.length == 1 ? '' : 's'}',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(4.5),
+                  fontSize: context.getFontSize(4.5),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.textColor,
                 ),
@@ -1034,7 +1034,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                 ),
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: context.colorPalette.textColor,
                 ),
               ),
@@ -1109,7 +1109,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.8),
+                      fontSize: context.getFontSize(3.8),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.textColor,
                     ),
@@ -1118,7 +1118,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(2.8),
+                      fontSize: context.getFontSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),
@@ -1207,7 +1207,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 Text(
                   message,
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(3.5),
+                    fontSize: context.getFontSize(3.5),
                     fontWeight: FontWeight.w500,
                     color: context.colorPalette.textColor,
                   ),

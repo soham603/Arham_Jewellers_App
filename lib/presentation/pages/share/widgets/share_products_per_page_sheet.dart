@@ -44,7 +44,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
           Text(
             'Products per Page',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getFontSize(4.5),
               fontWeight: FontWeight.w700,
               color: context.colorPalette.textColor,
             ),
@@ -53,7 +53,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
           Text(
             'Select how many products to show on each page',
             style: TextStyle(
-              fontSize: context.getScreenWidth(3),
+              fontSize: context.getFontSize(3),
               color: context.colorPalette.subTitleColor,
             ),
           ),
@@ -77,7 +77,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               child: Text(
                 'Generate PDF',
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.8),
+                  fontSize: context.getFontSize(3.8),
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -142,7 +142,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(3.5),
+                      fontSize: context.getFontSize(3.5),
                       fontWeight: FontWeight.w600,
                       color: isSelected
                           ? context.colorPalette.goldDeep
@@ -153,7 +153,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(2.8),
+                      fontSize: context.getFontSize(2.8),
                       color: context.colorPalette.subTitleColor,
                     ),
                   ),

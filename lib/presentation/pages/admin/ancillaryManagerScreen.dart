@@ -32,7 +32,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
         title: Text(
           'Ancillary Pages',
           style: TextStyle(
-            fontSize: context.getScreenWidth(5.5),
+            fontSize: context.getFontSize(5.5),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -81,7 +81,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
           Text(
             'Loading pages...',
             style: TextStyle(
-              fontSize: context.getScreenWidth(3.8),
+              fontSize: context.getFontSize(3.8),
               color: AppColors.textMuted,
             ),
           ),
@@ -107,7 +107,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
               controller.error.isNotEmpty ? controller.error : 'Failed to load pages',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
                 color: Colors.red.shade400,
               ),
             ),
@@ -194,7 +194,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                           label,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: context.getScreenWidth(4.2),
+                            fontSize: context.getFontSize(4.2),
                             color: AppColors.textDark,
                           ),
                         ),
@@ -208,7 +208,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3),
+                            fontSize: context.getFontSize(3),
                             color: AppColors.textMuted,
                           ),
                         ),
@@ -338,7 +338,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                   child: Text(
                     'Edit ${widget.label}',
                     style: TextStyle(
-                      fontSize: context.getScreenWidth(5),
+                      fontSize: context.getFontSize(5),
                       fontWeight: FontWeight.w700,
                       color: AppColors.textDark,
                     ),
@@ -358,7 +358,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
             TextField(
               controller: _titleController,
               style: TextStyle(
-                fontSize: context.getScreenWidth(4),
+                fontSize: context.getFontSize(4),
                 fontWeight: FontWeight.w600,
                 color: AppColors.textDark,
               ),
@@ -366,7 +366,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                 labelText: 'Title',
                 labelStyle: TextStyle(
                   color: AppColors.textMuted,
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -391,7 +391,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                 expands: true,
                 textAlignVertical: TextAlignVertical.top,
                 style: TextStyle(
-                  fontSize: context.getScreenWidth(3.5),
+                  fontSize: context.getFontSize(3.5),
                   color: AppColors.textDark,
                   fontFamily: 'monospace',
                 ),
@@ -399,7 +399,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                   labelText: 'HTML Content',
                   labelStyle: TextStyle(
                     color: AppColors.textMuted,
-                    fontSize: context.getScreenWidth(3.5),
+                    fontSize: context.getFontSize(3.5),
                   ),
                   alignLabelWithHint: true,
                   filled: true,
@@ -457,7 +457,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: context.getScreenWidth(4.2),
+                            fontSize: context.getFontSize(4.2),
                           ),
                         ),
                 ),

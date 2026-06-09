@@ -167,7 +167,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         title: Text(
           'My Orders',
           style: TextStyle(
-            fontSize: context.getScreenWidth(6),
+            fontSize: context.getFontSize(6),
             fontWeight: FontWeight.w700,
             color: AppColors.textDark,
           ),
@@ -191,11 +191,11 @@ class _MyOrdersPageState extends State<MyOrdersPage>
           indicatorColor: AppColors.primaryGold,
           indicatorWeight: 3,
           labelStyle: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
+            fontSize: context.getFontSize(3.8),
             fontWeight: FontWeight.w600,
           ),
           unselectedLabelStyle: TextStyle(
-            fontSize: context.getScreenWidth(3.8),
+            fontSize: context.getFontSize(3.8),
             fontWeight: FontWeight.w400,
           ),
           tabs: _tabs.map((t) => Tab(text: t)).toList(),
@@ -257,7 +257,7 @@ class _OrderCard extends StatelessWidget {
                                 ? 'Order #${order.orderToken}'
                                 : 'Order #${order.id.substring(0, 8).toUpperCase()}',
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(4.5),
+                              fontSize: context.getFontSize(4.5),
                               fontWeight: FontWeight.w700,
                               color: AppColors.textDark,
                             ),
@@ -266,7 +266,7 @@ class _OrderCard extends StatelessWidget {
                           Text(
                             _formatDate(order.createdAt),
                             style: TextStyle(
-                              fontSize: context.getScreenWidth(3.2),
+                              fontSize: context.getFontSize(3.2),
                               color: AppColors.textMuted,
                             ),
                           ),
@@ -308,7 +308,7 @@ class _OrderCard extends StatelessWidget {
                               Text(
                                 '${order.items.length} item(s)',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.8),
+                                  fontSize: context.getFontSize(3.8),
                                   color: AppColors.textMuted,
                                 ),
                               )
@@ -336,7 +336,7 @@ class _OrderCard extends StatelessWidget {
                                           Text(
                                             'x${item.quantity}',
                                             style: TextStyle(
-                                              fontSize: context.getScreenWidth(3.4),
+                                              fontSize: context.getFontSize(3.4),
                                               color: AppColors.textMuted,
                                             ),
                                           ),
@@ -348,7 +348,7 @@ class _OrderCard extends StatelessWidget {
                               Text(
                                 '+${order.items.length - 2} more items',
                                 style: TextStyle(
-                                  fontSize: context.getScreenWidth(3.2),
+                                  fontSize: context.getFontSize(3.2),
                                   color: AppColors.primaryGold,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -383,7 +383,7 @@ class _OrderCard extends StatelessWidget {
                             child: Text(
                               order.adminMessage!,
                               style: TextStyle(
-                                fontSize: context.getScreenWidth(3.4),
+                                fontSize: context.getFontSize(3.4),
                                 color: AppColors.textMuted,
                                 height: 1.4,
                               ),
@@ -405,7 +405,7 @@ class _OrderCard extends StatelessWidget {
                         Text(
                           'Total Amount',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(3.8),
+                            fontSize: context.getFontSize(3.8),
                             color: AppColors.textMuted,
                             fontWeight: FontWeight.w500,
                           ),
@@ -413,7 +413,7 @@ class _OrderCard extends StatelessWidget {
                         Text(
                           '₹${_formatAmount(order.totalAmount!)}',
                           style: TextStyle(
-                            fontSize: context.getScreenWidth(4.2),
+                            fontSize: context.getFontSize(4.2),
                             fontWeight: FontWeight.w700,
                             color: AppColors.primaryGold,
                           ),
@@ -554,7 +554,7 @@ class _EmptyOrdersView extends StatelessWidget {
             Text(
               'No Orders Yet',
               style: TextStyle(
-                fontSize: context.getScreenWidth(5.5),
+                fontSize: context.getFontSize(5.5),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -563,7 +563,7 @@ class _EmptyOrdersView extends StatelessWidget {
             Text(
               'Your orders will appear here once you place them.',
               style: TextStyle(
-                fontSize: context.getScreenWidth(3.8),
+                fontSize: context.getFontSize(3.8),
                 color: AppColors.textMuted,
                 height: 1.5,
               ),
@@ -586,7 +586,7 @@ class _EmptyOrdersView extends StatelessWidget {
                 child: Text(
                   'Start Shopping',
                   style: TextStyle(
-                    fontSize: context.getScreenWidth(4.5),
+                    fontSize: context.getFontSize(4.5),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -621,7 +621,7 @@ class _ErrorView extends StatelessWidget {
           Text(
             'Failed to load orders',
             style: TextStyle(
-              fontSize: context.getScreenWidth(4.5),
+              fontSize: context.getFontSize(4.5),
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
@@ -632,7 +632,7 @@ class _ErrorView extends StatelessWidget {
             child: Text(
               'Tap to retry',
               style: TextStyle(
-                fontSize: context.getScreenWidth(4),
+                fontSize: context.getFontSize(4),
                 color: AppColors.primaryGold,
                 fontWeight: FontWeight.w600,
               ),
@@ -715,7 +715,7 @@ class _OrderImagesStack extends StatelessWidget {
                   "$totalItems",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getScreenWidth(3.2),
+                    fontSize: context.getFontSize(3.2),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
