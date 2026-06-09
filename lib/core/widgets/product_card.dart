@@ -237,59 +237,60 @@ class _ProductCardState extends State<ProductCard>
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: 6,
-                          right: 6,
-                          child: Obx(() {
-                            final isWishlisted = WishlistController.instance.isWishlisted(product.id);
-                            return GestureDetector(
-                              onTap: () {
-                                if (isWishlisted) {
-                                  if (widget.showWishlistRemoveAlert) {
-                                    final messenger = ScaffoldMessenger.of(context);
-                                    WishlistController.instance.removeFromWishlist(product.id);
-                                    messenger.showSnackBar(
-                                      SnackBar(
-                                        content: Text('${product.name} removed from wishlist'),
-                                        duration: const Duration(seconds: 3),
-                                        behavior: SnackBarBehavior.floating,
-                                        action: SnackBarAction(
-                                          label: 'Undo',
-                                          textColor: AppColors.primaryGold,
-                                          onPressed: () {
-                                            WishlistController.instance.addToWishlist(product);
-                                          },
+                        if (!Get.find<AuthController>().isAdmin)
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: Obx(() {
+                              final isWishlisted = WishlistController.instance.isWishlisted(product.id);
+                              return GestureDetector(
+                                onTap: () {
+                                  if (isWishlisted) {
+                                    if (widget.showWishlistRemoveAlert) {
+                                      final messenger = ScaffoldMessenger.of(context);
+                                      WishlistController.instance.removeFromWishlist(product.id);
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text('${product.name} removed from wishlist'),
+                                          duration: const Duration(seconds: 3),
+                                          behavior: SnackBarBehavior.floating,
+                                          action: SnackBarAction(
+                                            label: 'Undo',
+                                            textColor: AppColors.primaryGold,
+                                            onPressed: () {
+                                              WishlistController.instance.addToWishlist(product);
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      WishlistController.instance.removeFromWishlist(product.id);
+                                    }
                                   } else {
-                                    WishlistController.instance.removeFromWishlist(product.id);
+                                    WishlistController.instance.addToWishlist(product);
                                   }
-                                } else {
-                                  WishlistController.instance.addToWishlist(product);
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.85),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.85),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    isWishlisted ? Icons.favorite : Icons.favorite_border,
+                                    color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
+                                    size: 16,
+                                  ),
                                 ),
-                                child: Icon(
-                                  isWishlisted ? Icons.favorite : Icons.favorite_border,
-                                  color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
-                                  size: 16,
-                                ),
-                              ),
-                            );
-                          }),
-                        ),
+                              );
+                            }),
+                          ),
                         if (widget.isSelected)
                           Positioned(
                             top: 6,
