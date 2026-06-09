@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_scr
 import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/chat/chat_screen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/wishlist/wishlist_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:intl/intl.dart';
@@ -516,6 +517,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.getScreenHeight(2)),
 
+                    _wishlistLink(context),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
                     Text(
                       "Help & Info",
                       style: TextStyle(
@@ -644,6 +649,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
               size: context.getResponsiveSize(5),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _wishlistLink(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+      child: GestureDetector(
+        onTap: () => Get.to(() => const WishlistPage()),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(4),
+            vertical: context.getScreenHeight(1.5),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.favorite_rounded,
+                  color: Colors.redAccent,
+                  size: context.getResponsiveSize(5),
+                ),
+              ),
+              SizedBox(width: context.getResponsiveSize(3)),
+              Expanded(
+                child: Text(
+                  'Wishlist',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: context.getResponsiveSize(4),
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textMuted,
+                size: context.getResponsiveSize(5),
+              ),
+            ],
+          ),
         ),
       ),
     );

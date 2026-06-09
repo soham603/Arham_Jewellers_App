@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatefulWidget {
@@ -234,10 +235,65 @@ class _ProductCardState extends State<ProductCard>
                             ),
                           ),
                         ),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Obx(() {
+                            final isWishlisted = WishlistController.instance.isWishlisted(product.id);
+                            return GestureDetector(
+                              onTap: () {
+                                if (isWishlisted) {
+                                  WishlistController.instance.removeFromWishlist(product.id);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${product.name} removed from wishlist'),
+                                      duration: const Duration(seconds: 3),
+                                      behavior: SnackBarBehavior.floating,
+                                      action: SnackBarAction(
+                                        label: 'Undo',
+                                        textColor: AppColors.primaryGold,
+                                        onPressed: () {
+                                          WishlistController.instance.addToWishlist(product);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  WishlistController.instance.addToWishlist(product);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${product.name} added to wishlist'),
+                                      duration: const Duration(seconds: 2),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.85),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  isWishlisted ? Icons.favorite : Icons.favorite_border,
+                                  color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
+                                  size: 16,
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
                         if (widget.isSelected)
                           Positioned(
                             top: 6,
-                            right: 6,
+                            right: 36,
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
