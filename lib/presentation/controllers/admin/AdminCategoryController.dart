@@ -137,8 +137,8 @@ class CategoryManagerController extends GetxController {
         'name': name,
         'boxName': boxName,
         if (description != null && description.isNotEmpty) 'description': description,
-        if (parentId != null) 'parentId': parentId,
-        if (level != null) 'level': level,
+        'parentId': ?parentId,
+        'level': ?level,
         if (imageFile != null) 'file': await MultipartFile.fromFile(imageFile.path),
       });
 
@@ -180,8 +180,8 @@ class CategoryManagerController extends GetxController {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
         if (boxName != null && boxName.isNotEmpty) "boxName": boxName,
-        if (description != null) "description": description,
-        if (parentId != null) "parentId": parentId,
+        "description": ?description,
+        "parentId": ?parentId,
         if (existingImages != null)
           "images": existingImages.map((e) => {"url": e["url"], "publicId": e["publicId"]}).toList(),
         if (imageFile != null) "image": await MultipartFile.fromFile(imageFile.path),

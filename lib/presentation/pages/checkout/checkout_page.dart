@@ -355,7 +355,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             height: context.getResponsiveSize(18),
 
                             decoration: BoxDecoration(
-                              color: AppColors.primaryGold.withOpacity(0.12),
+                              color: AppColors.primaryGold.withValues(alpha: 0.12),
                               shape: BoxShape.circle,
                             ),
 

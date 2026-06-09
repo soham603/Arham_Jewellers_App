@@ -185,7 +185,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         child: ListView.separated(
           padding: EdgeInsets.all(context.getResponsiveSize(4)),
           itemCount: list.length,
-          separatorBuilder: (_, __) =>
+          separatorBuilder: (_, _) =>
               SizedBox(height: context.getScreenHeight(1.5)),
           itemBuilder: (context, index) =>
               _deletedCarouselCard(context, list[index]),
@@ -209,7 +209,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         border: Border.all(color: context.colorPalette.boxColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -229,11 +229,11 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   width: double.infinity,
                   height: context.getScreenHeight(20),
                   fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(
+                  placeholder: (_, _) => Container(
                     color: context.colorPalette.shimmerBaseColor,
                     height: context.getScreenHeight(20),
                   ),
-                  errorWidget: (_, __, ___) => Container(
+                  errorWidget: (_, _, _) => Container(
                     height: context.getScreenHeight(20),
                     color: context.colorPalette.boxColor,
                     child: Icon(
@@ -253,7 +253,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     vertical: context.getScreenHeight(0.4),
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.65),
+                    color: Colors.black.withValues(alpha: 0.65),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -277,8 +277,8 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   ),
                   decoration: BoxDecoration(
                     color: item.isActive
-                        ? Colors.green.withOpacity(0.85)
-                        : Colors.orange.withOpacity(0.85),
+                        ? Colors.green.withValues(alpha: 0.85)
+                        : Colors.orange.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -298,7 +298,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 child: Container(
                   padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
@@ -420,7 +420,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -434,9 +434,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               width: context.getResponsiveSize(28),
               height: context.getScreenHeight(12),
               fit: BoxFit.cover,
-              placeholder: (_, __) =>
+              placeholder: (_, _) =>
                   Container(color: context.colorPalette.shimmerBaseColor),
-              errorWidget: (_, __, ___) => Container(
+              errorWidget: (_, _, _) => Container(
                 color: context.colorPalette.boxColor,
                 child: Icon(
                   Icons.image_not_supported,
@@ -461,7 +461,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                           vertical: context.getScreenHeight(0.3),
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -917,9 +917,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           vertical: context.getScreenHeight(0.6),
         ),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: isLoading
             ? SizedBox(
@@ -950,9 +950,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 3,
-      separatorBuilder: (_, __) =>
+      separatorBuilder: (_, _) =>
           SizedBox(height: context.getScreenHeight(1.5)),
-      itemBuilder: (_, __) => Container(
+      itemBuilder: (_, _) => Container(
         height: context.getScreenHeight(28),
         decoration: BoxDecoration(
           color: context.colorPalette.shimmerBaseColor,
@@ -1170,7 +1170,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.4),
+                                color: Colors.black.withValues(alpha: 0.4),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Center(
@@ -1290,10 +1290,10 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                           bottom: context.getScreenHeight(1.5),
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
+                          color: Colors.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: Colors.red.withOpacity(0.3),
+                            color: Colors.red.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Row(
@@ -1334,7 +1334,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   Switch(
                     value: _isActive,
                     onChanged: (v) => setState(() => _isActive = v),
-                    activeColor: context.colorPalette.primaryColor,
+                    activeThumbColor: context.colorPalette.primaryColor,
                   ),
                 ],
               ),

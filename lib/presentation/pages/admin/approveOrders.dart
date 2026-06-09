@@ -252,7 +252,7 @@ class _AdminOrderCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -288,7 +288,7 @@ class _AdminOrderCard extends StatelessWidget {
                         color: const Color(0xFFFFF3E0),
                         borderRadius: BorderRadius.circular(100),
                         border: Border.all(
-                          color: AppColors.primaryGold.withOpacity(0.3),
+                          color: AppColors.primaryGold.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -317,7 +317,7 @@ class _AdminOrderCard extends StatelessWidget {
                       vertical: context.getScreenHeight(0.3),
                     ),
                     decoration: BoxDecoration(
-                      color: _orderStatusColor(order.status).withOpacity(0.12),
+                      color: _orderStatusColor(order.status).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Text(
@@ -390,7 +390,7 @@ class _OrderImagesStack extends StatelessWidget {
                     border: Border.all(color: Colors.white, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -473,7 +473,7 @@ Widget _filterSegment(
         margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(0.5)),
         padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
         decoration: BoxDecoration(
-          color: isActive ? color : color.withOpacity(0.08),
+          color: isActive ? color : color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(

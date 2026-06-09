@@ -171,7 +171,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
             width: 32,
             height: 3,
             decoration: BoxDecoration(
-              color: context.colorPalette.goldDark.withOpacity(0.3),
+              color: context.colorPalette.goldDark.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(1.5),
             ),
           ),
@@ -291,7 +291,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                       width: 28,
                       height: 28,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(

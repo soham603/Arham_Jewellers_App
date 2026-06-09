@@ -88,12 +88,12 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
           borderRadius: BorderRadius.circular(50),
           color: const Color(0xFFF5F1EC),
           border: Border.all(
-            color: context.colorPalette.gold.withOpacity(0.2),
+            color: context.colorPalette.gold.withValues(alpha: 0.2),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: context.colorPalette.gold.withOpacity(0.06),
+              color: context.colorPalette.gold.withValues(alpha: 0.06),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

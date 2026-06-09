@@ -296,7 +296,7 @@ class _DrillDownList extends StatelessWidget {
             horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
           ),
-          color: context.colorPalette.boxColor.withOpacity(0.4),
+          color: context.colorPalette.boxColor.withValues(alpha: 0.4),
           child: Row(
             children: [
               GestureDetector(
@@ -416,7 +416,7 @@ class _GroupedL1Tile extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: context.getScreenHeight(0.4)),
               decoration: BoxDecoration(
-                color: context.colorPalette.primaryColor.withOpacity(0.15),
+                color: context.colorPalette.primaryColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text('$count', style: TextStyle(fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w700, color: context.colorPalette.primaryColor)),
@@ -464,7 +464,7 @@ class _L1GroupSheet extends StatelessWidget {
             margin: EdgeInsets.only(top: context.getScreenHeight(1)),
             width: context.getResponsiveSize(10),
             height: 4,
-            decoration: BoxDecoration(color: context.colorPalette.subTitleColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(color: context.colorPalette.subTitleColor.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2)),
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text('${cat.name} — ${parents.length} parents, ${l2Items.length} sub-categories',
@@ -474,7 +474,7 @@ class _L1GroupSheet extends StatelessWidget {
             child: ListView.separated(
               padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
               itemCount: parents.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: context.colorPalette.boxColor),
+              separatorBuilder: (_, _) => Divider(height: 1, color: context.colorPalette.boxColor),
               itemBuilder: (_, i) {
                 final p = parents[i];
                 final childCount = ctrl.level2For(p.id).length;
@@ -584,7 +584,7 @@ class _CategoryTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(12),
-        border: isDeleted ? Border.all(color: Colors.red.withOpacity(0.25)) : null,
+        border: isDeleted ? Border.all(color: Colors.red.withValues(alpha: 0.25)) : null,
       ),
       child: IntrinsicHeight(
         child: Row(
@@ -614,7 +614,7 @@ class _CategoryTile extends StatelessWidget {
                           SizedBox(width: context.getResponsiveSize(2)),
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
-                            decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                            decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
                             child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getResponsiveSize(2.5), fontWeight: FontWeight.w600)),
                           ),
                         ],
@@ -688,8 +688,8 @@ class _Thumb extends StatelessWidget {
                 opacity: cat.isDeleted ? 0.5 : 1.0,
                 child: CachedNetworkImage(
                   imageUrl: cat.imageUrl, fit: BoxFit.cover,
-                  placeholder: (_, __) => Container(color: context.colorPalette.shimmerBaseColor),
-                  errorWidget: (_, __, ___) => _noImg(context),
+                  placeholder: (_, _) => Container(color: context.colorPalette.shimmerBaseColor),
+                  errorWidget: (_, _, _) => _noImg(context),
                 ),
               )
             : _noImg(context),
@@ -714,7 +714,7 @@ class _LevelBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
-      decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(6)),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
       child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getResponsiveSize(2.5), color: color, fontWeight: FontWeight.w700)),
     );
   }
@@ -732,7 +732,7 @@ class _CircleBtn extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
-        decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
         child: Icon(icon, size: context.getResponsiveSize(3.5), color: color),
       ),
     );
@@ -743,7 +743,7 @@ Widget _shimmer() {
   return ListView.builder(
     padding: const EdgeInsets.all(16),
     itemCount: 5,
-    itemBuilder: (_, __) => Container(
+    itemBuilder: (_, _) => Container(
       margin: const EdgeInsets.only(bottom: 10),
       height: 72,
       decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
@@ -949,7 +949,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                         color: _pickedImage != null ? context.colorPalette.primaryColor : context.colorPalette.boxColor,
                         width: _pickedImage != null ? 2 : 1,
                       ),
-                      color: context.colorPalette.boxColor.withOpacity(0.4),
+                      color: context.colorPalette.boxColor.withValues(alpha: 0.4),
                     ),
                     child: _pickedImage != null
                         ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(_pickedImage!, fit: BoxFit.cover))
@@ -964,7 +964,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                     onPressed: _submitting ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: context.colorPalette.primaryColor,
-                      disabledBackgroundColor: context.colorPalette.primaryColor.withOpacity(0.5),
+                      disabledBackgroundColor: context.colorPalette.primaryColor.withValues(alpha: 0.5),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                     child: _submitting
@@ -991,7 +991,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
         borderRadius: BorderRadius.circular(12),
         child: Stack(fit: StackFit.expand, children: [
           CachedNetworkImage(imageUrl: widget.existing!.imageUrl, fit: BoxFit.cover),
-          Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withOpacity(0.35))),
+          Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withValues(alpha: 0.35))),
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getResponsiveSize(6)),
             SizedBox(height: context.getScreenHeight(0.3)),

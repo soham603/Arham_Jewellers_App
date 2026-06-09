@@ -114,17 +114,17 @@ class _ProductCardState extends State<ProductCard>
                               color: widget.isSelected
                                   ? AppColors.primaryGold
                                   : _isHovered
-                                      ? AppColors.primaryGold.withOpacity(0.3)
+                                      ? AppColors.primaryGold.withValues(alpha: 0.3)
                                       : _cardBorderColor,
                               width: widget.isSelected ? 2.0 : 1.0,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: widget.isSelected
-                                    ? AppColors.primaryGold.withOpacity(0.2)
+                                    ? AppColors.primaryGold.withValues(alpha: 0.2)
                                     : _isHovered
-                                        ? AppColors.primaryGold.withOpacity(0.12)
-                                        : Colors.black.withOpacity(0.06),
+                                        ? AppColors.primaryGold.withValues(alpha: 0.12)
+                                        : Colors.black.withValues(alpha: 0.06),
                                 blurRadius: widget.isSelected ? 12 : (_isHovered ? 16 : 10),
                                 offset: Offset(0, _isHovered ? 6 : 3),
                               ),
@@ -273,11 +273,11 @@ class _ProductCardState extends State<ProductCard>
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.85),
+                                    color: Colors.white.withValues(alpha: 0.85),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.15),
+                                        color: Colors.black.withValues(alpha: 0.15),
                                         blurRadius: 4,
                                       ),
                                     ],
@@ -302,7 +302,7 @@ class _ProductCardState extends State<ProductCard>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 4,
                                   ),
                                 ],
@@ -558,12 +558,12 @@ class _WeightInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final style = TextStyle(
       fontSize: fontSize,
-      color: AppColors.textDark.withOpacity(0.7),
+      color: AppColors.textDark.withValues(alpha: 0.7),
       fontWeight: FontWeight.w500,
       height: 1.3,
     );
     final dimSep = style.copyWith(
-      color: AppColors.textMuted.withOpacity(0.4),
+      color: AppColors.textMuted.withValues(alpha: 0.4),
     );
 
     return Column(
@@ -694,7 +694,7 @@ class _ViewButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.primaryGold,
-          disabledBackgroundColor: AppColors.primaryGold.withOpacity(0.45),
+          disabledBackgroundColor: AppColors.primaryGold.withValues(alpha: 0.45),
           foregroundColor: Colors.white,
           disabledForegroundColor: Colors.white70,
           padding: EdgeInsets.zero,

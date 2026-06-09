@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 
 class AuthController extends GetxController {
   final _userLoginState = CurrentAppState.INITIAL.obs;
@@ -29,6 +30,10 @@ class AuthController extends GetxController {
   // New error message state for Registration flow
   final RxString _userRegisterErrorMsg = "".obs;
   String get userRegisterErrorMsg => _userRegisterErrorMsg.value;
+
+  // Forgot Password state
+  final _forgotPasswordState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get forgotPasswordState => _forgotPasswordState.value;
 
   final Rxn<UserModel> _user = Rxn<UserModel>();
   UserModel? get user => _user.value;
@@ -355,6 +360,54 @@ class AuthController extends GetxController {
       _userRegisterErrorMsg.value = "An unexpected error occurred";
       _userRegisterState.value = CurrentAppState.ERROR;
       ToastUtils.showError(context, _userRegisterErrorMsg.value);
+    }
+    return false;
+  }
+
+  Future<bool> forgotPassword({
+    required String phoneNumber,
+    required BuildContext context,
+    VoidCallback? onSuccess,
+  }) async {
+    if (_forgotPasswordState.value == CurrentAppState.LOADING) return false;
+
+    try {
+      _forgotPasswordState.value = CurrentAppState.LOADING;
+
+      final response = await httpClient.post(
+        ApiUrlConstants.FORGOT_PASSWORD,
+        options: Options(extra: {"requiresAuth": false}),
+        data: {"phoneNumber": phoneNumber},
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        _forgotPasswordState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showSuccess(
+          context,
+          response.data['message'] ?? "Reset request submitted successfully!",
+        );
+        onSuccess?.call();
+        return true;
+      } else {
+        _forgotPasswordState.value = CurrentAppState.ERROR;
+        ToastUtils.showError(
+          context,
+          response.data['message'] ?? "Failed to submit reset request",
+        );
+      }
+    } on DioException catch (e) {
+      String errorMsg = "An unexpected error occurred";
+      if (e.response?.data != null) {
+        errorMsg = e.response!.data['error']?['message'] ??
+            e.response!.data['detail'] ??
+            e.response!.data['message'] ??
+            errorMsg;
+      }
+      _forgotPasswordState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(context, errorMsg);
+    } catch (e) {
+      _forgotPasswordState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(context, "An unexpected error occurred");
     }
     return false;
   }

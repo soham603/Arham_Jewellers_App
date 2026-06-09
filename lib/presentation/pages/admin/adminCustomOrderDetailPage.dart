@@ -221,7 +221,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: order.referenceImages.length,
-                    separatorBuilder: (_, __) => SizedBox(width: context.getResponsiveSize(3)),
+                    separatorBuilder: (_, _) => SizedBox(width: context.getResponsiveSize(3)),
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () => _showImageZoom(context, order.referenceImages[index]),
@@ -238,8 +238,8 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                             child: CachedNetworkImage(
                               imageUrl: order.referenceImages[index],
                               fit: BoxFit.cover,
-                              placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                              errorWidget: (_, __, ___) => const RatneshFallback.xs(),
+                              placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              errorWidget: (_, _, _) => const RatneshFallback.xs(),
                             ),
                           ),
                         ),
@@ -688,8 +688,8 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 child: CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.contain,
-                  placeholder: (_, __) => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
-                  errorWidget: (_, __, ___) => const Icon(Icons.error_outline, color: Colors.white, size: 40),
+                  placeholder: (_, _) => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+                  errorWidget: (_, _, _) => const Icon(Icons.error_outline, color: Colors.white, size: 40),
                 ),
               ),
               Positioned(

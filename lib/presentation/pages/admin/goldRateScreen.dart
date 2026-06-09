@@ -89,9 +89,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           width: double.infinity,
           padding: EdgeInsets.all(context.getResponsiveSize(5)),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.06),
+            color: Colors.red.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.red.withOpacity(0.2)),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
           ),
           child: Column(
             children: [
@@ -140,7 +140,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -254,7 +254,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primaryGold.withOpacity(0.3),
+                color: AppColors.primaryGold.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -326,7 +326,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   width: context.getResponsiveSize(10),
                   height: context.getScreenHeight(0.5),
                   decoration: BoxDecoration(
-                    color: context.colorPalette.subTitleColor.withOpacity(0.3),
+                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
@@ -367,7 +367,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   ),
                   hintText: 'e.g. 7200',
                   hintStyle: TextStyle(
-                    color: context.colorPalette.subTitleColor.withOpacity(0.4),
+                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
                   ),
                   filled: true,
                   fillColor: context.colorPalette.boxColor,
@@ -476,7 +476,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                 Icon(
                   Icons.history_rounded,
                   size: context.getResponsiveSize(12),
-                  color: context.colorPalette.subTitleColor.withOpacity(0.4),
+                  color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
                 Text(
@@ -524,7 +524,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: context.colorPalette.subTitleColor.withOpacity(0.1),
+          color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -534,8 +534,8 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
             height: context.getResponsiveSize(10),
             decoration: BoxDecoration(
               color: isFirst
-                  ? AppColors.primaryGold.withOpacity(0.12)
-                  : context.colorPalette.subTitleColor.withOpacity(0.08),
+                  ? AppColors.primaryGold.withValues(alpha: 0.12)
+                  : context.colorPalette.subTitleColor.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
               child: Center(
@@ -592,8 +592,8 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                   ),
                   decoration: BoxDecoration(
                     color: isUp
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(

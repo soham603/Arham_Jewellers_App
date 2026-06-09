@@ -14,7 +14,7 @@ void showImageZoomDialog(BuildContext context, String imageUrl) {
     barrierLabel: 'Close image',
     barrierColor: Colors.black87,
     transitionDuration: const Duration(milliseconds: 260),
-    pageBuilder: (_, __, ___) => _ImageZoomDialog(imageUrl: imageUrl),
+    pageBuilder: (_, _, _) => _ImageZoomDialog(imageUrl: imageUrl),
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(
         opacity: CurvedAnimation(

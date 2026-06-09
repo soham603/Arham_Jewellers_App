@@ -812,7 +812,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
             ),
             child: pw.Center(
               child: pw.Text(
-                '${cells[0]}',
+                cells[0],
                 style: pw.TextStyle(font: regularFont, fontSize: 8, color: mutedColor),
               ),
             ),
@@ -854,7 +854,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
         r['name'] as String,
         r['category'] as String,
         r['karat'] as String,
-        r['netWt'] != null ? '${(r['netWt'] as double).toStringAsFixed(2)}' : '-',
+        r['netWt'] != null ? (r['netWt'] as double).toStringAsFixed(2) : '-',
         '${r['qty']}',
       ], image: img);
     }),

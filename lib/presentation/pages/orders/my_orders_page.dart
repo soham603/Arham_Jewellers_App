@@ -101,7 +101,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
           ),
           itemCount: orders.length +
               (_orderController.hasMoreOrders ? 1 : 0),
-          separatorBuilder: (_, __) =>
+          separatorBuilder: (_, _) =>
               SizedBox(height: context.getScreenHeight(1.5)),
           itemBuilder: (context, index) {
             if (index == orders.length) {
@@ -469,9 +469,9 @@ class _OrdersShimmer extends StatelessWidget {
         context.getScreenHeight(2),
       ),
       itemCount: 4,
-      separatorBuilder: (_, __) =>
+      separatorBuilder: (_, _) =>
           SizedBox(height: context.getScreenHeight(1.5)),
-      itemBuilder: (_, __) => _ShimmerCard(context: context),
+      itemBuilder: (_, _) => _ShimmerCard(context: context),
     );
   }
 }
@@ -508,7 +508,7 @@ class _ShimmerCardState extends State<_ShimmerCard>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => Opacity(
+      builder: (_, _) => Opacity(
         opacity: _anim.value,
         child: Container(
           width: double.infinity,
@@ -688,7 +688,7 @@ class _OrderImagesStack extends StatelessWidget {
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

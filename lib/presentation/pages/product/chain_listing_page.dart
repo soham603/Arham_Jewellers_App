@@ -470,7 +470,7 @@ class _ChainCategoryImage extends StatelessWidget {
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => const RatneshFallback.s(),
+        errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
     }
 
@@ -521,7 +521,7 @@ class _ChainKaratSectionHeader extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -628,7 +628,7 @@ class _ChainLevel3Sheet extends StatelessWidget {
             width: context.responsiveWidth(40, tabletVal: 48),
             height: context.responsiveWidth(4, tabletVal: 5),
             decoration: BoxDecoration(
-              color: context.colorPalette.goldDark.withOpacity(0.3),
+              color: context.colorPalette.goldDark.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -693,7 +693,7 @@ class _ChainLevel3Sheet extends StatelessWidget {
                       border: Border.all(color: context.colorPalette.border),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),

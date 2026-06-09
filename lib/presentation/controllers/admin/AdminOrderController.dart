@@ -315,12 +315,11 @@ class AdminOrderController extends GetxController {
         "action": action,
         if (adminMessage != null && adminMessage.isNotEmpty)
           "adminMessage": adminMessage,
-        if (assignedKarigarId != null) "assignedKarigarId": assignedKarigarId,
-        if (talkedToStaffName != null) "talkedToStaffName": talkedToStaffName,
-        if (assignAdminNotes != null) "assignAdminNotes": assignAdminNotes,
-        if (deliveryDate != null) "deliveryDate": deliveryDate,
-        if (completeAdminNotes != null)
-          "completeAdminNotes": completeAdminNotes,
+        "assignedKarigarId": ?assignedKarigarId,
+        "talkedToStaffName": ?talkedToStaffName,
+        "assignAdminNotes": ?assignAdminNotes,
+        "deliveryDate": ?deliveryDate,
+        "completeAdminNotes": ?completeAdminNotes,
       };
 
       final response = await httpClient.post(

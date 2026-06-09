@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
-import 'package:ratnesh_gold_app/domain/entities/customOrderModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -150,19 +149,19 @@ class CustomOrderController extends GetxController {
       _modifyState.value = CurrentAppState.LOADING;
 
       final map = <String, dynamic>{
-        if (partyCode != null) 'partyCode': partyCode,
-        if (partyName != null) 'partyName': partyName,
-        if (area != null) 'area': area,
-        if (contactNumber != null) 'contactNumber': contactNumber,
-        if (itemName != null) 'itemName': itemName,
-        if (weight != null) 'weight': weight,
-        if (noOfPieces != null) 'noOfPieces': noOfPieces,
-        if (size != null) 'size': size,
-        if (lengthBroadness != null) 'lengthBroadness': lengthBroadness,
-        if (productDescription != null) 'productDescription': productDescription,
-        if (purity != null) 'purity': purity,
-        if (style != null) 'style': style,
-        if (marking != null) 'marking': marking,
+        'partyCode': ?partyCode,
+        'partyName': ?partyName,
+        'area': ?area,
+        'contactNumber': ?contactNumber,
+        'itemName': ?itemName,
+        'weight': ?weight,
+        'noOfPieces': ?noOfPieces,
+        'size': ?size,
+        'lengthBroadness': ?lengthBroadness,
+        'productDescription': ?productDescription,
+        'purity': ?purity,
+        'style': ?style,
+        'marking': ?marking,
         'removeOldImages': removeOldImages,
       };
 

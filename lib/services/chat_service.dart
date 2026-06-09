@@ -55,7 +55,7 @@ class ChatService {
         data: {
           'message': userMessage,
           'sessionId': 'flutter-app',
-          if (token != null) 'token': token,
+          'token': ?token,
         },
         options: Options(
           responseType: ResponseType.stream,

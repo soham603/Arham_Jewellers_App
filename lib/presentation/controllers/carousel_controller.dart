@@ -198,12 +198,11 @@ class CarouselsController extends GetxController {
       _error.value = '';
 
       final Map<String, dynamic> map = {
-        if (title != null) "title": title,
-        if (description != null) "description": description,
-        if (descHtml != null) "descHtml": descHtml,
-        if (linkUrl != null) "linkUrl": linkUrl,
-        if (mobileImageUrl != null)
-          "mobileImageUrl": mobileImageUrl,
+        "title": ?title,
+        "description": ?description,
+        "descHtml": ?descHtml,
+        "linkUrl": ?linkUrl,
+        "mobileImageUrl": ?mobileImageUrl,
         "image": await MultipartFile.fromFile(imageFile.path),
       };
 
@@ -274,14 +273,13 @@ class CarouselsController extends GetxController {
       _error.value = '';
 
       final Map<String, dynamic> map = {
-        if (title != null) "title": title,
-        if (description != null) "description": description,
-        if (descHtml != null) "descHtml": descHtml,
-        if (linkUrl != null) "linkUrl": linkUrl,
-        if (mobileImageUrl != null)
-          "mobileImageUrl": mobileImageUrl,
-        if (position != null) "position": position,
-        if (isActive != null) "isActive": isActive,
+        "title": ?title,
+        "description": ?description,
+        "descHtml": ?descHtml,
+        "linkUrl": ?linkUrl,
+        "mobileImageUrl": ?mobileImageUrl,
+        "position": ?position,
+        "isActive": ?isActive,
       };
 
       if (imageFile != null) {

@@ -80,9 +80,9 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           width: double.infinity,
           padding: EdgeInsets.all(context.getResponsiveSize(5)),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.06),
+            color: Colors.red.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.red.withOpacity(0.2)),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
           ),
           child: Column(
             children: [
@@ -131,7 +131,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -204,7 +204,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   vertical: context.getScreenHeight(0.6),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -246,7 +246,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             color: context.colorPalette.boxColor,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: context.colorPalette.subTitleColor.withOpacity(0.15),
+              color: context.colorPalette.subTitleColor.withValues(alpha: 0.15),
             ),
           ),
           child: Column(
@@ -255,14 +255,14 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               Icon(
                 Icons.show_chart_rounded,
                 size: context.getResponsiveSize(12),
-                color: context.colorPalette.subTitleColor.withOpacity(0.4),
+                color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
               ),
               SizedBox(height: context.getScreenHeight(1)),
               Text(
                 'Need at least 2 data points for graph',
                 style: TextStyle(
                   fontSize: context.getResponsiveSize(3.5),
-                  color: context.colorPalette.subTitleColor.withOpacity(0.6),
+                  color: context.colorPalette.subTitleColor.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -303,7 +303,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: context.colorPalette.subTitleColor.withOpacity(0.15),
+            color: context.colorPalette.subTitleColor.withValues(alpha: 0.15),
           ),
         ),
         child: Column(
@@ -333,7 +333,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     drawVerticalLine: false,
                     horizontalInterval: stepY,
                     getDrawingHorizontalLine: (value) => FlLine(
-                      color: context.colorPalette.subTitleColor.withOpacity(0.08),
+                      color: context.colorPalette.subTitleColor.withValues(alpha: 0.08),
                       strokeWidth: 1,
                     ),
                   ),
@@ -356,7 +356,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                               style: TextStyle(
                                 fontSize: context.getResponsiveSize(2.6),
                                 fontWeight: FontWeight.w500,
-                                color: context.colorPalette.subTitleColor.withOpacity(0.7),
+                                color: context.colorPalette.subTitleColor.withValues(alpha: 0.7),
                               ),
                             ),
                           );
@@ -386,7 +386,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                               style: TextStyle(
                                 fontSize: context.getResponsiveSize(2.2),
                                 color: context.colorPalette.subTitleColor
-                                    .withOpacity(0.6),
+                                    .withValues(alpha: 0.6),
                               ),
                             ),
                           );
@@ -453,8 +453,8 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         show: true,
                         gradient: LinearGradient(
                           colors: [
-                            lineColor.withOpacity(0.25),
-                            lineColor.withOpacity(0.0),
+                            lineColor.withValues(alpha: 0.25),
+                            lineColor.withValues(alpha: 0.0),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -514,7 +514,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                           border: Border.all(
                             color: isSelected
                                 ? AppColors.primaryGold
-                                : context.colorPalette.subTitleColor.withOpacity(0.15),
+                                : context.colorPalette.subTitleColor.withValues(alpha: 0.15),
                           ),
                         ),
                         child: Text(
@@ -564,7 +564,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                       border: Border.all(
                         color: isCustom
                             ? AppColors.primaryGold
-                            : context.colorPalette.subTitleColor.withOpacity(0.15),
+                            : context.colorPalette.subTitleColor.withValues(alpha: 0.15),
                       ),
                     ),
                     child: Row(
@@ -622,10 +622,10 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 vertical: context.getScreenHeight(1),
               ),
               decoration: BoxDecoration(
-                color: AppColors.primaryGold.withOpacity(0.08),
+                color: AppColors.primaryGold.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppColors.primaryGold.withOpacity(0.2),
+                  color: AppColors.primaryGold.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
@@ -684,11 +684,11 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: context.colorPalette.subTitleColor.withOpacity(0.12),
+            color: context.colorPalette.subTitleColor.withValues(alpha: 0.12),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -739,7 +739,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     vertical: context.getScreenHeight(0.8),
                   ),
                   decoration: BoxDecoration(
-                    color: trendColor.withOpacity(0.12),
+                    color: trendColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -757,7 +757,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
               child: Divider(
-                color: context.colorPalette.subTitleColor.withOpacity(0.15),
+                color: context.colorPalette.subTitleColor.withValues(alpha: 0.15),
                 thickness: 1,
               ),
             ),
@@ -847,7 +847,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                 Icon(
                   Icons.history_rounded,
                   size: context.getResponsiveSize(12),
-                  color: context.colorPalette.subTitleColor.withOpacity(0.4),
+                  color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),
                 Text(
@@ -895,7 +895,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: context.colorPalette.subTitleColor.withOpacity(0.1),
+          color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -905,8 +905,8 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             height: context.getResponsiveSize(10),
             decoration: BoxDecoration(
               color: isFirst
-                  ? AppColors.primaryGold.withOpacity(0.12)
-                  : context.colorPalette.subTitleColor.withOpacity(0.08),
+                  ? AppColors.primaryGold.withValues(alpha: 0.12)
+                  : context.colorPalette.subTitleColor.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
               child: Center(
@@ -963,8 +963,8 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: isUp
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.red.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(

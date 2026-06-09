@@ -113,7 +113,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                 padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                 scrollDirection: Axis.horizontal,
                 itemCount: _statusFilters.length,
-                separatorBuilder: (_, __) => SizedBox(width: context.getResponsiveSize(2)),
+                separatorBuilder: (_, _) => SizedBox(width: context.getResponsiveSize(2)),
                 itemBuilder: (context, index) {
                   final status = _statusFilters[index];
                   return Obx(() {
@@ -202,7 +202,7 @@ class _AdminCustomOrdersPageState extends State<AdminCustomOrdersPage> {
                       context.getScreenHeight(2),
                     ),
                     itemCount: orders.length + (_controller.hasMore ? 1 : 0),
-                    separatorBuilder: (_, __) => SizedBox(height: context.getScreenHeight(1.5)),
+                    separatorBuilder: (_, _) => SizedBox(height: context.getScreenHeight(1.5)),
                     itemBuilder: (context, index) {
                       if (index == orders.length) {
                         return Padding(
@@ -321,8 +321,8 @@ class _AdminOrderShimmer extends StatelessWidget {
         context.getScreenHeight(2),
       ),
       itemCount: 4,
-      separatorBuilder: (_, __) => SizedBox(height: context.getScreenHeight(1.5)),
-      itemBuilder: (_, __) => Container(
+      separatorBuilder: (_, _) => SizedBox(height: context.getScreenHeight(1.5)),
+      itemBuilder: (_, _) => Container(
         width: double.infinity,
         height: context.getScreenHeight(14),
         decoration: BoxDecoration(

@@ -214,13 +214,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 border: isTransparentBar
                     ? null
                     : Border.all(
-                        color: _goldDark.withOpacity(0.2),
+                        color: _goldDark.withValues(alpha: 0.2),
                         width: 1,
                       ),
                 boxShadow: widget.showShadow
                     ? [
                         BoxShadow(
-                          color: _goldDark.withOpacity(0.06),
+                          color: _goldDark.withValues(alpha: 0.06),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -315,7 +315,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                       size: filterIconSize,
                       color: widget.filterActiveCount > 0
                           ? _goldDark
-                          : _goldDark.withOpacity(0.6),
+                          : _goldDark.withValues(alpha: 0.6),
                     ),
                   ),
                   if (widget.filterActiveCount > 0)

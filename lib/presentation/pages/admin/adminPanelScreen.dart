@@ -47,7 +47,7 @@ class AdminPanelScreen extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.black.withValues(alpha: 0.08),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -93,7 +93,7 @@ class AdminPanelScreen extends StatelessWidget {
                               vertical: context.getScreenHeight(0.4),
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryGold.withOpacity(0.3),
+                              color: AppColors.primaryGold.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: Text(
@@ -118,7 +118,7 @@ class AdminPanelScreen extends StatelessWidget {
                     vertical: context.getScreenHeight(1.2),
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -259,7 +259,7 @@ class AdminPanelScreen extends StatelessWidget {
           border: Border.all(color: const Color(0xFFE7DED2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),

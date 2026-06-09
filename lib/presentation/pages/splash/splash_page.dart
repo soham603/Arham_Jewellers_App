@@ -167,9 +167,9 @@ class _SplashPageState extends State<SplashPage>
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  context.colorPalette.gold.withOpacity(0.6),
+                                  context.colorPalette.gold.withValues(alpha: 0.6),
                                   context.colorPalette.gold,
-                                  context.colorPalette.gold.withOpacity(0.6),
+                                  context.colorPalette.gold.withValues(alpha: 0.6),
                                   Colors.transparent,
                                 ],
                               ),

@@ -315,9 +315,9 @@ class CategoryController extends GetxController {
           'page': _adminPage,
           'limit': _adminLimit,
           'full': true,
-          if (filterLevel != null) 'level': filterLevel,
+          'level': ?filterLevel,
           if (filterName != null && filterName.isNotEmpty) 'name': filterName,
-          if (filterParentId != null) 'parentId': filterParentId,
+          'parentId': ?filterParentId,
           if (includeDeleted) 'isDeleted': true,
         },
         options: Options(extra: {'requiresAuth': true}),
@@ -396,9 +396,9 @@ class CategoryController extends GetxController {
       final formData = FormData.fromMap({
         'name': name,
         'boxName': boxName,
-        if (description != null) 'description': description,
-        if (parentId != null) 'parentId': parentId,
-        if (level != null) 'level': level,
+        'description': ?description,
+        'parentId': ?parentId,
+        'level': ?level,
         if (imageFile != null)
           'file': await MultipartFile.fromFile(imageFile.path),
       });
@@ -442,9 +442,9 @@ class CategoryController extends GetxController {
       _error.value = '';
 
       final formData = FormData.fromMap({
-        if (name != null) 'name': name,
-        if (boxName != null) 'boxName': boxName,
-        if (description != null) 'description': description,
+        'name': ?name,
+        'boxName': ?boxName,
+        'description': ?description,
         if (imageFile != null)
           'file': await MultipartFile.fromFile(imageFile.path),
       });
@@ -521,7 +521,7 @@ class CategoryController extends GetxController {
         '/api/v1/category/get-All',
         queryParameters: {
           'level': level,
-          if (parentId != null) 'parentId': parentId,
+          'parentId': ?parentId,
           'full': true,
         },
         options: Options(extra: {'requiresAuth': true}),

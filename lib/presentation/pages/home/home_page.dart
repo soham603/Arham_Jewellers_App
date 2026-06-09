@@ -188,7 +188,7 @@ GestureDetector(
       color: const Color(0xFFF5F1EC),
       shape: BoxShape.circle,
       border: Border.all(
-        color: context.colorPalette.gold.withOpacity(0.2),
+        color: context.colorPalette.gold.withValues(alpha: 0.2),
         width: 1,
       ),
     ),
@@ -283,8 +283,8 @@ GestureDetector(
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Colors.black.withOpacity(
-                                                        0.08,
+                                                      color: Colors.black.withValues(
+                                                        alpha: 0.08,
                                                       ),
                                                       blurRadius: 8,
                                                       offset: const Offset(0, 3),
@@ -315,8 +315,8 @@ GestureDetector(
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                      color: Colors.black.withOpacity(
-                                                        0.08,
+                                                      color: Colors.black.withValues(
+                                                        alpha: 0.08,
                                                       ),
                                                       blurRadius: 8,
                                                       offset: const Offset(0, 3),
@@ -360,8 +360,8 @@ GestureDetector(
                                       borderRadius: BorderRadius.circular(12),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(
-                                            0.08,
+                                          color: Colors.black.withValues(
+                                            alpha: 0.08,
                                           ),
                                           blurRadius: 8,
                                           offset: const Offset(0, 3),
@@ -435,9 +435,9 @@ GestureDetector(
                                 ),
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 5,
-                                separatorBuilder: (_, __) =>
+                                separatorBuilder: (_, _) =>
                                     const SizedBox(width: 12),
-                                itemBuilder: (_, __) {
+                                itemBuilder: (_, _) {
                           final cardWidth = context.getScreenWidth(50);
                                   return Shimmer.fromColors(
                                     baseColor:
@@ -558,7 +558,7 @@ GestureDetector(
                                     (carouselController.productLoadingMore
                                         ? 1
                                         : 0),
-                                separatorBuilder: (_, __) =>
+                                separatorBuilder: (_, _) =>
                                     const SizedBox(width: 12),
                                 itemBuilder: (_, index) {
                                   if (index >= products.length) {
@@ -681,7 +681,7 @@ class _KaratSection extends StatelessWidget {
 
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [accent.withOpacity(0.85), accent],
+                      colors: [accent.withValues(alpha: 0.85), accent],
                     ),
 
                     borderRadius: BorderRadius.circular(8),
@@ -753,7 +753,7 @@ class _KaratSection extends StatelessWidget {
 
                 itemCount: list.length,
 
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
 
                 itemBuilder: (_, index) {
                   final cat = list[index];
@@ -786,7 +786,7 @@ class _KaratSection extends StatelessWidget {
 
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
+                              color: Colors.black.withValues(alpha: 0.06),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -813,7 +813,7 @@ class _KaratSection extends StatelessWidget {
                                   imageUrl: cat.imageUrl,
                                   fit: BoxFit.cover,
 
-                                  errorWidget: (_, __, ___) => RatneshFallback(
+                                  errorWidget: (_, _, _) => RatneshFallback(
                                     logoSize: context.getResponsiveSize(5),
                                   ),
                                 ),
@@ -922,7 +922,7 @@ class _Level3Panel extends StatelessWidget {
         color: context.colorPalette.level3Bg,
         borderRadius: BorderRadius.circular(18),
 
-        border: Border.all(color: context.colorPalette.gold.withOpacity(0.35)),
+        border: Border.all(color: context.colorPalette.gold.withValues(alpha: 0.35)),
       ),
 
       child: Column(
@@ -1017,7 +1017,7 @@ class _Level3Panel extends StatelessWidget {
                               width: double.infinity,
                               fit: BoxFit.cover,
 
-                              errorWidget: (_, __, ___) => const RatneshFallback.s(),
+                              errorWidget: (_, _, _) => const RatneshFallback.s(),
                             ),
                           ),
                         ),
@@ -1295,7 +1295,7 @@ class _Level3Shimmer extends StatelessWidget {
         childAspectRatio: 0.78,
       ),
 
-      itemBuilder: (_, __) {
+      itemBuilder: (_, _) {
         return Container(
           decoration: BoxDecoration(
             color: context.colorPalette.shimmerBaseColor,
@@ -1571,7 +1571,7 @@ class _CarouselSection extends StatelessWidget {
           height: context.getScreenHeight(20),
 
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.06),
+            color: Colors.red.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(16),
           ),
 
@@ -1606,7 +1606,7 @@ class _CarouselSection extends StatelessWidget {
 
                     boxShadow: [
                       BoxShadow(
-                        color: context.colorPalette.gold.withOpacity(0.15),
+                        color: context.colorPalette.gold.withValues(alpha: 0.15),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -1620,7 +1620,7 @@ class _CarouselSection extends StatelessWidget {
                       imageUrl: item.imageUrl,
                       fit: BoxFit.cover,
                       placeholder: (_, _) => CarouselShimmer(),
-                      errorWidget: (_, __, ___) => Container(
+                      errorWidget: (_, _, _) => Container(
                         color: context.colorPalette.shimmerBaseColor,
                       ),
                     ),
@@ -1763,8 +1763,8 @@ class _CategoryQuickAccess extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               scrollDirection: Axis.horizontal,
               itemCount: 6,
-              separatorBuilder: (_, __) => const SizedBox(width: 6),
-              itemBuilder: (_, __) {
+              separatorBuilder: (_, _) => const SizedBox(width: 6),
+              itemBuilder: (_, _) {
                 return Column(
                   children: [
                     Container(
@@ -1798,7 +1798,7 @@ class _CategoryQuickAccess extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
           itemCount: unique.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 6),
+          separatorBuilder: (_, _) => const SizedBox(width: 6),
           itemBuilder: (_, index) {
             final cat = unique[index];
             return GestureDetector(
@@ -1820,7 +1820,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: context.colorPalette.gold.withOpacity(0.5),
+                        color: context.colorPalette.gold.withValues(alpha: 0.5),
                         width: 1.5,
                       ),
                     ),
@@ -1871,7 +1871,7 @@ class _CategoryQuickAccessImage extends StatelessWidget {
         width: context.getResponsiveSize(20),
         height: context.getResponsiveSize(20),
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => const RatneshFallback.s(),
+        errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
     }
 
@@ -1905,13 +1905,13 @@ class CustomiseOrderBanner extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: context.colorPalette.goldDeep.withOpacity(0.2),
+              color: context.colorPalette.goldDeep.withValues(alpha: 0.2),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
           ],
           border: Border.all(
-            color: context.colorPalette.goldDeep.withOpacity(0.15),
+            color: context.colorPalette.goldDeep.withValues(alpha: 0.15),
             width: 1.5,
           ),
         ),
@@ -1987,7 +1987,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                         Text(
                           "Dream Jewelry",
                           style: TextStyle(
-                            color: const Color(0xFF3E2723).withOpacity(0.8),
+                            color: const Color(0xFF3E2723).withValues(alpha: 0.8),
                             fontSize: context.getResponsiveSize(4),
                             fontWeight: FontWeight.w700,
                           ),
@@ -2032,12 +2032,12 @@ class CustomiseOrderBanner extends StatelessWidget {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: context.colorPalette.gold.withOpacity(0.5),
+                              color: context.colorPalette.gold.withValues(alpha: 0.5),
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: context.colorPalette.gold.withOpacity(
-                                  0.1,
+                                color: context.colorPalette.gold.withValues(
+                                  alpha: 0.1,
                                 ),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
@@ -2074,7 +2074,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                     child: Container(
                       height: context.getResponsiveSize(32),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
                       ),

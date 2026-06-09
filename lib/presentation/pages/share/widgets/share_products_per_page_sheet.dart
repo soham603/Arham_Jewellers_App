@@ -99,7 +99,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
         padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
         decoration: BoxDecoration(
           color: isSelected
-              ? context.colorPalette.gold.withOpacity(0.08)
+              ? context.colorPalette.gold.withValues(alpha: 0.08)
               : context.colorPalette.cardBg,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
