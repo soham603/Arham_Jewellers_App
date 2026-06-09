@@ -2009,7 +2009,7 @@ class CustomiseOrderBanner extends StatelessWidget {
 
                         // Tagline
                         Text(
-                          "Turn your unique inspirations into\nstunning gold masterpieces.",
+                          "Turn your unique inspirations into stunning gold masterpieces.",
                           style: TextStyle(
                             color: const Color(0xFF5D4037),
                             fontSize: context.getResponsiveSize(2.8),

@@ -340,7 +340,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) =>
-                                      ProductDetailsPage(product: product),
+                                      ProductDetailsPage(
+                                        product: product,
+                                        products: products,
+                                        initialIndex: index,
+                                        controller: _controller,
+                                        listType: _isCategoryOnly
+                                            ? 'category'
+                                            : _isCategoryFilter
+                                                ? 'filtered'
+                                                : 'karat',
+                                      ),
                                 ),
                               );
                             },
@@ -378,7 +388,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    ProductDetailsPage(product: product),
+                                    ProductDetailsPage(
+                                      product: product,
+                                      products: products,
+                                      initialIndex: index,
+                                      controller: _controller,
+                                      listType: _isCategoryOnly
+                                          ? 'category'
+                                          : _isCategoryFilter
+                                              ? 'filtered'
+                                              : 'karat',
+                                    ),
                               ),
                             );
                           },
