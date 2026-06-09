@@ -298,7 +298,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               top: 0,
               left: 0,
               right: 0,
-              height: context.getScreenHeight(38),
+              height: context.getScreenHeight(50),
               child: Stack(
                 children: [
                   Container(
@@ -474,7 +474,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
             // --- 2. Curved Bottom Sheet (Details) ---
             Positioned(
-              top: context.getScreenHeight(33),
+              top: context.getScreenHeight(45),
               left: 0,
               right: 0,
               bottom: 0,
