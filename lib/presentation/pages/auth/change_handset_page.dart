@@ -78,16 +78,15 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Padding(
+                  child: IntrinsicHeight(
+                    child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(5),
                         vertical: context.getScreenHeight(1),
                       ),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 400),
-                          child: Column(
+                      child: Column(
                         children: [
+                          SizedBox(height: context.getScreenHeight(5)),
                           // 1. Logo (Smaller as requested)
                           Center(
                             child: LogoWidget(
@@ -102,26 +101,32 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                               nameSubtitleSpacing: context.getScreenHeight(0.2),
                             ),
                           ),
-
-                          // 2. Form Section
-                          Form(
-                            key: _formKey,
-                            child: _buildCenterForm(context),
-                          ),
-
                           SizedBox(height: context.getScreenHeight(2)),
-
+                          // 2. Form Section
+                          Expanded(
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(maxWidth: 400),
+                                child: Form(
+                                  key: _formKey,
+                                  child: _buildCenterForm(context),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: context.getScreenHeight(2)),
                           // 3. Button (Anchored at the bottom)
-                          _buildBottomButton(context),
-
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 400),
+                            child: _buildBottomButton(context),
+                          ),
                           SizedBox(height: context.getScreenHeight(2)),
                         ],
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
+              ); // <- Changed here: correctly closed SingleChildScrollView return statement
             },
           ),
         ),

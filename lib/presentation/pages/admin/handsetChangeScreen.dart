@@ -755,7 +755,7 @@ class _RequestCardState extends State<_RequestCard> {
       BuildContext context, HandsetChangeRequestModel req) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: context.colorPalette.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -792,7 +792,7 @@ class _RequestCardState extends State<_RequestCard> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(color: context.colorPalette.subTitleColor),
@@ -804,15 +804,12 @@ class _RequestCardState extends State<_RequestCard> {
                       CurrentAppState.LOADING
                   ? null
                   : () async {
-                      final ok = await widget.controller.approveRequest(
+                      await widget.controller.approveRequest(
                         requestId: req.id,
                         context: context,
                       );
-                      if (context.mounted) {
-                        Get.back();
-                        if (ok) {
-                          _snack(context, 'Request approved', isError: false);
-                        }
+                      if (dialogContext.mounted) {
+                        Navigator.of(dialogContext).pop();
                       }
                     },
               style: ElevatedButton.styleFrom(
@@ -850,7 +847,7 @@ class _RequestCardState extends State<_RequestCard> {
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: context.colorPalette.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -916,7 +913,7 @@ class _RequestCardState extends State<_RequestCard> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancel',
               style: TextStyle(color: context.colorPalette.subTitleColor),
@@ -933,16 +930,13 @@ class _RequestCardState extends State<_RequestCard> {
                             isError: true);
                         return;
                       }
-                      final ok = await widget.controller.rejectRequest(
+                      await widget.controller.rejectRequest(
                         requestId: req.id,
                         rejectionReason: reasonController.text.trim(),
                         context: context,
                       );
-                      if (context.mounted) {
-                        Get.back();
-                        if (ok) {
-                          _snack(context, 'Request rejected', isError: false);
-                        }
+                      if (dialogContext.mounted) {
+                        Navigator.of(dialogContext).pop();
                       }
                     },
               style: ElevatedButton.styleFrom(

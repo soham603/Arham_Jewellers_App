@@ -1,69 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:another_flushbar/flushbar.dart';
-import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:get/get.dart';
 
 class ToastUtils {
   static void showSuccess(BuildContext context, String message) {
-    _showToast(
-      context,
-      message,
-      Colors.green,
-      Icons.check_circle,
-    );
+    _showToast(message, Colors.green, Icons.check_circle);
   }
 
   static void showError(BuildContext context, String message) {
-    _showToast(
-      context,
-      message,
-      Colors.red,
-      Icons.error,
-    );
+    _showToast(message, Colors.red, Icons.error);
   }
 
   static void showWarning(BuildContext context, String message) {
-    _showToast(
-      context,
-      message,
-      Colors.orange,
-      Icons.warning,
-    );
+    _showToast(message, Colors.orange, Icons.warning);
   }
 
   static void showInfo(BuildContext context, String message) {
-    _showToast(
-      context,
-      message,
-      const Color(0xFFA57A36),
-      Icons.info,
-    );
+    _showToast(message, const Color(0xFFA57A36), Icons.info);
   }
 
-  static void _showToast(
-      BuildContext context, String message, Color color, IconData icon) {
-    Flushbar(
-      margin: const EdgeInsets.all(16),
-      borderRadius: BorderRadius.circular(12),
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14.0),
+  static void _showToast(String message, Color color, IconData icon) {
+    Get.snackbar(
+      '',
+      message,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: color,
-      flushbarPosition: FlushbarPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
       duration: const Duration(seconds: 5),
-      icon: Icon(
-        icon,
-        color: context.colorPalette.backgroundColor,
-        size: 24,
-      ),
-      messageText: Text(
-        message,
-        style: TextStyle(
-          color: context.colorPalette.reverseTextColor,
-          fontSize: context.getResponsiveSize(3.25),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
       animationDuration: const Duration(milliseconds: 500),
       forwardAnimationCurve: Curves.easeOutBack,
       reverseAnimationCurve: Curves.easeInBack,
-    ).show(context);
+      icon: Icon(icon, color: Colors.white, size: 24),
+      colorText: Colors.white,
+      titleText: const SizedBox.shrink(),
+    );
   }
 }
