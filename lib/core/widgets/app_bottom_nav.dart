@@ -49,13 +49,13 @@ class AppBottomNav extends StatelessWidget {
       'but got $currentIndex.',
     );
 
-    final barHeight = context.responsiveWidth(66, tabletVal: 72);
-    final iconContainerSize = context.responsiveWidth(36, tabletVal: 40);
-    final iconSize = context.responsiveWidth(20, tabletVal: 22);
-    final labelFontSize = context.responsiveWidth(11, tabletVal: 12);
-    final itemVerticalPadding = context.responsiveWidth(6, tabletVal: 8);
-    final iconLabelSpacing = context.responsiveWidth(4, tabletVal: 5);
-    final inkwellBorderRadius = context.responsiveWidth(14, tabletVal: 16);
+    final barHeight = context.getResponsiveSize(11);
+    final iconContainerSize = context.getResponsiveSize(6);
+    final iconSize = context.getResponsiveSize(3.5);
+    final labelFontSize = context.getResponsiveSize(2);
+    final itemVerticalPadding = context.getResponsiveSize(1.2);
+    final iconLabelSpacing = context.getResponsiveSize(0.8);
+    final inkwellBorderRadius = context.getResponsiveSize(2.5);
 
     return Container(
       padding: EdgeInsets.only(
