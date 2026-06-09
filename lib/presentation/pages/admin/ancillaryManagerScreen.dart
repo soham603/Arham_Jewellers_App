@@ -43,7 +43,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
             icon: Icon(
               Icons.refresh_rounded,
               color: AppColors.textDark,
-              size: context.getScreenWidth(6),
+              size: context.getFontSize(6),
             ),
           ),
         ],
@@ -99,7 +99,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
           children: [
             Icon(
               Icons.error_outline_rounded,
-              size: context.getScreenWidth(14),
+              size: context.getFontSize(14),
               color: Colors.red.shade300,
             ),
             SizedBox(height: context.getScreenHeight(2)),
@@ -182,7 +182,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                     child: Icon(
                       _getPageIcon(key),
                       color: hasContent ? AppColors.primaryGold : AppColors.textMuted,
-                      size: context.getScreenWidth(6),
+                      size: context.getFontSize(6),
                     ),
                   ),
                   SizedBox(width: context.getScreenWidth(4)),
@@ -218,7 +218,7 @@ class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
                   Icon(
                     Icons.chevron_right_rounded,
                     color: AppColors.textMuted,
-                    size: context.getScreenWidth(6),
+                    size: context.getFontSize(6),
                   ),
                 ],
               ),
@@ -349,7 +349,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
                   icon: Icon(
                     Icons.close_rounded,
                     color: AppColors.textMuted,
-                    size: context.getScreenWidth(6),
+                    size: context.getFontSize(6),
                   ),
                 ),
               ],

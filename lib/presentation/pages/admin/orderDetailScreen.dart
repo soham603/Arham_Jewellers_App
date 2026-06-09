@@ -383,7 +383,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Icon(
               Icons.account_balance_wallet_rounded,
               color: AppColors.primaryGold,
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
           ),
           SizedBox(width: context.getScreenWidth(3)),
@@ -482,7 +482,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: context.getScreenWidth(4.5), color: AppColors.textMuted),
+        Icon(icon, size: context.getFontSize(4.5), color: AppColors.textMuted),
         SizedBox(width: context.getScreenWidth(2.5)),
         Flexible(
           child: Column(
@@ -519,7 +519,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }) {
     return Row(
       children: [
-        Icon(icon, size: context.getScreenWidth(4), color: AppColors.textMuted),
+        Icon(icon, size: context.getFontSize(4), color: AppColors.textMuted),
         SizedBox(width: context.getScreenWidth(2)),
         Text(
           "$label: ",
@@ -564,7 +564,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Icon(
                 Icons.info_outline_rounded,
                 color: order.status == "REJECTED" ? Colors.red : AppColors.primaryGold,
-                size: context.getScreenWidth(4.5),
+                size: context.getFontSize(4.5),
               ),
               SizedBox(width: context.getScreenWidth(2)),
               Text(

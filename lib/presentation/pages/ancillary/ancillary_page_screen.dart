@@ -84,7 +84,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                 children: [
                   Icon(
                     Icons.error_outline_rounded,
-                    size: context.getScreenWidth(14),
+                    size: context.getFontSize(14),
                     color: Colors.red.shade300,
                   ),
                   SizedBox(height: context.getScreenHeight(2)),
@@ -120,7 +120,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
               children: [
                 Icon(
                   Icons.article_outlined,
-                  size: context.getScreenWidth(14),
+                  size: context.getFontSize(14),
                   color: AppColors.textMuted.withOpacity(0.4),
                 ),
                 SizedBox(height: context.getScreenHeight(1)),

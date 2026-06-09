@@ -652,7 +652,7 @@ class _RegisterPageState extends State<RegisterPage> {
           icon: Icon(
             Icons.arrow_back_ios_new,
             color: AppColors.textDark,
-            size: context.getScreenWidth(5),
+            size: context.getFontSize(5),
           ),
           onPressed: () => Get.back(),
         ),

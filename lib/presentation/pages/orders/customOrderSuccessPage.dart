@@ -27,7 +27,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                   child: Icon(
                     Icons.check_circle_outline_rounded,
                     color: AppColors.primaryGold,
-                    size: context.getScreenWidth(14),
+                    size: context.getFontSize(14),
                   ),
                 ),
                 SizedBox(height: context.getScreenHeight(3)),

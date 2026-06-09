@@ -161,7 +161,7 @@ class _SharePageState extends State<SharePage> {
               children: [
                 Icon(
                   Icons.arrow_back_ios_rounded,
-                  size: context.getScreenWidth(4),
+                  size: context.getFontSize(4),
                   color: Colors.white,
                 ),
                 SizedBox(width: context.getScreenWidth(1.5)),
@@ -270,7 +270,7 @@ class _SharePageState extends State<SharePage> {
                     Icon(
                       Icons.chevron_right_rounded,
                       color: context.colorPalette.subTitleColor,
-                      size: context.getScreenWidth(5),
+                      size: context.getFontSize(5),
                     ),
                   ],
                 ),
@@ -342,7 +342,7 @@ class _SharePageState extends State<SharePage> {
                           allSelected
                               ? Icons.deselect_rounded
                               : Icons.select_all_rounded,
-                          size: context.getScreenWidth(3.5),
+                          size: context.getFontSize(3.5),
                           color: allSelected ? Colors.white : context.colorPalette.goldDark,
                         ),
                         SizedBox(width: context.getScreenWidth(1)),
@@ -411,7 +411,7 @@ class _SharePageState extends State<SharePage> {
                           child: isSelected
                               ? Icon(
                                   Icons.check,
-                                  size: context.getScreenWidth(3),
+                                  size: context.getFontSize(3),
                                   color: Colors.white,
                                 )
                               : null,
@@ -448,7 +448,7 @@ class _SharePageState extends State<SharePage> {
                             ),
                             child: Icon(
                               Icons.visibility_outlined,
-                              size: context.getScreenWidth(4),
+                              size: context.getFontSize(4),
                               color: context.colorPalette.goldDark,
                             ),
                           ),
@@ -477,7 +477,7 @@ class _SharePageState extends State<SharePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: context.getScreenWidth(12), color: context.colorPalette.subTitleColor),
+          Icon(icon, size: context.getFontSize(12), color: context.colorPalette.subTitleColor),
           SizedBox(height: context.getScreenHeight(1.5)),
           Text(
             message,
@@ -707,7 +707,7 @@ class _SharePageState extends State<SharePage> {
                 color: effectiveIconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: effectiveIconColor, size: context.getScreenWidth(6)),
+              child: Icon(icon, color: effectiveIconColor, size: context.getFontSize(6)),
             ),
             SizedBox(width: context.getScreenWidth(3)),
             Expanded(
@@ -736,7 +736,7 @@ class _SharePageState extends State<SharePage> {
             Icon(
               disabled ? Icons.lock_outline_rounded : Icons.chevron_right_rounded,
               color: effectiveSubtitleColor,
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
           ],
         ),

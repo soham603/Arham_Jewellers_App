@@ -68,7 +68,7 @@ class AdminPanelScreen extends StatelessWidget {
                       child: Icon(
                         Icons.admin_panel_settings_rounded,
                         color: Colors.white,
-                        size: context.getScreenWidth(10),
+                        size: context.getFontSize(10),
                       ),
                     ),
                     SizedBox(width: context.getScreenWidth(4)),
@@ -126,7 +126,7 @@ class AdminPanelScreen extends StatelessWidget {
                       Icon(
                         Icons.shield_rounded,
                         color: AppColors.primaryGold,
-                        size: context.getScreenWidth(5),
+                        size: context.getFontSize(5),
                       ),
                       SizedBox(width: context.getScreenWidth(2)),
                       Expanded(
@@ -278,7 +278,7 @@ class AdminPanelScreen extends StatelessWidget {
               child: Icon(
                 icon,
                 color: AppColors.primaryGold,
-                size: context.getScreenWidth(7),
+                size: context.getFontSize(7),
               ),
             ),
             SizedBox(height: context.getScreenHeight(1.5)),

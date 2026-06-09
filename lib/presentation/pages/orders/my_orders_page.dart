@@ -161,7 +161,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             color: AppColors.textDark,
-            size: context.getScreenWidth(5),
+            size: context.getFontSize(5),
           ),
         ),
         title: Text(
@@ -179,7 +179,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
             icon: Icon(
               Icons.refresh_rounded,
               color: AppColors.primaryGold,
-              size: context.getScreenWidth(6),
+              size: context.getFontSize(6),
             ),
           ),
           SizedBox(width: context.getScreenWidth(2)),
@@ -282,7 +282,7 @@ class _OrderCard extends StatelessWidget {
                           SizedBox(width: context.getScreenWidth(2)),
                           Icon(
                             Icons.arrow_forward_ios_rounded,
-                            size: context.getScreenWidth(3),
+                            size: context.getFontSize(3),
                             color: AppColors.textMuted,
                           ),
                         ],
@@ -375,7 +375,7 @@ class _OrderCard extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.info_outline_rounded,
-                            size: context.getScreenWidth(4),
+                            size: context.getFontSize(4),
                             color: AppColors.primaryGold,
                           ),
                           SizedBox(width: context.getScreenWidth(2)),
@@ -547,7 +547,7 @@ class _EmptyOrdersView extends StatelessWidget {
               child: Icon(
                 Icons.receipt_long_outlined,
                 color: AppColors.primaryGold,
-                size: context.getScreenWidth(11),
+                size: context.getFontSize(11),
               ),
             ),
             SizedBox(height: context.getScreenHeight(2.5)),
@@ -614,7 +614,7 @@ class _ErrorView extends StatelessWidget {
         children: [
           Icon(
             Icons.error_outline_rounded,
-            size: context.getScreenWidth(14),
+            size: context.getFontSize(14),
             color: AppColors.textMuted,
           ),
           SizedBox(height: context.getScreenHeight(2)),

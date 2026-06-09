@@ -271,7 +271,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                           controller.searchMode == SearchMode.PHONE
                               ? Icons.phone_android_rounded
                               : Icons.person_rounded,
-                          size: context.getScreenWidth(5),
+                          size: context.getFontSize(5),
                           color: Colors.white,
                         ),
                       ),
@@ -870,7 +870,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         children: [
           Icon(
             Icons.wifi_off_rounded,
-            size: context.getScreenWidth(14),
+            size: context.getFontSize(14),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -914,7 +914,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         children: [
           Icon(
             Icons.inbox_rounded,
-            size: context.getScreenWidth(16),
+            size: context.getFontSize(16),
             color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
@@ -1099,7 +1099,7 @@ class _RequestCardState extends State<_RequestCard> {
                               child: Icon(
                                 Icons.store_rounded,
                                 color: const Color(0xFFD4AF37),
-                                size: context.getScreenWidth(3.2),
+                                size: context.getFontSize(3.2),
                               ),
                             ),
                           Container(
@@ -1129,7 +1129,7 @@ class _RequestCardState extends State<_RequestCard> {
                             ? Icons.keyboard_arrow_up_rounded
                             : Icons.keyboard_arrow_down_rounded,
                         color: context.colorPalette.subTitleColor,
-                        size: context.getScreenWidth(5),
+                        size: context.getFontSize(5),
                       ),
                     ],
                   ),
@@ -1265,7 +1265,7 @@ class _RequestCardState extends State<_RequestCard> {
                           Icon(
                             Icons.store_rounded,
                             color: _isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
-                            size: context.getScreenWidth(5),
+                            size: context.getFontSize(5),
                           ),
                           SizedBox(width: context.getScreenWidth(3)),
                           Expanded(
@@ -1451,7 +1451,7 @@ class _RequestCardState extends State<_RequestCard> {
                   Icon(
                     icon,
                     color: outlined ? color : Colors.white,
-                    size: context.getScreenWidth(4),
+                    size: context.getFontSize(4),
                   ),
                   SizedBox(width: context.getScreenWidth(1.5)),
                   Text(

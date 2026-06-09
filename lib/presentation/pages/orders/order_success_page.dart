@@ -260,7 +260,7 @@ class _AnimatedHero extends StatelessWidget {
               child: Icon(
                 Icons.check_rounded,
                 color: Colors.white,
-                size: context.getScreenWidth(6),
+                size: context.getFontSize(6),
               ),
             ),
           ),
@@ -450,7 +450,7 @@ class _OrderDetailCard extends StatelessWidget {
           child: Icon(
             Icons.shopping_bag_outlined,
             color: AppColors.primaryGold,
-            size: context.getScreenWidth(9),
+            size: context.getFontSize(9),
           ),
         ),
       );
@@ -628,7 +628,7 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
               child: Icon(
                 _copied ? Icons.check_circle : Icons.copy_rounded,
                 key: ValueKey(_copied),
-                size: context.getScreenWidth(3.8),
+                size: context.getFontSize(3.8),
                 color: _copied ? Colors.green : AppColors.textMuted,
               ),
             ),
@@ -836,7 +836,7 @@ class _ContactAdminCard extends StatelessWidget {
                 child: Icon(
                   Icons.headset_mic_rounded,
                   color: AppColors.primaryGold,
-                  size: context.getScreenWidth(5),
+                  size: context.getFontSize(5),
                 ),
               ),
               SizedBox(width: context.getScreenWidth(3)),
@@ -873,7 +873,7 @@ class _ContactAdminCard extends StatelessWidget {
                 child: _ContactButton(
                   icon: Icon(Icons.phone_rounded,
                       color: AppColors.primaryGold,
-                      size: context.getScreenWidth(4.5)),
+                      size: context.getFontSize(4.5)),
                   label: 'Call Us',
                   color: AppColors.primaryGold,
                   onTap: _launchCall,

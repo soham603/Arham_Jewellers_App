@@ -1098,7 +1098,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: context.getScreenWidth(5.5),
+                size: context.getFontSize(5.5),
               ),
             ),
             SizedBox(width: context.getScreenWidth(3)),
@@ -1128,7 +1128,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Icon(
               Icons.chevron_right_rounded,
               color: context.colorPalette.subTitleColor,
-              size: context.getScreenWidth(5),
+              size: context.getFontSize(5),
             ),
           ],
         ),
