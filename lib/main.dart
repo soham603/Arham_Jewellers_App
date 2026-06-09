@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'app/app.dart';
 
@@ -13,6 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   Get.put(CartController());
+  Get.put(WishlistController());
   Get.put(AuthController());
   Get.put(GoldRateController());
   if (!kIsWeb) {
