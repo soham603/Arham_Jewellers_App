@@ -108,6 +108,7 @@ class _WishlistPageState extends State<WishlistPage> {
             final product = items[index];
             return ProductCard(
               product: product,
+              showWishlistRemoveAlert: true,
               onTap: () {
                 Navigator.push(
                   context,
