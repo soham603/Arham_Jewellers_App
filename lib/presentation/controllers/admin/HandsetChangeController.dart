@@ -202,9 +202,8 @@ class HandsetChangeController extends GetxController {
         return true;
       }
 
-      final message = response.data?['error']?['message'] ??
-          response.data?['message'] ??
-          'Action failed';
+      final resData = response.data;
+      final message = (resData is Map) ? (resData['error']?['message'] ?? resData['message'] ?? 'Action failed') : 'Action failed';
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
@@ -213,10 +212,13 @@ class HandsetChangeController extends GetxController {
     } on DioException catch (e, st) {
       Logger.error('HandsetChangeController', '_handleAction Dio: $e\n$st');
 
-      String message = e.response?.data?['error']?['message'] ??
-          e.response?.data?['message'] ??
-          e.message ??
-          'Something went wrong';
+      String message = 'Something went wrong';
+      if (e.response?.data is Map) {
+        final data = e.response!.data;
+        message = data['error']?['message'] ?? data['message'] ?? e.message ?? 'Something went wrong';
+      } else {
+        message = e.message ?? 'Something went wrong';
+      }
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;

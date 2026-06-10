@@ -192,11 +192,12 @@ class CategoryManagerController extends GetxController {
         Logger.info("CategoryManagerController", "Category created: ${created.name}");
         return null;
       }
-      return response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to create';
+      return (response.data is Map) ? (response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to create') : 'Failed to create';
     } catch (e) {
       Logger.error("CategoryManagerController", "create error: $e");
       if (e is DioException && e.response?.data != null) {
-        return e.response!.data['error']?['message'] ?? e.response!.data['message'] ?? 'Something went wrong';
+        final data = e.response!.data;
+        return (data is Map) ? (data['error']?['message'] ?? data['message'] ?? 'Something went wrong') : 'Something went wrong';
       }
       return 'Something went wrong';
     }
@@ -237,11 +238,12 @@ class CategoryManagerController extends GetxController {
         Logger.info("CategoryManagerController", "Category $id updated");
         return null;
       }
-      return response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to update';
+      return (response.data is Map) ? (response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to update') : 'Failed to update';
     } catch (e) {
       Logger.error("CategoryManagerController", "edit error: $e");
       if (e is DioException && e.response?.data != null) {
-        return e.response!.data['error']?['message'] ?? e.response!.data['message'] ?? 'Something went wrong';
+        final data = e.response!.data;
+        return (data is Map) ? (data['error']?['message'] ?? data['message'] ?? 'Something went wrong') : 'Something went wrong';
       }
       return 'Something went wrong';
     } finally {

@@ -348,10 +348,14 @@ class AuthController extends GetxController {
     } on DioException catch (e) {
       String errorMsg = "An unexpected error occurred";
       if (e.response?.data != null) {
-        errorMsg = e.response!.data['error']?['message'] ??
-            e.response!.data['detail'] ??
-            e.response!.data['message'] ??
-            errorMsg;
+        final data = e.response!.data;
+        if (data is Map) {
+          final error = data['error'];
+          errorMsg = (error is Map ? error['message'] : error?.toString()) ??
+              data['detail']?.toString() ??
+              data['message']?.toString() ??
+              errorMsg;
+        }
       }
       _userRegisterErrorMsg.value = errorMsg;
       _userRegisterState.value = CurrentAppState.ERROR;
@@ -398,10 +402,14 @@ class AuthController extends GetxController {
     } on DioException catch (e) {
       String errorMsg = "An unexpected error occurred";
       if (e.response?.data != null) {
-        errorMsg = e.response!.data['error']?['message'] ??
-            e.response!.data['detail'] ??
-            e.response!.data['message'] ??
-            errorMsg;
+        final data = e.response!.data;
+        if (data is Map) {
+          final error = data['error'];
+          errorMsg = (error is Map ? error['message'] : error?.toString()) ??
+              data['detail']?.toString() ??
+              data['message']?.toString() ??
+              errorMsg;
+        }
       }
       _forgotPasswordState.value = CurrentAppState.ERROR;
       ToastUtils.showError(errorMsg);

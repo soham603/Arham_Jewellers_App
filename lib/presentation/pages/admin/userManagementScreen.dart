@@ -646,6 +646,28 @@ class _UserCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (user.forgotPasswordStatus == 'PENDING') ...[
+                  SizedBox(height: context.getScreenHeight(0.5)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(2.5),
+                      vertical: context.getScreenHeight(0.4),
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'PASSWORD PENDING',
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontSize: context.getResponsiveSize(2),
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ],
                 SizedBox(height: context.getScreenHeight(0.5)),
                 Icon(
                   Icons.chevron_right_rounded,
@@ -691,12 +713,20 @@ class _UserDetailSheet extends StatefulWidget {
 class _UserDetailSheetState extends State<_UserDetailSheet> {
   late bool _isRetailer;
   late bool _isStaff;
+  final _newPasswordController = TextEditingController();
+  bool _obscureNewPassword = true;
 
   @override
   void initState() {
     super.initState();
     _isRetailer = widget.user.isRetailer ?? false;
     _isStaff = widget.user.role == 'ADMIN' || widget.user.role == 'SUPERADMIN';
+  }
+
+  @override
+  void dispose() {
+    _newPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -1112,6 +1142,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                 ? () => _confirmDeactivate(context)
                 : () => _confirmReactivate(context),
           ),
+
+          // Reset Password — visible only when forgotPasswordStatus is PENDING
+          if (widget.user.forgotPasswordStatus == 'PENDING') ...[
+            _sheetDivider(context),
+            _actionRow(
+              context,
+              icon: Icons.lock_reset_rounded,
+              title: 'Reset Password',
+              subtitle: 'Set a new password for this user',
+              color: Colors.orange,
+              isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+                  widget.controller.actioningId == widget.user.id,
+              onTap: () => _showResetPasswordDialog(context),
+            ),
+          ],
         ],
       ),
     );
@@ -1537,6 +1582,198 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showResetPasswordDialog(BuildContext context) {
+    _newPasswordController.clear();
+    _obscureNewPassword = true;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final hasPassword = _newPasswordController.text.trim().isNotEmpty;
+
+          return AlertDialog(
+            backgroundColor: context.colorPalette.backgroundColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            contentPadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(5),
+              context.getResponsiveSize(4),
+              context.getResponsiveSize(5),
+              0,
+            ),
+            actionsPadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(2),
+              0,
+              context.getResponsiveSize(3),
+              context.getScreenHeight(1),
+            ),
+            titlePadding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(5),
+              context.getResponsiveSize(4),
+              context.getResponsiveSize(5),
+              context.getScreenHeight(1),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.lock_reset_rounded,
+                    color: Colors.orange,
+                    size: 16,
+                  ),
+                ),
+                SizedBox(width: context.getResponsiveSize(2)),
+                Text(
+                  'Reset Password',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Set a new password for ${widget.user.name}',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.4),
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(1.5)),
+                TextField(
+                  controller: _newPasswordController,
+                  obscureText: _obscureNewPassword,
+                  onChanged: (_) => setDialogState(() {}),
+                  style: TextStyle(
+                    color: AppColors.textDark,
+                    fontSize: context.getResponsiveSize(3.5),
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'New Password',
+                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    prefixIcon: Icon(
+                      Icons.lock_outline_rounded,
+                      color: context.colorPalette.subTitleColor,
+                      size: context.getResponsiveSize(4.5),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureNewPassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey.shade500,
+                        size: context.getResponsiveSize(4.5),
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          _obscureNewPassword = !_obscureNewPassword;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor: context.colorPalette.boxColor,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.getScreenHeight(1.2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(3),
+                    vertical: context.getScreenHeight(0.6),
+                  ),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: context.colorPalette.subTitleColor,
+                    fontSize: context.getResponsiveSize(3.2),
+                  ),
+                ),
+              ),
+              Obx(
+                () => ElevatedButton(
+                  onPressed: hasPassword && widget.controller.actionState != CurrentAppState.LOADING
+                      ? () async {
+                          final password = _newPasswordController.text.trim();
+                          Navigator.of(dialogContext).pop();
+                          await widget.controller.adminResetPassword(
+                            userId: widget.user.id,
+                            newPassword: password,
+                          );
+                          if (context.mounted) Navigator.of(context).pop();
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    disabledBackgroundColor: Colors.orange.withValues(alpha: 0.35),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.getScreenHeight(0.6),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: widget.controller.actionState == CurrentAppState.LOADING
+                      ? const SizedBox(
+                          width: 16, height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Text(
+                          'Reset Password',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: context.getResponsiveSize(3.2),
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
