@@ -17,12 +17,15 @@ class CategoryManagerScreen extends StatefulWidget {
 
 class _CategoryManagerScreenState extends State<CategoryManagerScreen>
     with SingleTickerProviderStateMixin {
-  final CategoryManagerController ctrl = Get.put(CategoryManagerController());
+  late final CategoryManagerController ctrl;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    ctrl = Get.isRegistered<CategoryManagerController>()
+        ? Get.find<CategoryManagerController>()
+        : Get.put(CategoryManagerController());
     _tabController = TabController(length: 3, vsync: this);
   }
 

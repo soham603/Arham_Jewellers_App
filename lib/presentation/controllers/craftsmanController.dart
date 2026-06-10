@@ -21,7 +21,9 @@ class CraftsmanController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchCraftsmen();
+    if (_craftsmen.isEmpty) {
+      fetchCraftsmen();
+    }
   }
 
   Future<void> fetchCraftsmen() async {

@@ -16,7 +16,7 @@ class ApproveUsersScreen extends StatefulWidget {
 }
 
 class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
-  final AdminUserController controller = Get.put(AdminUserController());
+  late final AdminUserController controller;
   final ScrollController _scroll = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -29,6 +29,9 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   @override
   void initState() {
     super.initState();
+    controller = Get.isRegistered<AdminUserController>()
+        ? Get.find<AdminUserController>()
+        : Get.put(AdminUserController());
     _scroll.addListener(() {
       if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
         controller.loadMore();
