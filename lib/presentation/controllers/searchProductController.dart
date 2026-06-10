@@ -706,6 +706,60 @@ class SearchProductController extends GetxController {
     _categoryState.value = CurrentAppState.INITIAL;
   }
 
+  Future<void> loadProductsByMultipleCategories(List<String> categoryIds) async {
+    _categoryState.value = CurrentAppState.LOADING;
+    _categoryProducts.clear();
+
+    try {
+      final futures = categoryIds.map((catId) async {
+        try {
+          final response = await httpClient.get(
+            "/api/v1/products/get-all",
+            queryParameters: {
+              "categoryId": catId,
+              "page": 1,
+              "limit": _pageLimit,
+              "showReverse": true,
+            },
+          );
+
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            final data = response.data['data'];
+            final List raw = data['data'] is List ? data['data'] : [];
+            return raw.map((e) => ProductModel.fromJson(e)).toList();
+          }
+        } catch (e) {
+          Logger.error(
+            "SearchProductController",
+            "Failed to fetch category $catId: $e",
+          );
+        }
+        return <ProductModel>[];
+      });
+
+      final results = await Future.wait(futures);
+      final seenIds = <String>{};
+      final allProducts = <ProductModel>[];
+
+      for (final products in results) {
+        for (final p in products) {
+          if (seenIds.add(p.id)) {
+            allProducts.add(p);
+          }
+        }
+      }
+
+      _categoryProducts.value = allProducts;
+      _categoryState.value = CurrentAppState.SUCCESS;
+    } catch (e, st) {
+      _categoryState.value = CurrentAppState.ERROR;
+      Logger.error(
+        "SearchProductController",
+        "loadProductsByMultipleCategories error: $e\n$st",
+      );
+    }
+  }
+
   // ── Category + karat filtered products (client-side touch filter) ───
   final _filteredProducts = <ProductModel>[].obs;
   List<ProductModel> get filteredProducts => _filteredProducts;

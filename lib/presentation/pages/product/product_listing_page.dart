@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
+import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -18,14 +19,20 @@ class ProductListingPage extends StatefulWidget {
   final String? karat;
   final List<String>? karats;
   final String? categoryId;
+  final List<String>? categoryIds;
+  final Map<String, String>? categoryNames;
   final String? title;
+  final bool startInSelectMode;
 
   const ProductListingPage({
     super.key,
     this.karat,
     this.karats,
     this.categoryId,
+    this.categoryIds,
+    this.categoryNames,
     this.title,
+    this.startInSelectMode = false,
   });
 
   @override
@@ -48,6 +55,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   bool get _isSelectMode => _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
 
+  late String _selectedKarat;
+  List<String> _filteredCategoryIds = [];
+
   void _toggleSelection(String productId) {
     setState(() {
       if (_selectedProductIds.contains(productId)) {
@@ -64,15 +74,40 @@ class _ProductListingPageState extends State<ProductListingPage> {
     });
   }
 
-  bool get _isCategoryFilter => widget.categoryId != null;
+  bool get _isCategoryFilter => widget.categoryId != null || _isMultiCategory;
+  bool get _isMultiCategory => widget.categoryIds != null && widget.categoryIds!.isNotEmpty;
   bool get _hasKarat => widget.karat != null;
   bool get _isCategoryOnly => _isCategoryFilter && !_hasKarat;
 
-  List<ProductModel> get _displayedProducts => _isCategoryOnly
-      ? _controller.categoryProducts
-      : _isCategoryFilter
-      ? _controller.filteredProducts
-      : _controller.karatProducts;
+  List<ProductModel> get _displayedProducts {
+    final List<ProductModel> base;
+    if (_isMultiCategory) {
+      base = _controller.categoryProducts;
+    } else if (_isCategoryOnly) {
+      base = _controller.categoryProducts;
+    } else if (_isCategoryFilter) {
+      base = _controller.filteredProducts;
+    } else {
+      base = _controller.karatProducts;
+    }
+    if (!_isMultiCategory) return base;
+    var result = base;
+    if (_filteredCategoryIds.length != (widget.categoryIds?.length ?? 0)) {
+      result = result.where((p) {
+        final catId = p.category?.id;
+        return catId != null && _filteredCategoryIds.contains(catId);
+      }).toList();
+    }
+    if (_selectedKarat.isNotEmpty) {
+      final targetKarat = int.tryParse(
+        _selectedKarat.replaceAll(RegExp(r'[^0-9]'), ''),
+      );
+      if (targetKarat != null) {
+        result = result.where((p) => p.karatNumber == targetKarat).toList();
+      }
+    }
+    return result;
+  }
 
   double get _displayedWeightMax {
     double max = 0;
@@ -101,11 +136,25 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void initState() {
     super.initState();
     final tag = _isCategoryFilter
-        ? 'filtered_${widget.categoryId}_${widget.karat ?? ''}'
+        ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     _controller = Get.put(SearchProductController(), tag: tag);
 
-    if (_isCategoryFilter && _hasKarat) {
+    if (widget.startInSelectMode && _isAdmin) {
+      _selectedProductIds.add('_placeholder_');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _selectedProductIds.remove('_placeholder_');
+        });
+      });
+    }
+
+    _selectedKarat = _isMultiCategory ? '' : (widget.karat ?? '22K');
+
+    if (_isMultiCategory) {
+      _filteredCategoryIds = List<String>.from(widget.categoryIds!);
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!);
+    } else if (_isCategoryFilter && _hasKarat) {
       _controller.loadByCategoryWithKaratFilter(
         widget.categoryId!,
         widget.karat!,
@@ -130,7 +179,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     final tag = _isCategoryFilter
-        ? 'filtered_${widget.categoryId}_${widget.karat ?? ''}'
+        ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     Get.delete<SearchProductController>(tag: tag);
     super.dispose();
@@ -191,7 +240,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
       ),
       body: Column(
         children: [
-          if (_karatPurityLabel != null)
+          if (_isMultiCategory)
+            _buildKaratRow(context)
+          else if (_karatPurityLabel != null)
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 2),
@@ -214,23 +265,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
           Expanded(
             child: Obx(() {
               _controller.sortByObs.value;
-              final state = _isCategoryOnly
+              final state = _isMultiCategory
+                  ? _controller.categoryState
+                  : _isCategoryOnly
                   ? _controller.categoryState
                   : _isCategoryFilter
                   ? _controller.filteredState
                   : _controller.karatState;
-              final rawProducts = _isCategoryOnly
-                  ? _controller.categoryProducts
-                  : _isCategoryFilter
-                  ? _controller.filteredProducts
-                  : _controller.karatProducts;
-              final hasMore = _isCategoryOnly
+              final hasMore = _isMultiCategory
+                  ? false
+                  : _isCategoryOnly
                   ? false
                   : _isCategoryFilter
                   ? _controller.filteredHasMore
                   : _controller.karatHasMore;
 
-              final filteredProducts = _applyClientSideFilters(rawProducts);
+              final filteredProducts = _applyClientSideFilters(_displayedProducts);
               final products = _controller.sortProducts(
                 filteredProducts,
                 _controller.sortBy,
@@ -262,7 +312,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          if (_isCategoryOnly) {
+                          if (_isMultiCategory) {
+                            _controller.loadProductsByMultipleCategories(
+                              widget.categoryIds!,
+                            );
+                          } else if (_isCategoryOnly) {
                             _controller.loadProductsByCategory(
                               widget.categoryId!,
                             );
@@ -413,6 +467,83 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ],
       ),
       bottomNavigationBar: _isSelectMode ? _buildSelectionBar(context) : null,
+    );
+  }
+
+  Widget _buildKaratRow(BuildContext context) {
+    final karatOptions = [
+      {'label': '18K', 'percent': '76%'},
+      {'label': '20K', 'percent': '84%'},
+      {'label': '22K', 'percent': '92%'},
+    ];
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        context.getResponsiveSize(4),
+        context.getScreenHeight(0.4),
+        context.getResponsiveSize(4),
+        context.getScreenHeight(0.4),
+      ),
+      child: Row(
+        children: karatOptions.map((option) {
+          final karat = option['label']!;
+          final percent = option['percent']!;
+          final isSelected = _selectedKarat == karat;
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                right: karatOptions.last != option ? context.getResponsiveSize(2) : 0,
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  if (_selectedKarat == karat) return;
+                  setState(() {
+                    _selectedKarat = karat;
+                  });
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(2),
+                    vertical: context.getScreenHeight(0.6),
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.cardBg,
+                    borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+                    border: Border.all(
+                      color: isSelected
+                          ? context.colorPalette.gold
+                          : context.colorPalette.border,
+                      width: 2,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: context.colorPalette.gold.withValues(alpha: 0.4),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Text(
+                    '$karat ($percent)',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.2),
+                      fontWeight: FontWeight.w700,
+                      color: isSelected
+                          ? Colors.white
+                          : context.colorPalette.goldDeep,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -747,6 +878,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   void _showFilterSheet(BuildContext context) {
+    final categoryModels = _isMultiCategory
+        ? (widget.categoryNames ?? {}).entries.map((e) => CategoryModel(
+              id: e.key,
+              name: e.value,
+              nameSlug: e.value.toLowerCase().replaceAll(' ', '-'),
+              imageUrl: '',
+              isDeleted: false,
+            )).toList()
+        : <CategoryModel>[];
+
     FilterBottomSheet.show(
       context,
       initialSelectedKarats: const [],
@@ -759,6 +900,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
       showStockFilter: false,
       showWeightFilter: _hasWeightData,
       showPriceFilter: true,
+      showCategoryFilter: _isMultiCategory,
+      categories: categoryModels,
+      initialSelectedCategoryIds: _filteredCategoryIds,
       weightSliderMax: _displayedWeightMax,
       products: _displayedProducts,
       priceSliderMax: 5000000,
@@ -784,6 +928,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
               _priceMin = pMin;
               _priceMax = pMax;
               _selectedSizes = sizes;
+              if (_isMultiCategory && categoryIds.isNotEmpty) {
+                _filteredCategoryIds = categoryIds;
+              }
             });
           },
     );
@@ -1157,7 +1304,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> _getSelectedProducts() {
-    final allProducts = _isCategoryOnly
+    final allProducts = _isMultiCategory
+        ? _controller.categoryProducts
+        : _isCategoryOnly
         ? _controller.categoryProducts
         : _isCategoryFilter
         ? _controller.filteredProducts

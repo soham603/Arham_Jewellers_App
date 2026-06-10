@@ -553,6 +553,36 @@ class _SharePageState extends State<SharePage> {
               ),
             ),
             GestureDetector(
+              onTap: () {
+                final catNames = <String, String>{
+                  for (final entry in controller.selectedLevel3.entries)
+                    entry.value.id: entry.value.name,
+                };
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductListingPage(
+                      categoryIds: controller.selectedCategoryIds,
+                      categoryNames: catNames,
+                      karat: controller.selectedKarat,
+                      title: 'Selected Products',
+                      startInSelectMode: true,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: context.colorPalette.border),
+                ),
+                child: Icon(Icons.check_rounded, size: 18, color: context.colorPalette.goldDark),
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
               onTap: () => _showShareOptions(context),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
