@@ -57,25 +57,20 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ),
         ),
         actions: [
-          Obx(
-            () => Padding(
-              padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
+          Padding(
+            padding: EdgeInsets.only(right: context.getResponsiveSize(4)),
+            child: GestureDetector(
+              onTap: controller.refresh,
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(3),
-                  vertical: context.getScreenHeight(0.5),
-                ),
+                padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
+                  shape: BoxShape.circle,
                 ),
-                child: Text(
-                  '${controller.total} total',
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.2),
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryGold,
-                  ),
+                child: Icon(
+                  Icons.refresh_rounded,
+                  size: context.getResponsiveSize(5),
+                  color: AppColors.primaryGold,
                 ),
               ),
             ),
