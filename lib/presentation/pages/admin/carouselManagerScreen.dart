@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -224,23 +225,47 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: item.imageUrl,
-                  width: double.infinity,
-                  height: context.getScreenHeight(20),
-                  fit: BoxFit.cover,
-                  placeholder: (_, _) => Container(
-                    color: context.colorPalette.shimmerBaseColor,
-                    height: context.getScreenHeight(20),
-                  ),
-                  errorWidget: (_, _, _) => Container(
-                    height: context.getScreenHeight(20),
-                    color: context.colorPalette.boxColor,
-                    child: Icon(
-                      Icons.image_not_supported,
-                      color: context.colorPalette.subTitleColor,
+                child: Stack(
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      width: double.infinity,
+                      height: context.getScreenHeight(20),
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => Container(
+                        color: context.colorPalette.shimmerBaseColor,
+                        height: context.getScreenHeight(20),
+                      ),
+                      errorWidget: (_, _, _) => Container(
+                        height: context.getScreenHeight(20),
+                        color: context.colorPalette.boxColor,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: context.colorPalette.subTitleColor,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (item.mediaType == 'video')
+                      Positioned.fill(
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          child: Center(
+                            child: Container(
+                              padding: EdgeInsets.all(context.getResponsiveSize(2)),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.6),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.play_arrow_rounded,
+                                color: Colors.white,
+                                size: context.getResponsiveSize(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               // Position badge
@@ -598,9 +623,10 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required String? linkUrl,
               required File? imageFile,
               required bool? isActive,
+              String? mediaType,
             }) async {
               if (imageFile == null) {
-                _showSnack(context, 'Please select an image', isError: true);
+                _showSnack(context, 'Please select an image or video', isError: true);
                 return;
               }
               final ok = await controller.createCarousel(
@@ -609,6 +635,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 linkUrl: linkUrl,
                 imageFile: imageFile,
                 isActive: isActive ?? true,
+                mediaType: mediaType,
               );
               if (ok && context.mounted) {
                 Get.back();
@@ -640,6 +667,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required String? linkUrl,
               required File? imageFile,
               required bool? isActive,
+              String? mediaType,
             }) async {
               final ok = await controller.editCarousel(
                 id: item.id,
@@ -648,6 +676,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 linkUrl: linkUrl,
                 imageFile: imageFile,
                 isActive: isActive,
+                mediaType: mediaType,
               );
               if (ok && context.mounted) {
                 Get.back();
@@ -1042,6 +1071,7 @@ class _CarouselFormSheet extends StatefulWidget {
     required String? linkUrl,
     required File? imageFile,
     required bool? isActive,
+    String? mediaType,
   })
   onSubmit;
 
@@ -1058,8 +1088,10 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   final _linkController = TextEditingController();
   final _formError = ''.obs;
   File? _pickedImage;
+  VideoPlayerController? _videoPreviewController;
   bool _isActive = true;
   bool _isSubmitting = false;
+  String? _localMediaType;
 
   @override
   void initState() {
@@ -1069,6 +1101,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
       _descriptionController.text = widget.existing!.description;
       _linkController.text = widget.existing!.linkUrl ?? '';
       _isActive = widget.existing!.isActive;
+      _localMediaType = widget.existing!.mediaType;
     }
   }
 
@@ -1077,15 +1110,329 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
     _titleController.dispose();
     _descriptionController.dispose();
     _linkController.dispose();
+    _videoPreviewController?.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
+  Future<void> _pickMedia() async {
+    final source = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.colorPalette.backgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(context.getResponsiveSize(5)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Media Type',
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(5),
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              SizedBox(height: context.getScreenHeight(2)),
+              Row(
+                children: [
+                  Expanded(
+                    child: _mediaTypeOption(
+                      ctx,
+                      icon: Icons.image_rounded,
+                      label: 'Image',
+                      onTap: () => Navigator.pop(ctx, 'image'),
+                    ),
+                  ),
+                  SizedBox(width: context.getResponsiveSize(3)),
+                  Expanded(
+                    child: _mediaTypeOption(
+                      ctx,
+                      icon: Icons.videocam_rounded,
+                      label: 'Video',
+                      onTap: () => Navigator.pop(ctx, 'video'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
-    if (picked != null) setState(() => _pickedImage = File(picked.path));
+
+    if (source == null) return;
+
+    if (source == 'image') {
+      await _videoPreviewController?.dispose();
+      _videoPreviewController = null;
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      if (picked != null) {
+        setState(() {
+          _pickedImage = File(picked.path);
+          _localMediaType = 'image';
+        });
+      }
+    } else {
+      final picked = await ImagePicker().pickVideo(
+        source: ImageSource.gallery,
+        maxDuration: const Duration(seconds: 60),
+      );
+      if (picked != null) {
+        await _videoPreviewController?.dispose();
+        _videoPreviewController = VideoPlayerController.file(File(picked.path));
+        await _videoPreviewController!.initialize();
+        setState(() {
+          _pickedImage = File(picked.path);
+          _localMediaType = 'video';
+        });
+      }
+    }
+  }
+
+  Widget _mediaTypeOption(
+    BuildContext ctx,
+    {required IconData icon, required String label, required VoidCallback onTap}
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: context.getResponsiveSize(10), color: context.colorPalette.primaryColor),
+            SizedBox(height: context.getScreenHeight(0.8)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.8),
+                fontWeight: FontWeight.w600,
+                color: context.colorPalette.textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMediaPreview({required bool isEdit}) {
+    if (_pickedImage != null) {
+      if (_localMediaType == 'video') {
+        if (_videoPreviewController != null && _videoPreviewController!.value.isInitialized) {
+          final ctrl = _videoPreviewController!;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: ctrl.value.size.width,
+                  height: ctrl.value.size.height,
+                  child: VideoPlayer(ctrl),
+                ),
+              ),
+              Container(color: Colors.black.withValues(alpha: 0.25)),
+              Center(
+                child: Container(
+                  padding: EdgeInsets.all(context.getResponsiveSize(2)),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.white,
+                    size: context.getResponsiveSize(6),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: context.getResponsiveSize(2),
+                right: context.getResponsiveSize(2),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(2),
+                    vertical: context.getResponsiveSize(0.5),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Tap to change',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: context.getResponsiveSize(2.5),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(color: context.colorPalette.boxColor),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.videocam_rounded,
+                    size: context.getResponsiveSize(12),
+                    color: context.colorPalette.primaryColor,
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.8)),
+                  Text(
+                    'Video selected',
+                    style: TextStyle(
+                      color: context.colorPalette.textColor,
+                      fontSize: context.getResponsiveSize(3.5),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    'Tap to change',
+                    style: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(2.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.file(_pickedImage!, fit: BoxFit.cover),
+          Container(color: Colors.black.withValues(alpha: 0.2)),
+          Center(
+            child: Icon(
+              Icons.edit_rounded,
+              color: Colors.white,
+              size: context.getResponsiveSize(8),
+            ),
+          ),
+        ],
+      );
+    }
+
+    final existingUrl = widget.existing?.imageUrl;
+    final existingVideo = widget.existing?.mediaType == 'video';
+
+    if (existingUrl != null && existingUrl.isNotEmpty) {
+      if (existingVideo) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(color: context.colorPalette.boxColor),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.videocam_rounded,
+                    size: context.getResponsiveSize(12),
+                    color: context.colorPalette.primaryColor,
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.8)),
+                  Text(
+                    'Video (existing)',
+                    style: TextStyle(
+                      color: context.colorPalette.textColor,
+                      fontSize: context.getResponsiveSize(3.5),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    'Tap to change',
+                    style: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(2.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          CachedNetworkImage(
+            imageUrl: existingUrl,
+            fit: BoxFit.cover,
+          ),
+          Container(color: Colors.black.withValues(alpha: 0.4)),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.edit_rounded,
+                  color: Colors.white,
+                  size: context.getResponsiveSize(8),
+                ),
+                SizedBox(height: context.getScreenHeight(0.5)),
+                Text(
+                  'Tap to change',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.getResponsiveSize(3.2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.add_photo_alternate_rounded,
+          size: context.getResponsiveSize(12),
+          color: context.colorPalette.subTitleColor,
+        ),
+        SizedBox(height: context.getScreenHeight(0.8)),
+        Text(
+          'Tap to select image/video',
+          style: TextStyle(
+            color: context.colorPalette.subTitleColor,
+            fontSize: context.getResponsiveSize(3.5),
+          ),
+        ),
+        if (!isEdit) ...[
+          SizedBox(height: context.getScreenHeight(0.3)),
+          Text(
+            '* Required',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: context.getResponsiveSize(3),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 
   @override
@@ -1134,102 +1481,30 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(2)),
 
-              // ── Image Picker ────────────────────────────────────────────
+              // ── Media Picker ────────────────────────────────────────────────
               AspectRatio(
                 aspectRatio: 2.0,
                 child: GestureDetector(
-                  onTap: _pickImage,
+                  onTap: _pickMedia,
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                    color: context.colorPalette.boxColor,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: _pickedImage != null
-                          ? context.colorPalette.primaryColor
-                          : context.colorPalette.boxColor,
-                      width: 2,
+                      color: context.colorPalette.boxColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: _pickedImage != null
+                            ? context.colorPalette.primaryColor
+                            : context.colorPalette.boxColor,
+                        width: 2,
+                      ),
                     ),
-                  ),
-                  child: _pickedImage != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(_pickedImage!, fit: BoxFit.cover),
-                        )
-                      : widget.existing?.imageUrl != null
-                      ? Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: CachedNetworkImage(
-                                imageUrl: widget.existing!.imageUrl,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.4),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.edit_rounded,
-                                      color: Colors.white,
-                                      size: context.getResponsiveSize(8),
-                                    ),
-                                    SizedBox(
-                                      height: context.getScreenHeight(0.5),
-                                    ),
-                                    Text(
-                                      'Tap to change image',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: context.getResponsiveSize(3.2),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add_photo_alternate_rounded,
-                              size: context.getResponsiveSize(12),
-                              color: context.colorPalette.subTitleColor,
-                            ),
-                            SizedBox(height: context.getScreenHeight(0.8)),
-                            Text(
-                              'Tap to select image/video',
-                              style: TextStyle(
-                                color: context.colorPalette.subTitleColor,
-                                fontSize: context.getResponsiveSize(3.5),
-                              ),
-                            ),
-                            if (!isEdit) ...[
-                              SizedBox(height: context.getScreenHeight(0.3)),
-                              Text(
-                                '* Required',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: context.getResponsiveSize(3),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: _buildMediaPreview(isEdit: isEdit),
                     ),
                   ),
                 ),
-              SizedBox(height: context.getScreenHeight(1)),
+              ),
               Row(
                 children: [
                   Icon(
@@ -1349,7 +1624,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                       : () async {
                           _formError.value = '';
                           if (_pickedImage == null && widget.existing == null) {
-                            _formError.value = 'Please select an image';
+                            _formError.value = 'Please select an image or video';
                             return;
                           }
                           setState(() => _isSubmitting = true);
@@ -1365,6 +1640,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 : _linkController.text.trim(),
                             imageFile: _pickedImage,
                             isActive: _isActive,
+                            mediaType: _localMediaType,
                           );
                           if (mounted) {
                             setState(() => _isSubmitting = false);

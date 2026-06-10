@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
@@ -1542,7 +1544,7 @@ class _QuickStatsStrip extends StatelessWidget {
 }
 
 // 🔥 RESTORED EXACTLY TO YOUR ORIGINAL CODE! No default fallback banners.
-class _CarouselSection extends StatelessWidget {
+class _CarouselSection extends StatefulWidget {
   final CarouselsController controller;
   final PageController pageController;
   final int currentIndex;
@@ -1556,16 +1558,79 @@ class _CarouselSection extends StatelessWidget {
   });
 
   @override
+  State<_CarouselSection> createState() => _CarouselSectionState();
+}
+
+class _CarouselSectionState extends State<_CarouselSection> {
+  final Map<int, VideoPlayerController> _videoControllers = {};
+
+  @override
+  void didUpdateWidget(_CarouselSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _updateVideoPlayback();
+    }
+  }
+
+  void _updateVideoPlayback() {
+    for (final entry in _videoControllers.entries) {
+      if (entry.key == widget.currentIndex) {
+        if (entry.value.value.isInitialized && !entry.value.value.isPlaying) {
+          entry.value.play();
+        }
+      } else {
+        if (entry.value.value.isPlaying) {
+          entry.value.pause();
+        }
+      }
+    }
+  }
+
+  Future<void> _maybeInitVideo(int index, String url) async {
+    if (_videoControllers.containsKey(index)) return;
+    final ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+    _videoControllers[index] = ctrl;
+    try {
+      await ctrl.initialize();
+      ctrl.setLooping(true);
+      ctrl.setVolume(0);
+      if (mounted && index == widget.currentIndex) {
+        ctrl.play();
+        setState(() {});
+      }
+    } catch (e) {
+      _videoControllers.remove(index);
+      ctrl.dispose();
+    }
+  }
+
+  void _disposeVideoIfNeeded(int index) {
+    if (index != widget.currentIndex && _videoControllers.containsKey(index)) {
+      _videoControllers[index]?.dispose();
+      _videoControllers.remove(index);
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final ctrl in _videoControllers.values) {
+      ctrl.dispose();
+    }
+    _videoControllers.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.getCarouselState == CurrentAppState.LOADING && controller.list.isEmpty) {
+      if (widget.controller.getCarouselState == CurrentAppState.LOADING && widget.controller.list.isEmpty) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: CarouselShimmer(),
         );
       }
 
-      if (controller.getCarouselState == CurrentAppState.ERROR) {
+      if (widget.controller.getCarouselState == CurrentAppState.ERROR) {
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           height: context.getScreenHeight(20),
@@ -1579,7 +1644,7 @@ class _CarouselSection extends StatelessWidget {
         );
       }
 
-      final list = controller.list;
+      final list = widget.controller.list;
 
       if (list.isEmpty) return const SizedBox();
 
@@ -1589,11 +1654,11 @@ class _CarouselSection extends StatelessWidget {
             aspectRatio: 2.0,
 
             child: PageView.builder(
-              controller: pageController,
+              controller: widget.pageController,
 
               itemCount: list.length,
 
-              onPageChanged: onPageChanged,
+              onPageChanged: widget.onPageChanged,
 
               itemBuilder: (_, index) {
                 final item = list[index];
@@ -1616,13 +1681,12 @@ class _CarouselSection extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(18),
 
-                    child: CachedNetworkImage(
-                      imageUrl: item.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => CarouselShimmer(),
-                      errorWidget: (_, _, _) => Container(
-                        color: context.colorPalette.shimmerBaseColor,
-                      ),
+                    child: _CarouselMediaItem(
+                      item: item,
+                      isActive: index == widget.currentIndex,
+                      onVisible: () => _maybeInitVideo(index, item.imageUrl),
+                      onInvisible: () => _disposeVideoIfNeeded(index),
+                      videoController: _videoControllers[index],
                     ),
                   ),
                 );
@@ -1638,7 +1702,7 @@ class _CarouselSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(list.length, (i) {
-                final active = i == currentIndex;
+                final active = i == widget.currentIndex;
 
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
@@ -1658,6 +1722,77 @@ class _CarouselSection extends StatelessWidget {
         ],
       );
     });
+  }
+}
+
+class _CarouselMediaItem extends StatefulWidget {
+  final CarouselModel item;
+  final bool isActive;
+  final VoidCallback onVisible;
+  final VoidCallback onInvisible;
+  final VideoPlayerController? videoController;
+
+  const _CarouselMediaItem({
+    required this.item,
+    required this.isActive,
+    required this.onVisible,
+    required this.onInvisible,
+    this.videoController,
+  });
+
+  @override
+  State<_CarouselMediaItem> createState() => _CarouselMediaItemState();
+}
+
+class _CarouselMediaItemState extends State<_CarouselMediaItem> {
+  bool _wasActive = false;
+
+  @override
+  void didUpdateWidget(_CarouselMediaItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !_wasActive) {
+      widget.onVisible();
+    } else if (!widget.isActive && _wasActive) {
+      widget.onInvisible();
+    }
+    _wasActive = widget.isActive;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _wasActive = widget.isActive;
+    if (widget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => widget.onVisible());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.item.mediaType == 'video' && widget.videoController != null) {
+      final ctrl = widget.videoController!;
+      if (ctrl.value.isInitialized) {
+        return SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: ctrl.value.size.width,
+              height: ctrl.value.size.height,
+              child: VideoPlayer(ctrl),
+            ),
+          ),
+        );
+      }
+    }
+
+    return CachedNetworkImage(
+      imageUrl: widget.item.imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (_, _) => CarouselShimmer(),
+      errorWidget: (_, _, _) => Container(
+        color: context.colorPalette.shimmerBaseColor,
+      ),
+    );
   }
 }
 
