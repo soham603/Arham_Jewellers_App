@@ -278,11 +278,15 @@ class AdminOrderController extends GetxController {
     } catch (e) {
       String errorMessage = "Something went wrong";
       if (e is DioException) {
-        errorMessage =
-            e.response?.data?['error']?['message']?.toString() ??
-            e.response?.data?['message']?.toString() ??
-            e.message ??
-            errorMessage;
+        if (e.response?.data is Map) {
+          errorMessage =
+              e.response?.data?['error']?['message']?.toString() ??
+              e.response?.data?['message']?.toString() ??
+              e.message ??
+              errorMessage;
+        } else {
+          errorMessage = e.message ?? errorMessage;
+        }
       }
 
       ToastUtils.showError(errorMessage);
@@ -336,11 +340,15 @@ class AdminOrderController extends GetxController {
 
       String errorMessage = "Something went wrong";
       if (e is DioException) {
-        errorMessage =
-            e.response?.data?['error']?['message']?.toString() ??
-            e.response?.data?['message']?.toString() ??
-            e.message ??
-            errorMessage;
+        if (e.response?.data is Map) {
+          errorMessage =
+              e.response?.data?['error']?['message']?.toString() ??
+              e.response?.data?['message']?.toString() ??
+              e.message ??
+              errorMessage;
+        } else {
+          errorMessage = e.message ?? errorMessage;
+        }
       }
 
       ToastUtils.showError(errorMessage);

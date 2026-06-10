@@ -425,6 +425,7 @@ class UserSearchModel {
   final String? deviceId;
   final String? deviceName;
   final bool? isRetailer;
+  final String? forgotPasswordStatus;
 
   UserSearchModel({
     required this.id,
@@ -443,6 +444,7 @@ class UserSearchModel {
     this.deviceId,
     this.deviceName,
     this.isRetailer,
+    this.forgotPasswordStatus,
   });
 
   factory UserSearchModel.fromJson(Map<String, dynamic> json) {
@@ -471,6 +473,7 @@ class UserSearchModel {
       deviceId: json['deviceId'],
       deviceName: json['deviceName'],
       isRetailer: json['retailUser'] ?? false,
+      forgotPasswordStatus: json['forgotPasswordStatus'],
     );
   }
 
@@ -492,6 +495,7 @@ class UserSearchModel {
       'deviceId': deviceId,
       'deviceName': deviceName,
       'retailUser': isRetailer,
+      'forgotPasswordStatus': forgotPasswordStatus,
     };
   }
 
@@ -512,6 +516,7 @@ class UserSearchModel {
     String? deviceId,
     String? deviceName,
     bool? isRetailer,
+    String? forgotPasswordStatus,
   }) {
     return UserSearchModel(
       id: id ?? this.id,
@@ -530,6 +535,7 @@ class UserSearchModel {
       deviceId: deviceId ?? this.deviceId,
       deviceName: deviceName ?? this.deviceName,
       isRetailer: isRetailer ?? this.isRetailer,
+      forgotPasswordStatus: forgotPasswordStatus ?? this.forgotPasswordStatus,
     );
   }
 }

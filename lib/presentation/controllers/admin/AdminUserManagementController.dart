@@ -227,6 +227,19 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
+  /// Admin reset password for a user with pending forgot password status
+  Future<bool> adminResetPassword({
+    required String userId,
+    required String newPassword,
+  }) async {
+    return _handleAction(
+      userId: userId,
+      endpoint: '/api/v1/auth/admin-reset-password',
+      body: {'userId': userId, 'newPassword': newPassword},
+      actionLabel: 'password reset',
+    );
+  }
+
   // ── Generic action handler ───────────────────────────────────────────────
   Future<bool> _handleAction({
     required String userId,
@@ -252,9 +265,8 @@ class AdminUserManagementController extends GetxController {
         return true;
       }
 
-      final message = response.data?['error']?['message'] ??
-          response.data?['message'] ??
-          'Action failed';
+      final resData = response.data;
+      final message = (resData is Map) ? (resData['error']?['message'] ?? resData['message'] ?? 'Action failed') : 'Action failed';
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
@@ -263,10 +275,13 @@ class AdminUserManagementController extends GetxController {
     } on DioException catch (e, st) {
       Logger.error('AdminUserManagementController', 'action Dio: $e\n$st');
 
-      String message = e.response?.data?['error']?['message'] ??
-          e.response?.data?['message'] ??
-          e.message ??
-          'Something went wrong';
+      String message = 'Something went wrong';
+      if (e.response?.data is Map) {
+        final data = e.response!.data;
+        message = data['error']?['message'] ?? data['message'] ?? e.message ?? 'Something went wrong';
+      } else {
+        message = e.message ?? 'Something went wrong';
+      }
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
