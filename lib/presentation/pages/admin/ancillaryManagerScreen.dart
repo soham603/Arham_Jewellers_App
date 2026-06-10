@@ -13,12 +13,17 @@ class AncillaryManagerScreen extends StatefulWidget {
 }
 
 class _AncillaryManagerScreenState extends State<AncillaryManagerScreen> {
-  final AncillaryController controller = Get.put(AncillaryController());
+  late final AncillaryController controller;
 
   @override
   void initState() {
     super.initState();
-    controller.fetchAllPages();
+    controller = Get.isRegistered<AncillaryController>()
+        ? Get.find<AncillaryController>()
+        : Get.put(AncillaryController());
+    if (controller.pages.isEmpty) {
+      controller.fetchAllPages();
+    }
   }
 
   @override

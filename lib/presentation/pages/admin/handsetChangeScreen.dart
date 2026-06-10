@@ -16,7 +16,7 @@ class HandsetChangeScreen extends StatefulWidget {
 }
 
 class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
-  final HandsetChangeController controller = Get.put(HandsetChangeController());
+  late final HandsetChangeController controller;
   final ScrollController _scroll = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -25,13 +25,18 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   @override
   void initState() {
     super.initState();
+    controller = Get.isRegistered<HandsetChangeController>()
+        ? Get.find<HandsetChangeController>()
+        : Get.put(HandsetChangeController());
     _scroll.addListener(() {
       if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
         controller.loadMore();
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchRequests();
+      if (controller.requests.isEmpty) {
+        controller.fetchRequests();
+      }
     });
   }
 

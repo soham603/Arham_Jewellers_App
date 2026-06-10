@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/orderDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminCustomOrderDetailPage.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminOrderShimmer.dart';
@@ -31,6 +32,10 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
       controller = Get.find<AdminOrderController>();
     } else {
       controller = Get.put(AdminOrderController());
+    }
+
+    if (!Get.isRegistered<CraftsmanController>()) {
+      Get.put(CraftsmanController());
     }
   }
 

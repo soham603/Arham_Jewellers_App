@@ -16,7 +16,7 @@ class AdminProductScreen extends StatefulWidget {
 }
 
 class _AdminProductScreenState extends State<AdminProductScreen> {
-  final AdminProductController ctrl = Get.put(AdminProductController());
+  late final AdminProductController ctrl;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchTextCtrl = TextEditingController();
   Timer? _debounce;
@@ -24,6 +24,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
   @override
   void initState() {
     super.initState();
+    ctrl = Get.isRegistered<AdminProductController>()
+        ? Get.find<AdminProductController>()
+        : Get.put(AdminProductController());
     _scrollController.addListener(_onScroll);
   }
 

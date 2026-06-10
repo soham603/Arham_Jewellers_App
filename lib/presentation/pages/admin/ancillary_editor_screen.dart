@@ -19,7 +19,7 @@ class AncillaryEditorScreen extends StatefulWidget {
 class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
   final HtmlEditorController controller = HtmlEditorController();
 
-  final AncillaryController apiController = Get.put(AncillaryController());
+  late final AncillaryController apiController;
 
   bool isLoading = true;
   bool isSaving = false;
@@ -27,11 +27,16 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
   @override
   void initState() {
     super.initState();
+    apiController = Get.isRegistered<AncillaryController>()
+        ? Get.find<AncillaryController>()
+        : Get.put(AncillaryController());
     _loadInitialHtml();
   }
 
   Future<void> _loadInitialHtml() async {
-    await apiController.fetchPage(widget.category);
+    if (apiController.getPage(widget.category) == null) {
+      await apiController.fetchPage(widget.category);
+    }
 
     if (mounted) {
       setState(() {

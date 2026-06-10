@@ -16,8 +16,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  final AdminUserManagementController controller =
-      Get.put(AdminUserManagementController());
+  late final AdminUserManagementController controller;
   final ScrollController _scroll = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -27,6 +26,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   void initState() {
     super.initState();
+    controller = Get.isRegistered<AdminUserManagementController>()
+        ? Get.find<AdminUserManagementController>()
+        : Get.put(AdminUserManagementController());
     _scroll.addListener(() {
       if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
         controller.loadMore();

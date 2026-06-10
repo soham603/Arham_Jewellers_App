@@ -44,8 +44,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final CarouselsController carouselController = Get.put(CarouselsController());
-  final CategoryController categoryController = Get.put(CategoryController());
+  late final CarouselsController carouselController;
+  late final CategoryController categoryController;
   final PageController pageController = PageController();
 
   final ScrollController scrollController = ScrollController();
@@ -59,6 +59,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    carouselController = Get.isRegistered<CarouselsController>()
+        ? Get.find<CarouselsController>()
+        : Get.put(CarouselsController());
+    categoryController = Get.isRegistered<CategoryController>()
+        ? Get.find<CategoryController>()
+        : Get.put(CategoryController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) setState(() => _showCollectionShimmer = false);
     });
