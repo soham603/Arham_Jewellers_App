@@ -63,8 +63,8 @@ class AdminUserManagementController extends GetxController {
     if (!_hasMore && isPagination) return;
     if (_state.value == CurrentAppState.LOADING && !isPagination) return;
 
+    _state.value = CurrentAppState.LOADING;
     if (!isPagination) {
-      _state.value = CurrentAppState.LOADING;
       _page = 1;
       _hasMore = true;
     }

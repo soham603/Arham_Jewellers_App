@@ -299,23 +299,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       final isLoading = controller.state == CurrentAppState.LOADING &&
           controller.users.isNotEmpty;
 
-      if (isLoading) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
-          child: Center(
-            child: SizedBox(
-              width: context.getResponsiveSize(6),
-              height: context.getResponsiveSize(6),
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: context.colorPalette.primaryColor,
-              ),
-            ),
-          ),
-        );
-      }
-
-      if (!controller.hasMore) {
+      if (!controller.hasMore && !isLoading) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
           child: Center(
@@ -336,23 +320,33 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           horizontal: context.getResponsiveSize(12),
         ),
         child: ElevatedButton(
-          onPressed: controller.loadMore,
+          onPressed: isLoading ? null : controller.loadMore,
           style: ElevatedButton.styleFrom(
             backgroundColor: context.colorPalette.primaryColor,
+            disabledBackgroundColor: context.colorPalette.primaryColor.withValues(alpha: 0.6),
             padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.2)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
             elevation: 0,
           ),
-          child: Text(
-            'Load More',
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(3.8),
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
+          child: isLoading
+              ? SizedBox(
+                  width: context.getResponsiveSize(5),
+                  height: context.getResponsiveSize(5),
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  'Load More',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.8),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
         ),
       );
     });
@@ -620,6 +614,30 @@ class _UserCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                  SizedBox(height: context.getScreenHeight(0.4)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(2),
+                      vertical: context.getScreenHeight(0.2),
+                    ),
+                    decoration: BoxDecoration(
+                      color: (user.isRetailer == true
+                              ? const Color(0xFFD4AF37)
+                              : context.colorPalette.subTitleColor)
+                          .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      user.isRetailer == true ? 'Retail User' : 'Non Retail User',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(2.5),
+                        fontWeight: FontWeight.w700,
+                        color: user.isRetailer == true
+                            ? const Color(0xFFD4AF37)
+                            : context.colorPalette.subTitleColor,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
