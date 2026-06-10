@@ -150,27 +150,17 @@ class ToastUtils {
     final resolvedDuration = duration ?? config.duration;
     final resolvedPosition = position ?? config.position;
 
-    Get.snackbar(
-      // We supply empty strings here because we render custom
-      // titleText / messageText widgets instead.
-      '',
-      '',
-      titleText: resolvedTitle != null
-          ? _buildTitleText(resolvedTitle)
-          : const SizedBox.shrink(),
-      messageText: _buildMessageText(message),
+    Get.rawSnackbar(
+      messageText: _buildContent(resolvedTitle, message, config.icon),
       snackPosition: resolvedPosition,
       backgroundColor: config.backgroundColor,
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.zero,
       borderRadius: 12,
       duration: resolvedDuration,
       animationDuration: const Duration(milliseconds: 400),
       forwardAnimationCurve: Curves.easeOutBack,
       reverseAnimationCurve: Curves.easeInBack,
-      icon: Icon(config.icon, color: Colors.white, size: 26),
-      shouldIconPulse: false,
-      colorText: Colors.white,
       isDismissible: true,
       dismissDirection: DismissDirection.horizontal,
       snackStyle: SnackStyle.FLOATING,
@@ -179,29 +169,50 @@ class ToastUtils {
 
   // ─── Widget Builders ──────────────────────────────────────────────────────
 
-  static Widget _buildTitleText(String title) {
+  static Widget _buildContent(String? title, String message, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          height: 1.4,
-        ),
-      ),
-    );
-  }
-
-  static Widget _buildMessageText(String message) {
-    return Text(
-      message,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 13,
-        fontWeight: FontWeight.w400,
-        height: 1.4,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 36),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title != null)
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      height: 1.4,
+                    ),
+                  ),
+                if (title != null) const SizedBox(height: 2),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Icon(icon, color: Colors.white, size: 24),
+            ),
+          ),
+        ],
       ),
     );
   }
