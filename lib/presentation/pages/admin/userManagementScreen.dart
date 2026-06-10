@@ -29,11 +29,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     controller = Get.isRegistered<AdminUserManagementController>()
         ? Get.find<AdminUserManagementController>()
         : Get.put(AdminUserManagementController());
-    _scroll.addListener(() {
-      if (_scroll.position.pixels >= _scroll.position.maxScrollExtent - 300) {
-        controller.loadMore();
-      }
-    });
   }
 
   @override
@@ -300,8 +295,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   // ── List Footer ───────────────────────────────────────────────────────────
   Widget _listFooter(BuildContext context) {
     return Obx(() {
-      if (controller.state == CurrentAppState.LOADING &&
-          controller.users.isNotEmpty) {
+      final isLoading = controller.state == CurrentAppState.LOADING &&
+          controller.users.isNotEmpty;
+
+      if (isLoading) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
           child: Center(
@@ -316,6 +313,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ),
         );
       }
+
       if (!controller.hasMore) {
         return Padding(
           padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
@@ -330,7 +328,32 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           ),
         );
       }
-      return const SizedBox.shrink();
+
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: context.getScreenHeight(1.5),
+          horizontal: context.getResponsiveSize(12),
+        ),
+        child: ElevatedButton(
+          onPressed: controller.loadMore,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: context.colorPalette.primaryColor,
+            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.2)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
+          ),
+          child: Text(
+            'Load More',
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.8),
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
     });
   }
 
