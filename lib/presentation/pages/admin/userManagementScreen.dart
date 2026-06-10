@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserManagementController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
@@ -1064,19 +1065,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       ),
       child: Column(
         children: [
-          // Staff Toggle
-          _toggleRow(
-            context,
-            icon: Icons.admin_panel_settings_outlined,
-            title: 'Staff Access',
-            subtitle: 'Grant admin privileges',
-            value: _isStaff,
-            activeColor: AppColors.primaryGold,
-            isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
-                widget.controller.actioningId == widget.user.id,
-            onChanged: (val) => _confirmStaffToggle(context, val),
-          ),
-          _sheetDivider(context),
+          // Staff Toggle — visible only to SUPERADMIN
+          if (Get.find<AuthController>().user?.role == 'SUPERADMIN') ...[
+            _toggleRow(
+              context,
+              icon: Icons.admin_panel_settings_outlined,
+              title: 'Staff Access',
+              subtitle: 'Grant admin privileges',
+              value: _isStaff,
+              activeColor: AppColors.primaryGold,
+              isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+                  widget.controller.actioningId == widget.user.id,
+              onChanged: (val) => _confirmStaffToggle(context, val),
+            ),
+            _sheetDivider(context),
+          ],
 
           // Retailer Toggle
           _toggleRow(
