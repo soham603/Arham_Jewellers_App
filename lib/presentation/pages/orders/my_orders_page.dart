@@ -121,7 +121,6 @@ class _MyOrdersPageState extends State<MyOrdersPage>
             return _OrderCard(
               order: orders[index],
               context: context,
-              controller: _orderController,
             );
           },
         ),
@@ -226,9 +225,8 @@ class _MyOrdersPageState extends State<MyOrdersPage>
 class _OrderCard extends StatelessWidget {
   final UserOrderModel order;
   final BuildContext context;
-  final UserOrderController controller;
 
-  const _OrderCard({required this.order, required this.context, required this.controller});
+  const _OrderCard({required this.order, required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +296,7 @@ class _OrderCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _OrderImagesStack(order: order, controller: controller),
+                      _OrderImagesStack(order: order),
                       SizedBox(width: context.getResponsiveSize(3)),
                       Expanded(
                         child: Column(
@@ -647,17 +645,16 @@ class _ErrorView extends StatelessWidget {
 // ── Order Images Stack ───────────────────────────────────────────────────────
 
 class _OrderImagesStack extends StatelessWidget {
-  const _OrderImagesStack({required this.order, required this.controller});
+  const _OrderImagesStack({required this.order});
 
   final UserOrderModel order;
-  final UserOrderController controller;
 
   @override
   Widget build(BuildContext context) {
     final size = context.getResponsiveSize(20);
     final items = order.items;
     final images = items
-        .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))
+        .map((item) => item.product.imageUrl)
         .where((url) => url != null && url.isNotEmpty)
         .toList();
 

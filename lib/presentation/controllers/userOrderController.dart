@@ -78,24 +78,11 @@ class UserOrderController extends GetxController {
 
   int _ordersPage = 1;
 
-  final _productImageCache = <String, String?>{}.obs;
-  final _imageCacheTimestamp = <String, DateTime>{};
-  static const _cacheTTL = Duration(minutes: 5);
-  RxMap<String, String?> get productImageCache => _productImageCache;
-
   final _productDataCache = <String, ProductModel>{};
+  final _isFetchingProductDetails = false.obs;
+  bool get isFetchingProductDetails => _isFetchingProductDetails.value;
 
   ProductModel? getProductData(String productId) => _productDataCache[productId];
-
-  String? getProductImage(String productId) {
-    final timestamp = _imageCacheTimestamp[productId];
-    if (timestamp != null && DateTime.now().difference(timestamp) > _cacheTTL) {
-      _productImageCache.remove(productId);
-      _imageCacheTimestamp.remove(productId);
-      return null;
-    }
-    return _productImageCache[productId];
-  }
 
   // ── Status filter ──────────────────────────────────────────────────────
 
@@ -284,8 +271,6 @@ class UserOrderController extends GetxController {
 
         _ordersState.value = CurrentAppState.SUCCESS;
 
-        _fetchProductImages();
-
         Logger.info("UserOrderController", "Orders fetched successfully");
       } else {
         _ordersState.value = CurrentAppState.ERROR;
@@ -312,31 +297,19 @@ class UserOrderController extends GetxController {
     }
   }
 
-  // =====================================================
-  // FETCH PRODUCT IMAGES
-  // =====================================================
-
-  bool _isFetchingImages = false;
-
-  Future<void> _fetchProductImages() async {
-    if (_isFetchingImages) return;
-    _isFetchingImages = true;
-
-    try {
-      final uniqueProducts = <String, String>{};
-      for (final order in _userOrders) {
-        for (final item in order.items) {
-          final id = item.product.id;
-          if (!_productImageCache.containsKey(id) &&
-              !uniqueProducts.containsKey(id)) {
-            uniqueProducts[id] = item.product.name;
-          }
-        }
+  Future<void> fetchProductDetails(List<UserOrderItemModel> items) async {
+    final uncached = <String, String>{};
+    for (final item in items) {
+      final id = item.product.id;
+      if (!_productDataCache.containsKey(id) && !uncached.containsKey(id)) {
+        uncached[id] = item.product.name;
       }
+    }
+    if (uncached.isEmpty) return;
 
-      if (uniqueProducts.isEmpty) return;
-
-      final futures = uniqueProducts.entries.map((entry) async {
+    _isFetchingProductDetails.value = true;
+    try {
+      final futures = uncached.entries.map((entry) async {
         try {
           final response = await httpClient.get(
             "/api/v1/products/search",
@@ -347,31 +320,23 @@ class UserOrderController extends GetxController {
               "showAll": true,
             },
           );
-
           if (response.statusCode == 200 || response.statusCode == 201) {
             final List raw = response.data['data']['data'] ?? [];
             final match = raw.cast<Map<String, dynamic>?>().firstWhere(
                   (p) => p?['id'] == entry.key,
-                  orElse: () =>
-                      raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+                  orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
                 );
-
             if (match != null) {
-              final product = ProductModel.fromJson(match);
-              _productImageCache[entry.key] = product.displayImageUrl;
-              _productDataCache[entry.key] = product;
-              _imageCacheTimestamp[entry.key] = DateTime.now();
+              _productDataCache[entry.key] = ProductModel.fromJson(match);
             }
           }
         } catch (e) {
-          Logger.error(
-              "UserOrderController", "Image fetch failed for ${entry.key}: $e");
+          Logger.error("UserOrderController", "Product detail fetch failed for ${entry.key}: $e");
         }
       });
-
       await Future.wait(futures);
     } finally {
-      _isFetchingImages = false;
+      _isFetchingProductDetails.value = false;
     }
   }
 

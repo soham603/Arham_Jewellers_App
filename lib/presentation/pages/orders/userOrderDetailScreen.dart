@@ -32,6 +32,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     } else {
       controller = Get.put(UserOrderController());
     }
+    controller.fetchProductDetails(widget.order.items);
   }
 
   @override
@@ -168,7 +169,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1.5)),
           ...List.generate(order.items.length, (index) {
             final item = order.items[index];
-            final imageUrl = item.product.imageUrl ?? controller.getProductImage(item.product.id);
+            final imageUrl = item.product.imageUrl;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
@@ -243,17 +244,33 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             ],
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
-                          Row(
+                          Wrap(
+                            spacing: context.getResponsiveSize(2),
+                            runSpacing: context.getScreenHeight(0.6),
                             children: [
                               _itemDetailChip(
                                 context,
                                 label: "Qty: ${item.quantity}",
                               ),
-                              SizedBox(width: context.getResponsiveSize(2)),
                               _itemDetailChip(
                                 context,
                                 label: "₹${item.price.toStringAsFixed(2)}",
                               ),
+                              ...() {
+                                final chips = <Widget>[];
+                                final isLoading = controller.isFetchingProductDetails;
+                                final productData = controller.getProductData(item.product.id);
+                                final purity = productData?.touch;
+                                if (purity != null && purity.isNotEmpty) {
+                                  chips.add(_itemDetailChip(
+                                    context,
+                                    label: "Purity: $purity",
+                                  ));
+                                } else if (isLoading) {
+                                  chips.add(_ShimmerChip(context: context));
+                                }
+                                return chips;
+                              }(),
                             ],
                           ),
 
@@ -729,4 +746,21 @@ class _StatusInfo {
     required this.color,
     required this.bgColor,
   });
+}
+
+class _ShimmerChip extends StatelessWidget {
+  final BuildContext context;
+  const _ShimmerChip({required this.context});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: context.getResponsiveSize(18),
+      height: context.getResponsiveSize(5),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
 }

@@ -268,7 +268,6 @@ class _AdminOrderCard extends StatelessWidget {
           children: [
             _OrderImagesStack(
               order: order,
-              controller: controller,
             ),
             SizedBox(width: context.getResponsiveSize(4)),
             Expanded(
@@ -353,42 +352,17 @@ class _AdminOrderCard extends StatelessWidget {
   }
 }
 
-class _OrderImagesStack extends StatefulWidget {
-  const _OrderImagesStack({
-    required this.order,
-    required this.controller,
-  });
+class _OrderImagesStack extends StatelessWidget {
+  const _OrderImagesStack({required this.order});
 
   final AdminOrderModel order;
-  final AdminOrderController controller;
-
-  @override
-  State<_OrderImagesStack> createState() => _OrderImagesStackState();
-}
-
-class _OrderImagesStackState extends State<_OrderImagesStack> {
-  late final Worker _worker;
-
-  @override
-  void initState() {
-    super.initState();
-    _worker = ever(widget.controller.productImageCache, (_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _worker.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final size = context.getResponsiveSize(20);
 
-    final images = widget.order.orderItems
-        .map((item) => widget.controller.getProductImage(item.product.id))
+    final images = order.orderItems
+        .map((item) => item.product.imageUrl)
         .where((url) => url != null && url.isNotEmpty)
         .toList();
 
@@ -400,7 +374,7 @@ class _OrderImagesStackState extends State<_OrderImagesStack> {
     }
 
     final displayImages = images.take(3).toList();
-    final totalItems = widget.order.orderItems.length;
+    final totalItems = order.orderItems.length;
 
     return SizedBox(
       width: size,
