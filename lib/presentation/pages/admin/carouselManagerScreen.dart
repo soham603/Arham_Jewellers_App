@@ -1208,7 +1208,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             ),
                             SizedBox(height: context.getScreenHeight(0.8)),
                             Text(
-                              'Tap to select image',
+                              'Tap to select image/video',
                               style: TextStyle(
                                 color: context.colorPalette.subTitleColor,
                                 fontSize: context.getResponsiveSize(3.5),
