@@ -60,7 +60,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      orderController.fetchUserOrders();
+      if (!authController.isAdmin) {
+        orderController.fetchUserOrders();
+      }
     });
   }
 
