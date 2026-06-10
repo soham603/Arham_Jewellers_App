@@ -1227,7 +1227,7 @@ class _RequestCardState extends State<_RequestCard> {
 
                   SizedBox(height: context.getScreenHeight(1.5)),
 
-                  if (req.status == 'PENDING' || req.status == 'APPROVED')
+                  if (req.status == 'PENDING')
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(3),
@@ -1279,11 +1279,7 @@ class _RequestCardState extends State<_RequestCard> {
                             child: Switch(
                               value: _isRetailer,
                               onChanged: (val) {
-                                if (req.status == 'APPROVED') {
-                                  _confirmRetailerToggle(context, req, val);
-                                } else {
-                                  setState(() => _isRetailer = val);
-                                }
+                                setState(() => _isRetailer = val);
                               },
                               activeThumbColor: const Color(0xFFD4AF37),
                               activeTrackColor: const Color(0xFFD4AF37).withValues(alpha: 0.3),
@@ -1293,63 +1289,8 @@ class _RequestCardState extends State<_RequestCard> {
                       ),
                     ),
 
-                  if (req.status == 'PENDING' || req.status == 'APPROVED')
+                  if (req.status == 'PENDING')
                     SizedBox(height: context.getScreenHeight(1.5)),
-
-                  if (req.status == 'APPROVED')
-                    GestureDetector(
-                      onTap: () => _showResetPasswordDialog(context, req),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getResponsiveSize(3),
-                          vertical: context.getScreenHeight(1),
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryGold.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.primaryGold.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.lock_reset_rounded,
-                              color: AppColors.primaryGold,
-                              size: context.getResponsiveSize(5),
-                            ),
-                            SizedBox(width: context.getResponsiveSize(3)),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Reset Password',
-                                    style: TextStyle(
-                                      fontSize: context.getResponsiveSize(3.5),
-                                      fontWeight: FontWeight.w600,
-                                      color: context.colorPalette.textColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Set a new password for this user',
-                                    style: TextStyle(
-                                      fontSize: context.getResponsiveSize(2.8),
-                                      color: context.colorPalette.subTitleColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.chevron_right_rounded,
-                              color: context.colorPalette.subTitleColor,
-                              size: context.getResponsiveSize(5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
 
                   if (req.status == 'APPROVED')
                     SizedBox(height: context.getScreenHeight(1.5)),

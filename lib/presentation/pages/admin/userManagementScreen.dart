@@ -1125,18 +1125,18 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ],
 
           // Retailer Toggle
-          _toggleRow(
-            context,
-            icon: Icons.store_outlined,
-            title: 'Retailer Status',
-            subtitle: 'Mark as retailer',
-            value: _isRetailer,
-            activeColor: const Color(0xFFD4AF37),
-            isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
-                widget.controller.actioningId == widget.user.id,
-            onChanged: (val) => _confirmRetailerToggle(context, val),
-          ),
-          _sheetDivider(context),
+          // _toggleRow(
+          //   context,
+          //   icon: Icons.store_outlined,
+          //   title: 'Retailer Status',
+          //   subtitle: 'Mark as retailer',
+          //   value: _isRetailer,
+          //   activeColor: const Color(0xFFD4AF37),
+          //   isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+          //       widget.controller.actioningId == widget.user.id,
+          //   onChanged: (val) => _confirmRetailerToggle(context, val),
+          // ),
+          // _sheetDivider(context),
 
           // Deactivate / Activate — visible only to SUPERADMIN
           if (Get.find<AuthController>().user?.role == 'SUPERADMIN') ...[
