@@ -10,7 +10,7 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class AdminUserManagementController extends GetxController {
   static AdminUserManagementController get instance => Get.find();
 
-  static const int _pageLimit = 20;
+  static const int _pageLimit = 3; // TODO: change back to 20 before production
 
   final _users = <UserSearchModel>[].obs;
   List<UserSearchModel> get users => _users;
