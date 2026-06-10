@@ -1125,23 +1125,26 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ),
           _sheetDivider(context),
 
-          // Deactivate / Reactivate
-          _actionRow(
-            context,
-            icon: isActive
-                ? Icons.block_outlined
-                : Icons.check_circle_outline_rounded,
-            title: isActive ? 'Deactivate User' : 'Reactivate User',
-            subtitle: isActive
-                ? 'Disable this user account'
-                : 'Re-enable this user account',
-            color: isActive ? Colors.red : Colors.green,
-            isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
-                widget.controller.actioningId == widget.user.id,
-            onTap: isActive
-                ? () => _confirmDeactivate(context)
-                : () => _confirmReactivate(context),
-          ),
+          // Deactivate / Activate — visible only to SUPERADMIN
+          if (Get.find<AuthController>().user?.role == 'SUPERADMIN') ...[
+            _sheetDivider(context),
+            _actionRow(
+              context,
+              icon: isActive
+                  ? Icons.block_outlined
+                  : Icons.check_circle_outline_rounded,
+              title: isActive ? 'Deactivate User' : 'Activate User',
+              subtitle: isActive
+                  ? 'Disable this user account'
+                  : 'Re-enable this user account',
+              color: isActive ? Colors.red : Colors.green,
+              isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+                  widget.controller.actioningId == widget.user.id,
+              onTap: isActive
+                  ? () => _confirmDeactivate(context)
+                  : () => _confirmActivate(context),
+            ),
+          ],
 
           // Reset Password — visible only when forgotPasswordStatus is PENDING
           if (widget.user.forgotPasswordStatus == 'PENDING') ...[
@@ -1361,7 +1364,10 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ? null
                   : () async {
                       Navigator.of(dialogContext).pop();
-                      await widget.controller.deactivateUser(widget.user.id);
+                      await widget.controller.toggleUserActivation(
+                        userId: widget.user.id,
+                        action: 'DEACTIVATED',
+                      );
                       if (context.mounted) Navigator.of(context).pop();
                     },
               style: ElevatedButton.styleFrom(
@@ -1381,7 +1387,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     );
   }
 
-  void _confirmReactivate(BuildContext context) {
+  void _confirmActivate(BuildContext context) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1399,7 +1405,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             ),
             SizedBox(width: context.getResponsiveSize(2)),
             Text(
-              'Reactivate User',
+              'Activate User',
               style: TextStyle(
                 fontSize: context.getResponsiveSize(4.5),
                 fontWeight: FontWeight.w700,
@@ -1409,7 +1415,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ],
         ),
         content: Text(
-          'Reactivate ${widget.user.name}\'s account? They will regain access to the app.',
+          'Activate ${widget.user.name}\'s account? They will regain access to the app.',
           style: TextStyle(
             fontSize: context.getResponsiveSize(3.8),
             color: context.colorPalette.textColor,
@@ -1426,7 +1432,10 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ? null
                   : () async {
                       Navigator.of(dialogContext).pop();
-                      await widget.controller.reactivateUser(widget.user.id);
+                      await widget.controller.toggleUserActivation(
+                        userId: widget.user.id,
+                        action: 'ACTIVE',
+                      );
                       if (context.mounted) Navigator.of(context).pop();
                     },
               style: ElevatedButton.styleFrom(
@@ -1438,7 +1447,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                       width: 16, height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : const Text('Reactivate', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                  : const Text('Activate', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
             ),
           ),
         ],
