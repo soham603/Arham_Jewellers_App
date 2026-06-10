@@ -26,7 +26,7 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
     ctrl = Get.isRegistered<CategoryManagerController>()
         ? Get.find<CategoryManagerController>()
         : Get.put(CategoryManagerController());
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -65,7 +65,6 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
             labelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w600),
             unselectedLabelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w400),
             tabs: const [
-              Tab(text: 'Level 1'),
               Tab(text: 'Level 2'),
               Tab(text: 'Level 3'),
             ],
@@ -79,7 +78,6 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
         return TabBarView(
           controller: _tabController,
           children: [
-            _Level1Tab(ctrl: ctrl),
             _Level2Tab(ctrl: ctrl),
             _Level3Tab(ctrl: ctrl),
           ],
