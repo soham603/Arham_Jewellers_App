@@ -23,6 +23,7 @@ class CarouselModel {
   final String? deletedBy;
 
   final String? imagePublicId;
+  final String? mediaType;
 
   CarouselModel({
     required this.id,
@@ -41,6 +42,7 @@ class CarouselModel {
     this.deletedAt,
     this.deletedBy,
     this.imagePublicId,
+    this.mediaType,
   });
 
   CarouselModel copyWith({
@@ -60,6 +62,7 @@ class CarouselModel {
     Object? mobileImageUrl = _undefined,
     Object? linkUrl = _undefined,
     Object? imagePublicId = _undefined,
+    Object? mediaType = _undefined,
   }) {
     return CarouselModel(
       id: id ?? this.id,
@@ -80,9 +83,11 @@ class CarouselModel {
           : mobileImageUrl as String?,
       linkUrl:
           linkUrl == _undefined ? this.linkUrl : linkUrl as String?,
-      imagePublicId: imagePublicId == _undefined
-          ? this.imagePublicId
-          : imagePublicId as String?,
+imagePublicId: imagePublicId == _undefined
+           ? this.imagePublicId
+           : imagePublicId as String?,
+      mediaType:
+          mediaType == _undefined ? this.mediaType : mediaType as String?,
     );
   }
 
@@ -116,6 +121,7 @@ class CarouselModel {
       deletedBy: json['deletedBy'],
 
       imagePublicId: json['imagePublicId'],
+      mediaType: json['mediaType'],
     );
   }
 }

@@ -192,6 +192,7 @@ class CarouselsController extends GetxController {
     String? mobileImageUrl,
     bool? isActive,
     required File imageFile,
+    String? mediaType,
   }) async {
     try {
       _createState.value = CurrentAppState.LOADING;
@@ -204,6 +205,7 @@ class CarouselsController extends GetxController {
         "linkUrl": ?linkUrl,
         "mobileImageUrl": ?mobileImageUrl,
         "image": await MultipartFile.fromFile(imageFile.path),
+        if (mediaType != null) "mediaType": mediaType,
       };
 
       final response = await httpClient.post(
@@ -266,6 +268,7 @@ class CarouselsController extends GetxController {
     int? position,
     bool? isActive,
     File? imageFile,
+    String? mediaType,
   }) async {
     try {
       _editLoadingId.value = id;
@@ -280,6 +283,7 @@ class CarouselsController extends GetxController {
         "mobileImageUrl": ?mobileImageUrl,
         "position": ?position,
         "isActive": ?isActive,
+        if (mediaType != null) "mediaType": mediaType,
       };
 
       if (imageFile != null) {
