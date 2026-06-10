@@ -177,25 +177,16 @@ class AdminUserManagementController extends GetxController {
 
   // ── Actions (placeholder endpoints - to be finalized with backend) ───────
 
-  /// Deactivate a user account
-  /// TODO: Update endpoint when backend provides it
-  Future<bool> deactivateUser(String userId) async {
+  /// Toggle user activation status (ACTIVE / DEACTIVATED)
+  Future<bool> toggleUserActivation({
+    required String userId,
+    required String action,
+  }) async {
     return _handleAction(
       userId: userId,
-      endpoint: '/api/v1/admin-access/deactivate-user',
-      body: {'userId': userId},
-      actionLabel: 'deactivated',
-    );
-  }
-
-  /// Reactivate a user account
-  /// TODO: Update endpoint when backend provides it
-  Future<bool> reactivateUser(String userId) async {
-    return _handleAction(
-      userId: userId,
-      endpoint: '/api/v1/admin-access/reactivate-user',
-      body: {'userId': userId},
-      actionLabel: 'reactivated',
+      endpoint: '/update-user-activation',
+      body: {'userId': userId, 'action': action},
+      actionLabel: action == 'ACTIVE' ? 'activated' : 'deactivated',
     );
   }
 
