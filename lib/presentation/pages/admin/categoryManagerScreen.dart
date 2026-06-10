@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class CategoryManagerScreen extends StatefulWidget {
   const CategoryManagerScreen({super.key});
@@ -855,11 +856,10 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
 
-    final ok = isEditing
+    final String? error = isEditing
         ? await widget.ctrl.editCategory(
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
-            boxName: _nameCtrl.text.trim(),
             description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
             imageFile: _pickedImage,
           )
@@ -872,14 +872,11 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             imageFile: _pickedImage,
           );
 
-    if (ok && mounted) {
+    if (error == null && mounted) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(isEditing ? 'Updated' : 'Created'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ));
+      ToastUtils.showSuccess(context, isEditing ? 'Updated' : 'Created');
+    } else if (mounted) {
+      ToastUtils.showError(context, error ?? 'Something went wrong');
     }
     if (mounted) setState(() => _submitting = false);
   }
@@ -938,22 +935,29 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
 
                 _label('Image (optional)'),
                 SizedBox(height: context.getScreenHeight(0.8)),
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    height: context.getScreenHeight(14),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _pickedImage != null ? context.colorPalette.primaryColor : context.colorPalette.boxColor,
-                        width: _pickedImage != null ? 2 : 1,
+                Center(
+                  child: SizedBox(
+                    width: context.getScreenHeight(14),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _pickedImage != null ? context.colorPalette.primaryColor : context.colorPalette.boxColor,
+                              width: _pickedImage != null ? 2 : 1,
+                            ),
+                            color: context.colorPalette.boxColor.withValues(alpha: 0.4),
+                          ),
+                          child: _pickedImage != null
+                              ? Image.file(_pickedImage!, fit: BoxFit.cover)
+                              : _imagePlaceholder(context),
+                        ),
                       ),
-                      color: context.colorPalette.boxColor.withValues(alpha: 0.4),
                     ),
-                    child: _pickedImage != null
-                        ? ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.file(_pickedImage!, fit: BoxFit.cover))
-                        : _imagePlaceholder(context),
                   ),
                 ),
                 SizedBox(height: context.getScreenHeight(3)),
@@ -1000,11 +1004,9 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
         ]),
       );
     }
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(Icons.add_photo_alternate_outlined, size: context.getResponsiveSize(8), color: context.colorPalette.subTitleColor),
-      SizedBox(height: context.getScreenHeight(0.5)),
-      Text('Tap to pick image', style: TextStyle(fontSize: context.getResponsiveSize(3.3), color: context.colorPalette.subTitleColor)),
-    ]);
+    return Center(
+      child: Icon(Icons.add_photo_alternate_outlined, size: context.getResponsiveSize(6), color: context.colorPalette.subTitleColor),
+    );
   }
 }
 
