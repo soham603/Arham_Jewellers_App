@@ -100,10 +100,7 @@ class _ChainListingPageState extends State<ChainListingPage> {
   }
 
   List<CategoryModel> _filteredLevel3(CategoryModel parent) {
-    final children = controller.level3Cache[parent.id] ?? [];
-    return children
-        .where((cat) => cat.name.toUpperCase().contains('CHAIN'))
-        .toList();
+    return controller.level3Cache[parent.id] ?? [];
   }
 
   void _toggleKarat(Karat karat) {
