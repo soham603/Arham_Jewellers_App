@@ -669,7 +669,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   @override
   void initState() {
     super.initState();
-    _isRetailer = false;
+    _isRetailer = widget.user.isRetailer ?? false;
     _isStaff = widget.user.role == 'ADMIN' || widget.user.role == 'SUPERADMIN';
   }
 
@@ -887,7 +887,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               label: isActive ? 'Active' : 'Inactive',
               color: isActive ? Colors.green : Colors.red,
             ),
-            if (user.companyName != null && user.companyName!.isNotEmpty) ...[
+            if (user.isRetailer == true) ...[
               SizedBox(width: context.getResponsiveSize(2)),
               _badge(
                 context,
