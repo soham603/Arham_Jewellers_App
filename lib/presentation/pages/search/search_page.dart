@@ -1036,14 +1036,18 @@ class _SearchPageState extends State<SearchPage> {
                       .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                       .trim();
                   String? karatName;
+                  String? purityLabel;
                   if (categoryController.k18Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '76';
+                    karatName = '18K';
+                    purityLabel = '76';
                   } else if (categoryController.k20Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '84';
+                    karatName = '20K';
+                    purityLabel = '84';
                   } else if (categoryController.k22Categories.any((c) => c.id == cat.parentId)) {
-                    karatName = '92';
+                    karatName = '22K';
+                    purityLabel = '92';
                   }
-                  final displayName = karatName != null ? '$cleanedName — $karatName' : cleanedName;
+                  final displayName = purityLabel != null ? '$cleanedName — $purityLabel' : cleanedName;
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
