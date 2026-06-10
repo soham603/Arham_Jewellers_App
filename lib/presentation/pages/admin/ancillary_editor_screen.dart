@@ -98,7 +98,7 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
                   Get.back();
                 } else {
                   ToastUtils.showError(
-                    context,
+                    
                     "Failed to save ${widget.category}",
                   );
                 }
