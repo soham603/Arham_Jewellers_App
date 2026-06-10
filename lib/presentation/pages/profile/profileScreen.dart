@@ -823,7 +823,7 @@ class _OrderCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _OrderImagesStack(order: order, controller: controller),
+            _OrderImagesStack(order: order),
             SizedBox(width: context.getResponsiveSize(3)),
             Expanded(
               child: Column(
@@ -933,17 +933,16 @@ class _OrderCard extends StatelessWidget {
 // ── Order Images Stack ───────────────────────────────────────────────────────
 
 class _OrderImagesStack extends StatelessWidget {
-  const _OrderImagesStack({required this.order, required this.controller});
+  const _OrderImagesStack({required this.order});
 
   final UserOrderModel order;
-  final UserOrderController controller;
 
   @override
   Widget build(BuildContext context) {
     final size = context.getResponsiveSize(20);
     final items = order.items;
     final images = items
-        .map((item) => item.product.imageUrl ?? controller.getProductImage(item.product.id))
+        .map((item) => item.product.imageUrl)
         .where((url) => url != null && url.isNotEmpty)
         .toList();
 

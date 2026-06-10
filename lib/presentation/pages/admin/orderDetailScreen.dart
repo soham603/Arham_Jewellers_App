@@ -31,6 +31,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     } else {
       controller = Get.put(AdminOrderController());
     }
+    controller.fetchProductDetails(widget.order.orderItems);
   }
 
   @override
@@ -203,7 +204,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           SizedBox(height: context.getScreenHeight(1.5)),
           ...List.generate(order.orderItems.length, (index) {
             final item = order.orderItems[index];
-            final imageUrl = controller.getProductImage(item.product.id);
+            final imageUrl = item.product.imageUrl;
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
@@ -278,45 +279,52 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             ],
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
+                          Wrap(
+                            spacing: context.getResponsiveSize(2),
+                            runSpacing: context.getScreenHeight(0.6),
+                            children: [
+                              _itemDetailChip(
+                                context,
+                                label: "Qty: ${item.quantity}",
+                              ),
+                              if (item.price > 0)
                                 _itemDetailChip(
                                   context,
-                                  label: "Qty: ${item.quantity}",
+                                  label: "₹${item.price.toStringAsFixed(2)}",
                                 ),
-                                if (item.price > 0) ...[
-                                  SizedBox(width: context.getResponsiveSize(2)),
-                                  _itemDetailChip(
+                              ...() {
+                                final chips = <Widget>[];
+                                final isLoading = controller.isFetchingProductDetails;
+                                final rawData = controller.getProductRawData(item.product.id);
+                                final salesTouch = rawData?['SalesTouch']?.toString() ?? rawData?['Touch']?.toString();
+                                if (salesTouch != null && salesTouch.isNotEmpty) {
+                                  chips.add(_itemDetailChip(
                                     context,
-                                    label: "₹${item.price.toStringAsFixed(2)}",
-                                  ),
-                                ],
-                                ...() {
-                                  final chips = <Widget>[];
-                                  final rawData = controller.getProductRawData(item.product.id);
-                                  final karigarNetWtVal = rawData != null ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '') : null;
-                                  final weight = karigarNetWtVal;
-                                  if (weight != null) {
-                                    chips.add(SizedBox(width: context.getResponsiveSize(2)));
-                                    chips.add(_itemDetailChip(
-                                      context,
-                                      label: "Net Wt: ${weight.toStringAsFixed(2)}g",
-                                    ));
-                                  }
-                                  final sizeVal = rawData?['Size1']?.toString();
-                                  if (sizeVal != null && sizeVal.isNotEmpty) {
-                                    chips.add(SizedBox(width: context.getResponsiveSize(2)));
-                                    chips.add(_itemDetailChip(
-                                      context,
-                                      label: "Size: $sizeVal",
-                                    ));
-                                  }
-                                  return chips;
-                                }(),
-                              ],
-                            ),
+                                    label: "Purity: $salesTouch",
+                                  ));
+                                }
+                                final karigarNetWtVal = rawData != null ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '') : null;
+                                final weight = karigarNetWtVal;
+                                if (weight != null) {
+                                  chips.add(_itemDetailChip(
+                                    context,
+                                    label: "Net Wt: ${weight.toStringAsFixed(2)}g",
+                                  ));
+                                }
+                                final sizeVal = rawData?['Size1']?.toString();
+                                if (sizeVal != null && sizeVal.isNotEmpty) {
+                                  chips.add(_itemDetailChip(
+                                    context,
+                                    label: "Size: $sizeVal",
+                                  ));
+                                }
+                                if (chips.isEmpty && isLoading) {
+                                  chips.add(_ShimmerChip(context: context));
+                                  chips.add(_ShimmerChip(context: context));
+                                }
+                                return chips;
+                              }(),
+                            ],
                           ),
 
                         ],
@@ -858,5 +866,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       default:
         return Colors.orange;
     }
+  }
+}
+
+class _ShimmerChip extends StatelessWidget {
+  final BuildContext context;
+  const _ShimmerChip({required this.context});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: context.getResponsiveSize(18),
+      height: context.getResponsiveSize(5),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
   }
 }
