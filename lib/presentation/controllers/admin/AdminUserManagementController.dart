@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'dart:async';
 
 import 'package:dio/dio.dart';
@@ -251,7 +252,7 @@ class AdminUserManagementController extends GetxController {
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           response.data['success'] != false) {
         _actionState.value = CurrentAppState.SUCCESS;
-        Get.snackbar('Success', response.data['message'] ?? 'User $actionLabel');
+        ToastUtils.showSuccess(response.data['message'] ?? 'User $actionLabel');
         await refresh();
         return true;
       }
@@ -261,7 +262,7 @@ class AdminUserManagementController extends GetxController {
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
-      Get.snackbar('Failed', message);
+      ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
       Logger.error('AdminUserManagementController', 'action Dio: $e\n$st');
@@ -276,13 +277,13 @@ class AdminUserManagementController extends GetxController {
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
-      Get.snackbar('Failed', message, snackPosition: SnackPosition.BOTTOM);
+      ToastUtils.showError(message);
       return false;
     } catch (e, st) {
       Logger.error('AdminUserManagementController', 'action: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
+      ToastUtils.showError(e.toString());
       return false;
     } finally {
       _actioningId.value = '';

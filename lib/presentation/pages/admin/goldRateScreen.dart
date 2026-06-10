@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -395,7 +396,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                           final text = _rateController.text.trim().replaceAll(',', '');
                           final rate = double.tryParse(text);
 if (rate == null || rate < 0.1 || rate > 1000000) {
-  Get.snackbar('Invalid', 'Enter a rate between ₹0.10 and ₹10,00,000');
+  ToastUtils.showWarning('Enter a rate between ₹0.10 and ₹10,00,000');
                             return;
                           }
                           Get.back();

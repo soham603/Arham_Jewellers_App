@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
@@ -278,32 +279,23 @@ class GoldRateController extends GetxController {
           _currentRate.value = GoldRateModel.fromJson(data);
         }
         _actionState.value = CurrentAppState.SUCCESS;
-        Get.snackbar(
-          'Success',
-          'Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g',
-        );
+        ToastUtils.showSuccess('Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g');
         fetchHistory();
         return true;
       } else {
         _actionState.value = CurrentAppState.ERROR;
-        Get.snackbar(
-          'Error',
-          response.data?['message'] ?? 'Failed to update rate',
-        );
+        ToastUtils.showError(response.data?['message'] ?? 'Failed to update rate');
         return false;
       }
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'setRate Dio: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
-      Get.snackbar(
-        'Error',
-        e.response?.data?['message'] ?? e.message ?? 'Failed to update rate',
-      );
+      ToastUtils.showError(e.response?.data?['message'] ?? e.message ?? 'Failed to update rate');
       return false;
     } catch (e, st) {
       Logger.error('GoldRateController', 'setRate: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
-      Get.snackbar('Error', e.toString());
+      ToastUtils.showError(e.toString());
       return false;
     }
   }

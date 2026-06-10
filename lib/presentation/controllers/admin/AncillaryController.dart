@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:ratnesh_gold_app/domain/entities/ancillary_page_model.dart';
@@ -115,25 +116,25 @@ class AncillaryController extends GetxController {
           response.data['success'] != false) {
         _pages[pageKey] = AncillaryPageModel(title: title, content: content);
         _updateState.value = CurrentAppState.SUCCESS;
-        Get.snackbar('Success', '${pageLabels[pageKey] ?? pageKey} updated');
+        ToastUtils.showSuccess('${pageLabels[pageKey] ?? pageKey} updated');
         return true;
       } else {
         _updateState.value = CurrentAppState.ERROR;
         _error.value = response.data?['message'] ?? 'Failed to update page';
-        Get.snackbar('Error', _error.value);
+        ToastUtils.showError(_error.value);
         return false;
       }
     } on DioException catch (e, st) {
       Logger.error('AncillaryController', 'updatePage Dio: $e\n$st');
       _updateState.value = CurrentAppState.ERROR;
       _error.value = e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
-      Get.snackbar('Error', _error.value);
+      ToastUtils.showError(_error.value);
       return false;
     } catch (e, st) {
       Logger.error('AncillaryController', 'updatePage: $e\n$st');
       _updateState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      Get.snackbar('Error', _error.value);
+      ToastUtils.showError(_error.value);
       return false;
     }
   }

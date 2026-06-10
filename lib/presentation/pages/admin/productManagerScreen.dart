@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -904,22 +905,9 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
 
                                 if (success && context.mounted) {
                                   Get.back();
-                                  Get.snackbar(
-                                    'Updated',
-                                    '${product.name} updated successfully',
-                                    backgroundColor:
-                                        Colors.green.withValues(alpha: 0.9),
-                                    colorText: Colors.white,
-                                    duration: const Duration(seconds: 2),
-                                  );
+                                   ToastUtils.showSuccess('${product.name} updated successfully');
                                 } else if (!success && context.mounted) {
-                                  Get.snackbar(
-                                    'Failed',
-                                    'Could not update product. Try again.',
-                                    backgroundColor:
-                                        Colors.red.withValues(alpha: 0.9),
-                                    colorText: Colors.white,
-                                  );
+                                   ToastUtils.showError('Could not update product. Try again.');
                                 }
                               },
                         style: ElevatedButton.styleFrom(

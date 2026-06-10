@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -233,11 +234,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         });
       }
     } catch (e) {
-      Get.snackbar(
-        "Error",
-        "Failed to pick image",
-        backgroundColor: Colors.red.shade50,
-      );
+      ToastUtils.showError("Failed to pick image");
     }
   }
 
@@ -322,7 +319,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
                     // Validate required fields
                     if (itemNameCtrl.text.trim().isEmpty) {
-                      Get.snackbar("Required", "Please enter item name");
+                      ToastUtils.showWarning("Please enter item name");
                       return;
                     }
 
