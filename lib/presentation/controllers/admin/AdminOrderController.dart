@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class AdminOrderController extends GetxController {
   static AdminOrderController get instance => Get.find();
@@ -272,27 +273,19 @@ class AdminOrderController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchOrders();
       } else {
-        Get.snackbar(
-          "Error",
-          "Failed to update order",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        ToastUtils.showError("Failed to update order");
       }
     } catch (e) {
       String errorMessage = "Something went wrong";
-      try {
-        errorMessage = (e as dynamic).response.data["error"]["message"];
-      } catch (_) {}
+      if (e is DioException) {
+        errorMessage =
+            e.response?.data?['error']?['message']?.toString() ??
+            e.response?.data?['message']?.toString() ??
+            e.message ??
+            errorMessage;
+      }
 
-      Get.snackbar(
-        "Error",
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      ToastUtils.showError(errorMessage);
     } finally {
       _isActionLoading.value = false;
     }
@@ -332,23 +325,10 @@ class AdminOrderController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchOrders();
 
-        Get.snackbar(
-          "Success",
-          response.data['message'] ?? "Order updated",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xFF2D9D59),
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-        );
+        ToastUtils.showSuccess(response.data['message'] ?? "Order updated");
         return true;
       } else {
-        Get.snackbar(
-          "Error",
-          response.data?['message'] ?? "Failed to update order",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        ToastUtils.showError(response.data?['message'] ?? "Failed to update order");
         return false;
       }
     } catch (e, st) {
@@ -357,16 +337,13 @@ class AdminOrderController extends GetxController {
       String errorMessage = "Something went wrong";
       if (e is DioException) {
         errorMessage =
-            e.response?.data?['message']?.toString() ?? e.message ?? errorMessage;
+            e.response?.data?['error']?['message']?.toString() ??
+            e.response?.data?['message']?.toString() ??
+            e.message ??
+            errorMessage;
       }
 
-      Get.snackbar(
-        "Error",
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      ToastUtils.showError(errorMessage);
       return false;
     } finally {
       _isActionLoading.value = false;

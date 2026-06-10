@@ -277,31 +277,6 @@ class _AdminOrderCard extends StatelessWidget {
                       fontSize: context.getResponsiveSize(4.4),
                     ),
                   ),
-                  if (order.isCustom) ...[
-                    SizedBox(height: context.getScreenHeight(0.4)),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getResponsiveSize(2),
-                        vertical: context.getScreenHeight(0.2),
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF3E0),
-                        borderRadius: BorderRadius.circular(100),
-                        border: Border.all(
-                          color: AppColors.primaryGold.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Text(
-                        "CUSTOM",
-                        style: TextStyle(
-                          color: AppColors.primaryGold,
-                          fontWeight: FontWeight.w800,
-                          fontSize: context.getResponsiveSize(2.4),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ],
                   SizedBox(height: context.getScreenHeight(0.6)),
                   Text(
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
@@ -311,23 +286,52 @@ class _AdminOrderCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(1)),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.getResponsiveSize(2.5),
-                      vertical: context.getScreenHeight(0.3),
-                    ),
-                    decoration: BoxDecoration(
-                      color: _orderStatusColor(order.status).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Text(
-                      order.status,
-                      style: TextStyle(
-                        color: _orderStatusColor(order.status),
-                        fontWeight: FontWeight.w700,
-                        fontSize: context.getResponsiveSize(2.8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(2.5),
+                          vertical: context.getScreenHeight(0.3),
+                        ),
+                        decoration: BoxDecoration(
+                          color: _orderStatusColor(order.status).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          order.status,
+                          style: TextStyle(
+                            color: _orderStatusColor(order.status),
+                            fontWeight: FontWeight.w700,
+                            fontSize: context.getResponsiveSize(2.8),
+                          ),
+                        ),
                       ),
-                    ),
+                      if (order.isCustom) ...[
+                        SizedBox(width: context.getResponsiveSize(1.5)),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getResponsiveSize(2),
+                            vertical: context.getScreenHeight(0.3),
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: AppColors.primaryGold.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            "CUSTOM",
+                            style: TextStyle(
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w800,
+                              fontSize: context.getResponsiveSize(2.4),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
