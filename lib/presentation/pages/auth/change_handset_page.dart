@@ -294,11 +294,11 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                                     if (response.statusCode == 200 || response.statusCode == 201) {
                                       ToastUtils.showSuccess(
-                                        
                                         response.data['message'] ??
                                             "Handset change request submitted. Please wait for admin approval.",
                                       );
-                                      Get.back();
+                                      await Future.delayed(const Duration(seconds: 2));
+                                      if (mounted) Get.back();
                                     } else {
                                       ToastUtils.showError(
                                         
