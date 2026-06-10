@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -799,13 +800,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       onPressed: () async {
                         final reason = reasonController.text.trim();
                         if (reason.isEmpty) {
-                          Get.snackbar(
-                            "Required",
-                            "Please enter rejection reason",
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.orange,
-                            colorText: Colors.white,
-                          );
+                          ToastUtils.showWarning("Please enter rejection reason");
                           return;
                         }
                         Get.back();

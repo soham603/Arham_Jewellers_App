@@ -1,6 +1,7 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
@@ -98,10 +99,7 @@ class CustomOrderController extends GetxController {
       }
 
       _createState.value = CurrentAppState.ERROR;
-      Get.snackbar(
-        "Failed",
-        response.data?['message'] ?? "Failed to create custom order",
-      );
+      ToastUtils.showError(response.data?['message'] ?? "Failed to create custom order");
       return false;
     } catch (e, st) {
       _createState.value = CurrentAppState.ERROR;
@@ -113,7 +111,7 @@ class CustomOrderController extends GetxController {
             e.response?.data?['message']?.toString() ?? e.message ?? errorMessage;
       }
 
-      Get.snackbar("Failed", errorMessage);
+      ToastUtils.showError(errorMessage);
       return false;
     } finally {
       _isCreating.value = false;
@@ -190,10 +188,7 @@ class CustomOrderController extends GetxController {
       }
 
       _modifyState.value = CurrentAppState.ERROR;
-      Get.snackbar(
-        "Failed",
-        response.data?['message'] ?? "Failed to update custom order",
-      );
+      ToastUtils.showError(response.data?['message'] ?? "Failed to update custom order");
       return false;
     } catch (e, st) {
       _modifyState.value = CurrentAppState.ERROR;
@@ -205,7 +200,7 @@ class CustomOrderController extends GetxController {
             e.response?.data?['message']?.toString() ?? e.message ?? errorMessage;
       }
 
-      Get.snackbar("Failed", errorMessage);
+      ToastUtils.showError(errorMessage);
       return false;
     } finally {
       _isModifying.value = false;
@@ -228,23 +223,13 @@ class CustomOrderController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Get.snackbar(
-          "Deleted",
-          "Custom order deleted successfully",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xFF2D9D59),
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-        );
+        ToastUtils.showSuccess("Custom order deleted successfully");
 
         Logger.info("CustomOrderController", "Custom order deleted: $orderId");
         return true;
       }
 
-      Get.snackbar(
-        "Failed",
-        response.data?['message'] ?? "Failed to delete custom order",
-      );
+      ToastUtils.showError(response.data?['message'] ?? "Failed to delete custom order");
       return false;
     } catch (e, st) {
       Logger.error("CustomOrderController", "deleteCustomOrder error: $e\n$st");
@@ -255,7 +240,7 @@ class CustomOrderController extends GetxController {
             e.response?.data?['message']?.toString() ?? e.message ?? errorMessage;
       }
 
-      Get.snackbar("Failed", errorMessage);
+      ToastUtils.showError(errorMessage);
       return false;
     } finally {
       _isDeleting.value = false;

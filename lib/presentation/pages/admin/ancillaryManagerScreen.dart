@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
@@ -479,7 +480,7 @@ class _PageDetailSheetState extends State<_PageDetailSheet> {
     final content = _contentController.text.trim();
 
     if (title.isEmpty) {
-      Get.snackbar('Required', 'Please enter a title');
+      ToastUtils.showWarning('Please enter a title');
       return;
     }
 

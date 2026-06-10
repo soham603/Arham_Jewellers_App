@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -129,7 +130,7 @@ class UserOrderController extends GetxController {
     if (_isCreatingOrder.value) return false;
 
     if (cartController.items.isEmpty) {
-      Get.snackbar("Cart Empty", "Please add products to cart");
+      ToastUtils.showWarning("Please add products to cart");
 
       return false;
     }
@@ -199,10 +200,7 @@ class UserOrderController extends GetxController {
 
       _createOrderState.value = CurrentAppState.ERROR;
 
-      Get.snackbar(
-        "Order Failed",
-        response.data?["message"] ?? "Something went wrong",
-      );
+      ToastUtils.showError(response.data?["message"] ?? "Something went wrong");
 
       return false;
     } catch (e, st) {
@@ -219,7 +217,7 @@ class UserOrderController extends GetxController {
             errorMessage;
       }
 
-      Get.snackbar("Order Failed", errorMessage);
+      ToastUtils.showError(errorMessage);
 
       return false;
     } finally {
@@ -292,10 +290,7 @@ class UserOrderController extends GetxController {
       } else {
         _ordersState.value = CurrentAppState.ERROR;
 
-        Get.snackbar(
-          "Failed",
-          response.data?["message"] ?? "Failed to fetch orders",
-        );
+        ToastUtils.showError(response.data?["message"] ?? "Failed to fetch orders");
       }
     } catch (e, st) {
       _ordersState.value = CurrentAppState.ERROR;
@@ -311,7 +306,7 @@ class UserOrderController extends GetxController {
             errorMessage;
       }
 
-      Get.snackbar("Error", errorMessage);
+      ToastUtils.showError(errorMessage);
     } finally {
       _isFetchingOrders.value = false;
     }

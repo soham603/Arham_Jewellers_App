@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -255,11 +256,7 @@ class _SearchPageState extends State<SearchPage> {
                 if (product != null) {
                   Get.to(() => ProductDetailsPage(product: product));
                 } else {
-                  Get.snackbar(
-                    'Not Found',
-                    'No product found for barcode: $barcode',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
+                  ToastUtils.showError('No product found for barcode: $barcode');
                 }
               },
               filterActiveCount: controller.activeFilterCount,

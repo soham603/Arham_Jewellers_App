@@ -8,6 +8,14 @@
         "mcp-server"
       ]
     },
+    "codegraphcontext": {
+      "type": "local",
+      "command": [
+        "cgc",
+        "mcp",
+        "start"
+      ]
+    },
   },
   "experimental": {
     "disable_paste_summary": true
