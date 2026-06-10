@@ -1,10 +1,35 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+
+Uint8List _compressBytes(Uint8List bytes) {
+  final decoded = img.decodeImage(bytes);
+  if (decoded == null) return bytes;
+
+  final longest = decoded.width > decoded.height ? decoded.width : decoded.height;
+  final maxEdge = 1200;
+
+  final img.Image resized;
+  if (longest > maxEdge) {
+    resized = img.copyResize(
+      decoded,
+      width: decoded.width >= decoded.height ? maxEdge : null,
+      height: decoded.height > decoded.width ? maxEdge : null,
+      interpolation: img.Interpolation.linear,
+    );
+  } else {
+    resized = decoded;
+  }
+
+  return Uint8List.fromList(img.encodeJpg(resized, quality: 80));
+}
 
 class CategoryManagerController extends GetxController {
   static CategoryManagerController get instance => Get.find();
@@ -123,8 +148,17 @@ class CategoryManagerController extends GetxController {
 
   void clearPickedImage() => _pickedImage.value = null;
 
+  static Future<File> _compressImageFile(File file) async {
+    final bytes = await file.readAsBytes();
+    final compressedBytes = await compute(_compressBytes, bytes);
+    final tempDir = await getTemporaryDirectory();
+    final compressedFile = File('${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    await compressedFile.writeAsBytes(compressedBytes);
+    return compressedFile;
+  }
+
   // ── Create ────────────────────────────────────────────────────────────────
-  Future<bool> createCategory({
+  Future<String?> createCategory({
     required String name,
     required String boxName,
     String? description,
@@ -139,7 +173,7 @@ class CategoryManagerController extends GetxController {
         if (description != null && description.isNotEmpty) 'description': description,
         'parentId': ?parentId,
         'level': ?level,
-        if (imageFile != null) 'file': await MultipartFile.fromFile(imageFile.path),
+        if (imageFile != null) 'file': await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
       });
 
       final response = await httpClient.post(
@@ -156,22 +190,24 @@ class CategoryManagerController extends GetxController {
         _allCategories.insert(0, created);
         _pickedImage.value = null;
         Logger.info("CategoryManagerController", "Category created: ${created.name}");
-        return true;
+        return null;
       }
+      return response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to create';
     } catch (e) {
       Logger.error("CategoryManagerController", "create error: $e");
+      if (e is DioException && e.response?.data != null) {
+        return e.response!.data['error']?['message'] ?? e.response!.data['message'] ?? 'Something went wrong';
+      }
+      return 'Something went wrong';
     }
-    return false;
   }
 
   // ── Edit ──────────────────────────────────────────────────────────────────
-  Future<bool> editCategory({
+  Future<String?> editCategory({
     required String id,
     String? name,
-    String? boxName,
     String? description,
     String? parentId,
-    List<Map<String, String>>? existingImages,
     File? imageFile,
   }) async {
     _actionLoadingId.value = id;
@@ -179,12 +215,9 @@ class CategoryManagerController extends GetxController {
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        if (boxName != null && boxName.isNotEmpty) "boxName": boxName,
         "description": ?description,
         "parentId": ?parentId,
-        if (existingImages != null)
-          "images": existingImages.map((e) => {"url": e["url"], "publicId": e["publicId"]}).toList(),
-        if (imageFile != null) "image": await MultipartFile.fromFile(imageFile.path),
+        if (imageFile != null) "file": await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
       });
 
       final response = await httpClient.put(
@@ -202,14 +235,18 @@ class CategoryManagerController extends GetxController {
         if (idx != -1) _allCategories[idx] = updated;
         _pickedImage.value = null;
         Logger.info("CategoryManagerController", "Category $id updated");
-        return true;
+        return null;
       }
+      return response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to update';
     } catch (e) {
       Logger.error("CategoryManagerController", "edit error: $e");
+      if (e is DioException && e.response?.data != null) {
+        return e.response!.data['error']?['message'] ?? e.response!.data['message'] ?? 'Something went wrong';
+      }
+      return 'Something went wrong';
     } finally {
       _actionLoadingId.value = '';
     }
-    return false;
   }
 
   // ── Delete ────────────────────────────────────────────────────────────────
