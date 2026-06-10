@@ -874,9 +874,9 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
 
     if (error == null && mounted) {
       Navigator.of(context).pop();
-      ToastUtils.showSuccess(context, isEditing ? 'Updated' : 'Created');
+      ToastUtils.showSuccess(isEditing ? 'Updated' : 'Created');
     } else if (mounted) {
-      ToastUtils.showError(context, error ?? 'Something went wrong');
+      ToastUtils.showError(error ?? 'Something went wrong');
     }
     if (mounted) setState(() => _submitting = false);
   }

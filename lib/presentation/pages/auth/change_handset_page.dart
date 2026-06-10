@@ -267,7 +267,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                               ? null
                               : () async {
                                   if (!_formKey.currentState!.validate()) {
-                                    ToastUtils.showError(context, "Please fix the errors");
+                                    ToastUtils.showError("Please fix the errors");
                                     return;
                                   }
 
@@ -294,14 +294,14 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                                     if (response.statusCode == 200 || response.statusCode == 201) {
                                       ToastUtils.showSuccess(
-                                        context,
+                                        
                                         response.data['message'] ??
                                             "Handset change request submitted. Please wait for admin approval.",
                                       );
                                       Get.back();
                                     } else {
                                       ToastUtils.showError(
-                                        context,
+                                        
                                         response.data['message'] ?? "Request failed",
                                       );
                                     }
@@ -312,9 +312,9 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                                           e.response!.data['message'] ??
                                           msg;
                                     }
-                                    ToastUtils.showError(context, msg);
+                                    ToastUtils.showError(msg);
                                   } catch (e) {
-                                    ToastUtils.showError(context, e.toString());
+                                    ToastUtils.showError(e.toString());
                                   } finally {
                                     if (mounted) {
                                       setState(() {

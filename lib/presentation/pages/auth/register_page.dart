@@ -222,7 +222,7 @@ class _RegisterPageState extends State<RegisterPage> {
   // ───────────────────────── Submit ─────────────────────────
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) {
-      ToastUtils.showError(context, 'Please fix the errors');
+      ToastUtils.showError('Please fix the errors');
       return;
     }
 
@@ -260,7 +260,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
     } catch (e) {
       if (mounted) {
-        ToastUtils.showError(context, 'Something went wrong. Please try again.');
+        ToastUtils.showError('Something went wrong. Please try again.');
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

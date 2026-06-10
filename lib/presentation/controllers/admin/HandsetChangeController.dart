@@ -195,7 +195,7 @@ class HandsetChangeController extends GetxController {
         _actionState.value = CurrentAppState.SUCCESS;
         _actioningId.value = '';
         ToastUtils.showSuccess(
-          context,
+          
           response.data['message'] ?? 'Action completed successfully',
         );
         await refresh();
@@ -208,7 +208,7 @@ class HandsetChangeController extends GetxController {
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
-      ToastUtils.showError(context, message);
+      ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
       Logger.error('HandsetChangeController', '_handleAction Dio: $e\n$st');
@@ -220,13 +220,13 @@ class HandsetChangeController extends GetxController {
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
-      ToastUtils.showError(context, message);
+      ToastUtils.showError(message);
       return false;
     } catch (e, st) {
       Logger.error('HandsetChangeController', '_handleAction: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      ToastUtils.showError(context, e.toString());
+      ToastUtils.showError(e.toString());
       return false;
     } finally {
       _actioningId.value = '';

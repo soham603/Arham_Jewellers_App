@@ -108,7 +108,7 @@ class AuthController extends GetxController {
 
         _userLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
-          context,
+          
           response.data['message'] ?? "Login successful!",
         );
         onSuccess?.call();
@@ -116,7 +116,7 @@ class AuthController extends GetxController {
       } else if (response.statusCode == 202) {
         _userLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showInfo(
-          context,
+          
           response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
         );
       } else {
@@ -182,7 +182,7 @@ class AuthController extends GetxController {
 
         _adminLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
-          context,
+          
           response.data['message'] ?? "Admin login successful!",
         );
         onSuccess?.call();
@@ -190,7 +190,7 @@ class AuthController extends GetxController {
       } else if (response.statusCode == 202) {
         _adminLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showInfo(
-          context,
+          
           response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
         );
       } else {
@@ -246,7 +246,7 @@ class AuthController extends GetxController {
         _adminLoginErrorMsg.value = message;
         _adminLoginState.value = CurrentAppState.ERROR;
       }
-      ToastUtils.showError(context, message);
+      ToastUtils.showError(message);
     });
   }
 
@@ -259,10 +259,10 @@ class AuthController extends GetxController {
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;
-      ToastUtils.showSuccess(context, "Logged out successfully!");
+      ToastUtils.showSuccess("Logged out successfully!");
       onComplete?.call();
     } catch (e) {
-      ToastUtils.showError(context, "Logout failed. Please try again.");
+      ToastUtils.showError("Logout failed. Please try again.");
     }
   }
 
@@ -275,10 +275,10 @@ class AuthController extends GetxController {
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;
-      ToastUtils.showSuccess(context, "Admin logged out successfully!");
+      ToastUtils.showSuccess("Admin logged out successfully!");
       onComplete?.call();
     } catch (e) {
-      ToastUtils.showError(context, "Logout failed. Please try again.");
+      ToastUtils.showError("Logout failed. Please try again.");
     }
   }
 
@@ -330,7 +330,7 @@ class AuthController extends GetxController {
         if (response.data['success'] == true || response.data['success'] == null) {
           _userRegisterState.value = CurrentAppState.SUCCESS;
           ToastUtils.showSuccess(
-            context,
+            
             response.data['message'] ?? "Registration successful!",
           );
           onSuccess?.call();
@@ -338,12 +338,12 @@ class AuthController extends GetxController {
         } else {
           _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
           _userRegisterState.value = CurrentAppState.ERROR;
-          ToastUtils.showError(context, _userRegisterErrorMsg.value);
+          ToastUtils.showError(_userRegisterErrorMsg.value);
         }
       } else {
         _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
         _userRegisterState.value = CurrentAppState.ERROR;
-        ToastUtils.showError(context, _userRegisterErrorMsg.value);
+        ToastUtils.showError(_userRegisterErrorMsg.value);
       }
     } on DioException catch (e) {
       String errorMsg = "An unexpected error occurred";
@@ -355,11 +355,11 @@ class AuthController extends GetxController {
       }
       _userRegisterErrorMsg.value = errorMsg;
       _userRegisterState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(Get.context ?? context, _userRegisterErrorMsg.value);
+      ToastUtils.showError(_userRegisterErrorMsg.value);
     } catch (e) {
       _userRegisterErrorMsg.value = "An unexpected error occurred";
       _userRegisterState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(context, _userRegisterErrorMsg.value);
+      ToastUtils.showError(_userRegisterErrorMsg.value);
     }
     return false;
   }
@@ -383,7 +383,7 @@ class AuthController extends GetxController {
       if (response.statusCode == 200 && response.data['success'] == true) {
         _forgotPasswordState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
-          context,
+          
           response.data['message'] ?? "Reset request submitted successfully!",
         );
         onSuccess?.call();
@@ -391,7 +391,7 @@ class AuthController extends GetxController {
       } else {
         _forgotPasswordState.value = CurrentAppState.ERROR;
         ToastUtils.showError(
-          context,
+          
           response.data['message'] ?? "Failed to submit reset request",
         );
       }
@@ -404,10 +404,10 @@ class AuthController extends GetxController {
             errorMsg;
       }
       _forgotPasswordState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(context, errorMsg);
+      ToastUtils.showError(errorMsg);
     } catch (e) {
       _forgotPasswordState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(context, "An unexpected error occurred");
+      ToastUtils.showError("An unexpected error occurred");
     }
     return false;
   }
