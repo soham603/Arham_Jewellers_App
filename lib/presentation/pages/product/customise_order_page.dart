@@ -146,7 +146,11 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         itemNameCtrl.text = p.name;
       }
 
-      if (p.grossWeight != null && p.grossWeight! > 0) {
+      if (p.karigarNetWt != null && p.karigarNetWt! > 0) {
+        weightCtrl.text = p.karigarNetWt!.toStringAsFixed(2);
+      } else if (p.rawData != null && p.rawData!['KarigarNetWt'] != null) {
+        weightCtrl.text = p.rawData!['KarigarNetWt'].toString();
+      } else if (p.grossWeight != null && p.grossWeight! > 0) {
         weightCtrl.text = p.grossWeight!.toStringAsFixed(2);
       } else if (p.rawData != null && p.rawData!['GrossWt'] != null) {
         weightCtrl.text = p.rawData!['GrossWt'].toString();
