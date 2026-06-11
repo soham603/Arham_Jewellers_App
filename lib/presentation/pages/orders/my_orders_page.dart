@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.da
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MyOrdersPage extends StatefulWidget {
   const MyOrdersPage({super.key});
@@ -19,12 +20,11 @@ class MyOrdersPage extends StatefulWidget {
   State<MyOrdersPage> createState() => _MyOrdersPageState();
 }
 
-class _MyOrdersPageState extends State<MyOrdersPage>
-    with SingleTickerProviderStateMixin {
+class _MyOrdersPageState extends State<MyOrdersPage> {
   late final UserOrderController _orderController;
   final ScrollController _scrollController = ScrollController();
-  late final TabController _tabController;
   DateTime? _lastBackPress;
+  int _activeTabIndex = 0;
 
   static const _tabs = ['All', 'Pending', 'Approved', 'Rejected'];
   static const _filters = ['all', 'pending', 'approved', 'rejected'];
@@ -36,16 +36,9 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         ? Get.find<UserOrderController>()
         : Get.put(UserOrderController());
 
-    _tabController = TabController(length: _tabs.length, vsync: this);
-
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) {
-        _orderController.setFilter(_filters[_tabController.index]);
-      }
-    });
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderController.fetchUserOrders();
+      _orderController.setFilter(_filters[0]);
     });
 
     _scrollController.addListener(() {
@@ -59,7 +52,6 @@ class _MyOrdersPageState extends State<MyOrdersPage>
   @override
   void dispose() {
     _scrollController.dispose();
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -159,6 +151,7 @@ class _MyOrdersPageState extends State<MyOrdersPage>
         appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
+        centerTitle: false,
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: Icon(
@@ -187,34 +180,62 @@ class _MyOrdersPageState extends State<MyOrdersPage>
           ),
           SizedBox(width: context.getResponsiveSize(2)),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primaryGold,
-          unselectedLabelColor: AppColors.textMuted,
-          indicatorColor: AppColors.primaryGold,
-          indicatorWeight: 3,
-          labelStyle: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            fontWeight: FontWeight.w400,
-          ),
-          tabs: _tabs.map((t) => Tab(text: t)).toList(),
-        ),
       ),
       body: ResponsiveWrapper(
         child: Column(
         children: [
-          // ── Top gold accent bar (matches Figma TopAccent) ──────────
-          Container(height: 3, color: AppColors.divider),
+          // ── Filter buttons ─────────────────────────────────────────
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(4),
+              context.getScreenHeight(1),
+              context.getResponsiveSize(4),
+              context.getScreenHeight(0.5),
+            ),
+            child: Row(
+              children: List.generate(_tabs.length, (i) {
+                final isActive = _activeTabIndex == i;
+                final label = _tabs[i];
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() => _activeTabIndex = i);
+                      _orderController.setFilter(_filters[i]);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 3,
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: context.getScreenHeight(0.9),
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? AppColors.primaryGold
+                            : AppColors.primaryGold.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.4),
+                          fontWeight: FontWeight.w700,
+                          color: isActive ? Colors.white : AppColors.primaryGold,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+
+          Container(height: 1, color: AppColors.divider),
 
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: _filters.map((_) => _buildOrdersList()).toList(),
-            ),
+            child: _buildOrdersList(),
           ),
         ],
       ),
@@ -236,7 +257,18 @@ class _OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final statusInfo = getStatusInfo(order.status);
 
-    return StatusBorderCard(
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: StatusBorderCard(
       status: order.status,
       onTap: () {
         Get.to(() => UserOrderDetailScreen(order: order));
@@ -453,6 +485,7 @@ class _OrderCard extends StatelessWidget {
                 ],
               ),
             ),
+          ),
     );
   }
 
@@ -500,53 +533,131 @@ class _OrdersShimmer extends StatelessWidget {
       itemCount: 4,
       separatorBuilder: (_, _) =>
           SizedBox(height: context.getScreenHeight(1.5)),
-      itemBuilder: (_, _) => _ShimmerCard(context: context),
+      itemBuilder: (_, _) => const _ShimmerCard(),
     );
   }
 }
 
-class _ShimmerCard extends StatefulWidget {
-  final BuildContext context;
-  const _ShimmerCard({required this.context});
-
-  @override
-  State<_ShimmerCard> createState() => _ShimmerCardState();
-}
-
-class _ShimmerCardState extends State<_ShimmerCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))
-          ..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.4, end: 1.0).animate(_ctrl);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+class _ShimmerCard extends StatelessWidget {
+  const _ShimmerCard();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, _) => Opacity(
-        opacity: _anim.value,
-        child: Container(
-          width: double.infinity,
-          height: context.getScreenHeight(16),
-          decoration: BoxDecoration(
-            color: AppColors.tileBg,
-            borderRadius: BorderRadius.circular(20),
-          ),
+    return Shimmer.fromColors(
+      baseColor: AppColors.warmShimmerBase,
+      highlightColor: AppColors.warmShimmerHighlight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
         ),
+        child: Column(
+          children: [
+            Container(height: 4, color: Colors.white),
+            Padding(
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _ShimmerBlock(
+                            width: context.getResponsiveSize(30),
+                            height: context.getScreenHeight(2),
+                          ),
+                          SizedBox(height: context.getScreenHeight(0.8)),
+                          _ShimmerBlock(
+                            width: context.getResponsiveSize(20),
+                            height: context.getScreenHeight(1.5),
+                          ),
+                        ],
+                      ),
+                      _ShimmerBlock(
+                        width: context.getResponsiveSize(22),
+                        height: context.getScreenHeight(3),
+                        borderRadius: 20,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.getScreenHeight(2)),
+                  _ShimmerBlock(height: 1),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _ShimmerBlock(
+                        width: context.getResponsiveSize(20),
+                        height: context.getResponsiveSize(20),
+                        borderRadius: 14,
+                      ),
+                      SizedBox(width: context.getResponsiveSize(3)),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _ShimmerBlock(
+                              width: double.infinity,
+                              height: context.getScreenHeight(1.8),
+                            ),
+                            SizedBox(height: context.getScreenHeight(1.2)),
+                            _ShimmerBlock(
+                              width: context.getResponsiveSize(25),
+                              height: context.getScreenHeight(1.8),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+                  _ShimmerBlock(height: 1),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _ShimmerBlock(
+                        width: context.getResponsiveSize(20),
+                        height: context.getScreenHeight(2),
+                      ),
+                      _ShimmerBlock(
+                        width: context.getResponsiveSize(20),
+                        height: context.getScreenHeight(2.2),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShimmerBlock extends StatelessWidget {
+  final double? width;
+  final double height;
+  final double borderRadius;
+
+  const _ShimmerBlock({
+    this.width,
+    required this.height,
+    this.borderRadius = 6,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(borderRadius),
       ),
     );
   }
@@ -571,11 +682,11 @@ class _EmptyOrdersView extends StatelessWidget {
               height: context.getResponsiveSize(24),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.tileBg,
+                color: AppColors.primaryGold.withValues(alpha: 0.08),
               ),
               child: Icon(
                 Icons.receipt_long_outlined,
-                color: AppColors.primaryGold,
+                color: AppColors.primaryGold.withValues(alpha: 0.6),
                 size: context.getResponsiveSize(11),
               ),
             ),
@@ -608,7 +719,7 @@ class _EmptyOrdersView extends StatelessWidget {
                   backgroundColor: AppColors.primaryGold,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 onPressed: () => Get.offAllNamed('/home'),
@@ -638,36 +749,69 @@ class _ErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline_rounded,
-            size: context.getResponsiveSize(14),
-            color: AppColors.textMuted,
-          ),
-          SizedBox(height: context.getScreenHeight(2)),
-          Text(
-            'Failed to load orders',
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(4.5),
-              fontWeight: FontWeight.w600,
-              color: AppColors.textDark,
-            ),
-          ),
-          SizedBox(height: context.getScreenHeight(1.5)),
-          TextButton(
-            onPressed: onRetry,
-            child: Text(
-              'Tap to retry',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4),
-                color: AppColors.primaryGold,
-                fontWeight: FontWeight.w600,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(10)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: context.getResponsiveSize(22),
+              height: context.getResponsiveSize(22),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.dangerSoft,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: context.getResponsiveSize(10),
+                color: AppColors.danger,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: context.getScreenHeight(2.5)),
+            Text(
+              'Failed to load orders',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(4.5),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1)),
+            Text(
+              'Something went wrong. Please try again.',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.8),
+                color: AppColors.textMuted,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(
+              width: double.infinity,
+              height: context.getScreenHeight(6.5),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  backgroundColor: AppColors.primaryGold,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                label: Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4.5),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

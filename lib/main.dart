@@ -28,6 +28,7 @@ Future<void> main() async {
     Get.put(WishlistController());
     Get.put(AuthController());
     Get.put(GoldRateController());
+    Get.put(NotificationController());
     if (!kIsWeb) {
       try {
         await NotificationService().init();
@@ -35,7 +36,6 @@ Future<void> main() async {
         Logger.error('Main', 'NotificationService init failed: $e');
       }
     }
-    Get.put(NotificationController());
   }, (error, stackTrace) {
     Logger.error('Uncaught Error', '$error\n$stackTrace');
   });

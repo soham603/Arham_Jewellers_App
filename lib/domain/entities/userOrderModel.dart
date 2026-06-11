@@ -14,6 +14,21 @@ class UserOrderModel {
   final String? style;
   final String? marking;
   final List<String> referenceImages;
+  final String? partyCode;
+  final String? partyName;
+  final String? area;
+  final String? contactNumber;
+  final String? itemName;
+  final String? weight;
+  final String? noOfPieces;
+  final String? size;
+  final String? lengthBroadness;
+  final String? productDescription;
+  final String? assignedKarigar;
+  final String? talkedToStaffName;
+  final String? assignAdminNotes;
+  final String? completeAdminNotes;
+  final DateTime? deliveryDate;
 
   UserOrderModel({
     required this.id,
@@ -29,6 +44,21 @@ class UserOrderModel {
     this.style,
     this.marking,
     this.referenceImages = const [],
+    this.partyCode,
+    this.partyName,
+    this.area,
+    this.contactNumber,
+    this.itemName,
+    this.weight,
+    this.noOfPieces,
+    this.size,
+    this.lengthBroadness,
+    this.productDescription,
+    this.assignedKarigar,
+    this.talkedToStaffName,
+    this.assignAdminNotes,
+    this.completeAdminNotes,
+    this.deliveryDate,
   });
 
   factory UserOrderModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +90,23 @@ class UserOrderModel {
           ? List<String>.from(
               (json["referenceImages"] as List).map((e) => e.toString()))
           : [],
+      partyCode: json["partyCode"]?.toString(),
+      partyName: json["partyName"]?.toString(),
+      area: json["area"]?.toString(),
+      contactNumber: json["contactNumber"]?.toString(),
+      itemName: json["itemName"]?.toString(),
+      weight: json["weight"]?.toString(),
+      noOfPieces: json["noOfPieces"]?.toString(),
+      size: json["size"]?.toString(),
+      lengthBroadness: json["lengthBroadness"]?.toString(),
+      productDescription: json["productDescription"]?.toString(),
+      assignedKarigar: json["assignedKarigar"]?.toString(),
+      talkedToStaffName: json["talkedToStaffName"]?.toString(),
+      assignAdminNotes: json["assignAdminNotes"]?.toString(),
+      completeAdminNotes: json["completeAdminNotes"]?.toString(),
+      deliveryDate: json["deliveryDate"] != null
+          ? DateTime.tryParse(json["deliveryDate"].toString())
+          : null,
     );
   }
 }
@@ -99,6 +146,9 @@ class UserOrderProductModel {
   final String slug;
   final bool isActive;
   final String? imageUrl;
+  final double? karigarNetWt;
+  final double? karigarFineWt;
+  final String? size1;
 
   UserOrderProductModel({
     required this.id,
@@ -106,6 +156,9 @@ class UserOrderProductModel {
     required this.slug,
     required this.isActive,
     this.imageUrl,
+    this.karigarNetWt,
+    this.karigarFineWt,
+    this.size1,
   });
 
   factory UserOrderProductModel.fromJson(Map<String, dynamic> json) {
@@ -115,6 +168,13 @@ class UserOrderProductModel {
       slug: json["slug"]?.toString() ?? '',
       isActive: json["isActive"] ?? false,
       imageUrl: json["imageUrl"],
+      karigarNetWt: json["karigarNetWt"] != null
+          ? double.tryParse(json["karigarNetWt"].toString())
+          : null,
+      karigarFineWt: json["karigarFineWt"] != null
+          ? double.tryParse(json["karigarFineWt"].toString())
+          : null,
+      size1: json["size1"]?.toString(),
     );
   }
 

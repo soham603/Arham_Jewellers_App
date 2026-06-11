@@ -1414,7 +1414,9 @@ class _TopBar extends StatelessWidget {
             () => _IconBtn(
               icon: Icons.notifications_none_rounded,
               onTap: () => Get.toNamed(AppRoutes.notifications),
-              badgeCount: Get.find<NotificationController>().unreadCount.value,
+              badgeCount: Get.isRegistered<NotificationController>()
+                  ? Get.find<NotificationController>().unreadCount.value
+                  : 0,
             ),
           ),
 
@@ -1575,6 +1577,7 @@ class _CarouselSection extends StatefulWidget {
 class _CarouselSectionState extends State<_CarouselSection> {
   final Map<int, VideoPlayerController> _videoControllers = {};
   final Set<String> _failedVideoUrls = {};
+  final Set<String> _pendingVideoUrls = {};
 
   @override
   void didUpdateWidget(_CarouselSection oldWidget) {
@@ -1601,6 +1604,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
   Future<void> _maybeInitVideo(int index, String url) async {
     if (_videoControllers.containsKey(index)) return;
     if (_failedVideoUrls.contains(url)) return;
+    if (_pendingVideoUrls.contains(url)) return;
+    _pendingVideoUrls.add(url);
 
     VideoPlayerController? ctrl;
 
@@ -1625,14 +1630,17 @@ class _CarouselSectionState extends State<_CarouselSection> {
       } catch (e2, st2) {
         Logger.error("HomePage", "All video playback methods failed for carousel index $index", stackTrace: st2);
         _failedVideoUrls.add(url);
+        _pendingVideoUrls.remove(url);
         _videoControllers.remove(index);
         ctrl?.dispose();
         return;
       }
     }
 
+    _pendingVideoUrls.remove(url);
+
     try {
-      ctrl!.setLooping(true);
+      ctrl.setLooping(true);
       ctrl.setVolume(0);
       if (mounted && index == widget.currentIndex) {
         ctrl.play();
@@ -1660,6 +1668,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
     }
     _videoControllers.clear();
     _failedVideoUrls.clear();
+    _pendingVideoUrls.clear();
     super.dispose();
   }
 
@@ -1812,9 +1821,9 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.item.mediaType == 'video' && widget.videoController != null) {
-      final ctrl = widget.videoController!;
-      if (ctrl.value.isInitialized) {
+    if (widget.item.mediaType == 'video') {
+      if (widget.videoController != null && widget.videoController!.value.isInitialized) {
+        final ctrl = widget.videoController!;
         return SizedBox.expand(
           child: FittedBox(
             fit: BoxFit.cover,
@@ -1826,6 +1835,16 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
           ),
         );
       }
+      return Container(
+        color: context.colorPalette.shimmerBaseColor,
+        child: Center(
+          child: Icon(
+            Icons.play_circle_outline_rounded,
+            size: context.getResponsiveSize(8),
+            color: context.colorPalette.gold.withValues(alpha: 0.4),
+          ),
+        ),
+      );
     }
 
     return CachedNetworkImage(

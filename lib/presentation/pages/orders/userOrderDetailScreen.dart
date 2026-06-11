@@ -11,6 +11,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -137,7 +139,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
   Widget _buildOrderItems(BuildContext context, UserOrderModel order) {
     Logger.info("OrderDetail", "isCustomOrder=${order.isCustomOrder} purity=${order.purity} items=${order.items.length}");
-    if (order.isCustomOrder || order.purity != null) {
+    if (order.isCustomOrder) {
       return _buildCustomOrderDetails(context, order);
     }
     return _buildStandardOrderItems(context, order);
@@ -211,7 +213,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  item.product.name,
+                                  _cleanText(item.product.name) ?? 'Untitled',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: context.getResponsiveSize(3.8),
@@ -240,20 +242,46 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             ],
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
-                          Wrap(
-                            spacing: context.getResponsiveSize(2),
-                            runSpacing: context.getScreenHeight(0.6),
-                            children: [
-                              _itemDetailChip(
-                                context,
-                                label: "Qty: ${item.quantity}",
+                          if (item.product.karigarNetWt != null)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: context.getScreenHeight(0.3),
                               ),
-                              _itemDetailChip(
-                                context,
-                                label: "₹${item.price.toStringAsFixed(2)}",
+                              child: Text(
+                                'Net Wt: ${item.product.karigarNetWt!.toStringAsFixed(2)}g',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.0),
+                                  color: AppColors.textMuted,
+                                ),
                               ),
-                            ],
+                            ),
+                          if (item.product.size1 != null)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: context.getScreenHeight(0.3),
+                              ),
+                              child: Text(
+                                'Size: ${item.product.size1}',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.0),
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              bottom: context.getScreenHeight(0.3),
+                            ),
+                            child: Text(
+                              'Qty: ${item.quantity}',
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.0),
+                                color: AppColors.textMuted,
+                              ),
+                            ),
                           ),
+                          if (Get.find<AuthController>().user?.isRetailer == true)
+                            _priceRow(context, item),
                         ],
                       ),
                     ),
@@ -297,9 +325,32 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             ],
           ),
           SizedBox(height: context.getScreenHeight(1.5)),
+
+          if (order.itemName != null)
+            _customDetailRow(context, "Item", order.itemName!),
+          if (order.weight != null)
+            _customDetailRow(context, "Weight", "${order.weight}g"),
+          if (order.noOfPieces != null)
+            _customDetailRow(context, "Pieces", order.noOfPieces!),
+          if (order.size != null)
+            _customDetailRow(context, "Size", order.size!),
+          if (order.lengthBroadness != null)
+            _customDetailRow(context, "Length/Broadness", order.lengthBroadness!),
+          if (order.productDescription != null)
+            _customDetailRow(context, "Description", order.productDescription!),
           _customDetailRow(context, "Purity", order.purity ?? '-'),
           _customDetailRow(context, "Style", order.style ?? '-'),
           _customDetailRow(context, "Marking", order.marking ?? '-'),
+          if (order.assignedKarigar != null)
+            _customDetailRow(context, "Assigned To", order.assignedKarigar!),
+          if (order.talkedToStaffName != null)
+            _customDetailRow(context, "Contact Person", order.talkedToStaffName!),
+          if (order.deliveryDate != null)
+            _customDetailRow(
+              context,
+              "Delivery Date",
+              DateFormat("dd MMM yyyy").format(order.deliveryDate!.toLocal()),
+            ),
           if (order.referenceImages.isNotEmpty) ...[
             SizedBox(height: context.getScreenHeight(1.5)),
             Text(
@@ -344,7 +395,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       child: Row(
         children: [
           SizedBox(
-            width: context.getResponsiveSize(18),
+            width: context.getResponsiveSize(24),
             child: Text(
               label,
               style: TextStyle(
@@ -367,25 +418,40 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Widget _itemDetailChip(BuildContext context, {required String label}) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.getResponsiveSize(2),
-        vertical: context.getScreenHeight(0.2),
-      ),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
+  Widget _priceRow(BuildContext context, UserOrderItemModel item) {
+    final goldRate = Get.find<GoldRateController>().currentRate;
+    final netWt = item.product.karigarNetWt;
+    if (goldRate == null || netWt == null) return const SizedBox.shrink();
+    final price = GoldRateController.calculatePrice(
+      fineWeight: netWt,
+      ratePer10Gram: goldRate.rate,
+    );
+    if (price == null) return const SizedBox.shrink();
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.3)),
       child: Text(
-        label,
+        'Price: ${_formatPrice(price)}',
         style: TextStyle(
+          fontSize: context.getResponsiveSize(3.0),
+          color: AppColors.primaryGold,
           fontWeight: FontWeight.w600,
-          fontSize: context.getResponsiveSize(2.8),
-          color: AppColors.textDark,
         ),
       ),
     );
+  }
+
+  String _formatPrice(double value) {
+    final intVal = value.toInt();
+    final str = intVal.toString();
+    if (str.length <= 3) return '\u20B9$intVal';
+    String result = str.substring(str.length - 3);
+    int i = str.length - 3;
+    while (i > 0) {
+      final chunk = str.substring(i - 2 < 0 ? 0 : i - 2, i);
+      result = '$chunk,$result';
+      i -= 2;
+    }
+    return '\u20B9$result';
   }
 
   Widget _buildTotalAmount(BuildContext context, UserOrderModel order) {
@@ -716,6 +782,16 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         ],
       ),
     );
+  }
+
+  static String? _cleanText(String? value) {
+    final cleaned = value?.trim();
+    if (cleaned == null ||
+        cleaned.isEmpty ||
+        cleaned.toLowerCase() == 'null') {
+      return null;
+    }
+    return cleaned;
   }
 
   String _formatAmount(double amount) {
