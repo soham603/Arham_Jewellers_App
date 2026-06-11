@@ -57,7 +57,7 @@ class SessionManager {
     final prefs = await _prefs;
     final token = prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN);
     Logger.info("SessionManager",
-        "getAccessToken: ${token != null ? 'present (${token.substring(0, 20)}...)' : 'null'}");
+        "getAccessToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
@@ -65,7 +65,7 @@ class SessionManager {
     final prefs = await _prefs;
     final token = prefs.getString(DatabaseKeyConstants.REFRESH_TOKEN);
     Logger.info("SessionManager",
-        "getRefreshToken: ${token != null ? 'present (${token.substring(0, 20)}...)' : 'null'}");
+        "getRefreshToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
@@ -151,7 +151,8 @@ class SessionManager {
 
     try {
       return UserModel.fromJson(jsonDecode(jsonString));
-    } catch (e) {
+    } catch (e, st) {
+      Logger.error("SessionManager", "Failed to parse user data from SharedPreferences", stackTrace: st);
       return null;
     }
   }

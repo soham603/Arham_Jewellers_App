@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
 enum ChatEventType { toolCall, textDelta, done, error }
@@ -24,15 +25,29 @@ class ChatMessage {
 }
 
 class ChatService {
-  final Dio _dio = Dio();
+  final Dio _dio = httpClient;
   final List<ChatMessage> _messages = [];
   bool _isLoading = false;
 
   List<ChatMessage> get messages => List.unmodifiable(_messages);
   bool get isLoading => _isLoading;
 
-  String get _agentUrl => dotenv.env['AGENT_SERVER_URL'] ?? 'http://192.168.1.112:3001';
-  bool get isConfigured => _agentUrl.isNotEmpty;
+  String get _agentUrl {
+    final url = dotenv.env['AGENT_SERVER_URL'];
+    if (url == null || url.isEmpty) {
+      throw StateError('AGENT_SERVER_URL is not configured in .env');
+    }
+    return url;
+  }
+
+  bool get isConfigured {
+    try {
+      _agentUrl;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
   void clearHistory() {
     _messages.clear();
@@ -55,11 +70,13 @@ class ChatService {
         data: {
           'message': userMessage,
           'sessionId': 'flutter-app',
-          'token': ?token,
         },
         options: Options(
           responseType: ResponseType.stream,
           receiveTimeout: const Duration(seconds: 120),
+          headers: {
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
         ),
       );
 

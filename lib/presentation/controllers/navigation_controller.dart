@@ -25,14 +25,16 @@ class NavigationController extends GetxController {
     } else {
       _lastBackPress = now;
       HapticFeedback.lightImpact();
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          content: Text('Press back again to exit'),
-          duration: Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
-        ),
-      );
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Press back again to exit'),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+          ),
+        );
+      }
     }
   }
 }

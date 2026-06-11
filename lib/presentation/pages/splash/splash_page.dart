@@ -6,6 +6,7 @@ import '../../../core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../utils/Logger.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -84,22 +85,27 @@ class _SplashPageState extends State<SplashPage>
   }
 
   Future<void> _initFlow() async {
-    final stopwatch = Stopwatch()..start();
+    try {
+      final stopwatch = Stopwatch()..start();
 
-    final token = await sessionManager.getAccessToken();
-    final isAccessExpired = await sessionManager.isAccessTokenExpired();
-    final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
+      final token = await sessionManager.getAccessToken();
+      final isAccessExpired = await sessionManager.isAccessTokenExpired();
+      final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
 
-    final elapsed = stopwatch.elapsedMilliseconds;
-    final remaining = 3500 - elapsed;
+      final elapsed = stopwatch.elapsedMilliseconds;
+      final remaining = 3500 - elapsed;
 
-    if (remaining > 0) {
-      await Future.delayed(Duration(milliseconds: remaining));
-    }
+      if (remaining > 0) {
+        await Future.delayed(Duration(milliseconds: remaining));
+      }
 
-    if (token != null && (!isAccessExpired || !isRefreshExpired)) {
-      Get.offNamed(AppRoutes.home);
-    } else {
+      if (token != null && (!isAccessExpired || !isRefreshExpired)) {
+        Get.offNamed(AppRoutes.home);
+      } else {
+        Get.offNamed(AppRoutes.login);
+      }
+    } catch (e, stackTrace) {
+      Logger.error('SplashPage', 'Initialization flow failed', stackTrace: stackTrace);
       Get.offNamed(AppRoutes.login);
     }
   }

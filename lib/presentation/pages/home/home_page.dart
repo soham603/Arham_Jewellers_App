@@ -1,4 +1,5 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -104,12 +105,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onRefresh() async {
-    await Future.wait([
-      carouselController.getAllCarousels(),
-      // On pull-to-refresh, refresh tree data
-      categoryController.fetchCategoryTree(),
-      carouselController.loadLatestProducts(),
-    ]);
+    try {
+      await Future.wait([
+        carouselController.getAllCarousels(),
+        // On pull-to-refresh, refresh tree data
+        categoryController.fetchCategoryTree(),
+        carouselController.loadLatestProducts(),
+      ]);
+    } catch (e, stackTrace) {
+      Logger.error('HomePage', 'Refresh failed', stackTrace: stackTrace);
+    }
   }
 
   void scrollToProductSection() {
@@ -190,7 +195,7 @@ GestureDetector(
     width: context.responsiveWidth(34, tabletVal: 56),
     height: context.responsiveWidth(34, tabletVal: 56),
     decoration: BoxDecoration(
-      color: const Color(0xFFF5F1EC),
+      color: AppColors.warmBg,
       shape: BoxShape.circle,
       border: Border.all(
         color: context.colorPalette.gold.withValues(alpha: 0.2),
@@ -229,7 +234,7 @@ GestureDetector(
 
                         Container(
                           width: double.infinity,
-                          color: const Color(0xFF3E2723),
+                          color: AppColors.deepEspresso,
                           padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(3)),
                           child: Column(
                             children: [
@@ -1601,7 +1606,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
         ctrl.play();
         setState(() {});
       }
-    } catch (e) {
+    } catch (e, st) {
+      Logger.error("HomePage", "Failed to initialize video controller for carousel index $index", stackTrace: st);
       _videoControllers.remove(index);
       ctrl.dispose();
     }
@@ -2035,8 +2041,8 @@ class CustomiseOrderBanner extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFEAD8C1), // Rich beige/gold
-              Color(0xFFD6C1A1), // Deeper warm gold/brown
+              AppColors.goldGradientLight,
+              AppColors.goldGradientDark,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -2125,7 +2131,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                         Text(
                           "Dream Jewelry",
                           style: TextStyle(
-                            color: const Color(0xFF3E2723).withValues(alpha: 0.8),
+                            color: AppColors.deepEspresso.withValues(alpha: 0.8),
                             fontSize: context.responsiveFont(16),
                             fontWeight: FontWeight.w700,
                           ),
@@ -2151,7 +2157,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                         Text(
                           "Turn your unique inspirations into stunning gold masterpieces.",
                           style: TextStyle(
-                            color: const Color(0xFF5D4037),
+                            color: AppColors.espressoMuted,
                             fontSize: context.responsiveFont(11),
                             fontWeight: FontWeight.w600,
                             height: 1.3,
@@ -2247,7 +2253,7 @@ class CustomiseOrderBanner extends StatelessWidget {
   Widget _buildBulletDot(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Icon(Icons.circle, size: context.responsiveWidth(4, tabletVal: 5), color: const Color(0xFF3E2723)),
+      child: Icon(Icons.circle, size: context.responsiveWidth(4, tabletVal: 5), color: AppColors.deepEspresso),
     );
   }
 
@@ -2255,7 +2261,7 @@ class CustomiseOrderBanner extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: const Color(0xFF3E2723),
+        color: AppColors.deepEspresso,
         fontSize: context.responsiveFont(10),
         fontWeight: FontWeight.w800,
       ),

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserManagementController.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';

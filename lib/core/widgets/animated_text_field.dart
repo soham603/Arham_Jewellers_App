@@ -115,7 +115,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             ),
             counterText: "",
             filled: true,
-            fillColor: const Color(0xFFF9F9F9),
+            fillColor: AppColors.inputFill,
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.suffixIcon,
             contentPadding: EdgeInsets.symmetric(

@@ -37,7 +37,6 @@ class Logger {
 
   static void _log(String message) {
     if (kReleaseMode) return;
-    print(message);
     developer.log(message);
   }
 }

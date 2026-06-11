@@ -109,7 +109,7 @@ class _CartPageState extends State<CartPage> {
                               horizontal: context.getResponsiveSize(5),
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE85D4F),
+                              color: AppColors.danger,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             alignment: Alignment.centerRight,
@@ -137,7 +137,7 @@ class _CartPageState extends State<CartPage> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: const Color(0xFFE9E2D8),
+                                  color: AppColors.cardBorder,
                                 ),
                               ),
                               child: Row(
@@ -148,7 +148,7 @@ class _CartPageState extends State<CartPage> {
                                     child: Container(
                                       width: context.getResponsiveSize(20),
                                       height: context.getResponsiveSize(20),
-                                      color: const Color(0xFFF7F3EC),
+                                      color: AppColors.warmShimmerHighlight,
                                       child: imageURL != null &&
                                               imageURL.trim().isNotEmpty &&
                                               Uri.tryParse(imageURL)
@@ -160,9 +160,9 @@ class _CartPageState extends State<CartPage> {
                                               placeholder: (context, url) {
                                                 return Shimmer.fromColors(
                                                   baseColor:
-                                                      const Color(0xFFE9E3DA),
-                                                  highlightColor:
-                                                      const Color(0xFFF6F2EC),
+                                                      AppColors.warmShimmerBase,
+                                                   highlightColor:
+                                                       AppColors.warmShimmerHighlight,
                                                   child: Container(
                                                       color: Colors.white),
                                                 );
@@ -186,7 +186,7 @@ class _CartPageState extends State<CartPage> {
                                               child: Icon(
                                                 Icons.image_outlined,
                                                 color:
-                                                    const Color(0xFF8C7E68),
+                                                        AppColors.placeholderIcon,
                                                 size:
                                                     context.getResponsiveSize(6),
                                               ),
@@ -333,7 +333,7 @@ class _CartPageState extends State<CartPage> {
       width: context.getResponsiveSize(28),
       height: context.getScreenHeight(3.8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF3EEDF),
+        color: AppColors.warmBgLight,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -397,7 +397,7 @@ class _CartPageState extends State<CartPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE9E2D8)),
+          border: Border.all(color: AppColors.cardBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -625,7 +625,7 @@ class _CartPageState extends State<CartPage> {
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF25D366),
+              backgroundColor: AppColors.whatsappGreen,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -667,7 +667,7 @@ class _CartPageState extends State<CartPage> {
               width: context.getResponsiveSize(26),
               height: context.getResponsiveSize(26),
               decoration: BoxDecoration(
-                color: const Color(0xFFF4EFE6),
+                color: AppColors.warmBgLighter,
                 shape: BoxShape.circle,
               ),
               child: Icon(

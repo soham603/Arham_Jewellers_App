@@ -123,6 +123,7 @@ class NotificationService {
       final prefs = await SharedPreferences.getInstance();
       _notificationIdCounter = prefs.getInt(_counterKey) ?? 0;
     } catch (e) {
+      Logger.warning("NotificationService", "Failed to load notification ID counter, resetting to 0: $e");
       _notificationIdCounter = 0;
     }
   }
@@ -132,7 +133,7 @@ class NotificationService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_counterKey, _notificationIdCounter);
     } catch (e) {
-      // Best effort persistence
+      Logger.warning("NotificationService", "Failed to save notification ID counter: $e");
     }
   }
 

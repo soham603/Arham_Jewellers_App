@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -137,7 +138,8 @@ class ToastUtils {
 
     dismiss();
 
-    final ctx = Get.context!;
+    final ctx = Get.context;
+    if (ctx == null) return;
     final config = _defaultConfigs[type]!;
     final resolvedTitle = title ?? config.title;
     final resolvedDuration = duration ?? config.duration;
@@ -226,7 +228,8 @@ class ToastUtils {
   static bool _isGetContextAvailable() {
     try {
       return Get.context != null;
-    } catch (_) {
+    } catch (e, st) {
+      Logger.error("ToastUtils", "Failed to check Get context availability", stackTrace: st);
       return false;
     }
   }

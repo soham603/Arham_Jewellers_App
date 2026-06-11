@@ -271,8 +271,8 @@ class _LoginPageState extends State<LoginPage> {
               if (value == null || value.trim().isEmpty) {
                 return "Password is required";
               }
-              if (value.length < 4) {
-                return "Password too short";
+              if (value.length < 8) {
+                return "Password must be at least 8 characters";
               }
               return null;
             },

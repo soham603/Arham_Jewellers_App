@@ -48,6 +48,7 @@ abstract class AppTheme {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       centerTitle: false,
+      toolbarHeight: 64,
       iconTheme: const IconThemeData(color: AppColors.textDark, size: 24),
       titleTextStyle: GoogleFonts.inter(
         fontSize: 20,

@@ -5,6 +5,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/services/chat_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -45,26 +46,37 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     _scrollToBottom();
 
-    await for (final event in _chatService.sendMessageStream(text)) {
-      if (!mounted) return;
+    try {
+      await for (final event in _chatService.sendMessageStream(text)) {
+        if (!mounted) return;
 
-      setState(() {
-        switch (event.type) {
-          case ChatEventType.toolCall:
-            _toolStatus = event.label ?? event.tool;
-            _scrollToBottom();
-            break;
-          case ChatEventType.textDelta:
-            _toolStatus = null;
-            _streamBuffer += event.content ?? '';
-            _scrollToBottom();
-            break;
-          case ChatEventType.done:
-          case ChatEventType.error:
-            _toolStatus = null;
-            break;
-        }
-      });
+        setState(() {
+          switch (event.type) {
+            case ChatEventType.toolCall:
+              _toolStatus = event.label ?? event.tool;
+              _scrollToBottom();
+              break;
+            case ChatEventType.textDelta:
+              _toolStatus = null;
+              _streamBuffer += event.content ?? '';
+              _scrollToBottom();
+              break;
+            case ChatEventType.done:
+            case ChatEventType.error:
+              _toolStatus = null;
+              break;
+          }
+        });
+      }
+    } catch (e, stackTrace) {
+      Logger.error('ChatScreen', 'Failed to send message', stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _isStreaming = false;
+          _toolStatus = null;
+        });
+      }
+      return;
     }
 
     if (mounted) {

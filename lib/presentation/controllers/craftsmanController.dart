@@ -62,7 +62,8 @@ class CraftsmanController extends GetxController {
   CraftsmanModel? getById(String id) {
     try {
       return _craftsmen.firstWhere((c) => c.id == id);
-    } catch (_) {
+    } catch (e) {
+      Logger.warning("CraftsmanController", "getById: craftsman not found for id=$id");
       return null;
     }
   }

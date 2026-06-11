@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatefulWidget {
@@ -42,7 +43,7 @@ class _ProductCardState extends State<ProductCard>
   bool _isHovered = false;
   bool _isPressed = false;
 
-  static const _cardBorderColor = Color(0xFFE7E2DB);
+  static const _cardBorderColor = AppColors.cardBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +168,7 @@ class _ProductCardState extends State<ProductCard>
                                       child: Container(
                                         margin: EdgeInsets.symmetric(vertical: vPad),
                                         decoration: const BoxDecoration(
-                                          color: Color(0xFFFFF6DD),
+                                          color: AppColors.categoryChipBg,
                                           borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(100),
                                             bottomRight: Radius.circular(100),
@@ -377,7 +378,8 @@ class _ProductCardState extends State<ProductCard>
       if (!isRetailer && !isAdmin) return false;
       final goldRate = Get.find<GoldRateController>().currentRate;
       return goldRate != null;
-    } catch (_) {
+    } catch (e, st) {
+      Logger.error("ProductCard", "Failed to check retailer price visibility", stackTrace: st);
       return false;
     }
   }
@@ -420,14 +422,14 @@ class _ProductImage extends StatelessWidget {
             child: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
               child: ColoredBox(
-                color: const Color(0xFFF8F5F0),
+                color: AppColors.cardBgLight,
                 child: CachedNetworkImage(
                   imageUrl: imageUrl!,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
                   placeholder: (context, url) => const DecoratedBox(
-                    decoration: BoxDecoration(color: Color(0xFFF8F5F0)),
+                    decoration: BoxDecoration(color: AppColors.cardBgLight),
                   ),
                   errorWidget: (context, url, error) => const SizedBox.shrink(),
                 ),
@@ -449,8 +451,8 @@ class _ProductImage extends StatelessWidget {
                   width: double.infinity,
                   fadeInDuration: const Duration(milliseconds: 200),
                   placeholder: (context, url) => Shimmer.fromColors(
-                    baseColor: const Color(0xFFE8E3DB),
-                    highlightColor: const Color(0xFFF7F3ED),
+                          baseColor: AppColors.warmShimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
                     child: const DecoratedBox(
                       decoration: BoxDecoration(color: Colors.white),
                     ),
@@ -526,7 +528,7 @@ class _CategoryChip extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF6DD),
+          color: AppColors.categoryChipBg,
           borderRadius: BorderRadius.circular(100),
         ),
         child: Text(

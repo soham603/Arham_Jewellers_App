@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -226,15 +227,18 @@ class AuthController extends GetxController {
               errorMsg;
         }
       }
-    } catch (_) {
-      // ignore extraction errors, fall back to default message
+    } catch (e) {
+      Logger.warning("AuthController", "Failed to extract error message from DioException: $e");
     }
 
-    _scheduleError(
-      Get.context!,
-      errorMsg,
-      isUserLogin: isUserLogin,
-    );
+    final ctx = Get.context;
+    if (ctx != null) {
+      _scheduleError(
+        ctx,
+        errorMsg,
+        isUserLogin: isUserLogin,
+      );
+    }
   }
 
   void _scheduleError(BuildContext context, String message, {required bool isUserLogin}) {

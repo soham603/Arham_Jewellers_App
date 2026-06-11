@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WishlistController extends GetxController {
@@ -61,7 +62,8 @@ class WishlistController extends GetxController {
             .map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
             .toList();
         _items.addAll(loadedItems);
-      } catch (_) {
+      } catch (e, st) {
+        Logger.error("WishlistController", "Failed to load wishlist from SharedPreferences", stackTrace: st);
         await prefs.remove(_wishlistKey);
       }
     }

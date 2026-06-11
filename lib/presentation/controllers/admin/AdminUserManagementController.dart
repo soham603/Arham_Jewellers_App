@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
-import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -11,7 +11,7 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class AdminUserManagementController extends GetxController {
   static AdminUserManagementController get instance => Get.find();
 
-  static const int _pageLimit = 3; // TODO: change back to 20 before production
+  static const int _pageLimit = 20;
 
   final _users = <UserSearchModel>[].obs;
   List<UserSearchModel> get users => _users;

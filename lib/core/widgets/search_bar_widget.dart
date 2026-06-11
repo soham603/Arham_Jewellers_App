@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -49,8 +50,8 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class _SearchBarWidgetState extends State<SearchBarWidget> {
-  static const _goldDark = Color(0xFF8B6914);
-  static const _barColor = Color(0xFFF6F3EF);
+  static const _goldDark = AppColors.primaryGoldDark;
+  static const _barColor = AppColors.tileBg;
 
   Timer? _timer;
   int _currentIndex = 0;
@@ -140,7 +141,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       if (!mounted) return;
 
       _startTimer(names);
-    } catch (_) {
+    } catch (e, st) {
+      Logger.error("SearchBarWidget", "Failed to load category names for search hints", stackTrace: st);
       _timer?.cancel();
     }
   }
@@ -245,7 +247,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                             autofocus: widget.autofocus,
                             style: TextStyle(
                               fontSize: textSize,
-                              color: const Color(0xFF000000),
+                              color: AppColors.textDark,
                             ),
                             decoration: InputDecoration(
                               isDense: true,
@@ -261,7 +263,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               hintStyle: TextStyle(
                                 fontSize: hintSize,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF9E9590),
+                                color: AppColors.hint,
                               ),
                             ),
                             onChanged: widget.onChanged,
@@ -447,13 +449,14 @@ class _AnimatedHintState extends State<_AnimatedHint> {
               style: TextStyle(
                 fontSize: widget.fontSize,
                 fontWeight: FontWeight.w400,
-                color: const Color(0xFF9E9590),
+                color: AppColors.hint,
               ),
             ),
           ),
         ),
       );
-    } catch (_) {
+    } catch (e, st) {
+      Logger.error("SearchBarWidget", "Failed to build animated hint from categories", stackTrace: st);
       return _buildStaticHint();
     }
   }
@@ -466,7 +469,7 @@ class _AnimatedHintState extends State<_AnimatedHint> {
         style: TextStyle(
           fontSize: widget.fontSize,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF9E9590),
+          color: AppColors.hint,
         ),
       ),
     );
