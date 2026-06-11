@@ -1,4 +1,4 @@
-package com.example.ratnesh_gold_app
+package com.arhamjewellers.ratnesh_gold_app
 
 import android.content.ContentValues
 import android.os.Build

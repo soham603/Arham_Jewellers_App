@@ -42,6 +42,7 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _textController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
+  late final Worker _tabWorker;
 
   Set<SelectedCategory> _tempSelectedCategories = {};
   List<CategoryModel> _allCategories = [];
@@ -86,6 +87,15 @@ class _SearchPageState extends State<SearchPage> {
         }
       });
     }
+
+    final navController = Get.find<NavigationController>();
+    _tabWorker = ever(navController.selectedIndex, (int index) {
+      if (index == 1 && mounted && _textController.text.isEmpty) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) _focusNode.requestFocus();
+        });
+      }
+    });
   }
 
   void _onScroll() {
@@ -166,6 +176,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void dispose() {
+    _tabWorker.dispose();
     _textController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
