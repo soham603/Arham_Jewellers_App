@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class DateRangeResult {
   final DateTime startDate;
@@ -157,11 +158,14 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             onSurface: AppColors.textDark,
           ),
           datePickerTheme: DatePickerThemeData(
-            headerHeadlineStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            headerHelpStyle: const TextStyle(fontSize: 13),
-            dayStyle: const TextStyle(fontSize: 14),
-            weekdayStyle: const TextStyle(fontSize: 12),
-            dayShape: WidgetStateProperty.all(CircleBorder()),
+            headerHeadlineStyle: TextStyle(
+              fontSize: ctx.responsiveFont(22),
+              fontWeight: FontWeight.w600,
+            ),
+            headerHelpStyle: TextStyle(fontSize: ctx.responsiveFont(13)),
+            dayStyle: TextStyle(fontSize: ctx.responsiveFont(14)),
+            weekdayStyle: TextStyle(fontSize: ctx.responsiveFont(12)),
+            dayShape: WidgetStateProperty.all(const CircleBorder()),
           ),
         ),
         child: child!,
@@ -198,11 +202,14 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             onSurface: AppColors.textDark,
           ),
           datePickerTheme: DatePickerThemeData(
-            headerHeadlineStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            headerHelpStyle: const TextStyle(fontSize: 13),
-            dayStyle: const TextStyle(fontSize: 14),
-            weekdayStyle: const TextStyle(fontSize: 12),
-            dayShape: WidgetStateProperty.all(CircleBorder()),
+            headerHeadlineStyle: TextStyle(
+              fontSize: ctx.responsiveFont(22),
+              fontWeight: FontWeight.w600,
+            ),
+            headerHelpStyle: TextStyle(fontSize: ctx.responsiveFont(13)),
+            dayStyle: TextStyle(fontSize: ctx.responsiveFont(14)),
+            weekdayStyle: TextStyle(fontSize: ctx.responsiveFont(12)),
+            dayShape: WidgetStateProperty.all(const CircleBorder()),
           ),
         ),
         child: child!,
@@ -240,9 +247,11 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(context.responsiveWidth(24, tabletVal: 28)),
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -272,8 +281,8 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
     return Center(
       child: Container(
         margin: const EdgeInsets.only(top: 12),
-        width: 40,
-        height: 4,
+        width: context.responsiveWidth(40, tabletVal: 48),
+        height: context.responsiveWidth(4, tabletVal: 5),
         decoration: BoxDecoration(
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(2),
@@ -284,16 +293,25 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(16, tabletVal: 20),
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(8, tabletVal: 10),
+      ),
       child: Row(
         children: [
-          const Icon(Icons.date_range_rounded, color: AppColors.primaryGold, size: 22),
+          Icon(
+            Icons.date_range_rounded,
+            color: AppColors.primaryGold,
+            size: context.responsiveWidth(22, tabletVal: 24),
+          ),
           const SizedBox(width: 10),
-          const Expanded(
+          Expanded(
             child: Text(
               'Select Date Range',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: context.responsiveFont(18),
                 fontWeight: FontWeight.w700,
                 color: AppColors.textDark,
               ),
@@ -303,15 +321,18 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             GestureDetector(
               onTap: _clearSelection,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(10, tabletVal: 12),
+                  vertical: context.responsiveWidth(5, tabletVal: 6),
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.dangerSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
+                child: Text(
                   'Clear',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: context.responsiveFont(12),
                     fontWeight: FontWeight.w600,
                     color: Colors.red,
                   ),
@@ -327,18 +348,23 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
     final presets = ['This Month', 'Last 3 Months', 'Last 6 Months', 'This Year', 'Last Year'];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(8, tabletVal: 10),
+        context.responsiveWidth(24, tabletVal: 28),
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionLabel('Quick Select'),
           const SizedBox(height: 8),
           SizedBox(
-            height: 38,
+            height: context.responsiveWidth(38, tabletVal: 42),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: presets.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final preset = presets[index];
                 final isSelected = _selectedPreset == preset;
@@ -346,7 +372,10 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                   onTap: () => _applyPreset(preset),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveWidth(16, tabletVal: 20),
+                      vertical: context.responsiveWidth(8, tabletVal: 10),
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected ? AppColors.primaryGold : AppColors.tileBg,
                       borderRadius: BorderRadius.circular(20),
@@ -358,7 +387,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                     child: Text(
                       preset,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: context.responsiveFont(13),
                         fontWeight: FontWeight.w600,
                         color: isSelected ? Colors.white : AppColors.textDark,
                       ),
@@ -377,19 +406,24 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
     final now = DateTime.now();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(20, tabletVal: 24),
+        context.responsiveWidth(24, tabletVal: 28),
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionLabel('Select Month'),
           const SizedBox(height: 8),
           SizedBox(
-            height: 36,
+            height: context.responsiveWidth(36, tabletVal: 40),
             child: ListView.separated(
               controller: _monthScrollController,
               scrollDirection: Axis.horizontal,
               itemCount: _months.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 6),
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
                 final monthNum = index + 1;
                 final isSelected = _selectedMonth == monthNum && _selectedYear != null;
@@ -399,8 +433,8 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                       : null,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: 42,
-                    height: 36,
+                    width: context.responsiveWidth(42, tabletVal: 48),
+                    height: context.responsiveWidth(36, tabletVal: 40),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primaryGold
@@ -416,7 +450,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                     child: Text(
                       _months[index],
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: context.responsiveFont(11),
                         fontWeight: FontWeight.w600,
                         color: isSelected
                             ? Colors.white
@@ -434,12 +468,12 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
           _sectionLabel('Select Year'),
           const SizedBox(height: 8),
           SizedBox(
-            height: 36,
+            height: context.responsiveWidth(36, tabletVal: 40),
             child: ListView.separated(
               controller: _yearScrollController,
               scrollDirection: Axis.horizontal,
               itemCount: _years.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 6),
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
                 final year = _years[index];
                 final isSelected = _selectedYear == year;
@@ -448,8 +482,10 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                   onTap: isFuture ? null : () => setState(() => _selectedYear = year),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    height: 36,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveWidth(16, tabletVal: 20),
+                    ),
+                    height: context.responsiveWidth(36, tabletVal: 40),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.primaryGold
@@ -463,7 +499,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                     child: Text(
                       '$year',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: context.responsiveFont(13),
                         fontWeight: FontWeight.w600,
                         color: isSelected
                             ? Colors.white
@@ -482,7 +518,12 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
 
   Widget _buildCustomDateSection() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(20, tabletVal: 24),
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(8, tabletVal: 10),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -491,9 +532,15 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
           Row(
             children: [
               Expanded(child: _dateField('Start Date', _startDate, _pickStartDate)),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(Icons.arrow_forward_rounded, color: AppColors.primaryGold, size: 20),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(12, tabletVal: 14),
+                ),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  color: AppColors.primaryGold,
+                  size: context.responsiveWidth(20, tabletVal: 22),
+                ),
               ),
               Expanded(child: _dateField('End Date', _endDate, _pickEndDate)),
             ],
@@ -509,7 +556,10 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(14, tabletVal: 16),
+          vertical: context.responsiveWidth(12, tabletVal: 14),
+        ),
         decoration: BoxDecoration(
           color: hasDate ? AppColors.primaryGold.withValues(alpha: 0.06) : AppColors.tileBg,
           borderRadius: BorderRadius.circular(12),
@@ -524,7 +574,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w500,
                 color: hasDate ? AppColors.primaryGold : AppColors.textMuted,
               ),
@@ -533,7 +583,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             Text(
               hasDate ? DateFormat('dd MMM yyyy').format(date) : 'Tap to select',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: context.responsiveFont(13),
                 fontWeight: hasDate ? FontWeight.w600 : FontWeight.w400,
                 color: hasDate ? AppColors.textDark : AppColors.textMuted,
               ),
@@ -549,8 +599,8 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
   Widget _sectionLabel(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 12,
+      style: TextStyle(
+        fontSize: context.responsiveFont(12),
         fontWeight: FontWeight.w600,
         color: AppColors.textMuted,
         letterSpacing: 0.5,
@@ -562,7 +612,12 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
     final canApply = _startDate != null && _endDate != null;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(12, tabletVal: 14),
+        context.responsiveWidth(24, tabletVal: 28),
+        context.responsiveWidth(16, tabletVal: 20),
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: AppColors.divider.withValues(alpha: 0.5))),
@@ -579,9 +634,11 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.responsiveWidth(14, tabletVal: 16),
+                  ),
                 ),
-                child: const Text(
+                child: Text(
                   'Clear',
                   style: TextStyle(
                     color: AppColors.textMuted,
@@ -602,14 +659,16 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.responsiveWidth(14, tabletVal: 16),
+                  ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'Apply Range',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                    fontSize: context.responsiveFont(15),
                   ),
                 ),
               ),
@@ -620,3 +679,5 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
     );
   }
 }
+
+

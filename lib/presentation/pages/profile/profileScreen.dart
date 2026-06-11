@@ -82,6 +82,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: AppColors.pageBg,
+        toolbarHeight: MediaQuery.of(context).size.width >= 600
+            ? context.getScreenHeight(8)
+            : null,
         // 🔥 The Nuclear Option to permanently remove the back arrow:
         automaticallyImplyLeading: false,
         leading: const SizedBox.shrink(),

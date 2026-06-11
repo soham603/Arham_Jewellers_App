@@ -17,8 +17,15 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 // 🔥 Import the new Ancillary Data selection screen
 import 'ancillary_selection_screen.dart';
 
-class AdminPanelScreen extends StatelessWidget {
+class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
+
+  @override
+  State<AdminPanelScreen> createState() => _AdminPanelScreenState();
+}
+
+class _AdminPanelScreenState extends State<AdminPanelScreen> {
+  bool _isGridView = true;
 
   @override
   Widget build(BuildContext context) {
@@ -150,112 +157,266 @@ class AdminPanelScreen extends StatelessWidget {
           SizedBox(height: context.getScreenHeight(3)),
 
           // =====================================================
-          // ADMIN MENU GRID
+          // ADMIN MENU GRID / LIST
           // =====================================================
-          Text(
-            "Management",
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(6),
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-
-          SizedBox(height: context.getScreenHeight(2)),
-
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: context.gridColumns(),
-            crossAxisSpacing: context.getResponsiveSize(3),
-            mainAxisSpacing: context.getScreenHeight(1.5),
-            childAspectRatio: 1.0,
+          Row(
             children: [
-              _adminTile(
-                context,
-                icon: Icons.verified_user_rounded,
-                title: "Approve Users",
-                subtitle: "Manage access",
-                onTap: () => Get.to(() => const ApproveUsersScreen()),
+              Text(
+                "Management",
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(6),
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
               ),
-              _adminTile(
-                context,
-                icon: Icons.people_alt_rounded,
-                title: "User Management",
-                subtitle: "All users",
-                onTap: () => Get.to(() => const UserManagementScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.inventory_2_rounded,
-                title: "Approve Orders",
-                subtitle: "Verify orders",
-                onTap: () => Get.to(() => const ApproveOrdersScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.category_rounded,
-                title: "Categories",
-                subtitle: "Manage categories",
-                onTap: () => Get.to(() => CategoryManagerScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.production_quantity_limits_rounded,
-                title: "Products",
-                subtitle: "Manage products",
-                onTap: () => Get.to(() => AdminProductScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.view_carousel_rounded,
-                title: "Carousel",
-                subtitle: "Manage banners",
-                onTap: () => Get.to(() => CarouselManagerScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.text_snippet_rounded,
-                title: "Ancillary Data",
-                subtitle: "Terms, About, Policies",
-                onTap: () => Get.to(() => const AncillarySelectionScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.phone_android_rounded,
-                title: "Handset Requests",
-                subtitle: "Change requests",
-                onTap: () => Get.to(() => const HandsetChangeScreen()),
-              ),
-              _adminTile(
-                context,
-                icon: Icons.monetization_on_rounded,
-                title: "Gold Rate",
-                subtitle: "Set daily rate",
-                onTap: () => Get.to(() => const GoldRateScreen()),
-              ),
-
-              _adminTile(
-                context,
-                icon: Icons.play_circle_outline_rounded,
-                title: "View Splash",
-                subtitle: "Preview splash screen",
-                onTap: () => Get.to(() => const SplashPage()),
-              ),
-
-              // ── Temporary: Toast Test ──
-              _adminTile(
-                context,
-                icon: Icons.notifications_active_rounded,
-                title: "Test Toast",
-                subtitle: "Preview toasts",
-                onTap: () => _showToastTestSheet(context),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => setState(() => _isGridView = !_isGridView),
+                child: Container(
+                  padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                  decoration: BoxDecoration(
+                    color: _isGridView
+                        ? AppColors.primaryGold.withValues(alpha: 0.15)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isGridView
+                          ? AppColors.primaryGold
+                          : const Color(0xFFE7DED2),
+                    ),
+                  ),
+                  child: Icon(
+                    _isGridView ? Icons.list_rounded : Icons.grid_view_rounded,
+                    color: _isGridView
+                        ? AppColors.primaryGold
+                        : AppColors.textMuted,
+                    size: context.getResponsiveSize(5),
+                  ),
+                ),
               ),
             ],
           ),
 
+          SizedBox(height: context.getScreenHeight(2)),
+
+          if (_isGridView)
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: context.getResponsiveSize(3),
+              mainAxisSpacing: context.getScreenHeight(1.5),
+              childAspectRatio: 0.9,
+              children: [
+                _adminTile(
+                  context,
+                  icon: Icons.verified_user_rounded,
+                  title: "Approve Users",
+                  subtitle: "Manage access",
+                  onTap: () => Get.to(() => const ApproveUsersScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.people_alt_rounded,
+                  title: "User Management",
+                  subtitle: "All users",
+                  onTap: () => Get.to(() => const UserManagementScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.inventory_2_rounded,
+                  title: "Approve Orders",
+                  subtitle: "Verify orders",
+                  onTap: () => Get.to(() => const ApproveOrdersScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.category_rounded,
+                  title: "Categories",
+                  subtitle: "Manage categories",
+                  onTap: () => Get.to(() => CategoryManagerScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.production_quantity_limits_rounded,
+                  title: "Products",
+                  subtitle: "Manage products",
+                  onTap: () => Get.to(() => AdminProductScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.view_carousel_rounded,
+                  title: "Carousel",
+                  subtitle: "Manage banners",
+                  onTap: () => Get.to(() => CarouselManagerScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.text_snippet_rounded,
+                  title: "Ancillary Data",
+                  subtitle: "Terms, About, Policies",
+                  onTap: () => Get.to(() => const AncillarySelectionScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.phone_android_rounded,
+                  title: "Handset Requests",
+                  subtitle: "Change requests",
+                  onTap: () => Get.to(() => const HandsetChangeScreen()),
+                ),
+                _adminTile(
+                  context,
+                  icon: Icons.monetization_on_rounded,
+                  title: "Gold Rate",
+                  subtitle: "Set daily rate",
+                  onTap: () => Get.to(() => const GoldRateScreen()),
+                ),
+
+                _adminTile(
+                  context,
+                  icon: Icons.play_circle_outline_rounded,
+                  title: "View Splash",
+                  subtitle: "Preview splash screen",
+                  onTap: () => Get.to(() => const SplashPage()),
+                ),
+
+                // ── Temporary: Toast Test ──
+                _adminTile(
+                  context,
+                  icon: Icons.notifications_active_rounded,
+                  title: "Test Toast",
+                  subtitle: "Preview toasts",
+                  onTap: () => _showToastTestSheet(context),
+                ),
+              ],
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _managementItems.length,
+              separatorBuilder: (_, __) =>
+                  SizedBox(height: context.getScreenHeight(1.2)),
+              itemBuilder: (context, index) {
+                final item = _managementItems[index];
+                return _adminListTile(
+                  context,
+                  icon: item.icon,
+                  title: item.title,
+                  subtitle: item.subtitle,
+                  onTap: item.onTap,
+                );
+              },
+            ),
+
           SizedBox(height: context.getScreenHeight(3)),
         ],
+      ),
+    );
+  }
+
+  List<_ManagementItem> get _managementItems => [
+        _ManagementItem(Icons.verified_user_rounded, "Approve Users",
+            "Manage access", () => Get.to(() => const ApproveUsersScreen())),
+        _ManagementItem(Icons.people_alt_rounded, "User Management",
+            "All users", () => Get.to(() => const UserManagementScreen())),
+        _ManagementItem(Icons.inventory_2_rounded, "Approve Orders",
+            "Verify orders", () => Get.to(() => const ApproveOrdersScreen())),
+        _ManagementItem(Icons.category_rounded, "Categories",
+            "Manage categories", () => Get.to(() => CategoryManagerScreen())),
+        _ManagementItem(Icons.production_quantity_limits_rounded, "Products",
+            "Manage products", () => Get.to(() => AdminProductScreen())),
+        _ManagementItem(Icons.view_carousel_rounded, "Carousel",
+            "Manage banners", () => Get.to(() => CarouselManagerScreen())),
+        _ManagementItem(Icons.text_snippet_rounded, "Ancillary Data",
+            "Terms, About, Policies",
+            () => Get.to(() => const AncillarySelectionScreen())),
+        _ManagementItem(Icons.phone_android_rounded, "Handset Requests",
+            "Change requests", () => Get.to(() => const HandsetChangeScreen())),
+        _ManagementItem(Icons.monetization_on_rounded, "Gold Rate",
+            "Set daily rate", () => Get.to(() => const GoldRateScreen())),
+        _ManagementItem(Icons.play_circle_outline_rounded, "View Splash",
+            "Preview splash screen", () => Get.to(() => const SplashPage())),
+        _ManagementItem(Icons.notifications_active_rounded, "Test Toast",
+            "Preview toasts", () => _showToastTestSheet(context)),
+      ];
+
+  Widget _adminListTile(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(4),
+          vertical: context.getScreenHeight(1.5),
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: context.getResponsiveSize(12),
+              height: context.getResponsiveSize(12),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5EFE7),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.primaryGold,
+                size: context.getResponsiveSize(6),
+              ),
+            ),
+            SizedBox(width: context.getResponsiveSize(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                      fontSize: context.getResponsiveSize(4),
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.3)),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: context.getResponsiveSize(3.2),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textMuted,
+              size: context.getResponsiveSize(5),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -428,4 +589,13 @@ class AdminPanelScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ManagementItem {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _ManagementItem(this.icon, this.title, this.subtitle, this.onTap);
 }

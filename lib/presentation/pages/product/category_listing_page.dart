@@ -107,6 +107,18 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
   bool get _is22kOnly => !_isMultiKarat && widget.karats.first == Karat.k22;
 
+  double _gridAspectRatio(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width >= 1200) return 1.0;
+    if (width >= 900) return 0.92;
+    if (width >= 600) return 0.82;
+    return 0.85;
+  }
+
+  double _gridSpacing(BuildContext context) {
+    return context.responsiveWidth(12, tabletVal: 16);
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = widget.title ??
@@ -126,13 +138,15 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                       children: [
                         Align(
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 16),
+                            padding: EdgeInsets.only(
+                              top: context.responsiveWidth(16, tabletVal: 24),
+                            ),
                             child: _is22kOnly
                                 ? LogoWidget(
                                     showIcon: true,
                                     showName: false,
                                     showSubtitle: false,
-                                    logoSize: 80,
+                                    logoSize: context.responsiveWidth(80, tabletVal: 110),
                                     logoAsset: 'assets/images/arham-logo.png',
                                     iconColor: context.colorPalette.goldDark,
                                   )
@@ -140,13 +154,13 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                                     showIcon: true,
                                     showName: true,
                                     showSubtitle: false,
-                                    logoSize: 80,
+                                    logoSize: context.responsiveWidth(80, tabletVal: 110),
                                   ),
                           ),
                         ),
                         Positioned(
-                          left: 4,
-                          top: 8,
+                          left: context.responsiveWidth(4, tabletVal: 12),
+                          top: context.responsiveWidth(8, tabletVal: 16),
                           child: IconButton(
                             icon: Icon(Icons.arrow_back_ios_rounded,
                                 color: context.colorPalette.goldDeep),
@@ -155,14 +169,24 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: _is22kOnly ? 16 : 20),
+                    SizedBox(
+                      height: context.responsiveWidth(
+                        _is22kOnly ? 16 : 20,
+                        tabletVal: 28,
+                      ),
+                    ),
                     JewelleryDivider(vertical: _is22kOnly ? 0 : 4),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                      padding: EdgeInsets.fromLTRB(
+                        context.responsiveWidth(20, tabletVal: 32),
+                        context.responsiveWidth(16, tabletVal: 24),
+                        context.responsiveWidth(20, tabletVal: 32),
+                        context.responsiveWidth(4, tabletVal: 6),
+                      ),
                       child: Text(
                         title,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: context.responsiveFont(20),
                           fontWeight: FontWeight.w800,
                           color: context.colorPalette.goldDeep,
                         ),
@@ -170,68 +194,104 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.responsiveWidth(20, tabletVal: 32),
+                      ),
                       child: Text(
                         'Explore our exquisite collection of handcrafted jewellery',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: context.responsiveFont(13),
                           color: context.colorPalette.goldDark,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: context.responsiveWidth(12, tabletVal: 20)),
                     Obx(() {
                       if (_isLoading.value) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(
+                              context.responsiveWidth(32, tabletVal: 48),
+                            ),
+                            child: const CircularProgressIndicator(),
+                          ),
+                        );
                       }
 
                       if (_hasError.value &&
                           widget.karats.every((k) => _listForKarat(k).isEmpty)) {
                         return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.error_outline,
-                                  color: context.colorPalette.goldDark, size: 48),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Failed to load categories',
-                                style: TextStyle(
-                                  color: context.colorPalette.goldDark,
-                                  fontSize: 16,
+                          child: Padding(
+                            padding: EdgeInsets.all(
+                              context.responsiveWidth(32, tabletVal: 48),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error_outline,
+                                    color: context.colorPalette.goldDark,
+                                    size: context.responsiveWidth(48, tabletVal: 64)),
+                                SizedBox(
+                                  height: context.responsiveWidth(12, tabletVal: 16),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: _loadAll,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: context.colorPalette.gold,
-                                  foregroundColor: Colors.white,
+                                Text(
+                                  'Failed to load categories',
+                                  style: TextStyle(
+                                    color: context.colorPalette.goldDark,
+                                    fontSize: context.responsiveFont(16),
+                                  ),
                                 ),
-                                child: const Text('Retry'),
-                              ),
-                            ],
+                                SizedBox(
+                                  height: context.responsiveWidth(16, tabletVal: 24),
+                                ),
+                                ElevatedButton(
+                                  onPressed: _loadAll,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: context.colorPalette.gold,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.responsiveWidth(24, tabletVal: 36),
+                                      vertical: context.responsiveWidth(12, tabletVal: 16),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Retry',
+                                    style: TextStyle(
+                                      fontSize: context.responsiveFont(14),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }
 
                       if (widget.karats.every((k) => _listForKarat(k).isEmpty)) {
                         return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.diamond_outlined,
-                                  color: context.colorPalette.goldDark, size: 48),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No categories found',
-                                style: TextStyle(
-                                  color: context.colorPalette.goldDark,
-                                  fontSize: 16,
+                          child: Padding(
+                            padding: EdgeInsets.all(
+                              context.responsiveWidth(32, tabletVal: 48),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.diamond_outlined,
+                                    color: context.colorPalette.goldDark,
+                                    size: context.responsiveWidth(48, tabletVal: 64)),
+                                SizedBox(
+                                  height: context.responsiveWidth(12, tabletVal: 16),
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  'No categories found',
+                                  style: TextStyle(
+                                    color: context.colorPalette.goldDark,
+                                    fontSize: context.responsiveFont(16),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       }
@@ -241,8 +301,11 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                       }
 
                       final categories = _listForKarat(widget.karats.first);
+                      final spacing = _gridSpacing(context);
                       return Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(
+                          context.responsiveWidth(16, tabletVal: 24),
+                        ),
                         child: GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -250,9 +313,9 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: context.isTablet ? 0.72 : 0.85,
+                            mainAxisSpacing: spacing,
+                            crossAxisSpacing: spacing,
+                            childAspectRatio: _gridAspectRatio(context),
                           ),
                           itemBuilder: (_, index) {
                             final cat = categories[index];
@@ -330,7 +393,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
     return ListView(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(context.responsiveWidth(16, tabletVal: 24)),
       children: [
         for (final karat in widget.karats) ...[
           _KaratSectionHeader(
@@ -343,7 +406,9 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
             curve: Curves.easeInOut,
             child: _expandedKarats.contains(karat)
                 ? Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
+                    padding: EdgeInsets.only(
+                      bottom: context.responsiveWidth(16, tabletVal: 24),
+                    ),
                     child: _CategoryGrid(
                       categories: _listForKarat(karat),
                       karat: karat,
@@ -412,13 +477,20 @@ class _KaratSectionHeader extends StatelessWidget {
     return GestureDetector(
       onTap: onToggle,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: EdgeInsets.only(
+          bottom: context.responsiveWidth(8, tabletVal: 12),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(16, tabletVal: 24),
+          vertical: context.responsiveWidth(14, tabletVal: 20),
+        ),
         decoration: BoxDecoration(
           color: isExpanded
               ? context.colorPalette.goldLight
               : context.colorPalette.cardBg,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(
+            context.responsiveWidth(14, tabletVal: 18),
+          ),
           border: Border.all(
             color: isExpanded
                 ? context.colorPalette.gold
@@ -436,13 +508,13 @@ class _KaratSectionHeader extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: context.responsiveWidth(38, tabletVal: 46),
-              height: context.responsiveWidth(38, tabletVal: 46),
+              width: context.responsiveWidth(38, tabletVal: 52),
+              height: context.responsiveWidth(38, tabletVal: 52),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: context.colorPalette.gold,
-                  width: 2,
+                  width: context.responsiveWidth(2, tabletVal: 3),
                 ),
               ),
               child: Center(
@@ -457,8 +529,8 @@ class _KaratSectionHeader extends StatelessWidget {
                   ).createShader(bounds),
                   child: Text(
                     karat.displayName,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: context.responsiveFont(12),
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                       height: 1,
@@ -467,14 +539,14 @@ class _KaratSectionHeader extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: context.responsiveWidth(10, tabletVal: 14)),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '${karat.displayName} Collection',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: context.responsiveFont(16),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDeep,
                   ),
@@ -482,7 +554,7 @@ class _KaratSectionHeader extends StatelessWidget {
                 Text(
                   '${_purity(karat)} Pure Gold',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: context.responsiveFont(10),
                     color: context.colorPalette.goldDark,
                   ),
                 ),
@@ -495,6 +567,7 @@ class _KaratSectionHeader extends StatelessWidget {
               child: Icon(
                 Icons.keyboard_arrow_down,
                 color: context.colorPalette.goldDark,
+                size: context.responsiveWidth(24, tabletVal: 30),
               ),
             ),
           ],
@@ -519,6 +592,19 @@ class _CategoryGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CategoryController>();
+    final width = MediaQuery.of(context).size.width;
+    final spacing = width >= 600 ? 16.0 : 12.0;
+
+    double aspectRatio;
+    if (width >= 1200) {
+      aspectRatio = 1.0;
+    } else if (width >= 900) {
+      aspectRatio = 0.92;
+    } else if (width >= 600) {
+      aspectRatio = 0.82;
+    } else {
+      aspectRatio = 0.85;
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -526,9 +612,9 @@ class _CategoryGrid extends StatelessWidget {
       itemCount: categories.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: context.isTablet ? 0.72 : 0.85,
+        mainAxisSpacing: spacing,
+        crossAxisSpacing: spacing,
+        childAspectRatio: aspectRatio,
       ),
       itemBuilder: (_, index) {
         final cat = categories[index];
@@ -560,11 +646,15 @@ class _Level3Sheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
 
     return Container(
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(context.responsiveWidth(20, tabletVal: 24)),
+        ),
       ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -575,9 +665,11 @@ class _Level3Sheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              margin: EdgeInsets.only(top: context.responsiveWidth(10, tabletVal: 12)),
-              width: context.responsiveWidth(40, tabletVal: 48),
-              height: context.responsiveWidth(4, tabletVal: 5),
+              margin: EdgeInsets.only(
+                top: context.responsiveWidth(10, tabletVal: 14),
+              ),
+              width: context.responsiveWidth(40, tabletVal: 56),
+              height: context.responsiveWidth(4, tabletVal: 6),
               decoration: BoxDecoration(
                 color: context.colorPalette.goldDark.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
@@ -585,16 +677,17 @@ class _Level3Sheet extends StatelessWidget {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(
-                context.responsiveWidth(20, tabletVal: 24),
-                context.responsiveWidth(16, tabletVal: 18),
-                context.responsiveWidth(20, tabletVal: 24),
-                context.responsiveWidth(12, tabletVal: 14),
+                context.responsiveWidth(20, tabletVal: 28),
+                context.responsiveWidth(16, tabletVal: 22),
+                context.responsiveWidth(20, tabletVal: 28),
+                context.responsiveWidth(12, tabletVal: 16),
               ),
               child: Row(
                 children: [
                   Icon(Icons.grid_view_rounded,
-                      size: 20, color: context.colorPalette.goldDark),
-                  const SizedBox(width: 8),
+                      size: context.responsiveWidth(20, tabletVal: 26),
+                      color: context.colorPalette.goldDark),
+                  SizedBox(width: context.responsiveWidth(8, tabletVal: 12)),
                   Expanded(
                     child: Text(
                       parent.name
@@ -605,18 +698,28 @@ class _Level3Sheet extends StatelessWidget {
                           )
                           .trim(),
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: context.responsiveFont(18),
                         fontWeight: FontWeight.w700,
                         color: context.colorPalette.goldDeep,
                       ),
                     ),
                   ),
-                  Text(
-                    karat.displayName,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: context.colorPalette.goldDark,
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveWidth(10, tabletVal: 14),
+                      vertical: context.responsiveWidth(4, tabletVal: 6),
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.goldLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      karat.displayName,
+                      style: TextStyle(
+                        fontSize: context.responsiveFont(13),
+                        fontWeight: FontWeight.w600,
+                        color: context.colorPalette.goldDark,
+                      ),
                     ),
                   ),
                 ],
@@ -625,13 +728,15 @@ class _Level3Sheet extends StatelessWidget {
             Divider(height: 1, color: context.colorPalette.border),
             Flexible(
               child: GridView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(
+                  context.responsiveWidth(16, tabletVal: 20),
+                ),
                 itemCount: children.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: context.gridColumns(phone: 3, tablet: 4),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.78,
+                  mainAxisSpacing: isTablet ? 16 : 12,
+                  crossAxisSpacing: isTablet ? 16 : 12,
+                  childAspectRatio: isTablet ? 0.85 : 0.78,
                 ),
                 itemBuilder: (_, index) {
                   final cat = children[index];
@@ -640,7 +745,9 @@ class _Level3Sheet extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         color: context.colorPalette.cardBg,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(
+                          context.responsiveWidth(14, tabletVal: 16),
+                        ),
                         border: Border.all(color: context.colorPalette.border),
                         boxShadow: [
                           BoxShadow(
@@ -654,8 +761,10 @@ class _Level3Sheet extends StatelessWidget {
                         children: [
                           Expanded(
                             child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(13),
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(
+                                  context.responsiveWidth(13, tabletVal: 15),
+                                ),
                               ),
                               child: _CategoryListingImage(
                                 cat: cat,
@@ -663,7 +772,9 @@ class _Level3Sheet extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(6),
+                            padding: EdgeInsets.all(
+                              context.responsiveWidth(6, tabletVal: 10),
+                            ),
                             child: Text(
                               cat.name
                                   .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
@@ -676,7 +787,7 @@ class _Level3Sheet extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: context.responsiveFont(11),
                                 fontWeight: FontWeight.w600,
                                 color: context.colorPalette.goldDeep,
                               ),
@@ -717,7 +828,9 @@ class _CategoryCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: context.colorPalette.cardBg,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(
+            context.responsiveWidth(14, tabletVal: 18),
+          ),
           border: Border.all(color: context.colorPalette.border),
           boxShadow: [
             BoxShadow(
@@ -735,19 +848,21 @@ class _CategoryCard extends StatelessWidget {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(13),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(
+                        context.responsiveWidth(13, tabletVal: 17),
+                      ),
                     ),
                     child: _CategoryListingImage(
                       cat: category,
                     ),
                   ),
                   Positioned(
-                    top: 6,
-                    right: 6,
+                    top: context.responsiveWidth(6, tabletVal: 10),
+                    right: context.responsiveWidth(6, tabletVal: 10),
                     child: Container(
-                      width: 24,
-                      height: 24,
+                      width: context.responsiveWidth(24, tabletVal: 32),
+                      height: context.responsiveWidth(24, tabletVal: 32),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: context.colorPalette.gold,
@@ -756,8 +871,8 @@ class _CategoryCard extends StatelessWidget {
                         child: Text(
                           karat.displayName,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 9,
+                          style: TextStyle(
+                            fontSize: context.responsiveFont(9, tabletMultiplier: 1.5),
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
                             height: 1,
@@ -772,9 +887,9 @@ class _CategoryCard extends StatelessWidget {
             Expanded(
               flex: 1,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 2,
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(10, tabletVal: 14),
+                  vertical: context.responsiveWidth(2, tabletVal: 6),
                 ),
                 child: Text(
                   category.name
@@ -788,7 +903,7 @@ class _CategoryCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDeep,
                   ),

@@ -49,12 +49,12 @@ class AppBottomNav extends StatelessWidget {
       'but got $currentIndex.',
     );
 
-    final barHeight = context.getResponsiveSize(11);
-    final iconContainerSize = context.getResponsiveSize(10);
-    final iconSize = context.getResponsiveSize(6);
-    final labelFontSize = context.getResponsiveSize(2);
-    final itemVerticalPadding = context.getResponsiveSize(1.2);
-    final inkwellBorderRadius = context.getResponsiveSize(2.5);
+    final barHeight = context.getResponsiveSize(9.5);
+    final iconContainerSize = context.getResponsiveSize(8.5);
+    final iconSize = context.getResponsiveSize(5);
+    final labelFontSize = context.getResponsiveSize(1.8);
+    final itemVerticalPadding = context.getResponsiveSize(1.0);
+    final inkwellBorderRadius = context.getResponsiveSize(2.2);
 
     return Container(
       padding: EdgeInsets.only(
@@ -143,7 +143,7 @@ class _NavItemTile extends StatelessWidget {
                   containerSize: iconContainerSize,
                   iconSize: iconSize,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
                 _AnimatedLabel(
                   label: item.label,
                   isSelected: isSelected,

@@ -169,16 +169,16 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         widget.outerBackgroundColor == Colors.transparent;
     final isTransparentBar = widget.barBackgroundColor == Colors.transparent;
 
-    final iconSize = context.responsiveWidth(20, tabletVal: 24);
-    final smallIconSize = context.responsiveWidth(18, tabletVal: 22);
-    final filterIconSize = context.responsiveWidth(22, tabletVal: 26);
-    final hPad = context.responsiveWidth(16, tabletVal: 20);
-    final vPad = context.responsiveWidth(10, tabletVal: 12);
-    final spacing = context.responsiveWidth(10, tabletVal: 12);
-    final textSize = context.responsiveWidth(15, tabletVal: 17);
-    final hintSize = context.responsiveWidth(14, tabletVal: 16);
-    final badgeFontSize = context.responsiveWidth(9, tabletVal: 10);
-    final stackHeight = context.responsiveWidth(20, tabletVal: 24);
+    final iconSize = context.responsiveWidth(20, tabletVal: 30);
+    final smallIconSize = context.responsiveWidth(18, tabletVal: 28);
+    final filterIconSize = context.responsiveWidth(22, tabletVal: 32);
+    final hPad = context.responsiveWidth(16, tabletVal: 28);
+    final vPad = context.responsiveWidth(10, tabletVal: 16);
+    final spacing = context.responsiveWidth(10, tabletVal: 16);
+    final textSize = context.responsiveWidth(15, tabletVal: 22);
+    final hintSize = context.responsiveWidth(14, tabletVal: 20);
+    final badgeFontSize = context.responsiveWidth(9, tabletVal: 14);
+    final stackHeight = context.responsiveWidth(20, tabletVal: 32);
     const pillRadius = 50.0;
 
     final showAnimatedHint =

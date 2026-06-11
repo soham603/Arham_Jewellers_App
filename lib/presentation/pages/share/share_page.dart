@@ -497,10 +497,10 @@ class _SharePageState extends State<SharePage> {
 
       return Container(
         padding: EdgeInsets.fromLTRB(
-          20,
-          12,
-          20,
-          12 + MediaQuery.of(context).padding.bottom,
+          context.getResponsiveSize(4),
+          context.getScreenHeight(0.8),
+          context.getResponsiveSize(4),
+          context.getScreenHeight(0.8) + MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -518,21 +518,24 @@ class _SharePageState extends State<SharePage> {
             GestureDetector(
               onTap: () => controller.clearSelection(),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSize(2.5),
+                  vertical: context.getScreenHeight(0.6),
+                ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
                   border: Border.all(color: context.colorPalette.border),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close, size: 16, color: context.colorPalette.goldDark),
-                    const SizedBox(width: 4),
+                    Icon(Icons.close, size: context.getResponsiveSize(3.5), color: context.colorPalette.goldDark),
+                    SizedBox(width: context.getResponsiveSize(0.8)),
                     Text(
                       'Clear',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: context.getResponsiveSize(3),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDark,
                       ),
@@ -541,12 +544,12 @@ class _SharePageState extends State<SharePage> {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: context.getResponsiveSize(2.5)),
             Expanded(
               child: Text(
                 '${controller.selectedCount} selected',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: context.getResponsiveSize(3.5),
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.goldDeep,
                 ),
@@ -572,32 +575,38 @@ class _SharePageState extends State<SharePage> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSize(2.5),
+                  vertical: context.getScreenHeight(0.6),
+                ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
                   border: Border.all(color: context.colorPalette.border),
                 ),
-                child: Icon(Icons.check_rounded, size: 18, color: context.colorPalette.goldDark),
+                child: Icon(Icons.check_rounded, size: context.getResponsiveSize(4), color: context.colorPalette.goldDark),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: context.getResponsiveSize(1.5)),
             GestureDetector(
               onTap: () => _showShareOptions(context),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSize(2.5),
+                  vertical: context.getScreenHeight(0.6),
+                ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.goldDark,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.share_rounded, size: 16, color: Colors.white),
-                    SizedBox(width: 4),
+                  children: [
+                    Icon(Icons.share_rounded, size: context.getResponsiveSize(3.5), color: Colors.white),
+                    SizedBox(width: context.getResponsiveSize(0.8)),
                     Text(
                       'Share',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                      style: TextStyle(fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                   ],
                 ),

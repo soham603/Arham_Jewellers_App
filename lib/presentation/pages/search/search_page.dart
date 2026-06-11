@@ -7,7 +7,6 @@ import 'package:ratnesh_gold_app/core/widgets/category_picker_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
@@ -180,7 +179,7 @@ class _SearchPageState extends State<SearchPage> {
       body: SafeArea(
         child: Column(
           children: [
-            SearchBarWidget(
+            Obx(() => SearchBarWidget(
               controller: _textController,
               focusNode: _focusNode,
               autofocus: false,
@@ -217,26 +216,21 @@ class _SearchPageState extends State<SearchPage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
-                final auth = Get.find<AuthController>();
-                final showPrice = auth.user?.isRetailer == true || auth.isAdmin;
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
                   initialStockFilter: controller.stockFilter,
                   initialWeightMin: controller.weightMin,
                   initialWeightMax: controller.weightMax,
-                  initialPriceMin: controller.priceMin,
-                  initialPriceMax: controller.priceMax,
                   showKaratFilter: false,
                   showStockFilter: false,
                   showCategoryFilter: true,
-                  showPriceFilter: showPrice,
+                  showPriceFilter: false,
                   showWeightFilter: false,
                   weightSliderMax: controller.availableWeightMax,
                   products: controller.allProducts,
                   categories: _allCategories,
                   initialSelectedCategoryIds: controller.selectedCategoryIds,
-                  priceSliderMax: 5000000,
                   onApply: controller.applyFilters,
                 ).then((_) => setState(() {}));
               },
@@ -260,6 +254,7 @@ class _SearchPageState extends State<SearchPage> {
                 }
               },
               filterActiveCount: controller.activeFilterCount,
+            ),
             ),
             _buildKaratRow(context),
             Obx(() {
@@ -376,10 +371,13 @@ class _SearchPageState extends State<SearchPage> {
                                 return GestureDetector(
                                   onTap: () => _showSortSheet(context),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: context.responsiveWidth(10, tabletVal: 16),
+                                      vertical: context.responsiveWidth(6, tabletVal: 10),
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
                                       border: Border.all(color: context.colorPalette.border),
                                     ),
                                     child: Row(
@@ -387,14 +385,14 @@ class _SearchPageState extends State<SearchPage> {
                                       children: [
                                         Icon(
                                           Icons.sort_rounded,
-                                          size: 18,
+                                          size: context.responsiveWidth(18, tabletVal: 24),
                                           color: context.colorPalette.goldDark,
                                         ),
-                                        const SizedBox(width: 6),
+                                        SizedBox(width: context.responsiveWidth(6, tabletVal: 10)),
                                         Text(
                                           currentSort.label,
                                           style: TextStyle(
-                                            fontSize: 12,
+                                            fontSize: context.responsiveWidth(12, tabletVal: 16),
                                             fontWeight: FontWeight.w500,
                                             color: context.colorPalette.goldDark,
                                           ),
@@ -705,27 +703,27 @@ class _SearchPageState extends State<SearchPage> {
     required VoidCallback onRemove,
   }) {
     return Container(
-      margin: const EdgeInsets.only(right: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      margin: EdgeInsets.only(right: context.responsiveWidth(6, tabletVal: 10)),
+      padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(10, tabletVal: 16), vertical: context.responsiveWidth(4, tabletVal: 8)),
       decoration: BoxDecoration(
         color: context.colorPalette.gold,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(context.responsiveWidth(10, tabletVal: 14)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 11,
+            style: TextStyle(
+              fontSize: context.responsiveWidth(11, tabletVal: 16),
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: context.responsiveWidth(4, tabletVal: 8)),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.close, size: 12, color: Colors.white),
+            child: Icon(Icons.close, size: context.responsiveWidth(12, tabletVal: 18), color: Colors.white),
           ),
         ],
       ),
@@ -873,7 +871,7 @@ class _SearchPageState extends State<SearchPage> {
               child: Text(
                 'Browse Categories',
                 style: TextStyle(
-                  fontSize: context.getResponsiveSize(4.2),
+                  fontSize: context.responsiveWidth(16, tabletVal: 22, largeTabletVal: 28),
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF675F55),
                 ),
@@ -881,12 +879,12 @@ class _SearchPageState extends State<SearchPage> {
             ),
             SizedBox(height: context.getScreenHeight(0.6)),
             SizedBox(
-              height: context.getResponsiveSize(16) + 5 + context.getResponsiveSize(2.4) * 3.2,
+              height: context.responsiveWidth(100, tabletVal: 140, largeTabletVal: 185),
               child: ListView.separated(
                 padding: EdgeInsets.only(left: context.getResponsiveSize(4)),
                 scrollDirection: Axis.horizontal,
                 itemCount: unique.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 4),
+                separatorBuilder: (_, _) => SizedBox(width: context.responsiveWidth(4, tabletVal: 8, largeTabletVal: 12)),
                 itemBuilder: (_, index) {
                   final cat = unique[index];
                   final cleanedName = cat.name
@@ -912,8 +910,8 @@ class _SearchPageState extends State<SearchPage> {
                     child: Column(
                       children: [
                         Container(
-                          width: context.getResponsiveSize(16),
-                          height: context.getResponsiveSize(16),
+                          width: context.responsiveWidth(60, tabletVal: 80, largeTabletVal: 115),
+                          height: context.responsiveWidth(60, tabletVal: 80, largeTabletVal: 115),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -927,13 +925,13 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 5),
+                        SizedBox(height: context.responsiveWidth(5, tabletVal: 8)),
                         SizedBox(
-                          width: context.getResponsiveSize(20),
+                          width: context.responsiveWidth(70, tabletVal: 100),
                           child: Text(
                             cleanedName,
                             style: TextStyle(
-                              fontSize: context.responsiveWidth(10),
+                              fontSize: context.responsiveWidth(10, tabletVal: 14),
                               fontWeight: FontWeight.w700,
                               color: context.colorPalette.goldDeep,
                             ),
@@ -1295,7 +1293,6 @@ class _SearchPageState extends State<SearchPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Expanded(
-                        flex: 3,
                         child: ClipRRect(
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(14),
@@ -1310,41 +1307,39 @@ class _SearchPageState extends State<SearchPage> {
                               : RatneshFallback.m(),
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.getResponsiveSize(2),
-                            vertical: context.getScreenHeight(0.3),
-                          ),
-                          child: ClipRect(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  cleanedName,
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.8),
-                                    fontWeight: FontWeight.w600,
-                                    color: context.colorPalette.textColor,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(2),
+                          vertical: context.getScreenHeight(0.3),
+                        ),
+                        child: ClipRect(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                cleanedName,
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.8),
+                                  fontWeight: FontWeight.w600,
+                                  color: context.colorPalette.textColor,
                                 ),
-                                if (karatName != null) ...[
-                                  SizedBox(height: context.getScreenHeight(0.1)),
-                                  Text(
-                                    '$karatName • ${_getKaratPurity(karatName)}',
-                                    style: TextStyle(
-                                      fontSize: context.getResponsiveSize(2.2),
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colorPalette.goldDark,
-                                    ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (karatName != null) ...[
+                                SizedBox(height: context.getScreenHeight(0.1)),
+                                Text(
+                                  '$karatName • ${_getKaratPurity(karatName)}',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(2.2),
+                                    fontWeight: FontWeight.w500,
+                                    color: context.colorPalette.goldDark,
                                   ),
-                                ],
+                                ),
                               ],
-                            ),
-                          )
+                            ],
+                          ),
                         ),
                       ),
                     ],

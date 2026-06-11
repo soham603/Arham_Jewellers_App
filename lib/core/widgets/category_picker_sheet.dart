@@ -167,21 +167,26 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(top: 6),
-            width: 32,
-            height: 3,
+            margin: EdgeInsets.only(top: context.responsiveWidth(6)),
+            width: context.responsiveWidth(32),
+            height: context.responsiveWidth(3, tabletVal: 4),
             decoration: BoxDecoration(
               color: context.colorPalette.goldDark.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(1.5),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+            padding: EdgeInsets.fromLTRB(
+              context.responsiveWidth(12),
+              context.responsiveWidth(6),
+              context.responsiveWidth(12),
+              context.responsiveWidth(6),
+            ),
             child: Row(
               children: [
                 Icon(
                   Icons.grid_view_rounded,
-                  size: 16,
+                  size: context.responsiveWidth(16, tabletVal: 18),
                   color: context.colorPalette.goldDark,
                 ),
                 const SizedBox(width: 6),
@@ -189,7 +194,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                   child: Text(
                     'Select Categories',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: context.responsiveFont(14),
                       fontWeight: FontWeight.w700,
                       color: context.colorPalette.goldDeep,
                     ),
@@ -201,7 +206,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                     child: Text(
                       'Clear',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: context.responsiveFont(12),
                         color: context.colorPalette.goldDark,
                         fontWeight: FontWeight.w600,
                       ),
@@ -219,14 +224,14 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                       children: [
                         Icon(
                           Icons.category_outlined,
-                          size: 36,
+                          size: context.responsiveWidth(36, tabletVal: 40),
                           color: context.colorPalette.goldDark,
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'No categories found',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: context.responsiveFont(12),
                             color: context.colorPalette.goldDark,
                           ),
                         ),
@@ -269,8 +274,11 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
         GestureDetector(
           onTap: () => widget.categoryController.toggleExpand(cat),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            margin: EdgeInsets.only(bottom: context.responsiveWidth(2)),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.responsiveWidth(10, tabletVal: 12),
+              vertical: context.responsiveWidth(6),
+            ),
             decoration: BoxDecoration(
               color: context.colorPalette.cardBg,
               borderRadius: BorderRadius.circular(8),
@@ -288,12 +296,12 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                     borderRadius: BorderRadius.circular(6),
                     child: Image.network(
                       cat.imageUrl,
-                      width: 28,
-                      height: 28,
+                      width: context.responsiveWidth(28, tabletVal: 32),
+                      height: context.responsiveWidth(28, tabletVal: 32),
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Container(
-                        width: 28,
-                        height: 28,
+                        width: context.responsiveWidth(28, tabletVal: 32),
+                        height: context.responsiveWidth(28, tabletVal: 32),
                         decoration: BoxDecoration(
                           color: context.colorPalette.goldLight,
                           borderRadius: BorderRadius.circular(6),
@@ -301,7 +309,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                         child: Icon(
                           Icons.diamond_outlined,
                           color: context.colorPalette.goldDark,
-                          size: 14,
+                          size: context.responsiveWidth(14, tabletVal: 16),
                         ),
                       ),
                     ),
@@ -312,7 +320,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                   child: Text(
                     widget.cleanName(cat.name),
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: context.responsiveFont(11),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.goldDeep,
                     ),
@@ -321,10 +329,10 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                 if (level3.isNotEmpty && selectedCount > 0)
                   _buildCountBadge(context, selectedCount),
                 if (isLoading)
-                  const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                  SizedBox(
+                    width: context.responsiveWidth(14, tabletVal: 16),
+                    height: context.responsiveWidth(14, tabletVal: 16),
+                    child: const CircularProgressIndicator(strokeWidth: 1.5),
                   )
                 else
                   AnimatedRotation(
@@ -332,7 +340,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                     duration: const Duration(milliseconds: 200),
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      size: 16,
+                      size: context.responsiveWidth(16, tabletVal: 18),
                       color: context.colorPalette.goldDark,
                     ),
                   ),
@@ -344,8 +352,15 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
           GestureDetector(
             onTap: () => _toggleAllForParent(cat),
             child: Container(
-              margin: const EdgeInsets.only(left: 18, top: 2, bottom: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              margin: EdgeInsets.only(
+                left: context.responsiveWidth(18, tabletVal: 20),
+                top: context.responsiveWidth(2),
+                bottom: context.responsiveWidth(2),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.responsiveWidth(8, tabletVal: 10),
+                vertical: context.responsiveWidth(4),
+              ),
               decoration: BoxDecoration(
                 color: context.colorPalette.cardBg,
                 borderRadius: BorderRadius.circular(8),
@@ -357,7 +372,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                     child: Text(
                       'All',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: context.responsiveFont(10),
                         fontWeight: FontWeight.w700,
                         color: context.colorPalette.goldDeep,
                       ),
@@ -367,7 +382,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                     level3.every((c) => _isSelected(c.id))
                         ? Icons.check_box
                         : Icons.select_all_rounded,
-                    size: 12,
+                    size: context.responsiveWidth(12, tabletVal: 14),
                     color: context.colorPalette.goldDark,
                   ),
                 ],
@@ -387,8 +402,15 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
     return GestureDetector(
       onTap: () => _toggleSingle(sub),
       child: Container(
-        margin: const EdgeInsets.only(left: 18, top: 2, bottom: 2),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        margin: EdgeInsets.only(
+          left: context.responsiveWidth(18, tabletVal: 20),
+          top: context.responsiveWidth(2),
+          bottom: context.responsiveWidth(2),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(8, tabletVal: 10),
+          vertical: context.responsiveWidth(5),
+        ),
         decoration: BoxDecoration(
           color: selected
               ? context.colorPalette.goldLight
@@ -407,7 +429,7 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
               child: Text(
                 cleanedName,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: context.responsiveFont(10),
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                   color: selected
                       ? context.colorPalette.goldDeep
@@ -417,15 +439,15 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
             ),
             if (selected)
               Container(
-                width: 14,
-                height: 14,
+                width: context.responsiveWidth(14, tabletVal: 16),
+                height: context.responsiveWidth(14, tabletVal: 16),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: context.colorPalette.gold,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check,
-                  size: 9,
+                  size: context.responsiveWidth(9, tabletVal: 11),
                   color: Colors.white,
                 ),
               ),
@@ -437,17 +459,20 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
 
   Widget _buildCountBadge(BuildContext context, int count) {
     return Padding(
-      padding: const EdgeInsets.only(right: 4),
+      padding: EdgeInsets.only(right: context.responsiveWidth(4)),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(4),
+          vertical: context.responsiveWidth(1),
+        ),
         decoration: BoxDecoration(
           color: context.colorPalette.gold,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
           '$count',
-          style: const TextStyle(
-            fontSize: 9,
+          style: TextStyle(
+            fontSize: context.responsiveFont(9),
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
@@ -465,3 +490,5 @@ extension _IterableExt<T> on Iterable<T> {
     return null;
   }
 }
+
+

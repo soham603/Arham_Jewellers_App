@@ -55,18 +55,21 @@ class _ProductCardState extends State<ProductCard>
                 ? constraints.maxWidth
                 : MediaQuery.sizeOf(context).width * 0.45;
 
-        final radius = (width * 0.075).clamp(10.0, 22.0);
-        final hPad = (width * 0.055).clamp(7.0, 14.0);
-        final vPad = (width * 0.03).clamp(4.0, 10.0);
+        final screenW = MediaQuery.sizeOf(context).width;
+        final sf = (screenW / 414).clamp(1.0, 2.5);
 
-        final bodySize = (width * 0.05).clamp(8.0, 12.0);
-        final metaSize = (width * 0.05).clamp(8.0, 12.0);
-        final buttonTextSize = (width * 0.06).clamp(10.0, 14.0);
-        final buttonHeight = (width * 0.145).clamp(28.0, 40.0);
-        final iconSize = (width * 0.18).clamp(22.0, 38.0);
+        final radius = (width * 0.075).clamp(10.0 * sf, 22.0 * sf);
+        final hPad = (width * 0.055).clamp(7.0 * sf, 14.0 * sf);
+        final vPad = (width * 0.03).clamp(4.0 * sf, 10.0 * sf);
 
-        final gap2 = (width * 0.01).clamp(1.5, 3.0);
-        final gap3 = (width * 0.015).clamp(2.0, 4.0);
+        final bodySize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
+        final metaSize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
+        final buttonTextSize = (width * 0.06).clamp(10.0 * sf, 15.0 * sf);
+        final buttonHeight = (width * 0.145).clamp(28.0 * sf, 44.0 * sf);
+        final iconSize = (width * 0.18).clamp(22.0 * sf, 40.0 * sf);
+
+        final gap2 = (width * 0.01).clamp(1.5 * sf, 3.0 * sf);
+        final gap3 = (width * 0.015).clamp(2.0 * sf, 4.0 * sf);
 
         final displayName =
             _cleanText(product.name) ?? 'Untitled Product';
@@ -239,8 +242,8 @@ class _ProductCardState extends State<ProductCard>
                         ),
                         if (!Get.find<AuthController>().isAdmin)
                           Positioned(
-                            top: 6,
-                            right: 6,
+                            top: 6 * sf,
+                            right: 6 * sf,
                             child: Obx(() {
                               final isWishlisted = WishlistController.instance.isWishlisted(product.id);
                               return GestureDetector(
@@ -271,21 +274,21 @@ class _ProductCardState extends State<ProductCard>
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.all(4),
+                                  padding: EdgeInsets.all(4 * sf),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.85),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withValues(alpha: 0.15),
-                                        blurRadius: 4,
+                                        blurRadius: 4 * sf,
                                       ),
                                     ],
                                   ),
                                   child: Icon(
                                     isWishlisted ? Icons.favorite : Icons.favorite_border,
                                     color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
-                                    size: 16,
+                                    size: 16 * sf,
                                   ),
                                 ),
                               );
@@ -293,24 +296,24 @@ class _ProductCardState extends State<ProductCard>
                           ),
                         if (widget.isSelected)
                           Positioned(
-                            top: 6,
-                            right: 36,
+                            top: 6 * sf,
+                            right: 36 * sf,
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(4 * sf),
                               decoration: BoxDecoration(
                                 color: AppColors.primaryGold,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 4,
+                                    blurRadius: 4 * sf,
                                   ),
                                 ],
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.check,
                                 color: Colors.white,
-                                size: 14,
+                                size: 14 * sf,
                               ),
                             ),
                           ),
@@ -758,7 +761,7 @@ class _CartButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
-        child: const Icon(Icons.shopping_cart_outlined, size: 18),
+        child: Icon(Icons.shopping_cart_outlined, size: height * 0.45),
       ),
     );
   }

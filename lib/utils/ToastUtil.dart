@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -49,7 +50,6 @@ class ToastUtils {
 
   // ─── Public API ───────────────────────────────────────────────────────────
 
-  /// Shows a success toast with an optional [title] and [duration].
   static void showSuccess(
     String message, {
     String? title,
@@ -65,7 +65,6 @@ class ToastUtils {
     );
   }
 
-  /// Shows an error toast with an optional [title] and [duration].
   static void showError(
     String message, {
     String? title,
@@ -81,7 +80,6 @@ class ToastUtils {
     );
   }
 
-  /// Shows a warning toast with an optional [title] and [duration].
   static void showWarning(
     String message, {
     String? title,
@@ -97,7 +95,6 @@ class ToastUtils {
     );
   }
 
-  /// Shows an info toast with an optional [title] and [duration].
   static void showInfo(
     String message, {
     String? title,
@@ -113,7 +110,6 @@ class ToastUtils {
     );
   }
 
-  /// Dismisses any currently visible toast immediately.
   static void dismiss() {
     if (Get.isSnackbarOpen) {
       Get.closeCurrentSnackbar();
@@ -129,34 +125,34 @@ class ToastUtils {
     Duration? duration,
     SnackPosition? position,
   }) {
-    // Guard: require GetMaterialApp to be in the widget tree.
     if (!_isGetContextAvailable()) {
       debugPrint('[ToastUtils] GetMaterialApp context is not available.');
       return;
     }
 
-    // Guard: message must not be blank.
     if (message.trim().isEmpty) {
       debugPrint('[ToastUtils] Attempted to show a toast with an empty message.');
       return;
     }
 
-    // Dismiss any existing snackbar before showing a new one to
-    // prevent stacking / overlap issues.
     dismiss();
 
+    final ctx = Get.context!;
     final config = _defaultConfigs[type]!;
     final resolvedTitle = title ?? config.title;
     final resolvedDuration = duration ?? config.duration;
     final resolvedPosition = position ?? config.position;
 
+    final margin = ctx.responsiveWidth(16, tabletVal: 32);
+    final borderRadius = ctx.responsiveWidth(12, tabletVal: 20);
+
     Get.rawSnackbar(
-      messageText: _buildContent(resolvedTitle, message, config.icon),
+      messageText: _buildContent(ctx, resolvedTitle, message, config.icon),
       snackPosition: resolvedPosition,
       backgroundColor: config.backgroundColor,
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(margin),
       padding: EdgeInsets.zero,
-      borderRadius: 12,
+      borderRadius: borderRadius,
       duration: resolvedDuration,
       animationDuration: const Duration(milliseconds: 400),
       forwardAnimationCurve: Curves.easeOutBack,
@@ -169,14 +165,22 @@ class ToastUtils {
 
   // ─── Widget Builders ──────────────────────────────────────────────────────
 
-  static Widget _buildContent(String? title, String message, IconData icon) {
+  static Widget _buildContent(BuildContext ctx, String? title, String message, IconData icon) {
+    final hPad = ctx.responsiveWidth(16, tabletVal: 24);
+    final vPad = ctx.responsiveWidth(12, tabletVal: 18);
+    final iconLeft = ctx.responsiveWidth(36, tabletVal: 52);
+    final iconSize = ctx.responsiveWidth(24, tabletVal: 36);
+    final titleSize = ctx.responsiveFont(14);
+    final messageSize = ctx.responsiveFont(13);
+    final titleGap = ctx.responsiveWidth(2, tabletVal: 4);
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, vPad),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 36),
+            padding: EdgeInsets.only(left: iconLeft),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,19 +188,19 @@ class ToastUtils {
                 if (title != null)
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: titleSize,
                       fontWeight: FontWeight.w700,
                       height: 1.4,
                     ),
                   ),
-                if (title != null) const SizedBox(height: 2),
+                if (title != null) SizedBox(height: titleGap),
                 Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: messageSize,
                     fontWeight: FontWeight.w400,
                     height: 1.4,
                   ),
@@ -209,7 +213,7 @@ class ToastUtils {
             top: 0,
             bottom: 0,
             child: Center(
-              child: Icon(icon, color: Colors.white, size: 24),
+              child: Icon(icon, color: Colors.white, size: iconSize),
             ),
           ),
         ],

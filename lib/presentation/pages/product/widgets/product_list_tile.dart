@@ -30,15 +30,18 @@ class ProductListTile extends StatelessWidget {
     final touchData = _parseTouch(product.touch);
     final size = _cleanText(product.size);
 
+    final screenW = MediaQuery.of(context).size.width;
+    final sf = (screenW / 414).clamp(1.0, 2.0);
+
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 16 * sf, vertical: 4 * sf),
+        padding: EdgeInsets.all(10 * sf),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12 * sf),
           border: Border.all(
             color: isSelected ? AppColors.primaryGold : const Color(0xFFE7E2DB),
             width: isSelected ? 2.0 : 1.0,
@@ -59,10 +62,10 @@ class ProductListTile extends StatelessWidget {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8 * sf),
                   child: SizedBox(
-                    width: 80,
-                    height: 80,
+                    width: 80 * sf,
+                    height: 80 * sf,
                     child: imageUrl != null
                         ? CachedNetworkImage(
                             imageUrl: imageUrl,
@@ -82,30 +85,30 @@ class ProductListTile extends StatelessWidget {
                 ),
                 if (isSelected)
                   Positioned(
-                    top: 2,
-                    right: 2,
+                    top: 2 * sf,
+                    right: 2 * sf,
                     child: Container(
-                      padding: const EdgeInsets.all(3),
+                      padding: EdgeInsets.all(3 * sf),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGold,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 3,
+                            blurRadius: 3 * sf,
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.check,
                         color: Colors.white,
-                        size: 12,
+                        size: 12 * sf,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12 * sf),
             // Details
             Expanded(
               child: Column(
@@ -115,19 +118,19 @@ class ProductListTile extends StatelessWidget {
                     Text(
                       tagNo,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 10 * sf,
                         color: AppColors.textDark.withValues(alpha: 0.5),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   if (categoryName != null)
                     Container(
-                      margin: const EdgeInsets.only(bottom: 2, top: 2),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 1),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFFF6DD),
-                        borderRadius: BorderRadius.only(
+                      margin: EdgeInsets.only(bottom: 2 * sf, top: 2 * sf),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 6 * sf, vertical: 1 * sf),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF6DD),
+                        borderRadius: const BorderRadius.only(
                           topRight: Radius.circular(100),
                           bottomRight: Radius.circular(100),
                         ),
@@ -136,8 +139,8 @@ class ProductListTile extends StatelessWidget {
                         categoryName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 9,
+                        style: TextStyle(
+                          fontSize: 9 * sf,
                           color: AppColors.primaryGold,
                           fontWeight: FontWeight.w600,
                         ),
@@ -147,34 +150,34 @@ class ProductListTile extends StatelessWidget {
                     displayName,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 13 * sf,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
                       height: 1.3,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4 * sf),
                   Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
+                    spacing: 6 * sf,
+                    runSpacing: 4 * sf,
                     children: [
                       if (grossWeight != null)
-                        _InfoChip(label: 'Wt: ${grossWeight}g'),
+                        _InfoChip(label: 'Wt: ${grossWeight}g', sf: sf),
                       if (fineWeight != null && fineWeight != grossWeight)
-                        _InfoChip(label: 'Net Wt: ${fineWeight}g'),
-                      if (touchData != null) _InfoChip(label: touchData),
-                      if (size != null) _InfoChip(label: 'Size: $size'),
+                        _InfoChip(label: 'Net Wt: ${fineWeight}g', sf: sf),
+                      if (touchData != null) _InfoChip(label: touchData, sf: sf),
+                      if (size != null) _InfoChip(label: 'Size: $size', sf: sf),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8 * sf),
             Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textDark.withValues(alpha: 0.3),
-              size: 24,
+              size: 24 * sf,
             ),
           ],
         ),
@@ -214,21 +217,22 @@ class ProductListTile extends StatelessWidget {
 }
 
 class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.label});
+  const _InfoChip({required this.label, required this.sf});
   final String label;
+  final double sf;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: 6 * sf, vertical: 2 * sf),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F3EF),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(4 * sf),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 10,
+          fontSize: 10 * sf,
           color: AppColors.textDark.withValues(alpha: 0.7),
           fontWeight: FontWeight.w500,
         ),

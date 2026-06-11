@@ -62,17 +62,19 @@ class RatneshFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scale = (MediaQuery.of(context).size.shortestSide / 375).clamp(1.0, 2.0);
+
     final fallback = Container(
       color: context.colorPalette.goldLight,
       child: Center(
         child: LogoWidget(
-          logoSize: logoSize,
+          logoSize: logoSize * scale,
           showSubtitle: false,
           iconColor: context.colorPalette.goldDark,
           nameColor: context.colorPalette.goldDark,
           nameLetterSpacing: 0.5,
-          iconNameSpacing: 4,
-          nameFontSize: nameFontSize,
+          iconNameSpacing: 4 * scale,
+          nameFontSize: nameFontSize * scale,
         ),
       ),
     );

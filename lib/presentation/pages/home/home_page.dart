@@ -174,21 +174,21 @@ class _HomePageState extends State<HomePage> {
           children: [
                         const _TopBar(),
 
-                        const SizedBox(height: 8),
+                        SizedBox(height: context.getScreenHeight(1)),
 
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                           child: Row(
                             children: [
                               Expanded(
                                 child: HomeSearchBar(onScannerTap: _openScanner),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: context.getResponsiveSize(2.5)),
 GestureDetector(
   onTap: () => Get.to(() => const GoldRateDetailScreen()),
   child: Container(
-    width: context.responsiveWidth(34, tabletVal: 42),
-    height: context.responsiveWidth(34, tabletVal: 42),
+    width: context.responsiveWidth(34, tabletVal: 56),
+    height: context.responsiveWidth(34, tabletVal: 56),
     decoration: BoxDecoration(
       color: const Color(0xFFF5F1EC),
       shape: BoxShape.circle,
@@ -200,8 +200,8 @@ GestureDetector(
     child: Center(
       child: Image.asset(
         'assets/images/gold-price-icon.png',
-        width: 24,
-        height: 24,
+        width: context.responsiveWidth(24, tabletVal: 40),
+        height: context.responsiveWidth(24, tabletVal: 40),
         color: context.colorPalette.goldDark,
         colorBlendMode: BlendMode.srcIn,
       ),
@@ -212,7 +212,7 @@ GestureDetector(
                           ),
                         ),
 
-                        const SizedBox(height: 18),
+                        SizedBox(height: context.getScreenHeight(2.2)),
 
                         _CarouselSection(
                           controller: carouselController,
@@ -225,12 +225,12 @@ GestureDetector(
 
                         _CategoryQuickAccess(controller: categoryController),
 
-                        const SizedBox(height: 16),
+                        SizedBox(height: context.getScreenHeight(2)),
 
                         Container(
                           width: double.infinity,
                           color: const Color(0xFF3E2723),
-                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(3)),
                           child: Column(
                             children: [
                               const CollectionsDivider(
@@ -238,11 +238,11 @@ GestureDetector(
                                 label: 'Collections',
                               ),
 
-                              const SizedBox(height: 24),
+                              SizedBox(height: context.getScreenHeight(3)),
 
                               _showCollectionShimmer
                                   ? Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                                       child: Shimmer.fromColors(
                                         baseColor: context.colorPalette.shimmerBaseColor,
                                         highlightColor: context.colorPalette.shimmerHighLightColor,
@@ -257,7 +257,7 @@ GestureDetector(
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(width: 12),
+                                            SizedBox(width: context.getResponsiveSize(3)),
                                             Expanded(
                                               child: Container(
                                                 height: context.getScreenWidth(44),
@@ -272,8 +272,8 @@ GestureDetector(
                                       ),
                                     )
                                   : Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: context.getResponsiveSize(4),
                                       ),
                                       child: Row(
                                         children: [
@@ -308,7 +308,7 @@ GestureDetector(
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 12),
+                                          SizedBox(width: context.getResponsiveSize(3)),
                                           Expanded(
                                             child: GestureDetector(
                                               onTap: () =>
@@ -348,8 +348,8 @@ GestureDetector(
                               const CategoryDivider(vertical: 8),
                               const SizedBox(height: 12),
                               Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.getResponsiveSize(4),
                                 ),
                                 child: AspectRatio(
                                   aspectRatio: 16 / 9,
@@ -392,7 +392,7 @@ GestureDetector(
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.getScreenHeight(2.5)),
 
                         Obx(() {
                           if (!categoryController.showProductSection) {
@@ -414,7 +414,7 @@ GestureDetector(
                         SizedBox(height: context.getScreenHeight(1)),
 
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
                           child: _SectionTitle(
                             label: 'Latest Additions',
                             subtitle: 'Newest jewellery collections',
@@ -422,28 +422,28 @@ GestureDetector(
                           ),
                         ),
 
-                        const SizedBox(height: 12),
+                        SizedBox(height: context.getResponsiveSize(3)),
 
                         Obx(() {
                           final state = carouselController.productState;
                           final products = carouselController.latestProducts;
-                          final cardWidth = context.getScreenWidth(50);
-                          final cardHeight = cardWidth * 4 / 3 + 96;
+                          final cardWidth = context.getScreenWidth(42);
+                          final cardHeight = cardWidth * 4 / 3 + 80;
 
                           if (state == CurrentAppState.LOADING &&
                               products.isEmpty) {
                             return SizedBox(
                               height: context.getScreenHeight(34),
                               child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.getResponsiveSize(4),
                                 ),
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 5,
                                 separatorBuilder: (_, _) =>
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: context.getResponsiveSize(3)),
                                 itemBuilder: (_, _) {
-                          final cardWidth = context.getScreenWidth(50);
+                          final cardWidth = context.getScreenWidth(42);
                                   return Shimmer.fromColors(
                                     baseColor:
                                         context.colorPalette.shimmerBaseColor,
@@ -452,7 +452,7 @@ GestureDetector(
                                         .shimmerHighLightColor,
                                     child: Container(
                                       width: cardWidth,
-                                      height: cardWidth * 0.8 + 110,
+                                      height: cardWidth * 0.8 + context.getScreenHeight(14) + 16,
                                       decoration: BoxDecoration(
                                         color: context.colorPalette.cardBg,
                                         borderRadius: BorderRadius.circular(16),
@@ -525,8 +525,8 @@ GestureDetector(
                           if (state == CurrentAppState.ERROR &&
                               products.isEmpty) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSize(4),
                               ),
                               child: _ErrorRow(
                                 onRetry: () {
@@ -553,8 +553,8 @@ GestureDetector(
                             child: SizedBox(
                               height: cardHeight,
                               child: ListView.separated(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.getResponsiveSize(4),
                                 ),
                                 scrollDirection: Axis.horizontal,
                                 physics: const BouncingScrollPhysics(),
@@ -564,11 +564,11 @@ GestureDetector(
                                         ? 1
                                         : 0),
                                 separatorBuilder: (_, _) =>
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: context.getResponsiveSize(3)),
                                 itemBuilder: (_, index) {
                                   if (index >= products.length) {
                                     return SizedBox(
-                                      width: context.getScreenWidth(50),
+                                      width: context.getScreenWidth(42),
                                       child: Center(
                                         child: CircularProgressIndicator(
                                           color: context.colorPalette.gold,
@@ -580,7 +580,7 @@ GestureDetector(
                                   final product = products[index];
 
                                   return SizedBox(
-                                    width: context.getScreenWidth(50),
+                                    width: context.getScreenWidth(42),
                                     child: ProductCard(
                                       product: product,
                                       onTap: () {
@@ -604,11 +604,11 @@ GestureDetector(
                           );
                         }),
 
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.getScreenHeight(4)),
 
                         const CustomiseOrderBanner(),
 
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.getScreenHeight(4)),
                       ],
                     ),
                   ),
@@ -695,8 +695,8 @@ class _KaratSection extends StatelessWidget {
                   child: Text(
                     karat.displayName,
 
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: context.responsiveFont(13),
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
@@ -709,7 +709,7 @@ class _KaratSection extends StatelessWidget {
                   'Gold',
 
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: context.responsiveFont(16),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDeep,
                   ),
@@ -723,7 +723,7 @@ class _KaratSection extends StatelessWidget {
                     'See all →',
 
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: context.responsiveFont(12.5),
                       color: context.colorPalette.goldDark,
                       fontWeight: FontWeight.w600,
                     ),
@@ -843,7 +843,7 @@ class _KaratSection extends StatelessWidget {
                                 textAlign: TextAlign.center,
 
                                 style: TextStyle(
-                                  fontSize: context.getResponsiveSize(2.8),
+                                  fontSize: context.responsiveFont(11),
 
                                   color: isExpanded
                                       ? context.colorPalette.goldDeep
@@ -919,9 +919,9 @@ class _Level3Panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.getScreenHeight(1.2), context.getResponsiveSize(4), context.getScreenHeight(0.5)),
 
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
 
       decoration: BoxDecoration(
         color: context.colorPalette.level3Bg,
@@ -938,7 +938,7 @@ class _Level3Panel extends StatelessWidget {
             children: [
               Icon(
                 Icons.grid_view_rounded,
-                size: 18,
+                size: context.responsiveWidth(18, tabletVal: 22),
                 color: context.colorPalette.goldDark,
               ),
 
@@ -948,7 +948,7 @@ class _Level3Panel extends StatelessWidget {
                 parentCategory.name,
 
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: context.responsiveFont(15),
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.goldDeep,
                 ),
@@ -961,11 +961,11 @@ class _Level3Panel extends StatelessWidget {
           if (isLoading)
             const _Level3Shimmer()
           else if (children.isEmpty)
-            Text(
-              'No styles available',
+                    Text(
+                      "No styles available",
 
-              style: TextStyle(color: context.colorPalette.goldDark),
-            )
+                      style: TextStyle(color: context.colorPalette.goldDark, fontSize: context.responsiveFont(12)),
+                    )
           else
             GridView.builder(
               shrinkWrap: true,
@@ -1040,7 +1040,7 @@ class _Level3Panel extends StatelessWidget {
                           textAlign: TextAlign.center,
 
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: context.responsiveFont(12),
 
                             fontWeight: isSelected
                                 ? FontWeight.w700
@@ -1078,7 +1078,7 @@ class _ProductSection extends StatelessWidget {
     final productController = SearchProductController.instance;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), 0, context.getResponsiveSize(4), context.getScreenHeight(3.5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1091,7 +1091,7 @@ class _ProductSection extends StatelessWidget {
                     Text(
                       category.name,
                       style: TextStyle(
-                        fontSize: 19,
+                        fontSize: context.responsiveFont(19),
                         fontWeight: FontWeight.w800,
                         color: context.colorPalette.goldDeep,
                       ),
@@ -1099,7 +1099,7 @@ class _ProductSection extends StatelessWidget {
                     Text(
                       'Browse products in this category',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: context.responsiveFont(12),
                         color: context.colorPalette.goldDark,
                       ),
                     ),
@@ -1109,14 +1109,14 @@ class _ProductSection extends StatelessWidget {
               GestureDetector(
                 onTap: onClose,
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(context.getResponsiveSize(2)),
                   decoration: BoxDecoration(
                     color: context.colorPalette.goldLight,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.close_rounded,
-                    size: 16,
+                    size: context.responsiveWidth(16, tabletVal: 20),
                     color: context.colorPalette.goldDark,
                   ),
                 ),
@@ -1147,7 +1147,7 @@ class _ProductSection extends StatelessWidget {
                     'No products found',
                     style: TextStyle(
                       color: context.colorPalette.goldDark,
-                      fontSize: 14,
+                      fontSize: context.responsiveFont(14),
                     ),
                   ),
                 ),
@@ -1321,16 +1321,16 @@ class _ErrorRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.error_outline, color: Colors.red, size: 18),
+        Icon(Icons.error_outline, color: Colors.red, size: context.responsiveWidth(18, tabletVal: 22)),
 
-        const SizedBox(width: 6),
+        SizedBox(width: context.getResponsiveSize(1.5)),
 
-        const Text(
+        Text(
           'Failed to load',
-          style: TextStyle(color: Colors.red, fontSize: 13),
+          style: TextStyle(color: Colors.red, fontSize: context.responsiveFont(13)),
         ),
 
-        const SizedBox(width: 8),
+        SizedBox(width: context.getResponsiveSize(2)),
 
         GestureDetector(
           onTap: onRetry,
@@ -1340,7 +1340,7 @@ class _ErrorRow extends StatelessWidget {
 
             style: TextStyle(
               color: context.colorPalette.gold,
-              fontSize: 13,
+              fontSize: context.responsiveFont(13),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1356,7 +1356,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      padding: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.getScreenHeight(2.5), context.getResponsiveSize(4), context.getScreenHeight(1)),
 
       child: Row(
         children: [
@@ -1366,8 +1366,8 @@ class _TopBar extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const LogoWidget(
-                  logoSize: 36,
+                LogoWidget(
+                  logoSize: context.responsiveWidth(36, tabletVal: 50, largeTabletVal: 58),
                   showIcon: true,
                   showName: false,
                   showSubtitle: false,
@@ -1380,7 +1380,7 @@ class _TopBar extends StatelessWidget {
                     Text(
                       'RATNESHGOLD',
                       style: GoogleFonts.bodoniModa(
-                        fontSize: 16,
+                        fontSize: context.responsiveFont(16, tabletMultiplier: 1.5, largeTabletMultiplier: 1.8),
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
                         color: context.colorPalette.goldDeep,
@@ -1389,7 +1389,7 @@ class _TopBar extends StatelessWidget {
                     Text(
                       'Purity • Quality • Trust',
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: context.responsiveFont(11, tabletMultiplier: 1.5, largeTabletMultiplier: 1.8),
                         color: context.colorPalette.goldDark,
                         letterSpacing: 0.3,
                       ),
@@ -1446,36 +1446,36 @@ class _IconBtn extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: context.responsiveWidth(40, tabletVal: 52, largeTabletVal: 60),
+            height: context.responsiveWidth(40, tabletVal: 52, largeTabletVal: 60),
             decoration: BoxDecoration(
               color: context.colorPalette.goldLight,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: context.colorPalette.border),
             ),
-            child: Icon(icon, size: 20, color: context.colorPalette.goldDark),
+            child: Icon(icon, size: context.responsiveWidth(20, tabletVal: 26, largeTabletVal: 30), color: context.colorPalette.goldDark),
           ),
           if (badgeCount > 0)
             Positioned(
               right: -4,
               top: -4,
               child: Container(
-                padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                padding: EdgeInsets.all(context.getResponsiveSize(1)),
+                constraints: BoxConstraints(minWidth: context.responsiveWidth(18, tabletVal: 24, largeTabletVal: 28), minHeight: context.responsiveWidth(18, tabletVal: 24, largeTabletVal: 28)),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 1.5),
                 ),
-                child: Text(
-                  badgeCount > 99 ? '99+' : '$badgeCount',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                  child: Text(
+                    badgeCount > 99 ? '99+' : '$badgeCount',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: context.responsiveFont(10, tabletMultiplier: 1.5, largeTabletMultiplier: 1.8),
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
               ),
             ),
         ],
@@ -1500,19 +1500,19 @@ class _QuickStatsStrip extends StatelessWidget {
       height: context.getScreenHeight(8),
 
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
 
         scrollDirection: Axis.horizontal,
 
         itemCount: items.length,
 
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => SizedBox(width: context.getResponsiveSize(2.5)),
 
         itemBuilder: (_, i) {
           final item = items[i];
 
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1)),
 
             decoration: BoxDecoration(
               color: context.colorPalette.goldLight,
@@ -1524,15 +1524,15 @@ class _QuickStatsStrip extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
 
               children: [
-                Icon(item.$2, size: 16, color: context.colorPalette.goldDark),
+                Icon(item.$2, size: context.responsiveWidth(16, tabletVal: 20), color: context.colorPalette.goldDark),
 
-                const SizedBox(width: 6),
+                SizedBox(width: context.getResponsiveSize(1.5)),
 
                 Text(
                   item.$1,
 
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: context.responsiveFont(12),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDeep,
                   ),
@@ -1628,14 +1628,14 @@ class _CarouselSectionState extends State<_CarouselSection> {
     return Obx(() {
       if (widget.controller.getCarouselState == CurrentAppState.LOADING && widget.controller.list.isEmpty) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
           child: CarouselShimmer(),
         );
       }
 
       if (widget.controller.getCarouselState == CurrentAppState.ERROR) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
           height: context.getScreenHeight(20),
 
           decoration: BoxDecoration(
@@ -1667,7 +1667,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
                 final item = list[index];
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 14),
+                  margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
 
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
@@ -1710,8 +1710,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: active ? 22 : 6,
-                  height: 6,
+                  width: context.responsiveWidth(active ? 22 : 6, tabletVal: active ? 36 : 10),
+                  height: context.responsiveWidth(6, tabletVal: 12),
                   decoration: BoxDecoration(
                     color: active
                         ? context.colorPalette.gold
@@ -1822,7 +1822,7 @@ class _SectionTitle extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: context.responsiveFont(20),
                   fontWeight: FontWeight.w800,
                   color: context.colorPalette.goldDeep,
                 ),
@@ -1839,9 +1839,9 @@ class _SectionTitle extends StatelessWidget {
                 ),
                 child: Text(
                   badge!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
-                    fontSize: 8,
+                    fontSize: context.responsiveFont(10),
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -1855,7 +1855,7 @@ class _SectionTitle extends StatelessWidget {
 
         Text(
           subtitle,
-          style: TextStyle(fontSize: 12, color: context.colorPalette.goldDark),
+          style: TextStyle(fontSize: context.responsiveFont(14), color: context.colorPalette.goldDark),
         ),
       ],
     );
@@ -1893,7 +1893,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
       if (unique.isEmpty) {
         return SizedBox(
-          height: context.getResponsiveSize(20) + 7 + context.getScreenHeight(3),
+          height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(3),
           child: Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,
@@ -1906,8 +1906,8 @@ class _CategoryQuickAccess extends StatelessWidget {
                 return Column(
                   children: [
                     Container(
-                      width: context.getResponsiveSize(20),
-                      height: context.getResponsiveSize(20),
+                      width: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
+                      height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
@@ -1915,7 +1915,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                     ),
                     const SizedBox(height: 7),
                     Container(
-                      width: context.getResponsiveSize(16),
+                      width: context.responsiveWidth(60, tabletVal: 115, largeTabletVal: 90),
                       height: context.getScreenHeight(1.5),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -1931,7 +1931,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
 
       return SizedBox(
-        height: context.getResponsiveSize(20) + 7 + context.getScreenHeight(3),
+        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(3),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
@@ -1953,8 +1953,8 @@ class _CategoryQuickAccess extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    width: context.getResponsiveSize(20),
-                    height: context.getResponsiveSize(20),
+                    width: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
+                    height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -1968,14 +1968,14 @@ class _CategoryQuickAccess extends StatelessWidget {
                   ),
                   const SizedBox(height: 7),
                   SizedBox(
-                    width: context.getResponsiveSize(24),
+                    width: context.responsiveWidth(90, tabletVal: 170, largeTabletVal: 150),
                     child: Text(
                       cat.name
                           .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
                           .replaceAll(RegExp(r'collection', caseSensitive: false), '')
                           .trim(),
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(2.8),
+                        fontSize: context.responsiveFont(11),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDeep,
                       ),
@@ -2006,8 +2006,8 @@ class _CategoryQuickAccessImage extends StatelessWidget {
     if (cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: cat.imageUrl,
-        width: context.getResponsiveSize(20),
-        height: context.getResponsiveSize(20),
+        width: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
+        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
         fit: BoxFit.cover,
         errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
@@ -2077,7 +2077,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                   "Bespoke Service",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.getResponsiveSize(2.6),
+                    fontSize: context.responsiveFont(10),
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -2103,7 +2103,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "BRING IDEAS TO LIFE",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: context.getResponsiveSize(2.8),
+                            fontSize: context.responsiveFont(11),
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.2,
                           ),
@@ -2117,7 +2117,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                             color: const Color(
                               0xFF3E2723,
                             ), // Deep Espresso Brown
-                            fontSize: context.getResponsiveSize(5.5),
+                            fontSize: context.responsiveFont(22),
                             fontWeight: FontWeight.w900,
                             height: 1.1,
                           ),
@@ -2126,7 +2126,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Dream Jewelry",
                           style: TextStyle(
                             color: const Color(0xFF3E2723).withValues(alpha: 0.8),
-                            fontSize: context.getResponsiveSize(4),
+                            fontSize: context.responsiveFont(16),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -2152,7 +2152,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                           "Turn your unique inspirations into stunning gold masterpieces.",
                           style: TextStyle(
                             color: const Color(0xFF5D4037),
-                            fontSize: context.getResponsiveSize(2.8),
+                            fontSize: context.responsiveFont(11),
                             fontWeight: FontWeight.w600,
                             height: 1.3,
                           ),
@@ -2189,7 +2189,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 "Start Designing",
                                 style: TextStyle(
                                   color: context.colorPalette.goldDeep,
-                                  fontSize: context.getResponsiveSize(3),
+                                  fontSize: context.responsiveFont(12),
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -2197,7 +2197,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                               Icon(
                                 Icons.arrow_forward_rounded,
                                 color: context.colorPalette.goldDeep,
-                                size: context.getResponsiveSize(3.5),
+                                size: context.responsiveWidth(14, tabletVal: 18),
                               ),
                             ],
                           ),
@@ -2210,7 +2210,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                   Expanded(
                     flex: 4,
                     child: Container(
-                      height: context.getResponsiveSize(32),
+                      height: context.responsiveWidth(120, tabletVal: 160),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
@@ -2225,8 +2225,8 @@ class CustomiseOrderBanner extends StatelessWidget {
                             ),
                             child: Image.asset(
                               'assets/images/bespoke-icon.png',
-                              width: context.getResponsiveSize(22),
-                              height: context.getResponsiveSize(22),
+                              width: context.responsiveWidth(80, tabletVal: 100),
+                              height: context.responsiveWidth(80, tabletVal: 100),
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -2247,7 +2247,7 @@ class CustomiseOrderBanner extends StatelessWidget {
   Widget _buildBulletDot(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Icon(Icons.circle, size: 4, color: const Color(0xFF3E2723)),
+      child: Icon(Icons.circle, size: context.responsiveWidth(4, tabletVal: 5), color: const Color(0xFF3E2723)),
     );
   }
 
@@ -2256,7 +2256,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       text,
       style: TextStyle(
         color: const Color(0xFF3E2723),
-        fontSize: context.getResponsiveSize(2.6),
+        fontSize: context.responsiveFont(10),
         fontWeight: FontWeight.w800,
       ),
     );

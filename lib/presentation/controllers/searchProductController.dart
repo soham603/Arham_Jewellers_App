@@ -121,14 +121,11 @@ class SearchProductController extends GetxController {
   final _weightMax = 500.0.obs;
   double get weightMax => _weightMax.value;
 
-  final _priceMin = 0.0.obs;
-  double get priceMin => _priceMin.value;
-
-  final _priceMax = 5000000.0.obs;
-  double get priceMax => _priceMax.value;
-
   final _selectedSizes = <String>[].obs;
   List<String> get selectedSizes => _selectedSizes;
+
+  double get priceMin => 0;
+  double get priceMax => 5000000;
 
   bool get hasActiveFilters =>
       _selectedKarats.isNotEmpty ||
@@ -136,8 +133,6 @@ class SearchProductController extends GetxController {
       _stockFilter.value != 'ready' ||
       _weightMin.value > 0 ||
       _weightMax.value < 500 ||
-      _priceMin.value > 0 ||
-      _priceMax.value < 5000000 ||
       _selectedSizes.isNotEmpty;
 
   int get activeFilterCount {
@@ -145,7 +140,6 @@ class SearchProductController extends GetxController {
     if (_selectedCategoryIds.isNotEmpty) count++;
     if (_stockFilter.value != 'ready') count++;
     if (_weightMin.value > 0 || _weightMax.value < 500) count++;
-    if (_priceMin.value > 0 || _priceMax.value < 5000000) count++;
     count += _selectedSizes.length;
     return count;
   }
@@ -383,14 +377,6 @@ class SearchProductController extends GetxController {
         }).toList();
       }
 
-      if (_priceMin.value > 0 || _priceMax.value < 5000000) {
-        allFetched = allFetched.where((p) {
-          final price = _calculatePrice(p);
-          if (price == null) return true;
-          return price >= _priceMin.value && price <= _priceMax.value;
-        }).toList();
-      }
-
       if (_selectedSizes.isNotEmpty) {
         allFetched = allFetched.where((p) {
           final s = p.size;
@@ -513,14 +499,6 @@ class SearchProductController extends GetxController {
           final gw = p.grossWeight;
           if (gw == null) return true;
           return gw >= _weightMin.value && gw <= _weightMax.value;
-        }).toList();
-      }
-
-      if (_priceMin.value > 0 || _priceMax.value < 5000000) {
-        allFetched = allFetched.where((p) {
-          final price = _calculatePrice(p);
-          if (price == null) return true;
-          return price >= _priceMin.value && price <= _priceMax.value;
         }).toList();
       }
 
@@ -873,8 +851,6 @@ class SearchProductController extends GetxController {
     _stockFilter.value = 'ready';
     _weightMin.value = 0;
     _weightMax.value = 500;
-    _priceMin.value = 0;
-    _priceMax.value = 5000000;
     _selectedSizes.clear();
     _filteredInitialProducts.clear();
     _filteredInitialState.value = CurrentAppState.INITIAL;
@@ -912,8 +888,6 @@ class SearchProductController extends GetxController {
     _stockFilter.value = stockFilter;
     _weightMin.value = wMin;
     _weightMax.value = wMax;
-    _priceMin.value = pMin;
-    _priceMax.value = pMax;
     _selectedSizes
       ..clear()
       ..addAll(sizesCopy);

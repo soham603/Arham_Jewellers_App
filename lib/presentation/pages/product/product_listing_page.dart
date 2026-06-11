@@ -209,7 +209,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 style: GoogleFonts.bodoniModa(
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.goldDeep,
-                  fontSize: 18,
+                  fontSize: context.responsiveFont(18, largeTabletMultiplier: 1.8),
                 ),
               )
             : _buildAppBarTitleWidget(context),
@@ -217,6 +217,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         backgroundColor: context.colorPalette.cream,
         elevation: 0,
         scrolledUnderElevation: 1,
+        toolbarHeight: context.responsiveWidth(56, largeTabletVal: 76),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_rounded,
@@ -246,16 +247,19 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(8),
+                  vertical: context.responsiveWidth(2),
+                ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.gold.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
                 ),
                 child: Text(
                   _karatPurityLabel!,
                   style: GoogleFonts.bodoniModa(
                     fontWeight: FontWeight.w700,
-                    fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     color: context.colorPalette.goldDeep,
                   ),
                 ),
@@ -371,7 +375,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               if (!isGrid) {
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
                   itemCount: products.length + (hasMore ? 1 : 0),
                   itemBuilder: (_, index) {
                     if (index >= products.length) {
@@ -421,10 +425,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 padding: const EdgeInsets.all(16),
                 itemCount: products.length + (hasMore ? 1 : 0),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: context.isTablet ? 0.55 : 0.488,
+                  crossAxisCount: MediaQuery.of(context).size.width >= 1000
+                      ? 3
+                      : context.gridColumns(phone: 2, tablet: 3),
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                      ? 0.62
+                      : MediaQuery.of(context).size.width >= 600
+                          ? 0.55
+                          : 0.488,
                 ),
                 itemBuilder: (_, index) {
                   if (index >= products.length) {
@@ -555,11 +565,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: context.responsiveWidth(8)),
           const CategoryDivider(vertical: 4),
-          const SizedBox(height: 4),
+          SizedBox(height: context.responsiveWidth(4)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16)),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -570,14 +580,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     Icons.check_circle_outline_rounded,
                     context,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: context.responsiveWidth(8)),
                   _buildStockChip(
                     'Out of Stock',
                     'out',
                     Icons.remove_circle_outline_rounded,
                     context,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: context.responsiveWidth(8)),
                   _buildStockChip(
                     'Show All',
                     'all',
@@ -588,21 +598,21 @@ class _ProductListingPageState extends State<ProductListingPage> {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: context.responsiveWidth(4)),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16), vertical: context.responsiveWidth(8)),
             child: Row(
               children: [
                 GestureDetector(
                   onTap: () => _showSortSheet(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveWidth(10, largeTabletVal: 18),
+                      vertical: context.responsiveWidth(6, largeTabletVal: 12),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
                       border: Border.all(color: context.colorPalette.border),
                     ),
                     child: Row(
@@ -610,14 +620,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       children: [
                         Icon(
                           Icons.sort_rounded,
-                          size: 18,
+                          size: context.responsiveWidth(18, largeTabletVal: 28),
                           color: context.colorPalette.goldDark,
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: context.responsiveWidth(6, largeTabletVal: 10)),
                         Text(
                           currentSort.label,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: context.responsiveFont(12, largeTabletMultiplier: 1.8),
                             fontWeight: FontWeight.w500,
                             color: context.colorPalette.goldDark,
                           ),
@@ -631,15 +641,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 GestureDetector(
                   onTap: () => _showFilterSheet(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsiveWidth(10, largeTabletVal: 18),
+                      vertical: context.responsiveWidth(6, largeTabletVal: 12),
                     ),
                     decoration: BoxDecoration(
                       color: _hasActiveFilter
                           ? context.colorPalette.gold.withValues(alpha: 0.08)
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
                       border: Border.all(
                         color: _hasActiveFilter
                             ? context.colorPalette.gold
@@ -651,16 +661,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       children: [
                         Icon(
                           Icons.tune_rounded,
-                          size: 18,
+                          size: context.responsiveWidth(18, largeTabletVal: 28),
                           color: _hasActiveFilter
                               ? context.colorPalette.gold
                               : context.colorPalette.goldDark,
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: context.responsiveWidth(6, largeTabletVal: 10)),
                         Text(
                           'Filter',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: context.responsiveFont(12, largeTabletMultiplier: 1.8),
                             fontWeight: FontWeight.w500,
                             color: _hasActiveFilter
                                 ? context.colorPalette.gold
@@ -668,20 +678,20 @@ class _ProductListingPageState extends State<ProductListingPage> {
                           ),
                         ),
                         if (_activeFilterCount > 0) ...[
-                          const SizedBox(width: 4),
+                          SizedBox(width: context.responsiveWidth(4)),
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.responsiveWidth(5),
                               vertical: 1,
                             ),
                             decoration: BoxDecoration(
                               color: context.colorPalette.gold,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
                             ),
                             child: Text(
                               '$_activeFilterCount',
-                              style: const TextStyle(
-                                fontSize: 10,
+                              style: TextStyle(
+                                fontSize: context.responsiveFont(10),
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -692,19 +702,19 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: context.responsiveWidth(8)),
                 GestureDetector(
                   onTap: () => _controller.toggleLayout(),
                   child: Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: EdgeInsets.all(context.responsiveWidth(6, largeTabletVal: 12)),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
                       border: Border.all(color: context.colorPalette.border),
                     ),
                     child: Icon(
                       isGrid ? Icons.list_rounded : Icons.grid_view_rounded,
-                      size: 20,
+                      size: context.responsiveWidth(20, largeTabletVal: 32),
                       color: context.colorPalette.goldDark,
                     ),
                   ),
@@ -733,12 +743,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(10, largeTabletVal: 18),
+          vertical: context.responsiveWidth(6, largeTabletVal: 12),
+        ),
         decoration: BoxDecoration(
           color: isSelected
               ? context.colorPalette.gold.withValues(alpha: 0.08)
               : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
           border: Border.all(
             color: isSelected
                 ? context.colorPalette.gold
@@ -750,16 +763,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
           children: [
             Icon(
               icon,
-              size: 16,
+              size: context.responsiveWidth(16, largeTabletVal: 26),
               color: isSelected
                   ? context.colorPalette.gold
                   : context.colorPalette.goldDark,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: context.responsiveWidth(4)),
             Text(
               label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: context.responsiveFont(11, largeTabletMultiplier: 1.8),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
                     ? context.colorPalette.gold
@@ -853,7 +866,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       style: GoogleFonts.bodoniModa(
         fontWeight: FontWeight.w700,
         color: context.colorPalette.goldDeep,
-        fontSize: 18,
+        fontSize: context.responsiveFont(18, largeTabletMultiplier: 1.8),
       ),
     );
   }

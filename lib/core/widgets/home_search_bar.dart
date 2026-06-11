@@ -66,13 +66,13 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = context.responsiveWidth(20, tabletVal: 24);
-    final smallIconSize = context.responsiveWidth(18, tabletVal: 22);
-    final spacing = context.responsiveWidth(12, tabletVal: 14);
-    final hPad = context.responsiveWidth(14, tabletVal: 18);
-    final vPad = context.responsiveWidth(7, tabletVal: 9);
-    final fontSize = context.responsiveWidth(14, tabletVal: 16);
-    final stackHeight = context.responsiveWidth(20, tabletVal: 24);
+    final iconSize = context.responsiveWidth(20, tabletVal: 30);
+    final smallIconSize = context.responsiveWidth(18, tabletVal: 26);
+    final spacing = context.responsiveWidth(12, tabletVal: 16);
+    final hPad = context.responsiveWidth(14, tabletVal: 24);
+    final vPad = context.responsiveWidth(7, tabletVal: 12);
+    final fontSize = context.responsiveWidth(14, tabletVal: 19);
+    final stackHeight = context.responsiveWidth(20, tabletVal: 30);
 
     final categoryController = Get.find<CategoryController>();
 

@@ -142,7 +142,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
     _tempStockFilter = widget.initialStockFilter;
 
-    _tempSelectedCategoryIds = Set<String>.from(widget.initialSelectedCategoryIds);
+    _tempSelectedCategoryIds =
+        Set<String>.from(widget.initialSelectedCategoryIds);
 
     _tempSelectedSizes = List<String>.from(widget.initialSelectedSizes);
 
@@ -187,8 +188,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final products = widget.products;
     if (products.isEmpty) {
       setState(() {
-        _effectiveWeightSliderMax = widget.weightSliderMax
-            .clamp(_minWeightSliderMax, double.infinity);
+        _effectiveWeightSliderMax =
+            widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
         _clampWeightValues();
       });
       return;
@@ -232,8 +233,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       count++;
     }
     if (widget.showWeightFilter &&
-        (_tempWeightMin > 0 ||
-            _tempWeightMax < _effectiveWeightSliderMax)) {
+        (_tempWeightMin > 0 || _tempWeightMax < _effectiveWeightSliderMax)) {
       count++;
     }
     if (widget.showPriceFilter &&
@@ -243,7 +243,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     if (widget.showCategoryFilter && _tempSelectedCategoryIds.isNotEmpty) {
       final grouped = _getDeduplicatedCategories();
       count += grouped.entries
-          .where((e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)))
+          .where(
+              (e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)))
           .length;
     }
     if (widget.showSizeFilter) {
@@ -294,10 +295,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       categoryIds: selectedIds,
       categoryNames: selectedNames,
       stockFilter: _tempStockFilter,
-      wMin: _tempWeightMin,
-      wMax: _tempWeightMax,
-      pMin: _tempPriceMin,
-      pMax: _tempPriceMax,
+      wMin: widget.showWeightFilter ? _tempWeightMin : widget.initialWeightMin,
+      wMax: widget.showWeightFilter ? _tempWeightMax : widget.initialWeightMax,
+      pMin: widget.showPriceFilter ? _tempPriceMin : widget.initialPriceMin,
+      pMax: widget.showPriceFilter ? _tempPriceMax : widget.initialPriceMax,
       sizes: List<String>.from(_tempSelectedSizes),
     );
     Navigator.pop(context);
@@ -370,9 +371,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildHandle(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 6),
-      width: 32,
-      height: 3,
+      margin: EdgeInsets.only(top: context.responsiveWidth(6, tabletVal: 8)),
+      width: context.responsiveWidth(32),
+      height: context.responsiveWidth(3, tabletVal: 4),
       decoration: BoxDecoration(
         color: context.colorPalette.goldDark.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(1.5),
@@ -382,19 +383,24 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildHeader(BuildContext context, int count) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+      padding: EdgeInsets.fromLTRB(
+        context.responsiveWidth(14, tabletVal: 16),
+        context.responsiveWidth(6, tabletVal: 8),
+        context.responsiveWidth(14, tabletVal: 16),
+        context.responsiveWidth(6, tabletVal: 8),
+      ),
       child: Row(
         children: [
           Icon(
             Icons.tune_rounded,
-            size: 16,
+            size: context.responsiveWidth(16, tabletVal: 18),
             color: context.colorPalette.goldDark,
           ),
           const SizedBox(width: 6),
           Text(
             'Filter Products',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: context.responsiveFont(14),
               fontWeight: FontWeight.w700,
               color: context.colorPalette.goldDeep,
             ),
@@ -402,15 +408,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           if (count > 0) ...[
             const SizedBox(width: 6),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.responsiveWidth(6, tabletVal: 7),
+                vertical: context.responsiveWidth(1),
+              ),
               decoration: BoxDecoration(
                 color: context.colorPalette.gold,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '$count',
-                style: const TextStyle(
-                  fontSize: 10,
+                style: TextStyle(
+                  fontSize: context.responsiveFont(10),
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -429,7 +438,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Text(
           'Karat',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: context.responsiveFont(12),
             fontWeight: FontWeight.w600,
             color: context.colorPalette.goldDeep,
           ),
@@ -444,9 +453,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 onTap: () => _toggleKarat(karat),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsiveWidth(10, tabletVal: 12),
+                    vertical: context.responsiveWidth(4, tabletVal: 5),
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
@@ -463,7 +472,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   child: Text(
                     karat,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: context.responsiveFont(11),
                       fontWeight: FontWeight.w700,
                       color: isSelected
                           ? Colors.white
@@ -484,10 +493,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final grouped = _getDeduplicatedCategories();
     final uniqueCleanNames = grouped.keys.toList();
     final showExpand = uniqueCleanNames.length > collapsedCount;
-    final visibleNames =
-        _categoriesExpanded || !showExpand
-            ? uniqueCleanNames
-            : uniqueCleanNames.sublist(0, collapsedCount);
+    final visibleNames = _categoriesExpanded || !showExpand
+        ? uniqueCleanNames
+        : uniqueCleanNames.sublist(0, collapsedCount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -498,18 +506,19 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Category',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: context.responsiveFont(12),
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
             ),
             if (_tempSelectedCategoryIds.isNotEmpty)
               GestureDetector(
-                onTap: () => setState(() => _tempSelectedCategoryIds.clear()),
+                onTap: () =>
+                    setState(() => _tempSelectedCategoryIds.clear()),
                 child: Text(
                   'Clear',
                   style: TextStyle(
-                fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDark,
                   ),
@@ -523,11 +532,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           runSpacing: 6,
           children: visibleNames.map((cleanName) {
             final cats = grouped[cleanName]!;
-            final isSelected = cats.any((c) => _tempSelectedCategoryIds.contains(c.id));
+            final isSelected =
+                cats.any((c) => _tempSelectedCategoryIds.contains(c.id));
             return GestureDetector(
               onTap: () {
                 setState(() {
-                  final allSelected = cats.every((c) => _tempSelectedCategoryIds.contains(c.id));
+                  final allSelected = cats.every(
+                      (c) => _tempSelectedCategoryIds.contains(c.id));
                   for (final cat in cats) {
                     if (allSelected) {
                       _tempSelectedCategoryIds.remove(cat.id);
@@ -539,8 +550,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(10, tabletVal: 12),
+                  vertical: context.responsiveWidth(4, tabletVal: 5),
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? context.colorPalette.gold
@@ -556,7 +569,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 child: Text(
                   cleanName,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     fontWeight: FontWeight.w600,
                     color: isSelected
                         ? Colors.white
@@ -570,13 +583,18 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         if (showExpand) ...[
           const SizedBox(height: 8),
           GestureDetector(
-            onTap: () => setState(() => _categoriesExpanded = !_categoriesExpanded),
+            onTap: () =>
+                setState(() => _categoriesExpanded = !_categoriesExpanded),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.responsiveWidth(12, tabletVal: 14),
+                vertical: context.responsiveWidth(5, tabletVal: 6),
+              ),
               decoration: BoxDecoration(
                 color: context.colorPalette.cardBg,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: context.colorPalette.border, width: 1),
+                border: Border.all(
+                    color: context.colorPalette.border, width: 1),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -585,7 +603,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     _categoriesExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    size: 14,
+                    size: context.responsiveWidth(14, tabletVal: 16),
                     color: context.colorPalette.goldDark,
                   ),
                   const SizedBox(width: 4),
@@ -594,7 +612,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         ? 'Show less'
                         : 'Show all ${uniqueCleanNames.length} collections',
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: context.responsiveFont(11),
                       fontWeight: FontWeight.w600,
                       color: context.colorPalette.goldDark,
                     ),
@@ -615,7 +633,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Text(
           'Stock Status',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: context.responsiveFont(12),
             fontWeight: FontWeight.w600,
             color: context.colorPalette.goldDeep,
           ),
@@ -660,7 +678,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(
+            vertical: context.responsiveWidth(6, tabletVal: 8),
+          ),
           decoration: BoxDecoration(
             color: isSelected
                 ? context.colorPalette.gold
@@ -677,7 +697,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white
@@ -703,7 +723,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Fine Weight Range (g)',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: context.responsiveFont(12),
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
@@ -711,7 +731,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               '${_tempWeightMin.round()}g – ${_tempWeightMax.round()}g',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w500,
                 color: context.colorPalette.goldDark,
               ),
@@ -720,13 +740,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ),
         const SizedBox(height: 2),
         SliderTheme(
-          data: SliderThemeData(
-            rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 6),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+          data: const SliderThemeData(
+            rangeThumbShape:
+                RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
             trackHeight: 3,
           ),
           child: SizedBox(
-            height: 32,
+            height: context.responsiveWidth(32, tabletVal: 36),
             child: RangeSlider(
               values: RangeValues(
                 _tempWeightMin.clamp(0, sliderMax),
@@ -764,7 +785,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Size',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: context.responsiveFont(12),
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
@@ -775,7 +796,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 child: Text(
                   'Clear',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     fontWeight: FontWeight.w600,
                     color: context.colorPalette.goldDark,
                   ),
@@ -801,8 +822,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsiveWidth(10, tabletVal: 12),
+                  vertical: context.responsiveWidth(4, tabletVal: 5),
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? context.colorPalette.gold
@@ -818,7 +841,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 child: Text(
                   size,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: context.responsiveFont(11),
                     fontWeight: FontWeight.w600,
                     color: isSelected
                         ? Colors.white
@@ -847,7 +870,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               'Price Range (\u20B9)',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: context.responsiveFont(12),
                 fontWeight: FontWeight.w600,
                 color: context.colorPalette.goldDeep,
               ),
@@ -855,7 +878,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Text(
               '${_formatPriceLabel(_tempPriceMin)} \u2013 ${_formatPriceLabel(_tempPriceMax)}',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w500,
                 color: context.colorPalette.goldDark,
               ),
@@ -864,13 +887,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ),
         const SizedBox(height: 2),
         SliderTheme(
-          data: SliderThemeData(
-            rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 6),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+          data: const SliderThemeData(
+            rangeThumbShape:
+                RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
             trackHeight: 3,
           ),
           child: SizedBox(
-            height: 32,
+            height: context.responsiveWidth(32, tabletVal: 36),
             child: RangeSlider(
               values: RangeValues(
                 _tempPriceMin.clamp(0, sliderMax),
@@ -912,10 +936,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget _buildActions(BuildContext context, int count) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        10,
-        6,
-        10,
-        6 + MediaQuery.of(context).padding.bottom,
+        context.responsiveWidth(10, tabletVal: 12),
+        context.responsiveWidth(6, tabletVal: 8),
+        context.responsiveWidth(10, tabletVal: 12),
+        context.responsiveWidth(6, tabletVal: 8) +
+            MediaQuery.of(context).padding.bottom,
       ),
       child: Row(
         children: [
@@ -923,7 +948,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: OutlinedButton(
               onPressed: _clearAll,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  vertical: context.responsiveWidth(6, tabletVal: 8),
+                ),
                 side: BorderSide(color: context.colorPalette.gold),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -932,7 +959,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               child: Text(
                 'Clear',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: context.responsiveFont(12),
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.goldDark,
                 ),
@@ -945,7 +972,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: ElevatedButton(
               onPressed: _apply,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 6),
+                padding: EdgeInsets.symmetric(
+                  vertical: context.responsiveWidth(6, tabletVal: 8),
+                ),
                 backgroundColor: context.colorPalette.gold,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -954,8 +983,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
               child: Text(
                 'Apply${count > 0 ? ' ($count)' : ''}',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: context.responsiveFont(12),
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
                 ),
@@ -967,4 +996,5 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 }
+
 
