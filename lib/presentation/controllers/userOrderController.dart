@@ -1,15 +1,17 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class UserOrderController extends GetxController {
   static UserOrderController get instance => Get.find();
+
+  final _orderRepo = OrderRepository();
 
   final CartController cartController = Get.isRegistered<CartController>() ? Get.find<CartController>() : Get.put(CartController());
 
@@ -133,18 +135,9 @@ class UserOrderController extends GetxController {
 
       Logger.info("UserOrderController", "Creating order payload: $products");
 
-      final response = await httpClient.post(
-        "/api/v1/products/create-order",
-        data: {"products": products},
-        options: Options(
-          extra: {"requiresAuth" : true },
-        )
-      );
+      final responseData = await _orderRepo.createOrder(orderData: {"products": products});
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = response.data;
-
-        final data = responseData["data"] ?? {};
+      final data = responseData["data"] ?? {};
 
         _createdOrderId.value = data["orderId"]?.toString() ?? '';
 
@@ -183,13 +176,6 @@ class UserOrderController extends GetxController {
         Logger.info("UserOrderController", "Order created successfully");
 
         return true;
-      }
-
-      _createOrderState.value = CurrentAppState.ERROR;
-
-      ToastUtils.showError(response.data?["message"] ?? "Something went wrong");
-
-      return false;
     } catch (e, st) {
       _createOrderState.value = CurrentAppState.ERROR;
 
@@ -235,48 +221,35 @@ class UserOrderController extends GetxController {
 
       Logger.info("UserOrderController", "Fetching orders page: $_ordersPage");
 
-      final response = await httpClient.get(
-        "/api/v1/products/get-userAllOrders",
-        queryParameters: {"page": _ordersPage, "limit": _ordersLimit},
-        options: Options(
-          extra: {"requiresAuth" : true },
-        ),
+      final responseData = await _orderRepo.fetchUserOrders(
+        queryParams: {"page": _ordersPage, "limit": _ordersLimit},
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = response.data;
+      final data = responseData["data"] ?? {};
 
-        final data = responseData["data"] ?? {};
+      final List rawOrders = data["orders"] is List ? data["orders"] : [];
 
-        final List rawOrders = data["orders"] is List ? data["orders"] : [];
+      final fetchedOrders = rawOrders
+          .map((e) => UserOrderModel.fromJson(e))
+          .toList();
 
-        final fetchedOrders = rawOrders
-            .map((e) => UserOrderModel.fromJson(e))
-            .toList();
-
-        if (isPagination) {
-          _userOrders.addAll(fetchedOrders);
-        } else {
-          _userOrders.value = fetchedOrders;
-        }
-
-        _totalOrders.value = data["total"] ?? 0;
-
-        // IMPORTANT PAGINATION LOGIC
-        if (fetchedOrders.length < _ordersLimit) {
-          _hasMoreOrders.value = false;
-        } else {
-          _ordersPage++;
-        }
-
-        _ordersState.value = CurrentAppState.SUCCESS;
-
-        Logger.info("UserOrderController", "Orders fetched successfully");
+      if (isPagination) {
+        _userOrders.addAll(fetchedOrders);
       } else {
-        _ordersState.value = CurrentAppState.ERROR;
-
-        ToastUtils.showError(response.data?["message"] ?? "Failed to fetch orders");
+        _userOrders.value = fetchedOrders;
       }
+
+      _totalOrders.value = data["total"] ?? 0;
+
+      if (fetchedOrders.length < _ordersLimit) {
+        _hasMoreOrders.value = false;
+      } else {
+        _ordersPage++;
+      }
+
+      _ordersState.value = CurrentAppState.SUCCESS;
+
+      Logger.info("UserOrderController", "Orders fetched successfully");
     } catch (e, st) {
       _ordersState.value = CurrentAppState.ERROR;
 
@@ -311,24 +284,21 @@ class UserOrderController extends GetxController {
     try {
       final futures = uncached.entries.map((entry) async {
         try {
-          final response = await httpClient.get(
-            "/api/v1/products/search",
-            queryParameters: {
-              "search": entry.value,
+          final response = await _orderRepo.searchProducts(
+            query: entry.value,
+            queryParams: {
               "page": 1,
               "limit": 10,
               "showAll": true,
             },
           );
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final List raw = response.data['data']['data'] ?? [];
-            final match = raw.cast<Map<String, dynamic>?>().firstWhere(
-                  (p) => p?['id'] == entry.key,
-                  orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
-                );
-            if (match != null) {
-              _productDataCache[entry.key] = ProductModel.fromJson(match);
-            }
+          final List raw = response['data']['data'] ?? [];
+          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
+                (p) => p?['id'] == entry.key,
+                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+              );
+          if (match != null) {
+            _productDataCache[entry.key] = ProductModel.fromJson(match);
           }
         } catch (e) {
           Logger.error("UserOrderController", "Product detail fetch failed for ${entry.key}: $e");

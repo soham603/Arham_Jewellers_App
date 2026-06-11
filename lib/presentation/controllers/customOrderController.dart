@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import 'package:get/get.dart' hide FormData, MultipartFile;
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
+import 'package:ratnesh_gold_app/data/repositories/custom_order_repository.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CustomOrderController extends GetxController {
   static CustomOrderController get instance => Get.find();
+
+  final _customOrderRepo = CustomOrderRepository();
 
   // ── Create state ──
   final _createState = CurrentAppState.INITIAL.obs;
@@ -81,14 +82,10 @@ class CustomOrderController extends GetxController {
 
       Logger.info("CustomOrderController", "Creating custom order...");
 
-      final response = await httpClient.post(
-        ApiUrlConstants.CUSTOM_ORDER_CREATE,
-        data: formData,
-        options: Options(extra: {"requiresAuth": true}),
-      );
+      final responseData = await _customOrderRepo.createCustomOrder(data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'] ?? {};
+      if (responseData.isNotEmpty) {
+        final data = responseData['data'] ?? {};
         _createdOrderId.value = data['orderId']?.toString() ?? '';
         _createState.value = CurrentAppState.SUCCESS;
 
@@ -99,7 +96,7 @@ class CustomOrderController extends GetxController {
       }
 
       _createState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(response.data?['message'] ?? "Failed to create custom order");
+      ToastUtils.showError("Failed to create custom order");
       return false;
     } catch (e, st) {
       _createState.value = CurrentAppState.ERROR;
@@ -173,23 +170,16 @@ class CustomOrderController extends GetxController {
 
       final formData = FormData.fromMap(map);
 
-      final response = await httpClient.patch(
-        ApiUrlConstants.customOrderModify(orderId),
+      await _customOrderRepo.modifyCustomOrder(
+        orderId: orderId,
         data: formData,
-        options: Options(extra: {"requiresAuth": true}),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _modifyState.value = CurrentAppState.SUCCESS;
+      _modifyState.value = CurrentAppState.SUCCESS;
 
-        Logger.info("CustomOrderController", "Custom order modified: $orderId");
+      Logger.info("CustomOrderController", "Custom order modified: $orderId");
 
-        return true;
-      }
-
-      _modifyState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(response.data?['message'] ?? "Failed to update custom order");
-      return false;
+      return true;
     } catch (e, st) {
       _modifyState.value = CurrentAppState.ERROR;
       Logger.error("CustomOrderController", "modifyCustomOrder error: $e\n$st");
@@ -217,20 +207,12 @@ class CustomOrderController extends GetxController {
     try {
       _isDeleting.value = true;
 
-      final response = await httpClient.delete(
-        ApiUrlConstants.customOrderDelete(orderId),
-        options: Options(extra: {"requiresAuth": true}),
-      );
+      await _customOrderRepo.deleteCustomOrder(orderId: orderId);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ToastUtils.showSuccess("Custom order deleted successfully");
+      ToastUtils.showSuccess("Custom order deleted successfully");
 
-        Logger.info("CustomOrderController", "Custom order deleted: $orderId");
-        return true;
-      }
-
-      ToastUtils.showError(response.data?['message'] ?? "Failed to delete custom order");
-      return false;
+      Logger.info("CustomOrderController", "Custom order deleted: $orderId");
+      return true;
     } catch (e, st) {
       Logger.error("CustomOrderController", "deleteCustomOrder error: $e\n$st");
 

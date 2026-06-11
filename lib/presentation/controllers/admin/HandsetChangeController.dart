@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:ratnesh_gold_app/data/repositories/auth_repository.dart';
+import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/handsetChangeModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -11,6 +12,8 @@ import 'package:flutter/material.dart';
 
 class HandsetChangeController extends GetxController {
   static HandsetChangeController get instance => Get.find();
+
+  final _authRepo = AuthRepository();
 
   static const int _pageLimit = 10;
 
@@ -71,11 +74,7 @@ class HandsetChangeController extends GetxController {
         queryParams['search'] = _searchQuery.value.trim();
       }
 
-      final response = await httpClient.get(
-        '/api/v1/auth/device-change-request',
-        queryParameters: queryParams,
-        options: Options(extra: {'requiresAuth': true}),
-      );
+      final response = await _authRepo.fetchHandsetRequests(queryParams: queryParams);
 
       if (response.statusCode == 200) {
         final data = response.data['data'];
@@ -150,10 +149,7 @@ class HandsetChangeController extends GetxController {
   }) async {
     return _handleAction(
       requestId: requestId,
-      body: {
-        'requestId': requestId,
-        'action': 'APPROVE',
-      },
+      action: 'APPROVE',
       context: context,
     );
   }
@@ -165,18 +161,16 @@ class HandsetChangeController extends GetxController {
   }) async {
     return _handleAction(
       requestId: requestId,
-      body: {
-        'requestId': requestId,
-        'action': 'REJECT',
-        'rejectionReason': rejectionReason,
-      },
+      action: 'REJECT',
+      rejectionReason: rejectionReason,
       context: context,
     );
   }
 
   Future<bool> _handleAction({
     required String requestId,
-    required Map<String, dynamic> body,
+    required String action,
+    String? rejectionReason,
     required BuildContext context,
   }) async {
     try {
@@ -184,10 +178,10 @@ class HandsetChangeController extends GetxController {
       _actioningId.value = requestId;
       _error.value = '';
 
-      final response = await httpClient.patch(
-        '/api/v1/auth/device-change-request/action',
-        data: body,
-        options: Options(extra: {'requiresAuth': true}),
+      final response = await _authRepo.handleHandsetRequest(
+        requestId: requestId,
+        action: action,
+        rejectionReason: rejectionReason,
       );
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&
@@ -211,15 +205,7 @@ class HandsetChangeController extends GetxController {
       return false;
     } on DioException catch (e, st) {
       Logger.error('HandsetChangeController', '_handleAction Dio: $e\n$st');
-
-      String message = 'Something went wrong';
-      if (e.response?.data is Map) {
-        final data = e.response!.data;
-        message = data['error']?['message'] ?? data['message'] ?? e.message ?? 'Something went wrong';
-      } else {
-        message = e.message ?? 'Something went wrong';
-      }
-
+      final message = DioErrorHelper.getMessage(e);
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
       ToastUtils.showError(message);

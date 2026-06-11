@@ -5,8 +5,9 @@ import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
+import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
@@ -33,6 +34,7 @@ Uint8List _compressBytes(Uint8List bytes) {
 
 class CategoryManagerController extends GetxController {
   static CategoryManagerController get instance => Get.find();
+  final _categoryRepo = CategoryRepository();
 
   // ── All categories cache ──────────────────────────────────────────────────
   final _allCategories = <CategoryModel>[].obs;
@@ -61,16 +63,9 @@ class CategoryManagerController extends GetxController {
     if (!force && _allCategories.isNotEmpty) return;
     _loading.value = true;
     try {
-      final response = await httpClient.get(
-        "/api/v1/category/get-All",
-        queryParameters: {"full": true},
-        options: Options(extra: {"requiresAuth": true}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final List raw = response.data['data']['results'] ?? [];
-        _allCategories.value = raw.map((e) => CategoryModel.fromJson(e)).toList();
-      }
+      final data = await _categoryRepo.fetchCategories(queryParams: {"full": true});
+      final List raw = data['results'] ?? [];
+      _allCategories.value = raw.map((e) => CategoryModel.fromJson(e)).toList();
     } catch (e) {
       Logger.error("CategoryManagerController", "fetchAll error: $e");
     } finally {
@@ -176,30 +171,16 @@ class CategoryManagerController extends GetxController {
         if (imageFile != null) 'file': await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
       });
 
-      final response = await httpClient.post(
-        "/api/v1/category/create",
-        data: formData,
-        options: Options(
-          headers: {"Content-Type": "multipart/form-data"},
-          extra: {"requiresAuth": true},
-        ),
-      );
+      final response = await _categoryRepo.createCategory(data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final created = CategoryModel.fromJson(response.data['data']);
-        _allCategories.insert(0, created);
-        _pickedImage.value = null;
-        Logger.info("CategoryManagerController", "Category created: ${created.name}");
-        return null;
-      }
-      return (response.data is Map) ? (response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to create') : 'Failed to create';
+      final created = CategoryModel.fromJson(response['data']);
+      _allCategories.insert(0, created);
+      _pickedImage.value = null;
+      Logger.info("CategoryManagerController", "Category created: ${created.name}");
+      return null;
     } catch (e) {
       Logger.error("CategoryManagerController", "create error: $e");
-      if (e is DioException && e.response?.data != null) {
-        final data = e.response!.data;
-        return (data is Map) ? (data['error']?['message'] ?? data['message'] ?? 'Something went wrong') : 'Something went wrong';
-      }
-      return 'Something went wrong';
+      return DioErrorHelper.getMessage(e);
     }
   }
 
@@ -217,31 +198,17 @@ class CategoryManagerController extends GetxController {
         if (imageFile != null) "file": await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
       });
 
-      final response = await httpClient.put(
-        "/api/v1/category/edit/$id",
-        data: formData,
-        options: Options(
-          headers: {"Content-Type": "multipart/form-data"},
-          extra: {"requiresAuth": true},
-        ),
-      );
+      final response = await _categoryRepo.editCategory(id: id, data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final updated = CategoryModel.fromJson(response.data['data']);
-        final idx = _allCategories.indexWhere((c) => c.id == id);
-        if (idx != -1) _allCategories[idx] = updated;
-        _pickedImage.value = null;
-        Logger.info("CategoryManagerController", "Category $id updated");
-        return null;
-      }
-      return (response.data is Map) ? (response.data['error']?['message'] ?? response.data['message'] ?? 'Failed to update') : 'Failed to update';
+      final updated = CategoryModel.fromJson(response['data']);
+      final idx = _allCategories.indexWhere((c) => c.id == id);
+      if (idx != -1) _allCategories[idx] = updated;
+      _pickedImage.value = null;
+      Logger.info("CategoryManagerController", "Category $id updated");
+      return null;
     } catch (e) {
       Logger.error("CategoryManagerController", "edit error: $e");
-      if (e is DioException && e.response?.data != null) {
-        final data = e.response!.data;
-        return (data is Map) ? (data['error']?['message'] ?? data['message'] ?? 'Something went wrong') : 'Something went wrong';
-      }
-      return 'Something went wrong';
+      return DioErrorHelper.getMessage(e);
     } finally {
       _actionLoadingId.value = '';
     }
@@ -252,25 +219,20 @@ class CategoryManagerController extends GetxController {
     _actionLoadingId.value = id;
 
     try {
-      final response = await httpClient.delete(
-        "/api/v1/category/delete/$id",
-        options: Options(extra: {"requiresAuth": true}),
-      );
+      await _categoryRepo.deleteCategory(id: id);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final idx = _allCategories.indexWhere((c) => c.id == id);
-        if (idx != -1) {
-          final cat = _allCategories[idx];
-          _allCategories[idx] = CategoryModel(
-            id: cat.id, name: cat.name, nameSlug: cat.nameSlug,
-            parentId: cat.parentId, level: cat.level,
-            imageUrl: cat.imageUrl, images: cat.images,
-            isDeleted: true, createdAt: cat.createdAt, updatedAt: cat.updatedAt,
-          );
-        }
-        Logger.info("CategoryManagerController", "Category $id deleted");
-        return true;
+      final idx = _allCategories.indexWhere((c) => c.id == id);
+      if (idx != -1) {
+        final cat = _allCategories[idx];
+        _allCategories[idx] = CategoryModel(
+          id: cat.id, name: cat.name, nameSlug: cat.nameSlug,
+          parentId: cat.parentId, level: cat.level,
+          imageUrl: cat.imageUrl, images: cat.images,
+          isDeleted: true, createdAt: cat.createdAt, updatedAt: cat.updatedAt,
+        );
       }
+      Logger.info("CategoryManagerController", "Category $id deleted");
+      return true;
     } catch (e) {
       Logger.error("CategoryManagerController", "delete error: $e");
     } finally {
@@ -284,18 +246,13 @@ class CategoryManagerController extends GetxController {
     _actionLoadingId.value = id;
 
     try {
-      final response = await httpClient.patch(
-        "/api/v1/category/restore/$id",
-        options: Options(extra: {"requiresAuth": true}),
-      );
+      final response = await _categoryRepo.restoreCategory(id: id);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final updated = CategoryModel.fromJson(response.data['data']);
-        final idx = _allCategories.indexWhere((c) => c.id == id);
-        if (idx != -1) _allCategories[idx] = updated;
-        Logger.info("CategoryManagerController", "Category $id restored");
-        return true;
-      }
+      final updated = CategoryModel.fromJson(response['data']);
+      final idx = _allCategories.indexWhere((c) => c.id == id);
+      if (idx != -1) _allCategories[idx] = updated;
+      Logger.info("CategoryManagerController", "Category $id restored");
+      return true;
     } catch (e) {
       Logger.error("CategoryManagerController", "restore error: $e");
     } finally {

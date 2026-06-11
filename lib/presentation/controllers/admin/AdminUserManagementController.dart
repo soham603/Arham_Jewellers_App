@@ -3,13 +3,15 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:ratnesh_gold_app/data/repositories/admin_access_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AdminUserManagementController extends GetxController {
   static AdminUserManagementController get instance => Get.find();
+
+  final _adminAccessRepo = AdminAccessRepository();
 
   static const int _pageLimit = 20;
 
@@ -89,14 +91,12 @@ class AdminUserManagementController extends GetxController {
         }
       }
 
-      final response = await httpClient.get(
-        '/api/v1/admin-access/get-all-users',
-        queryParameters: queryParams,
-        options: Options(extra: {'requiresAuth': true}),
+      final response = await _adminAccessRepo.fetchUsers(
+        queryParams: queryParams,
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data['data']['data'];
+      if (response['data'] != null) {
+        final data = response['data']['data'];
         final List raw = data['users'] ?? [];
         final fetched = raw.map((e) => UserSearchModel.fromJson(e)).toList();
 
@@ -117,7 +117,7 @@ class AdminUserManagementController extends GetxController {
         _state.value = CurrentAppState.SUCCESS;
       } else {
         _state.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Failed to fetch users';
+        _error.value = response['message'] ?? 'Failed to fetch users';
       }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
@@ -176,7 +176,7 @@ class AdminUserManagementController extends GetxController {
     await fetchUsers();
   }
 
-  // ── Actions (placeholder endpoints - to be finalized with backend) ───────
+  // ── Actions ──────────────────────────────────────────────────────────────
 
   /// Toggle user activation status (ACTIVE / DEACTIVATED)
   Future<bool> toggleUserActivation({
@@ -185,35 +185,33 @@ class AdminUserManagementController extends GetxController {
   }) async {
     return _handleAction(
       userId: userId,
-      endpoint: '/update-user-activation',
+      actionType: AdminAction.toggleActivation,
       body: {'userId': userId, 'action': action},
       actionLabel: action == 'ACTIVE' ? 'activated' : 'deactivated',
     );
   }
 
   /// Toggle staff status for a user
-  /// TODO: Update endpoint when backend provides it
   Future<bool> toggleStaff({
     required String userId,
     required bool isStaff,
   }) async {
     return _handleAction(
       userId: userId,
-      endpoint: '/api/v1/admin-access/toggle-staff',
+      actionType: AdminAction.toggleStaff,
       body: {'userId': userId, 'isStaff': isStaff},
       actionLabel: isStaff ? 'granted staff' : 'removed staff',
     );
   }
 
   /// Toggle retailer status for a user
-  /// TODO: Update endpoint when backend provides it
   Future<bool> toggleRetailer({
     required String userId,
     required bool isRetailer,
   }) async {
     return _handleAction(
       userId: userId,
-      endpoint: '/api/v1/admin-access/toggle-retailer',
+      actionType: AdminAction.toggleRetailer,
       body: {'userId': userId, 'retailUser': isRetailer},
       actionLabel: isRetailer ? 'granted retailer' : 'removed retailer',
     );
@@ -226,7 +224,7 @@ class AdminUserManagementController extends GetxController {
   }) async {
     return _handleAction(
       userId: userId,
-      endpoint: '/api/v1/auth/admin-reset-password',
+      actionType: AdminAction.resetPassword,
       body: {'userId': userId, 'newPassword': newPassword},
       actionLabel: 'password reset',
     );
@@ -235,7 +233,7 @@ class AdminUserManagementController extends GetxController {
   // ── Generic action handler ───────────────────────────────────────────────
   Future<bool> _handleAction({
     required String userId,
-    required String endpoint,
+    required AdminAction actionType,
     required Map<String, dynamic> body,
     required String actionLabel,
   }) async {
@@ -243,22 +241,32 @@ class AdminUserManagementController extends GetxController {
       _actionState.value = CurrentAppState.LOADING;
       _actioningId.value = userId;
 
-      final response = await httpClient.post(
-        endpoint,
-        data: body,
-        options: Options(extra: {'requiresAuth': true}),
-      );
+      final Map<String, dynamic> response;
+      switch (actionType) {
+        case AdminAction.toggleStaff:
+          response = await _adminAccessRepo.toggleStaff(data: body);
+          break;
+        case AdminAction.toggleRetailer:
+          response = await _adminAccessRepo.toggleRetailer(data: body);
+          break;
+        case AdminAction.resetPassword:
+          response = await _adminAccessRepo.adminResetPassword(data: body);
+          break;
+        case AdminAction.toggleActivation:
+          response = await _adminAccessRepo.toggleUserActivation(data: body);
+          break;
+      }
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['success'] != false) {
+      if (response['success'] != false) {
         _actionState.value = CurrentAppState.SUCCESS;
-        ToastUtils.showSuccess(response.data['message'] ?? 'User $actionLabel');
+        ToastUtils.showSuccess(response['message'] ?? 'User $actionLabel');
         await refresh();
         return true;
       }
 
-      final resData = response.data;
-      final message = (resData is Map) ? (resData['error']?['message'] ?? resData['message'] ?? 'Action failed') : 'Action failed';
+      final message = response['error']?['message'] ??
+          response['message'] ??
+          'Action failed';
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
@@ -295,4 +303,11 @@ enum UserSearchMode {
   NAME,
   EMAIL,
   PHONE,
+}
+
+enum AdminAction {
+  toggleActivation,
+  toggleStaff,
+  toggleRetailer,
+  resetPassword,
 }

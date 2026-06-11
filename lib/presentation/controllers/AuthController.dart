@@ -1,17 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/data/repositories/auth_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
-
+import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 
 class AuthController extends GetxController {
+  final _authRepo = AuthRepository();
+
   final _userLoginState = CurrentAppState.INITIAL.obs;
   CurrentAppState get userLoginState => _userLoginState.value;
 
@@ -80,15 +80,11 @@ class AuthController extends GetxController {
 
       final fcmToken = await _getFcmToken();
 
-      final response = await httpClient.post(
-        "/api/v1/auth/user-login",
-        options: Options(extra: {"requiresAuth": false}),
-        data: {
-          "phoneNumber": phoneNumber,
-          "password": password,
-          "deviceId": deviceId,
-          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
-        },
+      final response = await _authRepo.loginUser(
+        phone: phoneNumber,
+        password: password,
+        deviceId: deviceId,
+        fcmToken: fcmToken,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -154,15 +150,11 @@ class AuthController extends GetxController {
 
       final fcmToken = await _getFcmToken();
 
-      final response = await httpClient.post(
-        "/api/v1/auth/admin-login",
-        options: Options(extra: {"requiresAuth": false}),
-        data: {
-          "phoneNumber": phoneNumber,
-          "password": password,
-          "deviceId": deviceId,
-          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
-        },
+      final response = await _authRepo.loginAdmin(
+        phone: phoneNumber,
+        password: password,
+        deviceId: deviceId,
+        fcmToken: fcmToken,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -214,23 +206,7 @@ class AuthController extends GetxController {
   }
 
   void _handleLoginError(DioException e, {required bool isUserLogin}) {
-    String errorMsg = "An unexpected error occurred";
-
-    try {
-      if (e.response?.data != null) {
-        final data = e.response!.data as Map;
-        if (data['error'] is Map) {
-          errorMsg = (data['error']['message'] as String?) ?? errorMsg;
-        } else {
-          errorMsg = (data['message'] as String?) ??
-              (data['detail'] as String?) ??
-              errorMsg;
-        }
-      }
-    } catch (e) {
-      Logger.warning("AuthController", "Failed to extract error message from DioException: $e");
-    }
-
+    final errorMsg = DioErrorHelper.getMessage(e);
     final ctx = Get.context;
     if (ctx != null) {
       _scheduleError(
@@ -310,25 +286,21 @@ class AuthController extends GetxController {
       _userRegisterState.value = CurrentAppState.LOADING;
       _userRegisterErrorMsg.value = "";
 
-      final response = await httpClient.post(
-        "/api/v1/auth/register",
-        options: Options(extra: {"requiresAuth": false}),
-        data: {
-          "email": email,
-          "password": password,
-          "name": name,
-          "phoneNumber": phoneNumber,
-          "deviceId": deviceId,
-          "gstNumber": gstNumber,
-          "state": state,
-          "city": city,
-          "area": area,
-          "pincode": pincode,
-          "companyName": companyName,
-          "deviceName": deviceName,
-          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
-        },
-      );
+      final response = await _authRepo.registerUser(userData: {
+        "email": email,
+        "password": password,
+        "name": name,
+        "phoneNumber": phoneNumber,
+        "deviceId": deviceId,
+        "gstNumber": gstNumber,
+        "state": state,
+        "city": city,
+        "area": area,
+        "pincode": pincode,
+        "companyName": companyName,
+        "deviceName": deviceName,
+        if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
+      });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.data['success'] == true || response.data['success'] == null) {
@@ -350,17 +322,7 @@ class AuthController extends GetxController {
         ToastUtils.showError(_userRegisterErrorMsg.value);
       }
     } on DioException catch (e) {
-      String errorMsg = "An unexpected error occurred";
-      if (e.response?.data != null) {
-        final data = e.response!.data;
-        if (data is Map) {
-          final error = data['error'];
-          errorMsg = (error is Map ? error['message'] : error?.toString()) ??
-              data['detail']?.toString() ??
-              data['message']?.toString() ??
-              errorMsg;
-        }
-      }
+      final errorMsg = DioErrorHelper.getMessage(e);
       _userRegisterErrorMsg.value = errorMsg;
       _userRegisterState.value = CurrentAppState.ERROR;
       ToastUtils.showError(_userRegisterErrorMsg.value);
@@ -382,11 +344,7 @@ class AuthController extends GetxController {
     try {
       _forgotPasswordState.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.post(
-        ApiUrlConstants.FORGOT_PASSWORD,
-        options: Options(extra: {"requiresAuth": false}),
-        data: {"phoneNumber": phoneNumber},
-      );
+      final response = await _authRepo.forgotPassword(phone: phoneNumber);
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         _forgotPasswordState.value = CurrentAppState.SUCCESS;
@@ -404,17 +362,7 @@ class AuthController extends GetxController {
         );
       }
     } on DioException catch (e) {
-      String errorMsg = "An unexpected error occurred";
-      if (e.response?.data != null) {
-        final data = e.response!.data;
-        if (data is Map) {
-          final error = data['error'];
-          errorMsg = (error is Map ? error['message'] : error?.toString()) ??
-              data['detail']?.toString() ??
-              data['message']?.toString() ??
-              errorMsg;
-        }
-      }
+      final errorMsg = DioErrorHelper.getMessage(e);
       _forgotPasswordState.value = CurrentAppState.ERROR;
       ToastUtils.showError(errorMsg);
     } catch (e) {

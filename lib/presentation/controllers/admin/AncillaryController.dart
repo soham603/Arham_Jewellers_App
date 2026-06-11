@@ -1,13 +1,15 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:ratnesh_gold_app/data/repositories/ancillary_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/ancillary_page_model.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AncillaryController extends GetxController {
   static AncillaryController get instance => Get.find();
+
+  final _ancillaryRepo = AncillaryRepository();
 
   static const List<String> pageKeys = [
     'TERMS',
@@ -45,25 +47,17 @@ class AncillaryController extends GetxController {
     try {
       _state.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get(
-        '/api/v1/ancillary/get-page/$pageKey',
-        options: Options(
-          extra: {'requiresAuth': false},
-          sendTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-        ),
-      );
+      final response = await _ancillaryRepo.fetchPage(pageKey: pageKey);
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['success'] != false) {
-        final data = response.data['data'];
+      if (response['success'] != false) {
+        final data = response['data'];
         if (data != null) {
           _pages[pageKey] = AncillaryPageModel.fromJson(data);
         }
         _state.value = CurrentAppState.SUCCESS;
       } else {
         _state.value = CurrentAppState.ERROR;
-        _error.value = response.data?['message'] ?? 'Failed to load page';
+        _error.value = response['message'] ?? 'Failed to load page';
       }
     } on DioException catch (e, st) {
       Logger.error('AncillaryController', 'fetchPage Dio: $e\n$st');
@@ -99,28 +93,22 @@ class AncillaryController extends GetxController {
     _updateState.value = CurrentAppState.LOADING;
 
     try {
-      final response = await httpClient.put(
-        '/api/v1/ancillary/update-page/$pageKey',
+      final response = await _ancillaryRepo.updatePage(
+        pageKey: pageKey,
         data: {
           'title': title,
           'content': content,
         },
-        options: Options(
-          extra: {'requiresAuth': true},
-          sendTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 10),
-        ),
       );
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['success'] != false) {
+      if (response['success'] != false) {
         _pages[pageKey] = AncillaryPageModel(title: title, content: content);
         _updateState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess('${pageLabels[pageKey] ?? pageKey} updated');
         return true;
       } else {
         _updateState.value = CurrentAppState.ERROR;
-        _error.value = response.data?['message'] ?? 'Failed to update page';
+        _error.value = response['message'] ?? 'Failed to update page';
         ToastUtils.showError(_error.value);
         return false;
       }

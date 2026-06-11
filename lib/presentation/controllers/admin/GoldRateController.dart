@@ -3,14 +3,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/data/repositories/gold_rate_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class GoldRateController extends GetxController {
   static GoldRateController get instance => Get.find();
+
+  final _goldRateRepo = GoldRateRepository();
 
   final _currentRate = Rxn<GoldRateModel>();
   GoldRateModel? get currentRate => _currentRate.value;
@@ -64,25 +65,17 @@ class GoldRateController extends GetxController {
     try {
       _currentRateState.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get(
-        ApiUrlConstants.LIVE_RATE_CURRENT,
-        options: Options(
-          extra: {'requiresAuth': false},
-          sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-        ),
-      );
+      final response = await _goldRateRepo.fetchCurrentRate();
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['code'] != 'ERROR') {
-        final data = response.data['data'];
+      if (response['code'] != 'ERROR') {
+        final data = response['data'];
         if (data != null) {
           _currentRate.value = GoldRateModel.fromJson(data);
         }
         _currentRateState.value = CurrentAppState.SUCCESS;
       } else {
         _currentRateState.value = CurrentAppState.ERROR;
-        _error.value = response.data?['message'] ?? 'Failed to load gold rate';
+        _error.value = response['message'] ?? 'Failed to load gold rate';
       }
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'fetchCurrentRate Dio: $e\n$st');
@@ -130,19 +123,12 @@ class GoldRateController extends GetxController {
         queryParams['period'] = _selectedPeriod.value;
       }
 
-      final response = await httpClient.get(
-        ApiUrlConstants.LIVE_RATE_HISTORY,
-        queryParameters: queryParams,
-        options: Options(
-          extra: {'requiresAuth': false},
-          sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-        ),
+      final response = await _goldRateRepo.fetchHistory(
+        queryParams: queryParams,
       );
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['code'] != 'ERROR') {
-        final rawData = response.data['data'];
+      if (response['code'] != 'ERROR') {
+        final rawData = response['data'];
         List<GoldRateModel> items = [];
 
         if (rawData is List) {
@@ -175,7 +161,7 @@ class GoldRateController extends GetxController {
         _historyState.value = CurrentAppState.SUCCESS;
       } else {
         _historyState.value = CurrentAppState.ERROR;
-        _error.value = response.data?['message'] ?? 'Failed to load history';
+        _error.value = response['message'] ?? 'Failed to load history';
       }
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'fetchHistory Dio: $e\n$st');
@@ -212,27 +198,12 @@ class GoldRateController extends GetxController {
         queryParams['period'] = period ?? _selectedPeriod.value;
       }
 
-      final response = await httpClient.get(
-        ApiUrlConstants.LIVE_RATE_STATISTICS,
-        queryParameters: queryParams,
-        options: Options(
-          extra: {'requiresAuth': false},
-          sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-          validateStatus: (status) =>
-              status != null && (status < 300 || status == 404),
-        ),
+      final response = await _goldRateRepo.fetchStatistics(
+        queryParams: queryParams,
       );
 
-      if (response.statusCode == 404) {
-        _statisticsState.value = CurrentAppState.SUCCESS;
-        _statistics.value = null;
-        return;
-      }
-
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['code'] != 'ERROR') {
-        final data = response.data['data'];
+      if (response['code'] != 'ERROR') {
+        final data = response['data'];
         if (data != null && data['summary'] != null) {
           _statistics.value = GoldRateStatistics.fromJson(data['summary']);
         }
@@ -241,6 +212,11 @@ class GoldRateController extends GetxController {
         _statisticsState.value = CurrentAppState.ERROR;
       }
     } on DioException catch (e, st) {
+      if (e.response?.statusCode == 404) {
+        _statistics.value = null;
+        _statisticsState.value = CurrentAppState.SUCCESS;
+        return;
+      }
       Logger.error('GoldRateController', 'fetchStatistics Dio: $e\n$st');
       _statisticsState.value = CurrentAppState.ERROR;
     } catch (e, st) {
@@ -258,23 +234,16 @@ class GoldRateController extends GetxController {
           ? (rate - currentRateValue).toStringAsFixed(2)
           : '0.00';
 
-      final response = await httpClient.post(
-        ApiUrlConstants.LIVE_RATE_UPDATE,
-        data: {
+      final response = await _goldRateRepo.updateRate(
+        rateData: {
           'rate': rate,
           'source': 'market',
           'metadata': {'change': change},
         },
-        options: Options(
-          extra: {'requiresAuth': true},
-          sendTimeout: const Duration(seconds: 5),
-          receiveTimeout: const Duration(seconds: 5),
-        ),
       );
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['code'] != 'ERROR') {
-        final data = response.data['data'];
+      if (response['code'] != 'ERROR') {
+        final data = response['data'];
         if (data != null) {
           _currentRate.value = GoldRateModel.fromJson(data);
         }
@@ -284,7 +253,7 @@ class GoldRateController extends GetxController {
         return true;
       } else {
         _actionState.value = CurrentAppState.ERROR;
-        ToastUtils.showError(response.data?['message'] ?? 'Failed to update rate');
+        ToastUtils.showError(response['message'] ?? 'Failed to update rate');
         return false;
       }
     } on DioException catch (e, st) {

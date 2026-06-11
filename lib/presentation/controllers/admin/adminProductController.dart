@@ -3,13 +3,15 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
+import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AdminProductController extends GetxController {
   static AdminProductController get instance => Get.find();
+
+  final _productRepo = ProductRepository();
 
   final _products = <ProductModel>[].obs;
   List<ProductModel> get products => _products;
@@ -74,31 +76,25 @@ class AdminProductController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        "/api/v1/products/get-all",
-        queryParameters: {"page": _page, "limit": _limit, "showReverse": true, "showAll": true},
-        options: Options(extra: {"requiresAuth": true}),
+      final responseData = await _productRepo.fetchProducts(
+        queryParams: {"page": _page, "limit": _limit, "showReverse": true, "showAll": true},
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      final data = responseData['data'];
+      final List raw = data['data'] is List ? data['data'] : [];
+      final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
-        isPagination ? _products.addAll(fetched) : _products.value = fetched;
+      isPagination ? _products.addAll(fetched) : _products.value = fetched;
 
-        _total.value = data['totalCount'] ?? fetched.length;
+      _total.value = data['totalCount'] ?? fetched.length;
 
-        if (fetched.length < _limit) {
-          _hasMore = false;
-        } else {
-          _page++;
-        }
-
-        _state.value = CurrentAppState.SUCCESS;
+      if (fetched.length < _limit) {
+        _hasMore = false;
       } else {
-        _state.value = CurrentAppState.ERROR;
+        _page++;
       }
+
+      _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       Logger.error("AdminProductController", "fetchProducts: $e\n$st");
@@ -135,10 +131,9 @@ class AdminProductController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        "/api/v1/products/search",
-        queryParameters: {
-          if (q.isNotEmpty) "search": q,
+      final responseData = await _productRepo.searchProducts(
+        query: q,
+        queryParams: {
           if (_filterKarat.value != null) "karat": _filterKarat.value,
           if (_filterCategoryId.value != null)
             "categoryId": _filterCategoryId.value,
@@ -146,29 +141,24 @@ class AdminProductController extends GetxController {
           "limit": _limit,
           "showAll": true,
         },
-        options: Options(extra: {"requiresAuth": true}),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final raw = data['data'];
-        final List list = raw is List ? raw : [];
-        final fetched = list.map((e) => ProductModel.fromJson(e)).toList();
+      final data = responseData['data'];
+      final raw = data['data'];
+      final List list = raw is List ? raw : [];
+      final fetched = list.map((e) => ProductModel.fromJson(e)).toList();
 
-        isPagination
-            ? _searchResults.addAll(fetched)
-            : _searchResults.value = fetched;
+      isPagination
+          ? _searchResults.addAll(fetched)
+          : _searchResults.value = fetched;
 
-        if (fetched.length < _limit) {
-          _searchHasMore = false;
-        } else {
-          _searchPage++;
-        }
-
-        _searchState.value = CurrentAppState.SUCCESS;
+      if (fetched.length < _limit) {
+        _searchHasMore = false;
       } else {
-        _searchState.value = CurrentAppState.ERROR;
+        _searchPage++;
       }
+
+      _searchState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _searchState.value = CurrentAppState.ERROR;
       Logger.error("AdminProductController", "runSearch: $e\n$st");
@@ -262,17 +252,13 @@ class AdminProductController extends GetxController {
 
       final formData = FormData.fromMap(data);
 
-      final response = await httpClient.patch(
-        "/api/v1/products/update/$id",
+      final responseData = await _productRepo.updateProduct(
+        id: id,
         data: formData,
-        options: Options(
-          headers: {"Content-Type": "multipart/form-data"},
-          extra: {"requiresAuth": true},
-        ),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final updated = ProductModel.fromJson(response.data["data"]);
+      if (responseData["data"] != null) {
+        final updated = ProductModel.fromJson(responseData["data"]);
 
         _updateInLists(id, updated);
 

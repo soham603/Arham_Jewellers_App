@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
+import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 enum Karat { k18, k20, k22 }
@@ -35,6 +36,7 @@ extension KaratExtension on Karat {
 
 class CategoryController extends GetxController {
   static CategoryController get instance => Get.find();
+  final _categoryRepo = CategoryRepository();
 
   // ── Level-2 lists per karat ───────────────────────────────────────────────
   final _k18Categories = <CategoryModel>[].obs;
@@ -157,50 +159,33 @@ class CategoryController extends GetxController {
 
   Future<void> _doFetchCategoryTree() async {
     try {
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {'tree': true, 'full': true},
-      );
+      final results = await _categoryRepo.fetchCategoryTree();
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          final results = data['results'] as List;
+      for (final item in results) {
+        final karatCat = CategoryModel.fromJson(item);
+        final karat = _karatNameMap[karatCat.name];
+        if (karat == null) continue;
 
-          for (final item in results) {
-            final karatCat = CategoryModel.fromJson(item);
-            final karat = _karatNameMap[karatCat.name];
-            if (karat == null) continue;
+        final level2List = <CategoryModel>[];
+        final children = karatCat.children;
+        if (children != null) {
+          for (final level2 in children) {
+            level2List.add(level2);
 
-            final level2List = <CategoryModel>[];
-            final children = karatCat.children;
-            if (children != null) {
-              for (final level2 in children) {
-                level2List.add(level2);
-
-                // Pre-cache level-3 children
-                final level3Children = level2.children;
-                if (level3Children != null && level3Children.isNotEmpty) {
-                  _level3Cache[level2.id] = level3Children;
-                }
-              }
+            final level3Children = level2.children;
+            if (level3Children != null && level3Children.isNotEmpty) {
+              _level3Cache[level2.id] = level3Children;
             }
-
-            _listForKarat(karat).addAll(level2List);
-            _stateForKarat(karat).value = CurrentAppState.SUCCESS;
           }
-
-          // Populate latest level-3 categories from tree
-          _populateLatestLevel3FromTree(results);
-
-          _treeHasFullData = true;
-          return;
         }
+
+        _listForKarat(karat).addAll(level2List);
+        _stateForKarat(karat).value = CurrentAppState.SUCCESS;
       }
 
-      _k18State.value = CurrentAppState.ERROR;
-      _k20State.value = CurrentAppState.ERROR;
-      _k22State.value = CurrentAppState.ERROR;
+      _populateLatestLevel3FromTree(results);
+
+      _treeHasFullData = true;
     } catch (e, st) {
       _k18State.value = CurrentAppState.ERROR;
       _k20State.value = CurrentAppState.ERROR;
@@ -309,48 +294,35 @@ class CategoryController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {
-          'page': _adminPage,
-          'limit': _adminLimit,
-          'full': true,
-          'level': ?filterLevel,
-          if (filterName != null && filterName.isNotEmpty) 'name': filterName,
-          'parentId': ?filterParentId,
-          if (includeDeleted) 'isDeleted': true,
-        },
-        options: Options(extra: {'requiresAuth': true}),
-      );
+      final queryParams = {
+        'page': _adminPage,
+        'limit': _adminLimit,
+        'full': true,
+        'level': ?filterLevel,
+        if (filterName != null && filterName.isNotEmpty) 'name': filterName,
+        'parentId': ?filterParentId,
+        if (includeDeleted) 'isDeleted': true,
+      };
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          final fetched = (data['results'] as List)
-              .map((e) => CategoryModel.fromJson(e))
-              .toList();
+      final data = await _categoryRepo.fetchCategories(queryParams: queryParams);
+      final List raw = data['results'] ?? [];
+      final fetched = raw.map((e) => CategoryModel.fromJson(e)).toList();
 
-          if (isPagination) {
-            _adminCategoryList.addAll(fetched);
-          } else {
-            _adminCategoryList.value = fetched;
-          }
-
-          _adminTotal.value = data['total'] ?? fetched.length;
-
-          if (fetched.length < _adminLimit) {
-            adminHasMore = false;
-          } else {
-            _adminPage++;
-          }
-
-          _adminState.value = CurrentAppState.SUCCESS;
-        } else {
-          _adminState.value = CurrentAppState.ERROR;
-        }
+      if (isPagination) {
+        _adminCategoryList.addAll(fetched);
       } else {
-        _adminState.value = CurrentAppState.ERROR;
+        _adminCategoryList.value = fetched;
       }
+
+      _adminTotal.value = data['total'] ?? fetched.length;
+
+      if (fetched.length < _adminLimit) {
+        adminHasMore = false;
+      } else {
+        _adminPage++;
+      }
+
+      _adminState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _adminState.value = CurrentAppState.ERROR;
       Logger.error('CategoryController', 'fetchAdminCategories error: $e\n$st');
@@ -403,29 +375,17 @@ class CategoryController extends GetxController {
           'file': await MultipartFile.fromFile(imageFile.path),
       });
 
-      final response = await httpClient.post(
-        '/api/v1/category/create',
-        data: formData,
-        options: Options(
-          headers: {'Content-Type': 'multipart/form-data'},
-          extra: {'requiresAuth': true},
-        ),
-      );
+      final response = await _categoryRepo.createCategory(data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data != null) {
-          _adminCategoryList.insert(0, CategoryModel.fromJson(data));
-        }
-        _createState.value = CurrentAppState.SUCCESS;
-        return true;
-      } else {
-        _createState.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Create failed';
+      final data = response['data'];
+      if (data != null) {
+        _adminCategoryList.insert(0, CategoryModel.fromJson(data));
       }
+      _createState.value = CurrentAppState.SUCCESS;
+      return true;
     } catch (e) {
       _createState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      _error.value = DioErrorHelper.getMessage(e);
     }
     return false;
   }
@@ -449,31 +409,19 @@ class CategoryController extends GetxController {
           'file': await MultipartFile.fromFile(imageFile.path),
       });
 
-      final response = await httpClient.put(
-        '/api/v1/category/edit/$id',
-        data: formData,
-        options: Options(
-          headers: {'Content-Type': 'multipart/form-data'},
-          extra: {'requiresAuth': true},
-        ),
-      );
+      final response = await _categoryRepo.editCategory(id: id, data: formData);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final updated = response.data['data'];
-        if (updated != null) {
-          final model = CategoryModel.fromJson(updated);
-          final i = _adminCategoryList.indexWhere((e) => e.id == id);
-          if (i != -1) _adminCategoryList[i] = model;
-        }
-        _editState.value = CurrentAppState.SUCCESS;
-        return true;
-      } else {
-        _editState.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Update failed';
+      final updated = response['data'];
+      if (updated != null) {
+        final model = CategoryModel.fromJson(updated);
+        final i = _adminCategoryList.indexWhere((e) => e.id == id);
+        if (i != -1) _adminCategoryList[i] = model;
       }
+      _editState.value = CurrentAppState.SUCCESS;
+      return true;
     } catch (e) {
       _editState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      _error.value = DioErrorHelper.getMessage(e);
     }
     return false;
   }
@@ -483,22 +431,14 @@ class CategoryController extends GetxController {
       _deleteState.value = CurrentAppState.LOADING;
       _error.value = '';
 
-      final response = await httpClient.delete(
-        '/api/v1/category/delete/$id',
-        options: Options(extra: {'requiresAuth': true}),
-      );
+      await _categoryRepo.deleteCategory(id: id);
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        _adminCategoryList.removeWhere((e) => e.id == id);
-        _deleteState.value = CurrentAppState.SUCCESS;
-        return true;
-      } else {
-        _deleteState.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Delete failed';
-      }
+      _adminCategoryList.removeWhere((e) => e.id == id);
+      _deleteState.value = CurrentAppState.SUCCESS;
+      return true;
     } catch (e) {
       _deleteState.value = CurrentAppState.ERROR;
-      _error.value = e.toString();
+      _error.value = DioErrorHelper.getMessage(e);
     }
     return false;
   }
@@ -517,24 +457,13 @@ class CategoryController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        '/api/v1/category/get-All',
-        queryParameters: {
-          'level': level,
-          'parentId': ?parentId,
-          'full': true,
-        },
-        options: Options(extra: {'requiresAuth': true}),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        if (data is Map && data['results'] is List) {
-          return (data['results'] as List)
-              .map((e) => CategoryModel.fromJson(e))
-              .toList();
-        }
-      }
+      final data = await _categoryRepo.fetchCategories(queryParams: {
+        'level': level,
+        'parentId': ?parentId,
+        'full': true,
+      });
+      final List raw = data['results'] ?? [];
+      return raw.map((e) => CategoryModel.fromJson(e)).toList();
     } catch (e) {
       Logger.error('CategoryController', '_fetchLevelFlat error: $e');
     }

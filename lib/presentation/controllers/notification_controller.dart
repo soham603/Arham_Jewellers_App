@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
+import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
@@ -13,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NotificationController extends GetxController {
   static const String _storageKey = 'notifications_list';
   static const int _maxNotifications = 100;
+
+  final _notificationRepo = NotificationRepository();
 
   static const Set<String> _allowedRoutes = {
     AppRoutes.splash,
@@ -152,10 +153,7 @@ class NotificationController extends GetxController {
           Logger.info("NotificationController", "Skipping FCM token update — user not logged in");
           return;
         }
-        await httpClient.post(
-          ApiUrlConstants.UPDATE_FCM_TOKEN,
-          data: {'fcmToken': token},
-        );
+        await _notificationRepo.updateFcmToken(data: {'fcmToken': token});
         Logger.info("NotificationController", "FCM token updated on backend");
         return;
       } catch (e) {

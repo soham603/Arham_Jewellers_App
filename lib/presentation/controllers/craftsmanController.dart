@@ -1,13 +1,13 @@
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/data/repositories/craftsman_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CraftsmanController extends GetxController {
   static CraftsmanController get instance => Get.find();
+
+  final _craftsmanRepo = CraftsmanRepository();
 
   final _craftsmen = <CraftsmanModel>[].obs;
   List<CraftsmanModel> get craftsmen => _craftsmen;
@@ -33,24 +33,11 @@ class CraftsmanController extends GetxController {
       _isLoading.value = true;
       _state.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get(
-        ApiUrlConstants.CRAFTSMAN_GET_ALL,
-        options: Options(extra: {"requiresAuth": true}),
-      );
+      final raw = await _craftsmanRepo.fetchCraftsmen();
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final dynamic data = response.data['data'];
-        final List raw = data is List
-            ? data
-            : data is Map<String, dynamic>
-                ? (data['craftsmen'] ?? data['results'] ?? data['data'] ?? [])
-                : [];
-        _craftsmen.value =
-            raw.map((e) => CraftsmanModel.fromJson(e)).toList();
-        _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
-      }
+      _craftsmen.value =
+          raw.map((e) => CraftsmanModel.fromJson(e)).toList();
+      _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       Logger.error("CraftsmanController", "fetchCraftsmen error: $e\n$st");
       _state.value = CurrentAppState.ERROR;

@@ -3,14 +3,16 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:ratnesh_gold_app/data/repositories/admin_access_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminAccessModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AdminUserController extends GetxController {
   static AdminUserController get instance => Get.find();
+
+  final _adminAccessRepo = AdminAccessRepository();
 
   static const int _pageLimit = 10;
 
@@ -93,14 +95,12 @@ class AdminUserController extends GetxController {
         queryParams['userId'] = _selectedUserId.value;
       }
 
-      final response = await httpClient.get(
-        '/api/v1/admin-access/get-all-access',
-        queryParameters: queryParams,
-        options: Options(extra: {'requiresAuth': true}),
+      final response = await _adminAccessRepo.fetchAccessRequests(
+        queryParams: queryParams,
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data['data'];
+      if (response['data'] != null) {
+        final data = response['data'];
         final List raw = data['results'] ?? [];
         final fetched = raw.map((e) => AccessRequestModel.fromJson(e)).toList();
 
@@ -121,7 +121,7 @@ class AdminUserController extends GetxController {
         _state.value = CurrentAppState.SUCCESS;
       } else {
         _state.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Failed to fetch';
+        _error.value = response['message'] ?? 'Failed to fetch';
       }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
@@ -188,14 +188,12 @@ class AdminUserController extends GetxController {
     _searchState.value = CurrentAppState.LOADING;
 
     try {
-      final response = await httpClient.get(
-        '/api/v1/admin-access/get-all-users',
-        queryParameters: {'name': query.trim()},
-        options: Options(extra: {'requiresAuth': true}),
+      final response = await _adminAccessRepo.fetchUsers(
+        queryParams: {'name': query.trim()},
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data['data']['data'];
+      if (response['data'] != null) {
+        final data = response['data']['data'];
         final List usersRaw = data['users'] ?? [];
         final users = usersRaw.map((e) => UserSearchModel.fromJson(e)).toList();
         _searchResults.value = users;
@@ -278,19 +276,16 @@ class AdminUserController extends GetxController {
       _actioningId.value = requestId;
       _error.value = '';
 
-      final response = await httpClient.post(
-        '/api/v1/admin-access/handle-access',
-        data: {
+      final response = await _adminAccessRepo.handleAccess(
+        actionData: {
           'requestId': requestId,
           'action': 'APPROVED',
           'approvedTillDate': currentApprovedTill.add(const Duration(days: 1)).toIso8601String(),
           'retailUser': isRetailer,
         },
-        options: Options(extra: {'requiresAuth': true}),
       );
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['success'] != false) {
+      if (response['success'] != false) {
         final index = _requests.indexWhere((r) => r.id == requestId);
         if (index != -1) {
           _requests[index] = _requests[index].copyWith(isRetailer: isRetailer);
@@ -298,12 +293,12 @@ class AdminUserController extends GetxController {
 
         _actionState.value = CurrentAppState.SUCCESS;
         _actioningId.value = '';
-        ToastUtils.showSuccess(response.data["message"] ?? "Retailer updated");
+        ToastUtils.showSuccess(response['message'] ?? "Retailer updated");
         return true;
       }
 
-      final message = response.data?["error"]?["message"] ??
-          response.data?["message"] ??
+      final message = response['error']?['message'] ??
+          response['message'] ??
           "Action failed";
 
       _actionState.value = CurrentAppState.ERROR;
@@ -343,14 +338,9 @@ class AdminUserController extends GetxController {
       _actioningId.value = requestId;
       _error.value = '';
 
-      final response = await httpClient.post(
-        '/api/v1/admin-access/handle-access',
-        data: body,
-        options: Options(extra: {'requiresAuth': true}),
-      );
+      final response = await _adminAccessRepo.handleAccess(actionData: body);
 
-      if ((response.statusCode == 200 || response.statusCode == 201) &&
-          response.data['success'] != false) {
+      if (response['success'] != false) {
         final index = _requests.indexWhere((r) => r.id == requestId);
 
         if (index != -1) {
@@ -366,13 +356,13 @@ class AdminUserController extends GetxController {
 
         _actionState.value = CurrentAppState.SUCCESS;
         _actioningId.value = '';
-        ToastUtils.showSuccess(response.data["message"] ?? "Action completed");
+        ToastUtils.showSuccess(response['message'] ?? "Action completed");
         await refresh();
         return true;
       }
 
-      final message = response.data?["error"]?["message"] ??
-          response.data?["message"] ??
+      final message = response['error']?['message'] ??
+          response['message'] ??
           "Action failed";
 
       _actionState.value = CurrentAppState.ERROR;

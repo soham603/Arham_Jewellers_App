@@ -2,15 +2,16 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class AdminOrderController extends GetxController {
   static AdminOrderController get instance => Get.find();
+
+  final _orderRepo = OrderRepository();
 
   static const int _pageLimit = 10;
 
@@ -81,9 +82,8 @@ class AdminOrderController extends GetxController {
         _isPaginationLoading.value = true;
       }
 
-      final response = await httpClient.get(
-        "/api/v1/admin-order/get-AllOrders",
-        queryParameters: {
+      final response = await _orderRepo.fetchAdminOrders(
+        queryParams: {
           "page": _page,
           "limit": _pageLimit,
           "status": selectedStatus.value,
@@ -92,42 +92,40 @@ class AdminOrderController extends GetxController {
         },
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data["data"];
+      final data = response["data"];
 
-        final totalPages = data["totalPages"] ?? 1;
+      final totalPages = data["totalPages"] ?? 1;
 
-        final currentPage = data["page"] ?? 1;
+      final currentPage = data["page"] ?? 1;
 
-        final List raw = data["results"] ?? [];
+      final List raw = data["results"] ?? [];
 
-        final fetched = raw.map((e) => AdminOrderModel.fromJson(e)).toList();
+      final fetched = raw.map((e) => AdminOrderModel.fromJson(e)).toList();
 
-        final List<AdminOrderModel> filtered;
-        if (selectedOrderType.value == "custom") {
-          filtered = fetched.where((o) => o.isCustom).toList();
-        } else if (selectedOrderType.value == "normal") {
-          filtered = fetched.where((o) => !o.isCustom).toList();
-        } else {
-          filtered = fetched;
-        }
-
-        filtered.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-
-        if (isPagination) {
-          _orders.addAll(filtered);
-        } else {
-          _orders.value = filtered;
-        }
-
-        _hasMore = currentPage < totalPages;
-
-        if (_hasMore) {
-          _page++;
-        }
-
-        _orderState.value = CurrentAppState.SUCCESS;
+      final List<AdminOrderModel> filtered;
+      if (selectedOrderType.value == "custom") {
+        filtered = fetched.where((o) => o.isCustom).toList();
+      } else if (selectedOrderType.value == "normal") {
+        filtered = fetched.where((o) => !o.isCustom).toList();
+      } else {
+        filtered = fetched;
       }
+
+      filtered.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+      if (isPagination) {
+        _orders.addAll(filtered);
+      } else {
+        _orders.value = filtered;
+      }
+
+      _hasMore = currentPage < totalPages;
+
+      if (_hasMore) {
+        _page++;
+      }
+
+      _orderState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       Logger.error("AdminOrderController", "$e\n$st");
 
@@ -151,24 +149,21 @@ class AdminOrderController extends GetxController {
     try {
       final futures = uncached.entries.map((entry) async {
         try {
-          final response = await httpClient.get(
-            "/api/v1/products/search",
-            queryParameters: {
-              "search": entry.value,
+          final response = await _orderRepo.searchProducts(
+            query: entry.value,
+            queryParams: {
               "page": 1,
               "limit": 10,
               "showAll": true,
             },
           );
-          if (response.statusCode == 200 || response.statusCode == 201) {
-            final List raw = response.data['data']['data'] ?? [];
-            final match = raw.cast<Map<String, dynamic>?>().firstWhere(
-                  (p) => p?['id'] == entry.key,
-                  orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
-                );
-            if (match != null && match['rawData'] != null) {
-              _productRawDataCache[entry.key] = Map<String, dynamic>.from(match['rawData']);
-            }
+          final List raw = response['data']['data'] ?? [];
+          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
+                (p) => p?['id'] == entry.key,
+                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
+              );
+          if (match != null && match['rawData'] != null) {
+            _productRawDataCache[entry.key] = Map<String, dynamic>.from(match['rawData']);
           }
         } catch (e) {
           Logger.error("AdminOrderController", "Product detail fetch failed for ${entry.key}: $e");
@@ -230,9 +225,8 @@ class AdminOrderController extends GetxController {
     try {
       _isActionLoading.value = true;
 
-      final response = await httpClient.post(
-        "/api/v1/admin-order/order-action",
-        data: {
+      await _orderRepo.performOrderAction(
+        actionData: {
           "orderId": orderId,
           "action": action,
           "allocations": allocations,
@@ -245,11 +239,7 @@ class AdminOrderController extends GetxController {
         },
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        await fetchOrders();
-      } else {
-        ToastUtils.showError("Failed to update order");
-      }
+      await fetchOrders();
     } catch (e) {
       String errorMessage = "Something went wrong";
       if (e is DioException) {
@@ -283,33 +273,24 @@ class AdminOrderController extends GetxController {
     try {
       _isActionLoading.value = true;
 
-      final body = <String, dynamic>{
-        "orderId": orderId,
-        "action": action,
-        if (adminMessage != null && adminMessage.isNotEmpty)
-          "adminMessage": adminMessage,
-        "assignedKarigarId": ?assignedKarigarId,
-        "talkedToStaffName": ?talkedToStaffName,
-        "assignAdminNotes": ?assignAdminNotes,
-        "deliveryDate": ?deliveryDate,
-        "completeAdminNotes": ?completeAdminNotes,
-      };
-
-      final response = await httpClient.post(
-        ApiUrlConstants.ADMIN_CUSTOM_ORDER_ACTION,
-        data: body,
-        options: Options(extra: {"requiresAuth": true}),
+      final responseData = await _orderRepo.performCustomOrderAction(
+        actionData: {
+          "orderId": orderId,
+          "action": action,
+          if (adminMessage != null && adminMessage.isNotEmpty)
+            "adminMessage": adminMessage,
+          "assignedKarigarId": ?assignedKarigarId,
+          "talkedToStaffName": ?talkedToStaffName,
+          "assignAdminNotes": ?assignAdminNotes,
+          "deliveryDate": ?deliveryDate,
+          "completeAdminNotes": ?completeAdminNotes,
+        },
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        await fetchOrders();
+      await fetchOrders();
 
-        ToastUtils.showSuccess(response.data['message'] ?? "Order updated");
-        return true;
-      } else {
-        ToastUtils.showError(response.data?['message'] ?? "Failed to update order");
-        return false;
-      }
+      ToastUtils.showSuccess(responseData['message'] ?? "Order updated");
+      return true;
     } catch (e, st) {
       Logger.error("AdminOrderController", "performCustomOrderAction error: $e\n$st");
 

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -34,26 +36,24 @@ android {
 
     signingConfigs {
         create("release") {
-            val keyProperties = java.util.Properties()
             val keyFile = rootProject.file("key.properties")
             if (keyFile.exists()) {
-                keyProperties.load(keyFile.inputStream())
-                storeFile = file(keyProperties["storeFile"] as String)
-                storePassword = keyProperties["storePassword"] as String
-                keyAlias = keyProperties["keyAlias"] as String
-                keyPassword = keyProperties["keyPassword"] as String
+                val props = Properties()
+                props.load(keyFile.inputStream())
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
             }
         }
     }
 
     buildTypes {
         release {
-            val keyProperties = java.util.Properties()
-            val keyFile = rootProject.file("key.properties")
-            if (keyFile.exists()) {
-                signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (rootProject.file("key.properties").exists()) {
+                signingConfigs.getByName("release")
             } else {
-                signingConfig = signingConfigs.getByName("debug")
+                signingConfigs.getByName("debug")
             }
             isMinifyEnabled = true
             isShrinkResources = true

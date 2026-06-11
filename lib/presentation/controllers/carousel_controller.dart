@@ -2,14 +2,16 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData, Response;
+import 'package:ratnesh_gold_app/data/repositories/carousel_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
-import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CarouselsController extends GetxController {
   static CarouselsController get instance => Get.find();
+
+  final _carouselRepo = CarouselRepository();
 
   final _getCarouselState = CurrentAppState.INITIAL.obs;
   CurrentAppState get getCarouselState => _getCarouselState.value;
@@ -84,19 +86,13 @@ class CarouselsController extends GetxController {
     try {
       _getCarouselState.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get("/api/v1/carousel/get-All");
+      final data = await _carouselRepo.fetchCarousels();
 
-      if (response.statusCode == 200) {
-        final data = response.data['data'] ?? [];
+      _list.value = (data)
+          .map((e) => CarouselModel.fromJson(e))
+          .toList();
 
-        _list.value = (data as List)
-            .map((e) => CarouselModel.fromJson(e))
-            .toList();
-
-        _getCarouselState.value = CurrentAppState.SUCCESS;
-      } else {
-        _getCarouselState.value = CurrentAppState.ERROR;
-      }
+      _getCarouselState.value = CurrentAppState.SUCCESS;
     } catch (e) {
       _getCarouselState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
@@ -112,29 +108,15 @@ class CarouselsController extends GetxController {
     try {
       _adminState.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get(
-        "/api/v1/carousel/get-All",
-        queryParameters: {
-          "showAll": true,
-        },
-        options: Options(
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
+      final data = await _carouselRepo.fetchCarousels(
+        queryParams: {"showAll": true},
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data['data'] ?? [];
+      _adminList.value = (data)
+          .map((e) => CarouselModel.fromJson(e))
+          .toList();
 
-        _adminList.value = (data as List)
-            .map((e) => CarouselModel.fromJson(e))
-            .toList();
-
-        _adminState.value = CurrentAppState.SUCCESS;
-      } else {
-        _adminState.value = CurrentAppState.ERROR;
-      }
+      _adminState.value = CurrentAppState.SUCCESS;
     } catch (e) {
       _adminState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
@@ -150,29 +132,15 @@ class CarouselsController extends GetxController {
     try {
       _deletedState.value = CurrentAppState.LOADING;
 
-      final response = await httpClient.get(
-        "/api/v1/carousel/get-All",
-        queryParameters: {
-          "showDeleted": true,
-        },
-        options: Options(
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
+      final data = await _carouselRepo.fetchCarousels(
+        queryParams: {"showDeleted": true},
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data['data'] ?? [];
+      _deletedList.value = (data)
+          .map((e) => CarouselModel.fromJson(e))
+          .toList();
 
-        _deletedList.value = (data as List)
-            .map((e) => CarouselModel.fromJson(e))
-            .toList();
-
-        _deletedState.value = CurrentAppState.SUCCESS;
-      } else {
-        _deletedState.value = CurrentAppState.ERROR;
-      }
+      _deletedState.value = CurrentAppState.SUCCESS;
     } catch (e) {
       _deletedState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
@@ -208,35 +176,17 @@ class CarouselsController extends GetxController {
         if (mediaType != null) "mediaType": mediaType,
       };
 
-      final response = await httpClient.post(
-        "/api/v1/carousel/create",
+      final responseData = await _carouselRepo.createCarousel(
         data: FormData.fromMap(map),
-        options: Options(
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
       );
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
-        final newItem = CarouselModel.fromJson(
-          response.data['data'],
-        );
+      final newItem = CarouselModel.fromJson(responseData['data']);
 
-        _adminList.insert(0, newItem);
+      _adminList.insert(0, newItem);
 
-        _createState.value = CurrentAppState.SUCCESS;
+      _createState.value = CurrentAppState.SUCCESS;
 
-        return true;
-      }
-
-      _createState.value = CurrentAppState.ERROR;
-      _error.value =
-          response.data['message'] ?? 'Create failed';
+      return true;
     } catch (e) {
       _createState.value = CurrentAppState.ERROR;
       if (e is DioException) {
@@ -292,24 +242,13 @@ class CarouselsController extends GetxController {
         );
       }
 
-      final response = await httpClient.put(
-        "/api/v1/carousel/edit/$id",
+      final responseData = await _carouselRepo.editCarousel(
+        id: id,
         data: FormData.fromMap(map),
-        options: Options(
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
       );
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
-        final updated = CarouselModel.fromJson(
-          response.data['data'],
-        );
+      if (responseData != null && responseData['data'] != null) {
+        final updated = CarouselModel.fromJson(responseData['data']);
 
         var index = _adminList.indexWhere(
           (e) => e.id == id,
@@ -327,18 +266,10 @@ class CarouselsController extends GetxController {
             _deletedList.refresh();
           }
         }
-
-        _editLoadingId.value = '';
-        _editState.value = CurrentAppState.SUCCESS;
-
-        return true;
-      }
-
-      if (response.statusCode == 204) {
+      } else if (isActive != null) {
         var index = _adminList.indexWhere(
           (e) => e.id == id,
         );
-
         if (index != -1) {
           _adminList[index] = _adminList[index].copyWith(
             isActive: isActive,
@@ -355,19 +286,12 @@ class CarouselsController extends GetxController {
             _deletedList.refresh();
           }
         }
-
-        _editLoadingId.value = '';
-        _editState.value = CurrentAppState.SUCCESS;
-
-        return true;
       }
 
       _editLoadingId.value = '';
-      _editState.value = CurrentAppState.ERROR;
-      _error.value = (response.data != null
-              ? response.data['message']
-              : null) ??
-          'Edit failed';
+      _editState.value = CurrentAppState.SUCCESS;
+
+      return true;
     } catch (e) {
       _editLoadingId.value = '';
       _editState.value = CurrentAppState.ERROR;
@@ -396,40 +320,22 @@ class CarouselsController extends GetxController {
       _deleteState.value = CurrentAppState.LOADING;
       _error.value = '';
 
-      final response = await httpClient.delete(
-        "/api/v1/carousel/delete/$id",
-        options: Options(
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
+      await _carouselRepo.deleteCarousel(id: id);
+
+      final removed = _adminList.firstWhereOrNull(
+        (e) => e.id == id,
       );
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201 ||
-          response.statusCode == 204) {
-        final removed = _adminList.firstWhereOrNull(
-          (e) => e.id == id,
-        );
+      _adminList.removeWhere((e) => e.id == id);
 
-        _adminList.removeWhere((e) => e.id == id);
-
-        if (removed != null) {
-          _deletedList.insert(0, removed);
-        }
-
-        _deleteLoadingId.value = '';
-        _deleteState.value = CurrentAppState.SUCCESS;
-
-        return true;
+      if (removed != null) {
+        _deletedList.insert(0, removed);
       }
 
       _deleteLoadingId.value = '';
-      _deleteState.value = CurrentAppState.ERROR;
-      _error.value = (response.data != null
-              ? response.data['message']
-              : null) ??
-          'Delete failed';
+      _deleteState.value = CurrentAppState.SUCCESS;
+
+      return true;
     } catch (e) {
       _deleteLoadingId.value = '';
       _deleteState.value = CurrentAppState.ERROR;
@@ -458,35 +364,18 @@ class CarouselsController extends GetxController {
       _restoreState.value = CurrentAppState.LOADING;
       _error.value = '';
 
-      final response = await httpClient.patch(
-        "/api/v1/carousel/restore/$id",
-        options: Options(
-          extra: {
-            "requiresAuth": true,
-          },
-        ),
-      );
+      final responseData = await _carouselRepo.restoreCarousel(id: id);
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
-        final restored = CarouselModel.fromJson(
-          response.data['data'],
-        );
+      final restored = CarouselModel.fromJson(responseData['data']);
 
-        _deletedList.removeWhere((e) => e.id == id);
+      _deletedList.removeWhere((e) => e.id == id);
 
-        _adminList.insert(0, restored);
-
-        _restoreLoadingId.value = '';
-        _restoreState.value = CurrentAppState.SUCCESS;
-
-        return true;
-      }
+      _adminList.insert(0, restored);
 
       _restoreLoadingId.value = '';
-      _restoreState.value = CurrentAppState.ERROR;
-      _error.value =
-          response.data['message'] ?? 'Restore failed';
+      _restoreState.value = CurrentAppState.SUCCESS;
+
+      return true;
     } catch (e) {
       _restoreLoadingId.value = '';
       _restoreState.value = CurrentAppState.ERROR;
@@ -556,48 +445,44 @@ class CarouselsController extends GetxController {
         _productHasMore.value = true;
       }
 
-      final response = await httpClient.get(
-        "/api/v1/products/get-all",
-        queryParameters: {
+      final responseData = await _carouselRepo.fetchLatestProducts(
+        queryParams: {
           "page": _productPage,
           "limit": _productLimit,
           "showReverse": true,
         },
       );
 
-      if (response.statusCode == 200 ||
-          response.statusCode == 201) {
-        final responseData = response.data['data'];
+      final data = responseData['data'];
 
-        final List raw =
-            responseData['data'] is List
-                ? responseData['data']
-                : [];
+      final List raw =
+          data['data'] is List
+              ? data['data']
+              : [];
 
-        final fetched = raw
-            .map((e) => ProductModel.fromJson(e))
-            .toList();
+      final fetched = raw
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
 
-        if (isPagination) {
-          _latestProducts.addAll(fetched);
-        } else {
-          _latestProducts.value = fetched;
-        }
-
-        final totalPages =
-            responseData['totalPages'] ?? 1;
-
-        if (_productPage >= totalPages ||
-            fetched.length < _productLimit) {
-          _productHasMore.value = false;
-        } else {
-          _productPage++;
-        }
-
-        _productState.value = CurrentAppState.SUCCESS;
-      } else if (!isPagination) {
-        _productState.value = CurrentAppState.ERROR;
+      if (isPagination) {
+        _latestProducts.addAll(fetched);
+      } else {
+        _latestProducts.value = fetched;
       }
+
+      final dynamic rawTotalPages = data['totalPages'] ?? 1;
+      final int totalPages = rawTotalPages is int
+          ? rawTotalPages
+          : int.tryParse(rawTotalPages.toString()) ?? 1;
+
+      if (_productPage >= totalPages ||
+          fetched.length < _productLimit) {
+        _productHasMore.value = false;
+      } else {
+        _productPage++;
+      }
+
+      _productState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       if (!isPagination) {
         _productState.value = CurrentAppState.ERROR;
