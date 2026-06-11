@@ -106,32 +106,44 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
 
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // STATUS FILTER
+              // STATUS FILTER DROPDOWN
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _filterSegment(
-                    context,
-                    label: 'PENDING',
-                    isActive: controller.selectedStatus.value == 'PENDING',
-                    color: const Color(0xFFD4AF37),
-                    onTap: () => controller.changeStatus('PENDING'),
-                  ),
-                  SizedBox(width: context.getResponsiveSize(1)),
-                  _filterSegment(
-                    context,
-                    label: 'APPROVED',
-                    isActive: controller.selectedStatus.value == 'APPROVED',
-                    color: Colors.green,
-                    onTap: () => controller.changeStatus('APPROVED'),
-                  ),
-                  SizedBox(width: context.getResponsiveSize(1)),
-                  _filterSegment(
-                    context,
-                    label: 'REJECTED',
-                    isActive: controller.selectedStatus.value == 'REJECTED',
-                    color: Colors.red,
-                    onTap: () => controller.changeStatus('REJECTED'),
-                  ),
+                  Obx(() {
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(3),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFE7DED2)),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: controller.selectedStatus.value,
+                          isDense: true,
+                          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textMuted, size: context.getResponsiveSize(5)),
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(3.3),
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textDark,
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'PENDING', child: Text('Pending')),
+                            DropdownMenuItem(value: 'APPROVED', child: Text('Approved')),
+                            DropdownMenuItem(value: 'ASSIGNED', child: Text('Assigned')),
+                            DropdownMenuItem(value: 'COMPLETED', child: Text('Completed')),
+                            DropdownMenuItem(value: 'REJECTED', child: Text('Rejected')),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) controller.changeStatus(val);
+                          },
+                        ),
+                      ),
+                    );
+                  }),
                 ],
               ),
 
@@ -445,6 +457,8 @@ Color _orderStatusColor(String status) {
     case 'APPROVED':
     case 'CONFIRMED':
       return Colors.green;
+    case 'ASSIGNED':
+      return const Color(0xFF3B82F6);
     case 'REJECTED':
     case 'CANCELLED':
       return Colors.red;
@@ -456,37 +470,4 @@ Color _orderStatusColor(String status) {
     default:
       return Colors.orange;
   }
-}
-
-Widget _filterSegment(
-  BuildContext context, {
-  required String label,
-  required bool isActive,
-  required Color color,
-  required VoidCallback onTap,
-}) {
-  return Expanded(
-    child: GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(0.5)),
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
-        decoration: BoxDecoration(
-          color: isActive ? color : color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3),
-            fontWeight: FontWeight.w700,
-            color: isActive ? Colors.white : color,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    ),
-  );
 }

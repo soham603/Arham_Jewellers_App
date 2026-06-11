@@ -224,6 +224,8 @@ class AdminOrderController extends GetxController {
     required String action,
     required List<Map<String, dynamic>> allocations,
     String? reason,
+    String? deliveryDate,
+    String? completeAdminNotes,
   }) async {
     try {
       _isActionLoading.value = true;
@@ -236,6 +238,10 @@ class AdminOrderController extends GetxController {
           "allocations": allocations,
           if (reason != null && reason.trim().isNotEmpty)
             "adminMessage": reason.trim(),
+          if (deliveryDate != null && deliveryDate.isNotEmpty)
+            "deliveryDate": deliveryDate,
+          if (completeAdminNotes != null && completeAdminNotes.isNotEmpty)
+            "completeAdminNotes": completeAdminNotes,
         },
       );
 
