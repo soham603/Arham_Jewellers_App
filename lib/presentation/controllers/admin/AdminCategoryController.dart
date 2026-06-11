@@ -14,7 +14,9 @@ Uint8List _compressBytes(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
   if (decoded == null) return bytes;
 
-  final longest = decoded.width > decoded.height ? decoded.width : decoded.height;
+  final longest = decoded.width > decoded.height
+      ? decoded.width
+      : decoded.height;
   final maxEdge = 1200;
 
   final img.Image resized;
@@ -63,7 +65,9 @@ class CategoryManagerController extends GetxController {
     if (!force && _allCategories.isNotEmpty) return;
     _loading.value = true;
     try {
-      final data = await _categoryRepo.fetchCategories(queryParams: {"full": true});
+      final data = await _categoryRepo.fetchCategories(
+        queryParams: {"full": true},
+      );
       final List raw = data['results'] ?? [];
       _allCategories.value = raw.map((e) => CategoryModel.fromJson(e)).toList();
     } catch (e) {
@@ -74,7 +78,11 @@ class CategoryManagerController extends GetxController {
   }
 
   // ── Filtered views (client-side) ─────────────────────────────────────────
-  List<CategoryModel> byLevel(int level, {String? parentId, bool includeDeleted = true}) {
+  List<CategoryModel> byLevel(
+    int level, {
+    String? parentId,
+    bool includeDeleted = true,
+  }) {
     return _allCategories.where((c) {
       if (c.level != level) return false;
       if (!includeDeleted && c.isDeleted) return false;
@@ -99,7 +107,9 @@ class CategoryManagerController extends GetxController {
 
   // Count of L1 parents sharing this group's name
   int level1GroupCount(String name) {
-    return level1Categories.where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase()).length;
+    return level1Categories
+        .where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase())
+        .length;
   }
 
   // All L1 parent IDs sharing this group's name
@@ -120,10 +130,12 @@ class CategoryManagerController extends GetxController {
     }).toList();
   }
 
-  List<CategoryModel> level2For(String parentId) => byLevel(2, parentId: parentId, includeDeleted: true);
+  List<CategoryModel> level2For(String parentId) =>
+      byLevel(2, parentId: parentId, includeDeleted: true);
   List<CategoryModel> get level2All => byLevel(2, includeDeleted: true);
 
-  List<CategoryModel> level3For(String parentId) => byLevel(3, parentId: parentId, includeDeleted: true);
+  List<CategoryModel> level3For(String parentId) =>
+      byLevel(3, parentId: parentId, includeDeleted: true);
   List<CategoryModel> get level3All => byLevel(3, includeDeleted: true);
 
   String? parentName(String? parentId) {
@@ -137,7 +149,10 @@ class CategoryManagerController extends GetxController {
 
   // ── Image picker ──────────────────────────────────────────────────────────
   Future<void> pickImage() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final picked = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (picked != null) _pickedImage.value = File(picked.path);
   }
 
@@ -147,7 +162,9 @@ class CategoryManagerController extends GetxController {
     final bytes = await file.readAsBytes();
     final compressedBytes = await compute(_compressBytes, bytes);
     final tempDir = await getTemporaryDirectory();
-    final compressedFile = File('${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final compressedFile = File(
+      '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
     await compressedFile.writeAsBytes(compressedBytes);
     return compressedFile;
   }
@@ -164,11 +181,12 @@ class CategoryManagerController extends GetxController {
     try {
       final formData = FormData.fromMap({
         'name': name,
-        'boxName': boxName,
-        if (description != null && description.isNotEmpty) 'description': description,
         'parentId': ?parentId,
         'level': ?level,
-        if (imageFile != null) 'file': await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
+        if (imageFile != null)
+          'file': await MultipartFile.fromFile(
+            (await _compressImageFile(imageFile)).path,
+          ),
       });
 
       final response = await _categoryRepo.createCategory(data: formData);
@@ -176,7 +194,10 @@ class CategoryManagerController extends GetxController {
       final created = CategoryModel.fromJson(response['data']);
       _allCategories.insert(0, created);
       _pickedImage.value = null;
-      Logger.info("CategoryManagerController", "Category created: ${created.name}");
+      Logger.info(
+        "CategoryManagerController",
+        "Category created: ${created.name}",
+      );
       return null;
     } catch (e) {
       Logger.error("CategoryManagerController", "create error: $e");
@@ -195,7 +216,10 @@ class CategoryManagerController extends GetxController {
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        if (imageFile != null) "file": await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
+        if (imageFile != null)
+          "file": await MultipartFile.fromFile(
+            (await _compressImageFile(imageFile)).path,
+          ),
       });
 
       final response = await _categoryRepo.editCategory(id: id, data: formData);
@@ -225,10 +249,16 @@ class CategoryManagerController extends GetxController {
       if (idx != -1) {
         final cat = _allCategories[idx];
         _allCategories[idx] = CategoryModel(
-          id: cat.id, name: cat.name, nameSlug: cat.nameSlug,
-          parentId: cat.parentId, level: cat.level,
-          imageUrl: cat.imageUrl, images: cat.images,
-          isDeleted: true, createdAt: cat.createdAt, updatedAt: cat.updatedAt,
+          id: cat.id,
+          name: cat.name,
+          nameSlug: cat.nameSlug,
+          parentId: cat.parentId,
+          level: cat.level,
+          imageUrl: cat.imageUrl,
+          images: cat.images,
+          isDeleted: true,
+          createdAt: cat.createdAt,
+          updatedAt: cat.updatedAt,
         );
       }
       Logger.info("CategoryManagerController", "Category $id deleted");

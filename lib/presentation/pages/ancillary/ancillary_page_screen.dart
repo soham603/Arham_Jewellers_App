@@ -89,7 +89,9 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                   ),
                   SizedBox(height: context.getScreenHeight(2)),
                   Text(
-                    controller.error.isNotEmpty ? controller.error : 'Failed to load content',
+                    controller.error.isNotEmpty
+                        ? controller.error
+                        : 'Failed to load content',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(3.8),
@@ -105,7 +107,10 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('Retry', style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Retry',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -144,17 +149,6 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (page.title.isNotEmpty) ...[
-                Text(
-                  page.title,
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(6),
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                SizedBox(height: context.getScreenHeight(2)),
-              ],
               Html(
                 data: page.content,
                 style: {
@@ -175,9 +169,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                     fontSize: FontSize(context.getResponsiveSize(4.5)),
                     fontWeight: FontWeight.w600,
                   ),
-                  'p': Style(
-                    margin: Margins.only(bottom: 12),
-                  ),
+                  'p': Style(margin: Margins.only(bottom: 12)),
                   'a': Style(
                     color: AppColors.primaryGold,
                     textDecoration: TextDecoration.underline,

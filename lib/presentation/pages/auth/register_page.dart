@@ -38,12 +38,15 @@ class _RegisterPageState extends State<RegisterPage> {
   String _selectedCountryCode = '+91';
   bool _isFormValid = false;
   bool _isSubmitting = false;
-  bool _obscurePassword = true;
 
   // ───────────────────────── India States & Cities ─────────────────────────
   static const Map<String, List<String>> _indiaData = {
     'Andhra Pradesh': [
-      'Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore', 'Tirupati',
+      'Visakhapatnam',
+      'Vijayawada',
+      'Guntur',
+      'Nellore',
+      'Tirupati',
     ],
     'Arunachal Pradesh': ['Itanagar', 'Naharlagun', 'Pasighat', 'Tawang'],
     'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon'],
@@ -52,55 +55,79 @@ class _RegisterPageState extends State<RegisterPage> {
     'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'Dwarka'],
     'Goa': ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa'],
     'Gujarat': [
-      'Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar',
+      'Ahmedabad',
+      'Surat',
+      'Vadodara',
+      'Rajkot',
+      'Bhavnagar',
+      'Jamnagar',
     ],
     'Haryana': [
-      'Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal', 'Hisar',
+      'Gurugram',
+      'Faridabad',
+      'Panipat',
+      'Ambala',
+      'Karnal',
+      'Hisar',
     ],
     'Himachal Pradesh': ['Shimla', 'Manali', 'Dharamshala', 'Solan', 'Mandi'],
     'Jharkhand': ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Hazaribagh'],
-    'Karnataka': [
-      'Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi', 'Belagavi',
-    ],
+    'Karnataka': ['Bengaluru', 'Mysuru', 'Mangaluru', 'Hubballi', 'Belagavi'],
     'Kerala': [
-      'Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam',
+      'Thiruvananthapuram',
+      'Kochi',
+      'Kozhikode',
+      'Thrissur',
+      'Kollam',
     ],
-    'Madhya Pradesh': [
-      'Bhopal', 'Indore', 'Gwalior', 'Jabalpur', 'Ujjain',
-    ],
+    'Madhya Pradesh': ['Bhopal', 'Indore', 'Gwalior', 'Jabalpur', 'Ujjain'],
     'Maharashtra': [
-      'Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Aurangabad',
+      'Mumbai',
+      'Pune',
+      'Nagpur',
+      'Thane',
+      'Nashik',
+      'Aurangabad',
     ],
     'Manipur': ['Imphal', 'Thoubal', 'Bishnupur'],
     'Meghalaya': ['Shillong', 'Tura', 'Jowai'],
     'Mizoram': ['Aizawl', 'Lunglei', 'Champhai'],
     'Nagaland': ['Kohima', 'Dimapur', 'Mokokchung'],
-    'Odisha': [
-      'Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur',
-    ],
-    'Punjab': [
-      'Chandigarh', 'Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala',
-    ],
-    'Rajasthan': [
-      'Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer',
-    ],
+    'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur'],
+    'Punjab': ['Chandigarh', 'Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala'],
+    'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer'],
     'Sikkim': ['Gangtok', 'Namchi', 'Gyalshing'],
     'Tamil Nadu': [
-      'Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem',
+      'Chennai',
+      'Coimbatore',
+      'Madurai',
+      'Tiruchirappalli',
+      'Salem',
     ],
     'Telangana': [
-      'Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam',
+      'Hyderabad',
+      'Warangal',
+      'Nizamabad',
+      'Karimnagar',
+      'Khammam',
     ],
     'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar'],
     'Uttar Pradesh': [
-      'Lucknow', 'Kanpur', 'Agra', 'Varanasi', 'Meerut', 'Noida',
+      'Lucknow',
+      'Kanpur',
+      'Agra',
+      'Varanasi',
+      'Meerut',
+      'Noida',
     ],
     'Uttarakhand': [
-      'Dehradun', 'Haridwar', 'Rishikesh', 'Nainital', 'Haldwani',
+      'Dehradun',
+      'Haridwar',
+      'Rishikesh',
+      'Nainital',
+      'Haldwani',
     ],
-    'West Bengal': [
-      'Kolkata', 'Howrah', 'Darjeeling', 'Siliguri', 'Asansol',
-    ],
+    'West Bengal': ['Kolkata', 'Howrah', 'Darjeeling', 'Siliguri', 'Asansol'],
   };
 
   // ───────────────────────── Validators ─────────────────────────
@@ -135,8 +162,10 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   String? _validatePhone(String? value) {
-    if (value == null || value.trim().isEmpty) return 'Mobile number is required';
-    if (!_phoneRegex.hasMatch(value.trim())) return 'Enter a valid 10‑digit number';
+    if (value == null || value.trim().isEmpty)
+      return 'Mobile number is required';
+    if (!_phoneRegex.hasMatch(value.trim()))
+      return 'Enter a valid 10‑digit number';
     return null;
   }
 
@@ -155,13 +184,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _validatePincode(String? value) {
     if (value == null || value.trim().isEmpty) return 'Pincode is required';
-    if (!_pincodeRegex.hasMatch(value.trim())) return 'Enter a valid 6‑digit pincode';
+    if (!_pincodeRegex.hasMatch(value.trim()))
+      return 'Enter a valid 6‑digit pincode';
     return null;
   }
 
   // ───────────────────────── Form State Helpers ─────────────────────────
   void _onFieldChanged() {
-    final valid = emailController.text.trim().isNotEmpty &&
+    final valid =
+        emailController.text.trim().isNotEmpty &&
         passwordController.text.trim().isNotEmpty &&
         nameController.text.trim().isNotEmpty &&
         phoneController.text.trim().isNotEmpty &&
@@ -178,19 +209,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   List<TextEditingController> get _allControllers => [
-        emailController,
-        passwordController,
-        nameController,
-        phoneController,
-        gstController,
-        stateController,
-        cityController,
-        areaController,
-        pincodeController,
-        companyNameController,
-      ];
+    emailController,
+    passwordController,
+    nameController,
+    phoneController,
+    gstController,
+    stateController,
+    cityController,
+    areaController,
+    pincodeController,
+    companyNameController,
+  ];
 
-  // ───────────────────────── Lifecycle ─────────────────────────
   @override
   void initState() {
     super.initState();
@@ -220,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  // ───────────────────────── Submit ─────────────────────────
+  // ───────────────────────── Submit (UPDATED FIX) ─────────────────────────
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) {
       ToastUtils.showError('Please fix the errors');
@@ -231,13 +261,18 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isSubmitting = true);
 
     try {
-      final results = await Future.wait([
-        getDeviceId(),
-        getDeviceName(),
-      ]);
+      // safely fetch as dynamic so the compiler doesn't enforce List vs String
+      dynamic rawId = await getDeviceId();
+      dynamic rawName = await getDeviceName();
 
-      final deviceId = results[0];
-      final deviceName = results[1];
+      // Safely convert to a pure String whether it returned a String or a List<String>
+      final String finalDeviceId = rawId is List
+          ? rawId.join(' ')
+          : rawId.toString();
+      final String finalDeviceName = rawName is List
+          ? rawName.join(' ')
+          : rawName.toString();
+
       final fullPhoneNumber =
           '$_selectedCountryCode${phoneController.text.trim()}';
       final fcmToken = NotificationService().fcmToken;
@@ -247,8 +282,8 @@ class _RegisterPageState extends State<RegisterPage> {
         password: passwordController.text.trim(),
         name: nameController.text.trim(),
         phoneNumber: fullPhoneNumber,
-        deviceId: deviceId,
-        deviceName: deviceName,
+        deviceId: finalDeviceId, // Guaranteed to be a valid String now
+        deviceName: finalDeviceName, // Guaranteed to be a valid String now
         gstNumber: gstController.text.trim().toUpperCase(),
         state: stateController.text.trim(),
         city: cityController.text.trim(),
@@ -268,53 +303,148 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  // ───────────────────────── Styled Dropdown Builder ─────────────────────────
-  Widget _buildStyledDropdown({
+  // ───────────────────────── Modern Bottom Sheet with Search ─────────────────────────
+  void _showSearchSelectionBottomSheet({
+    required String title,
+    required List<String> items,
+    required ValueChanged<String> onSelected,
+  }) {
+    final searchController = TextEditingController();
+    var filteredItems = List<String>.from(items);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: context.getScreenHeight(70),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(4.5),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        color: Colors.grey,
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (val) {
+                      setModalState(() {
+                        filteredItems = items
+                            .where(
+                              (item) => item.toLowerCase().contains(
+                                val.toLowerCase(),
+                              ),
+                            )
+                            .toList();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: filteredItems.isEmpty
+                        ? const Center(child: Text('No matches found'))
+                        : ListView.builder(
+                            itemCount: filteredItems.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(
+                                  filteredItems[index],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                trailing: const Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 20,
+                                ),
+                                onTap: () {
+                                  onSelected(filteredItems[index]);
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ───────────────────────── Compact Card Dropdown ─────────────────────────
+  Widget _buildCompactDropdownCard({
     required String hintText,
     required String? value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required VoidCallback onTap,
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
-      child: Container(
-        height: context.getScreenHeight(5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-          color: const Color(0xFFF9F9F9),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: value,
-            isExpanded: true,
-            padding: EdgeInsets.symmetric(
-              horizontal: context.getResponsiveSize(3.5).clamp(14.0, 20.0),
-            ),
-            hint: Text(
-              hintText,
-              style: TextStyle(
-                color: Colors.grey.shade400,
-                fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: context.getScreenHeight(5.5).clamp(46.0, 60.0),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+            color: const Color(0xFFF9F9F9),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                value ?? hintText,
+                style: TextStyle(
+                  color: value == null
+                      ? Colors.grey.shade400
+                      : AppColors.textDark,
+                  fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
+                  fontWeight: value == null
+                      ? FontWeight.normal
+                      : FontWeight.w500,
+                ),
               ),
-            ),
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
-              size: context.getResponsiveSize(5),
-              color: Colors.grey.shade500,
-            ),
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
-              color: AppColors.textDark,
-              fontWeight: FontWeight.w500,
-            ),
-            items: items
-                .map((item) => DropdownMenuItem(
-                      value: item,
-                      child: Text(item),
-                    ))
-                .toList(),
-            onChanged: onChanged,
+              Icon(
+                Icons.unfold_more_rounded,
+                size: context.getResponsiveSize(5),
+                color: Colors.grey.shade500,
+              ),
+            ],
           ),
         ),
       ),
@@ -324,7 +454,8 @@ class _RegisterPageState extends State<RegisterPage> {
   // ───────────────────────── Build ─────────────────────────
   @override
   Widget build(BuildContext context) {
-    final safeHeight = MediaQuery.of(context).size.height -
+    final safeHeight =
+        MediaQuery.of(context).size.height -
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom -
         kToolbarHeight;
@@ -355,9 +486,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
-                        context.getResponsiveSize(5),
+                        context.getResponsiveSize(4.5),
                         context.getScreenHeight(1),
-                        context.getResponsiveSize(5),
+                        context.getResponsiveSize(4.5),
                         MediaQuery.of(context).viewInsets.bottom +
                             context.getScreenHeight(2),
                       ),
@@ -365,7 +496,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         key: _formKey,
                         child: Center(
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 400),
+                            constraints: const BoxConstraints(maxWidth: 380),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -390,7 +521,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                                 SizedBox(height: context.getScreenHeight(2.5)),
 
-                                // 1 ── EMAIL
                                 AnimatedTextField(
                                   controller: emailController,
                                   hintText: 'Email Address *',
@@ -398,30 +528,13 @@ class _RegisterPageState extends State<RegisterPage> {
                                   isRequired: true,
                                   validator: _validateEmail,
                                 ),
-
-                                // 2 ── PASSWORD
                                 AnimatedTextField(
                                   controller: passwordController,
                                   hintText: 'Create Password *',
-                                  obscureText: _obscurePassword,
+                                  obscureText: true,
                                   isRequired: true,
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscurePassword = !_obscurePassword;
-                                      });
-                                    },
-                                  ),
                                   validator: _validatePassword,
                                 ),
-
-                                // 3 ── NAME
                                 AnimatedTextField(
                                   controller: nameController,
                                   hintText: 'Full Name *',
@@ -429,8 +542,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   isRequired: true,
                                   validator: _validateName,
                                 ),
-
-                                // 4 ── PHONE
                                 AnimatedTextField(
                                   controller: phoneController,
                                   hintText: 'Enter Mobile Number *',
@@ -462,8 +573,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   validator: _validatePhone,
                                 ),
-
-                                // 5 ── GST NUMBER
                                 AnimatedTextField(
                                   controller: gstController,
                                   hintText: 'GST NO. *',
@@ -474,37 +583,49 @@ class _RegisterPageState extends State<RegisterPage> {
                                   validator: _validateGST,
                                 ),
 
-                                // 6 ── STATE
-                                _buildStyledDropdown(
+                                _buildCompactDropdownCard(
                                   hintText: 'State *',
                                   value: _selectedState,
-                                  items: _indiaData.keys.toList()..sort(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedState = value;
-                                      _selectedCity = null;
-                                      stateController.text = value ?? '';
-                                      cityController.clear();
-                                    });
+                                  onTap: () {
+                                    _showSearchSelectionBottomSheet(
+                                      title: 'Select State',
+                                      items: _indiaData.keys.toList()..sort(),
+                                      onSelected: (val) {
+                                        setState(() {
+                                          _selectedState = val;
+                                          _selectedCity = null;
+                                          stateController.text = val;
+                                          cityController.clear();
+                                          _onFieldChanged();
+                                        });
+                                      },
+                                    );
                                   },
                                 ),
-
-                                // 7 ── CITY (dynamic based on state)
-                                _buildStyledDropdown(
+                                _buildCompactDropdownCard(
                                   hintText: 'City *',
                                   value: _selectedCity,
-                                  items: _selectedState != null
-                                      ? _indiaData[_selectedState]!
-                                      : [],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCity = value;
-                                      cityController.text = value ?? '';
-                                    });
+                                  onTap: () {
+                                    if (_selectedState == null) {
+                                      ToastUtils.showError(
+                                        'Please select a state first',
+                                      );
+                                      return;
+                                    }
+                                    _showSearchSelectionBottomSheet(
+                                      title: 'Select City',
+                                      items: _indiaData[_selectedState]!,
+                                      onSelected: (val) {
+                                        setState(() {
+                                          _selectedCity = val;
+                                          cityController.text = val;
+                                          _onFieldChanged();
+                                        });
+                                      },
+                                    );
                                   },
                                 ),
 
-                                // 8 ── AREA
                                 AnimatedTextField(
                                   controller: areaController,
                                   hintText: 'Area *',
@@ -513,8 +634,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   validator: (v) =>
                                       _validateRequired('Area', v),
                                 ),
-
-                                // 9 ── PINCODE
                                 AnimatedTextField(
                                   controller: pincodeController,
                                   hintText: 'Pincode *',
@@ -523,8 +642,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   isRequired: true,
                                   validator: _validatePincode,
                                 ),
-
-                                // 10 ── COMPANY NAME
                                 AnimatedTextField(
                                   controller: companyNameController,
                                   hintText: 'Company Name *',
@@ -536,12 +653,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                 SizedBox(height: context.getScreenHeight(1)),
 
-                                // ── REGISTER BUTTON ──
                                 Obx(() {
                                   final isLoading =
                                       authController.userRegisterState ==
-                                              CurrentAppState.LOADING ||
-                                          _isSubmitting;
+                                          CurrentAppState.LOADING ||
+                                      _isSubmitting;
 
                                   return SizedBox(
                                     width: double.infinity,
@@ -550,43 +666,47 @@ class _RegisterPageState extends State<RegisterPage> {
                                       style: ButtonStyle(
                                         backgroundColor:
                                             WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(
-                                                  WidgetState.disabled)
-                                              ? AppColors.primaryGold
-                                                  .withValues(alpha: 0.35)
-                                              : AppColors.primaryGold,
-                                        ),
+                                              (states) =>
+                                                  states.contains(
+                                                    WidgetState.disabled,
+                                                  )
+                                                  ? AppColors.primaryGold
+                                                        .withValues(alpha: 0.35)
+                                                  : AppColors.primaryGold,
+                                            ),
                                         elevation:
                                             WidgetStateProperty.resolveWith(
-                                          (states) => states.contains(
-                                                  WidgetState.disabled)
-                                              ? 0
-                                              : 2,
-                                        ),
+                                              (states) =>
+                                                  states.contains(
+                                                    WidgetState.disabled,
+                                                  )
+                                                  ? 0
+                                                  : 2,
+                                            ),
                                         shape: WidgetStateProperty.all(
                                           RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(
+                                            borderRadius: BorderRadius.circular(
                                               context.getResponsiveSize(2.5),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      onPressed:
-                                          (!_isFormValid || isLoading)
-                                              ? null
-                                              : _handleRegister,
+                                      onPressed: (!_isFormValid || isLoading)
+                                          ? null
+                                          : _handleRegister,
                                       child: isLoading
                                           ? SizedBox(
-                                              height:
-                                                  context.getResponsiveSize(5),
-                                              width:
-                                                  context.getResponsiveSize(5),
+                                              height: context.getResponsiveSize(
+                                                5,
+                                              ),
+                                              width: context.getResponsiveSize(
+                                                5,
+                                              ),
                                               child:
                                                   const CircularProgressIndicator(
-                                                color: Colors.white,
-                                                strokeWidth: 2.5,
-                                              ),
+                                                    color: Colors.white,
+                                                    strokeWidth: 2.5,
+                                                  ),
                                             )
                                           : Text(
                                               'Register',
@@ -605,15 +725,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                 const Spacer(),
                                 SizedBox(height: context.getScreenHeight(2)),
 
-                                // ── Footer ──
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
                                       'Already have an account? ',
                                       style: TextStyle(
-                                        fontSize:
-                                            context.getResponsiveSize(3.5),
+                                        fontSize: context.getResponsiveSize(
+                                          3.5,
+                                        ),
                                         color: AppColors.textMuted,
                                       ),
                                     ),
@@ -623,8 +743,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                       child: Text(
                                         'Sign In',
                                         style: TextStyle(
-                                          fontSize:
-                                              context.getResponsiveSize(3.5),
+                                          fontSize: context.getResponsiveSize(
+                                            3.5,
+                                          ),
                                           color: AppColors.primaryGold,
                                           fontWeight: FontWeight.w700,
                                         ),

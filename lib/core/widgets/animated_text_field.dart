@@ -14,7 +14,7 @@ class AnimatedTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final double? paddingBottom;
-  final FocusNode? focusNode; // 🔥 Added this to support Autocomplete!
+  final FocusNode? focusNode;
 
   const AnimatedTextField({
     super.key,
@@ -29,7 +29,7 @@ class AnimatedTextField extends StatefulWidget {
     this.suffixIcon,
     this.validator,
     this.paddingBottom,
-    this.focusNode, // 🔥 Added here
+    this.focusNode,
   });
 
   @override
@@ -39,11 +39,13 @@ class AnimatedTextField extends StatefulWidget {
 class _AnimatedTextFieldState extends State<AnimatedTextField> {
   late FocusNode _focusNode;
   bool _isLocalFocusNode = false;
+  late bool _obscureText; // Toggle state
 
   @override
   void initState() {
     super.initState();
-    // Use the provided focusNode if it exists, otherwise create a local one
+    _obscureText = widget.obscureText;
+
     if (widget.focusNode != null) {
       _focusNode = widget.focusNode!;
     } else {
@@ -62,7 +64,6 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
   @override
   void dispose() {
     _focusNode.removeListener(_onFocusChange);
-    // Only dispose the focusNode if we created it locally
     if (_isLocalFocusNode) {
       _focusNode.dispose();
     }
@@ -71,11 +72,29 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
 
   @override
   Widget build(BuildContext context) {
-    // 🔥 Added a safety check: only append '*' if it doesn't already have one!
     final displayHintText =
         widget.isRequired && !widget.hintText.trim().endsWith('*')
         ? '${widget.hintText} *'
         : widget.hintText;
+
+    // Dynamically insert eye button if it's an obscure field without a custom suffix
+    Widget? dynamicSuffixIcon = widget.suffixIcon;
+    if (widget.obscureText && widget.suffixIcon == null) {
+      dynamicSuffixIcon = IconButton(
+        icon: Icon(
+          _obscureText
+              ? Icons.visibility_off_rounded
+              : Icons.visibility_rounded,
+          color: Colors.grey.shade500,
+          size: context.getResponsiveSize(5),
+        ),
+        onPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+      );
+    }
 
     return Padding(
       padding: EdgeInsets.only(
@@ -96,10 +115,10 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
               : [],
         ),
         child: TextFormField(
-          focusNode: _focusNode, // 🔥 Now perfectly wired up!
+          focusNode: _focusNode,
           controller: widget.controller,
           keyboardType: widget.keyboardType,
-          obscureText: widget.obscureText,
+          obscureText: _obscureText,
           maxLength: widget.maxLength,
           textCapitalization: widget.textCapitalization,
           style: TextStyle(
@@ -117,29 +136,42 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             filled: true,
             fillColor: AppColors.inputFill,
             prefixIcon: widget.prefixIcon,
-            suffixIcon: widget.suffixIcon,
+            suffixIcon: dynamicSuffixIcon,
             contentPadding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(3.5).clamp(14.0, 20.0),
               vertical: context.getScreenHeight(1.5).clamp(10.0, 16.0),
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(
+                context.getResponsiveSize(2.5).clamp(8.0, 14.0),
+              ),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(
+                context.getResponsiveSize(2.5).clamp(8.0, 14.0),
+              ),
               borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
-              borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
+              borderRadius: BorderRadius.circular(
+                context.getResponsiveSize(2.5).clamp(8.0, 14.0),
+              ),
+              borderSide: const BorderSide(
+                color: AppColors.primaryGold,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(
+                context.getResponsiveSize(2.5).clamp(8.0, 14.0),
+              ),
               borderSide: const BorderSide(color: Colors.redAccent),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5).clamp(8.0, 14.0)),
+              borderRadius: BorderRadius.circular(
+                context.getResponsiveSize(2.5).clamp(8.0, 14.0),
+              ),
               borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
             ),
           ),

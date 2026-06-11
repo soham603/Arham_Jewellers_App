@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import '../theme/app_colors.dart';
 
 class _NavItem {
-  const _NavItem({
-    required this.label,
-    required this.icon,
-  });
+  const _NavItem({required this.label, required this.icon});
 
   final String label;
   final IconData icon;
@@ -25,111 +23,83 @@ class AppBottomNav extends StatelessWidget {
   final bool isAdmin;
 
   static const Duration _animationDuration = Duration(milliseconds: 220);
-  static const Curve _animationCurve = Curves.easeOutCubic;
-  static const double _maxContentWidth = 720;
 
-  static const List<_NavItem> _userItems = [
-    _NavItem(label: 'Home', icon: Icons.home_rounded),
-    _NavItem(label: 'Search', icon: Icons.search_rounded),
-    _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
-    _NavItem(label: 'Profile', icon: Icons.person_rounded),
-  ];
+  // Exact theme colors paired with the floating capsule look
+  static const Color _unselectedBgColor = Color(
+    0xFFF2EEEA,
+  ); // Light warm background
+  static const Color _unselectedContentColor = Color(
+    0xFF847B71,
+  ); // Soft grey content
+  static const Color _brandBrownColor = Color(
+    0xFF3E2723,
+  ); // Signature deep espresso brown
+  static const Color _activeCapsuleColor = Color(
+    0xFFEBDCCB,
+  ); // Elegant cream-brown capsule tint
 
-  static const List<_NavItem> _adminItems = [
-    _NavItem(label: 'Home', icon: Icons.home_rounded),
-    _NavItem(label: 'Search', icon: Icons.search_rounded),
-    _NavItem(label: 'Share', icon: Icons.share_rounded),
-    _NavItem(label: 'Admin', icon: Icons.admin_panel_settings_rounded),
+  List<_NavItem> get _navItems => [
+    const _NavItem(label: 'Home', icon: Icons.home_rounded),
+    const _NavItem(label: 'Search', icon: Icons.search_rounded),
+    _NavItem(
+      label: isAdmin ? 'Share' : 'Cart',
+      icon: isAdmin ? Icons.share_rounded : Icons.shopping_cart_rounded,
+    ),
+    _NavItem(label: isAdmin ? 'Admin' : 'Profile', icon: Icons.person_rounded),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final items = isAdmin ? _adminItems : _userItems;
-
     assert(
-      currentIndex >= 0 && currentIndex < items.length,
-      'currentIndex must be between 0 and ${items.length - 1}, but got $currentIndex.',
+      currentIndex >= 0 && currentIndex < _navItems.length,
+      'currentIndex must be between 0 and ${_navItems.length - 1}, '
+      'but got $currentIndex.',
     );
 
-    final safeIndex =
-        currentIndex >= 0 && currentIndex < items.length ? currentIndex : 0;
+    final barHeight = context.getResponsiveSize(10.5);
+    final labelFontSize = context.getResponsiveSize(2.3);
+    final iconSize = context.getResponsiveSize(5.6);
+    final inkwellBorderRadius = context.getResponsiveSize(4.0);
 
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isLargeScreen = MediaQuery.of(context).size.shortestSide >= 600;
-
-    final barHeight = isLargeScreen ? 80.0 : 72.0;
-    final bubbleSize = isLargeScreen ? 42.0 : 36.0;
-    final iconSize = isLargeScreen ? 22.0 : 20.0;
-    final labelFontSize = isLargeScreen ? 13.0 : 12.0;
-
-    final unselectedBubbleColor = Color.alphaBlend(
-      colorScheme.onSurface.withOpacity(
-        theme.brightness == Brightness.dark ? 0.14 : 0.05,
+    return Container(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewPaddingOf(context).bottom + 4,
+        left: 12,
+        right: 12,
+        top: 6,
       ),
-      colorScheme.surface,
-    );
-
-    return SizedBox(
-      height: barHeight,
-      child: Material(
-        color: colorScheme.surface,
-        elevation: 10,
-        shadowColor: Colors.black.withOpacity(
-          theme.brightness == Brightness.dark ? 0.24 : 0.08,
+      // Mimicking the exact rounded container card shape from image_0fdf5f.png
+      decoration: const BoxDecoration(
+        color: _unselectedBgColor,
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(28), // Beautifully curved lower terminal edge
         ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: colorScheme.outline.withOpacity(0.10),
-              ),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 2),
           ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-              child: Align(
-                alignment: Alignment.center,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _maxContentWidth),
-                  child: Row(
-                    children: List.generate(items.length, (index) {
-                      final item = items[index];
-                      final isSelected = index == safeIndex;
-
-                      return _NavItemTile(
-                        item: item,
-                        index: index,
-                        totalCount: items.length,
-                        isSelected: isSelected,
-                        onTap: () {
-                          if (isSelected) {
-                            // Optional UX enhancement:
-                            // trigger scroll-to-top or pop-to-root here.
-                            return;
-                          }
-
-                          HapticFeedback.selectionClick();
-                          onTap(index);
-                        },
-                        animationDuration: _animationDuration,
-                        animationCurve: _animationCurve,
-                        bubbleSize: bubbleSize,
-                        iconSize: iconSize,
-                        labelFontSize: labelFontSize,
-                        selectedBubbleColor: colorScheme.primary,
-                        unselectedBubbleColor: unselectedBubbleColor,
-                        selectedIconColor: colorScheme.onPrimary,
-                        selectedLabelColor: colorScheme.primary,
-                        unselectedIconColor: context.colorPalette.goldDeep,
-                        unselectedLabelColor: colorScheme.onSurfaceVariant,
-                      );
-                    }),
-                  ),
-                ),
-              ),
+        ],
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: barHeight),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(
+            _navItems.length,
+            (index) => _NavItemTile(
+              item: _navItems[index],
+              isSelected: index == currentIndex,
+              onTap: () {
+                if (index == currentIndex) return;
+                HapticFeedback.selectionClick();
+                onTap(index);
+              },
+              animationDuration: _animationDuration,
+              iconSize: iconSize,
+              labelFontSize: labelFontSize,
+              inkwellBorderRadius: inkwellBorderRadius,
             ),
           ),
         ),
@@ -141,122 +111,82 @@ class AppBottomNav extends StatelessWidget {
 class _NavItemTile extends StatelessWidget {
   const _NavItemTile({
     required this.item,
-    required this.index,
-    required this.totalCount,
     required this.isSelected,
     required this.onTap,
     required this.animationDuration,
-    required this.animationCurve,
-    required this.bubbleSize,
     required this.iconSize,
     required this.labelFontSize,
-    required this.selectedBubbleColor,
-    required this.unselectedBubbleColor,
-    required this.selectedIconColor,
-    required this.selectedLabelColor,
-    required this.unselectedIconColor,
-    required this.unselectedLabelColor,
+    required this.inkwellBorderRadius,
   });
 
   final _NavItem item;
-  final int index;
-  final int totalCount;
   final bool isSelected;
   final VoidCallback onTap;
   final Duration animationDuration;
-  final Curve animationCurve;
-  final double bubbleSize;
   final double iconSize;
   final double labelFontSize;
-  final Color selectedBubbleColor;
-  final Color unselectedBubbleColor;
-  final Color selectedIconColor;
-  final Color selectedLabelColor;
-  final Color unselectedIconColor;
-  final Color unselectedLabelColor;
+  final double inkwellBorderRadius;
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(20);
-
-    return Expanded(
-      child: Tooltip(
-        message: item.label,
-        waitDuration: const Duration(milliseconds: 500),
-        child: Semantics(
-          label: '${item.label}, tab ${index + 1} of $totalCount',
-          hint: isSelected ? 'Current tab' : 'Double tap to open',
-          selected: isSelected,
-          button: true,
-          excludeSemantics: true,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: borderRadius,
-              mouseCursor: SystemMouseCursors.click,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              hoverColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.03),
-              focusColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.05),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedScale(
-                        duration: animationDuration,
-                        curve: animationCurve,
-                        scale: isSelected ? 1.0 : 0.96,
-                        child: AnimatedContainer(
-                          duration: animationDuration,
-                          curve: animationCurve,
-                          width: bubbleSize,
-                          height: bubbleSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isSelected
-                                ? selectedBubbleColor
-                                : unselectedBubbleColor,
-                          ),
-                          child: Icon(
-                            item.icon,
-                            size: iconSize,
-                            color: isSelected
-                                ? selectedIconColor
-                                : unselectedIconColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      SizedBox(
-                        width: bubbleSize + 24,
-                        child: AnimatedDefaultTextStyle(
-                          duration: animationDuration,
-                          curve: animationCurve,
-                          style: TextStyle(
-                            fontSize: labelFontSize,
-                            height: 1.1,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? selectedLabelColor
-                                : unselectedLabelColor,
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
+    return Semantics(
+      label: item.label,
+      selected: isSelected,
+      button: true,
+      excludeSemantics: true,
+      child: AnimatedContainer(
+        duration: animationDuration,
+        curve: Curves.easeInOut,
+        // Active capsule container padding vs standard raw item space
+        padding: EdgeInsets.symmetric(
+          horizontal: isSelected ? 16.0 : 8.0,
+          vertical: 8.0,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppBottomNav._activeCapsuleColor
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(
+            24,
+          ), // Perfectly circular stadium border pill
+        ),
+        child: InkWell(
+          onTap: onTap,
+          highlightColor: Colors.transparent,
+          splashColor: AppBottomNav._brandBrownColor.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(inkwellBorderRadius),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                item.icon,
+                size: iconSize,
+                color: isSelected
+                    ? AppBottomNav
+                          ._brandBrownColor // Deep brown active state
+                    : AppBottomNav._unselectedContentColor,
+              ),
+              // Dynamic layout adjustment: only rendering the label string beside the icon if selected
+              AnimatedCrossFade(
+                firstChild: Padding(
+                  padding: const EdgeInsets.only(left: 6.0),
+                  child: Text(
+                    item.label,
+                    style: TextStyle(
+                      fontSize: labelFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: AppBottomNav._brandBrownColor,
+                      letterSpacing: 0.1,
+                    ),
                   ),
                 ),
+                secondChild: const SizedBox.shrink(),
+                crossFadeState: isSelected
+                    ? CrossFadeState.showFirst
+                    : CrossFadeState.showSecond,
+                duration: animationDuration,
               ),
-            ),
+            ],
           ),
         ),
       ),
