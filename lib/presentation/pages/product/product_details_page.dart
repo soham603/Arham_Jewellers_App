@@ -56,6 +56,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     if (_hasController) {
       _liveProducts.assignAll(_getControllerList());
+      final idx = _liveProducts.indexWhere((p) => p.id == widget.product.id);
+      if (idx != -1) {
+        _currentIndex = idx;
+      }
       _productsWorker = ever(_getControllerObservable(), (_) {
         final newList = _getControllerList();
         final oldLen = _liveProducts.length;
@@ -69,7 +73,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     }
 
     if (_canSwipe) {
-      _pageController = PageController(initialPage: widget.initialIndex);
+      _pageController = PageController(initialPage: _currentIndex);
     }
 
     if (Get.isRegistered<CartController>()) {
