@@ -130,7 +130,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1.5),
+          vertical: context.getScreenHeight(2),
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
@@ -150,8 +150,8 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         child: Row(
           children: [
             Container(
-              width: context.getResponsiveSize(10),
-              height: context.getResponsiveSize(10),
+              width: context.getResponsiveSize(11),
+              height: context.getResponsiveSize(11),
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primaryGold,
@@ -159,7 +159,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               child: Icon(
                 Icons.monetization_on_rounded,
                 color: Colors.white,
-                size: context.getResponsiveSize(5),
+                size: context.getResponsiveSize(5.5),
               ),
             ),
             SizedBox(width: context.getResponsiveSize(3)),
@@ -169,7 +169,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Current Rate',
+                    'Today\'s Gold Rate',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: context.getResponsiveSize(3.2),
@@ -185,16 +185,16 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
                                 fontSize: context.getResponsiveSize(7),
-                                height: 1.1,
+                                height: 1.0,
                               ),
                             ),
                             TextSpan(
                               text: '/10g',
                               style: TextStyle(
-                                color: Colors.white54,
-                                fontWeight: FontWeight.w400,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
                                 fontSize: context.getResponsiveSize(3),
-                                height: 1.1,
+                                height: 1.0,
                               ),
                             ),
                           ])
@@ -211,34 +211,39 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 ],
               ),
             ),
-            if (rate?.source != null)
-              Expanded(
-                flex: 0,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      rate!.source!,
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: context.getResponsiveSize(2.2),
-                      ),
-                    ),
-                    Text(
-                      DateFormat('dd MMM, hh:mm a').format(rate.timestamp.toLocal()),
-                      style: TextStyle(
-                        color: Colors.white54,
-                        fontSize: context.getResponsiveSize(2),
-                      ),
-                    ),
-                  ],
+            if (rate != null)
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSize(2.5),
+                  vertical: context.getScreenHeight(0.6),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _timeAgo(rate.timestamp),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: context.getResponsiveSize(2.6),
+                  ),
                 ),
               ),
           ],
         ),
       );
     });
+  }
+
+  String _timeAgo(DateTime dateTime) {
+    final diff = DateTime.now().difference(dateTime);
+    if (diff.isNegative) return 'just now';
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 
   Widget _setRateButton(BuildContext context) {

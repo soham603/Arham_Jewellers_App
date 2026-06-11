@@ -7,6 +7,7 @@ abstract class AppColors {
   static const textMuted = Color(0xFF7E756C);
   static const divider = Color(0xFFE3DDD5);
   static const primaryGold = Color(0xFFA57A36);
+  static const gold = Color(0xFFD4AF37);
   static const primaryGoldDark = Color(0xFF8B652E);
   static const tileBg = Color(0xFFE9E5DF);
   static const success = Color(0xFF2D9D59);

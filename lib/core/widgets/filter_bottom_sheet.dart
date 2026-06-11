@@ -132,7 +132,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late double _effectiveWeightSliderMax;
   late Set<String> _tempSelectedCategoryIds;
   late List<String> _tempSelectedSizes;
-  bool _categoriesExpanded = false;
+  bool _categoriesExpanded = true;
 
   @override
   void initState() {
@@ -491,7 +491,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget _buildCategorySection(BuildContext context) {
     const collapsedCount = 10;
     final grouped = _getDeduplicatedCategories();
-    final uniqueCleanNames = grouped.keys.toList();
+    final uniqueCleanNames = grouped.keys.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     final showExpand = uniqueCleanNames.length > collapsedCount;
     final visibleNames = _categoriesExpanded || !showExpand
         ? uniqueCleanNames

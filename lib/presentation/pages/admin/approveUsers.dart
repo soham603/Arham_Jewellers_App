@@ -983,6 +983,15 @@ class _RequestCardState extends State<_RequestCard> {
   }
 
   @override
+  void didUpdateWidget(covariant _RequestCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.request.id == widget.request.id &&
+        oldWidget.request.isRetailer != widget.request.isRetailer) {
+      _isRetailer = widget.request.isRetailer;
+    }
+  }
+
+  @override
   void dispose() {
     _newPasswordController.dispose();
     super.dispose();
@@ -1074,17 +1083,12 @@ class _RequestCardState extends State<_RequestCard> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           if (req.isRetailer)
-                            Container(
-                              margin: EdgeInsets.only(right: context.getResponsiveSize(1.5)),
-                              padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD4AF37).withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 4),
                               child: Icon(
                                 Icons.store_rounded,
                                 color: const Color(0xFFD4AF37),
-                                size: context.getResponsiveSize(3.2),
+                                size: context.getResponsiveSize(4.5),
                               ),
                             ),
                           Container(
@@ -1293,8 +1297,67 @@ class _RequestCardState extends State<_RequestCard> {
                   if (req.status == 'PENDING')
                     SizedBox(height: context.getScreenHeight(1.5)),
 
-                  if (req.status == 'APPROVED')
+                  if (req.status == 'APPROVED') ...[
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(3),
+                        vertical: context.getScreenHeight(0.5),
+                      ),
+                      decoration: BoxDecoration(
+                        color: _isRetailer
+                            ? const Color(0xFFD4AF37).withValues(alpha: 0.1)
+                            : context.colorPalette.boxColor,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: _isRetailer
+                              ? const Color(0xFFD4AF37).withValues(alpha: 0.4)
+                              : context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.store_rounded,
+                            color: _isRetailer ? const Color(0xFFD4AF37) : context.colorPalette.subTitleColor,
+                            size: context.getResponsiveSize(5),
+                          ),
+                          SizedBox(width: context.getResponsiveSize(3)),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                  Text(
+                                    'Mark as Retailer',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(3.5),
+                                      fontWeight: FontWeight.w600,
+                                      color: context.colorPalette.textColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Grant retailer privileges',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(2.8),
+                                    color: context.colorPalette.subTitleColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Transform.scale(
+                            scale: 0.7,
+                            child: Switch(
+                              value: _isRetailer,
+                              onChanged: (val) => _confirmRetailerToggle(context, req, val),
+                              activeThumbColor: const Color(0xFFD4AF37),
+                              activeTrackColor: const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: context.getScreenHeight(1.5)),
+                  ],
 
                   Obx(() {
                     final isLoading = widget.controller.actionState == CurrentAppState.LOADING && 

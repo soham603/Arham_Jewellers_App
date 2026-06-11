@@ -74,63 +74,64 @@ class _SharePageState extends State<SharePage> {
         context.getScreenHeight(0.6),
       ),
       child: Row(
-        children: karatOptions.map((option) {
-          final karat = option['label']!;
-          final percent = option['percent']!;
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                right: karatOptions.last != option ? context.getResponsiveSize(2) : 0,
-              ),
-              child: GestureDetector(
-                onTap: () => controller.selectKarat(karat),
-                child: Obx(() {
-                  final isSelected = controller.selectedKarat == karat;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.getResponsiveSize(2),
-                      vertical: context.getScreenHeight(0.8),
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colorPalette.gold
-                          : context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-                      border: Border.all(
-                        color: isSelected
-                            ? context.colorPalette.gold
-                            : context.colorPalette.border,
-                        width: 2,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: context.colorPalette.gold.withValues(alpha: 0.4),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    child: Text(
-                      '$karat ($percent)',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        fontWeight: FontWeight.w700,
-                        color: isSelected
-                            ? Colors.white
-                            : context.colorPalette.goldDeep,
-                      ),
-                    ),
-                  );
-                }),
-              ),
+        children: [
+          for (int i = 0; i < karatOptions.length; i++) ...[
+            Expanded(
+              child: _buildKaratChip(context, karatOptions[i]['label']!, karatOptions[i]['percent']!),
             ),
-          );
-        }).toList(),
+            if (i < karatOptions.length - 1)
+              SizedBox(width: context.getResponsiveSize(2)),
+          ],
+        ],
       ),
+    );
+  }
+
+  Widget _buildKaratChip(BuildContext context, String karat, String percent) {
+    return GestureDetector(
+      onTap: () => controller.selectKarat(karat),
+      child: Obx(() {
+        final isSelected = controller.selectedKarat == karat;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(2),
+            vertical: context.getScreenHeight(0.8),
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.cardBg,
+            borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+            border: Border.all(
+              color: isSelected
+                  ? context.colorPalette.gold
+                  : context.colorPalette.border,
+              width: 2,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: context.colorPalette.gold.withValues(alpha: 0.4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Text(
+            '$karat ($percent)',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.2),
+              fontWeight: FontWeight.w700,
+              color: isSelected
+                  ? Colors.white
+                  : context.colorPalette.goldDeep,
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -498,9 +499,9 @@ class _SharePageState extends State<SharePage> {
       return Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(0.8),
+          context.responsiveWidth(12, tabletVal: 16),
           context.getResponsiveSize(4),
-          context.getScreenHeight(0.8) + MediaQuery.of(context).padding.bottom,
+          context.responsiveWidth(12, tabletVal: 16) + MediaQuery.of(context).padding.bottom,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -519,23 +520,23 @@ class _SharePageState extends State<SharePage> {
               onTap: () => controller.clearSelection(),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.6),
+                  horizontal: context.responsiveWidth(10, tabletVal: 14),
+                  vertical: context.responsiveWidth(8, tabletVal: 12),
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
                   border: Border.all(color: context.colorPalette.border),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close, size: context.getResponsiveSize(3.5), color: context.colorPalette.goldDark),
-                    SizedBox(width: context.getResponsiveSize(0.8)),
+                    Icon(Icons.close, size: context.responsiveWidth(16, tabletVal: 20), color: context.colorPalette.goldDark),
+                    SizedBox(width: context.responsiveWidth(4)),
                     Text(
                       'Clear',
                       style: TextStyle(
-                        fontSize: context.getResponsiveSize(3),
+                        fontSize: context.responsiveWidth(12, tabletVal: 16),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDark,
                       ),
@@ -544,12 +545,12 @@ class _SharePageState extends State<SharePage> {
                 ),
               ),
             ),
-            SizedBox(width: context.getResponsiveSize(2.5)),
+            SizedBox(width: context.responsiveWidth(10, tabletVal: 14)),
             Expanded(
               child: Text(
                 '${controller.selectedCount} selected',
                 style: TextStyle(
-                  fontSize: context.getResponsiveSize(3.5),
+                  fontSize: context.responsiveWidth(14, tabletVal: 18),
                   fontWeight: FontWeight.w600,
                   color: context.colorPalette.goldDeep,
                 ),
@@ -576,37 +577,37 @@ class _SharePageState extends State<SharePage> {
               },
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.6),
+                  horizontal: context.responsiveWidth(10, tabletVal: 14),
+                  vertical: context.responsiveWidth(8, tabletVal: 12),
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
                   border: Border.all(color: context.colorPalette.border),
                 ),
-                child: Icon(Icons.check_rounded, size: context.getResponsiveSize(4), color: context.colorPalette.goldDark),
+                child: Icon(Icons.check_rounded, size: context.responsiveWidth(18, tabletVal: 22), color: context.colorPalette.goldDark),
               ),
             ),
-            SizedBox(width: context.getResponsiveSize(1.5)),
+            SizedBox(width: context.responsiveWidth(8, tabletVal: 12)),
             GestureDetector(
               onTap: () => _showShareOptions(context),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.6),
+                  horizontal: context.responsiveWidth(10, tabletVal: 14),
+                  vertical: context.responsiveWidth(8, tabletVal: 12),
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.goldDark,
-                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.share_rounded, size: context.getResponsiveSize(3.5), color: Colors.white),
-                    SizedBox(width: context.getResponsiveSize(0.8)),
+                    Icon(Icons.share_rounded, size: context.responsiveWidth(16, tabletVal: 20), color: Colors.white),
+                    SizedBox(width: context.responsiveWidth(4)),
                     Text(
                       'Share',
-                      style: TextStyle(fontSize: context.getResponsiveSize(3), fontWeight: FontWeight.w600, color: Colors.white),
+                      style: TextStyle(fontSize: context.responsiveWidth(12, tabletVal: 16), fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                   ],
                 ),

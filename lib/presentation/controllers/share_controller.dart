@@ -41,7 +41,6 @@ class ShareController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _selectedKarat.value = '18K';
   }
 
   // ── Selected level-3 categories (persist across navigation) ─

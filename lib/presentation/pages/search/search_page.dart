@@ -227,6 +227,7 @@ class _SearchPageState extends State<SearchPage> {
               },
               onFilterTap: () {
                 _focusNode.unfocus();
+                _loadCategories();
                 FilterBottomSheet.show(
                   context,
                   initialSelectedKarats: controller.selectedKarats,
@@ -364,17 +365,6 @@ class _SearchPageState extends State<SearchPage> {
                                       color: const Color(0xFF675F55),
                                     ),
                                   ),
-                                  if (controller.selectedKarats.isNotEmpty) ...[
-                                    SizedBox(width: context.getResponsiveSize(2)),
-                                    Text(
-                                      '— ${controller.selectedKarats.join(", ")}',
-                                      style: TextStyle(
-                                        fontSize: context.getResponsiveSize(3.5),
-                                        fontWeight: FontWeight.w600,
-                                        color: context.colorPalette.goldDark,
-                                      ),
-                                    ),
-                                  ],
                                 ],
                               ),
                               Obx(() {
@@ -450,77 +440,82 @@ class _SearchPageState extends State<SearchPage> {
       ),
       child: Obx(() {
         return Row(
-          children: karatOptions.map((option) {
-            final karat = option['label']!;
-            final percent = option['percent']!;
-            final isSelected = controller.selectedKarats.contains(karat);
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: karatOptions.last != option ? context.getResponsiveSize(2) : 0),
-                child: GestureDetector(
-                  onTap: () {
-                    controller.toggleKaratFilter(karat);
-                    if (controller.isSearching) {
-                      controller.applyFilters(
-                        karats: controller.selectedKarats,
-                        categoryIds: controller.selectedCategoryIds,
-                        categoryNames: controller.selectedCategoryNames,
-                        stockFilter: controller.stockFilter,
-                        wMin: controller.weightMin,
-                        wMax: controller.weightMax,
-                        pMin: controller.priceMin,
-                        pMax: controller.priceMax,
-                        sizes: controller.selectedSizes,
-                      );
-                    } else if (controller.hasActiveFilters) {
-                      controller.loadFilteredProducts();
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.getResponsiveSize(2),
-                      vertical: context.getScreenHeight(0.8),
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colorPalette.gold
-                          : context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-                      border: Border.all(
-                        color: isSelected
-                            ? context.colorPalette.gold
-                            : context.colorPalette.border,
-                        width: 2,
-                      ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: context.colorPalette.gold.withValues(alpha: 0.4),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    child: Text(
-                      '$karat ($percent)',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        fontWeight: FontWeight.w700,
-                        color: isSelected
-                            ? Colors.white
-                            : context.colorPalette.goldDeep,
-                      ),
-                    ),
-                  ),
-                ),
+          children: [
+            for (int i = 0; i < karatOptions.length; i++) ...[
+              Expanded(
+                child: _buildKaratChip(context, karatOptions[i]),
               ),
-            );
-          }).toList(),
+              if (i < karatOptions.length - 1)
+                SizedBox(width: context.getResponsiveSize(2)),
+            ],
+          ],
         );
       }),
+    );
+  }
+
+  Widget _buildKaratChip(BuildContext context, Map<String, String> option) {
+    final karat = option['label']!;
+    final percent = option['percent']!;
+    final isSelected = controller.selectedKarats.contains(karat);
+    return GestureDetector(
+      onTap: () {
+        controller.toggleKaratFilter(karat);
+        if (controller.isSearching) {
+          controller.applyFilters(
+            karats: controller.selectedKarats,
+            categoryIds: controller.selectedCategoryIds,
+            categoryNames: controller.selectedCategoryNames,
+            stockFilter: controller.stockFilter,
+            wMin: controller.weightMin,
+            wMax: controller.weightMax,
+            pMin: controller.priceMin,
+            pMax: controller.priceMax,
+            sizes: controller.selectedSizes,
+          );
+        } else if (controller.hasActiveFilters) {
+          controller.loadFilteredProducts();
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(2),
+          vertical: context.getScreenHeight(0.8),
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colorPalette.gold
+              : context.colorPalette.cardBg,
+          borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+          border: Border.all(
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.border,
+            width: 2,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: context.colorPalette.gold.withValues(alpha: 0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
+        ),
+        child: Text(
+          '$karat ($percent)',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(3.2),
+            fontWeight: FontWeight.w700,
+            color: isSelected
+                ? Colors.white
+                : context.colorPalette.goldDeep,
+          ),
+        ),
+      ),
     );
   }
 

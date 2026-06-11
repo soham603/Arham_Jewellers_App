@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/staffPanelScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
@@ -92,7 +93,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: false, // 🔥 Forces title to the left
         titleSpacing: context.getResponsiveSize(4),
         title: Text(
-          isAdmin ? "Admin Panel" : "Profile",
+          isAdmin
+              ? (authController.user?.role == 'SUPERADMIN'
+                  ? "Admin Panel"
+                  : "Staff Panel")
+              : "Profile",
           style: TextStyle(
             color: AppColors.textDark,
             fontWeight: FontWeight.w700,
@@ -206,7 +211,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
 
       body: isAdmin
-          ? const AdminPanelScreen()
+          ? (authController.user?.role == 'SUPERADMIN'
+              ? const AdminPanelScreen()
+              : const StaffPanelScreen())
           : Obx(() {
               if (orderController.ordersState == CurrentAppState.LOADING &&
                   orderController.userOrders.isEmpty) {
@@ -513,10 +520,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: AppColors.textDark,
                       ),
                     ),
-
-                    SizedBox(height: context.getScreenHeight(2)),
-
-                    _chatButton(context),
 
                     SizedBox(height: context.getScreenHeight(2)),
 

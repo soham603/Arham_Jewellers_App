@@ -63,7 +63,6 @@ class AdminUserManagementController extends GetxController {
   // ── Fetch users ──────────────────────────────────────────────────────────
   Future<void> fetchUsers({bool isPagination = false}) async {
     if (!_hasMore && isPagination) return;
-    if (_state.value == CurrentAppState.LOADING && !isPagination) return;
 
     _state.value = CurrentAppState.LOADING;
     if (!isPagination) {
@@ -159,7 +158,16 @@ class AdminUserManagementController extends GetxController {
 
   List<UserSearchModel> get filteredUsers {
     if (_activeFilter.value == 'ALL') return _users;
-    return _users.where((u) => u.role == _activeFilter.value).toList();
+    if (_activeFilter.value == 'STAFF') {
+      return _users.where((u) {
+        final r = u.role.toUpperCase();
+        return r == 'STAFF' || r == 'SUPERADMIN' || r == 'ADMIN';
+      }).toList();
+    }
+    if (_activeFilter.value == 'RETAILER') {
+      return _users.where((u) => u.isRetailer == true).toList();
+    }
+    return _users.where((u) => u.role.toUpperCase() == _activeFilter.value.toUpperCase()).toList();
   }
 
   // ── Pagination ───────────────────────────────────────────────────────────

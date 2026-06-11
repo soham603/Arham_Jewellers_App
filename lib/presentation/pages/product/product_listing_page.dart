@@ -494,65 +494,66 @@ class _ProductListingPageState extends State<ProductListingPage> {
         context.getScreenHeight(0.4),
       ),
       child: Row(
-        children: karatOptions.map((option) {
-          final karat = option['label']!;
-          final percent = option['percent']!;
-          final isSelected = _selectedKarat == karat;
-          return Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                right: karatOptions.last != option ? context.getResponsiveSize(2) : 0,
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  if (_selectedKarat == karat) return;
-                  setState(() {
-                    _selectedKarat = karat;
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.getResponsiveSize(2),
-                    vertical: context.getScreenHeight(0.6),
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.colorPalette.gold
-                        : context.colorPalette.cardBg,
-                    borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-                    border: Border.all(
-                      color: isSelected
-                          ? context.colorPalette.gold
-                          : context.colorPalette.border,
-                      width: 2,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: context.colorPalette.gold.withValues(alpha: 0.4),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [],
-                  ),
-                  child: Text(
-                    '$karat ($percent)',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.2),
-                      fontWeight: FontWeight.w700,
-                      color: isSelected
-                          ? Colors.white
-                          : context.colorPalette.goldDeep,
-                    ),
-                  ),
-                ),
-              ),
+        children: [
+          for (int i = 0; i < karatOptions.length; i++) ...[
+            Expanded(
+              child: _buildKaratChip(context, karatOptions[i]['label']!, karatOptions[i]['percent']!),
             ),
-          );
-        }).toList(),
+            if (i < karatOptions.length - 1)
+              SizedBox(width: context.getResponsiveSize(2)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKaratChip(BuildContext context, String karat, String percent) {
+    final isSelected = _selectedKarat == karat;
+    return GestureDetector(
+      onTap: () {
+        if (_selectedKarat == karat) return;
+        setState(() {
+          _selectedKarat = karat;
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(2),
+          vertical: context.getScreenHeight(0.6),
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colorPalette.gold
+              : context.colorPalette.cardBg,
+          borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+          border: Border.all(
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.border,
+            width: 2,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: context.colorPalette.gold.withValues(alpha: 0.4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [],
+        ),
+        child: Text(
+          '$karat ($percent)',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(3.2),
+            fontWeight: FontWeight.w700,
+            color: isSelected
+                ? Colors.white
+                : context.colorPalette.goldDeep,
+          ),
+        ),
       ),
     );
   }

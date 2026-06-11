@@ -22,7 +22,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
-  static const _roleFilters = ['ALL', 'ADMIN', 'USER'];
+  static const _roleFilters = ['ALL', 'STAFF', 'USER', 'RETAILER'];
 
   @override
   void initState() {
@@ -248,8 +248,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 onTap: () => controller.setFilter(f),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: context.getResponsiveSize(1),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 4,
                   ),
                   padding: EdgeInsets.symmetric(
                     vertical: context.getScreenHeight(0.8),
@@ -279,10 +279,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Color _roleColor(String role) {
     switch (role) {
-      case 'ADMIN':
+      case 'STAFF':
         return AppColors.primaryGold;
       case 'USER':
         return const Color(0xFF2D9D59);
+      case 'RETAILER':
+        return AppColors.gold;
       default:
         return context.colorPalette.subTitleColor;
     }
@@ -565,27 +567,6 @@ class _UserCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (user.role == 'ADMIN' || user.role == 'SUPERADMIN') ...[
-                        SizedBox(width: context.getResponsiveSize(1.5)),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.getResponsiveSize(1.5),
-                            vertical: context.getScreenHeight(0.2),
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGold.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            user.role,
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(2.2),
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryGold,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
@@ -609,30 +590,53 @@ class _UserCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                  SizedBox(height: context.getScreenHeight(0.4)),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.getResponsiveSize(2),
-                      vertical: context.getScreenHeight(0.2),
-                    ),
-                    decoration: BoxDecoration(
-                      color: (user.isRetailer == true
+                   if (user.role.toUpperCase() != 'STAFF' && user.role.toUpperCase() != 'SUPERADMIN' && user.role.toUpperCase() != 'ADMIN') ...[
+                    SizedBox(height: context.getScreenHeight(0.4)),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(2),
+                        vertical: context.getScreenHeight(0.2),
+                      ),
+                      decoration: BoxDecoration(
+                        color: (user.isRetailer == true
+                                ? const Color(0xFFD4AF37)
+                                : context.colorPalette.subTitleColor)
+                            .withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        user.isRetailer == true ? 'Retail User' : 'Non Retail User',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.5),
+                          fontWeight: FontWeight.w700,
+                          color: user.isRetailer == true
                               ? const Color(0xFFD4AF37)
-                              : context.colorPalette.subTitleColor)
-                          .withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      user.isRetailer == true ? 'Retail User' : 'Non Retail User',
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(2.5),
-                        fontWeight: FontWeight.w700,
-                        color: user.isRetailer == true
-                            ? const Color(0xFFD4AF37)
-                            : context.colorPalette.subTitleColor,
+                              : context.colorPalette.subTitleColor,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
+                  if ((user.role.toUpperCase() == 'STAFF' || user.role.toUpperCase() == 'SUPERADMIN' || user.role.toUpperCase() == 'ADMIN') && user.isRetailer != true) ...[
+                    SizedBox(height: context.getScreenHeight(0.3)),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(2),
+                        vertical: context.getScreenHeight(0.2),
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGold.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'STAFF',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.5),
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryGold,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (user.forgotPasswordStatus == 'PENDING') ...[
                     SizedBox(height: context.getScreenHeight(0.3)),
                     Container(
@@ -731,6 +735,15 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   void initState() {
     super.initState();
     _isRetailer = widget.user.isRetailer ?? false;
+  }
+
+  @override
+  void didUpdateWidget(covariant _UserDetailSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.user.id == widget.user.id &&
+        oldWidget.user.isRetailer != widget.user.isRetailer) {
+      _isRetailer = widget.user.isRetailer ?? false;
+    }
   }
 
   @override
@@ -1078,9 +1091,10 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   }
 
   Color _roleBadgeColor(String? role) {
-    switch (role) {
+    switch (role?.toUpperCase()) {
       case 'SUPERADMIN':
         return Colors.purple;
+      case 'STAFF':
       case 'ADMIN':
         return AppColors.primaryGold;
       default:
@@ -1107,8 +1121,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
         children: [
           // Create Admin — visible only to SUPERADMIN for non-admin users
           if (Get.find<AuthController>().user?.role == 'SUPERADMIN' &&
-              widget.user.role != 'ADMIN' &&
-              widget.user.role != 'SUPERADMIN') ...[
+              widget.user.role.toUpperCase() != 'STAFF' &&
+              widget.user.role.toUpperCase() != 'SUPERADMIN' &&
+              widget.user.role.toUpperCase() != 'ADMIN') ...[
             _actionRow(
               context,
               icon: Icons.admin_panel_settings_outlined,
@@ -1123,18 +1138,18 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ],
 
           // Retailer Toggle
-          // _toggleRow(
-          //   context,
-          //   icon: Icons.store_outlined,
-          //   title: 'Retailer Status',
-          //   subtitle: 'Mark as retailer',
-          //   value: _isRetailer,
-          //   activeColor: const Color(0xFFD4AF37),
-          //   isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
-          //       widget.controller.actioningId == widget.user.id,
-          //   onChanged: (val) => _confirmRetailerToggle(context, val),
-          // ),
-          // _sheetDivider(context),
+          _toggleRow(
+            context,
+            icon: Icons.store_outlined,
+            title: 'Retailer Status',
+            subtitle: 'Mark as retailer',
+            value: _isRetailer,
+            activeColor: const Color(0xFFD4AF37),
+            isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+                widget.controller.actioningId == widget.user.id,
+            onChanged: (val) => _confirmRetailerToggle(context, val),
+          ),
+          _sheetDivider(context),
 
           // Deactivate / Activate — visible only to SUPERADMIN
           if (Get.find<AuthController>().user?.role == 'SUPERADMIN') ...[
@@ -1525,6 +1540,14 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                 ),
                 SizedBox(height: context.getScreenHeight(2)),
+                Text(
+                  'Enter your password to confirm this action',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3),
+                    color: context.colorPalette.subTitleColor,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(0.8)),
                 TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
@@ -1534,8 +1557,8 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     fontSize: context.getResponsiveSize(3.5),
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Admin Password',
-                    hintText: 'Set admin password',
+                    labelText: 'Your Password',
+                    hintText: 'Enter your password',
                     hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
                     prefixIcon: Icon(
                       Icons.lock_outline_rounded,

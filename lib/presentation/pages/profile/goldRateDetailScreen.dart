@@ -166,33 +166,37 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     ),
                   ),
                   SizedBox(height: context.getScreenHeight(0.3)),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        rate != null
-                            ? '₹${NumberFormat.decimalPattern('en_IN').format(rate.rate)}'
-                            : '—',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: context.getResponsiveSize(7.5),
-                          height: 1.0,
-                        ),
-                      ),
-                      SizedBox(width: context.getResponsiveSize(1.5)),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 2.0),
-                        child: Text(
-                          '/10g',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                            fontSize: context.getResponsiveSize(4.0),
+                  Text.rich(
+                    rate != null
+                        ? TextSpan(children: [
+                            TextSpan(
+                              text: '₹${NumberFormat.decimalPattern('en_IN').format(rate.rate)}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: context.getResponsiveSize(7),
+                                height: 1.0,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '/10g',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
+                                fontSize: context.getResponsiveSize(3),
+                                height: 1.0,
+                              ),
+                            ),
+                          ])
+                        : const TextSpan(
+                            text: '—',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 32,
+                              height: 1.1,
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
                   ),
                 ],
               ),
