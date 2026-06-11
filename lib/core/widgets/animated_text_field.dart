@@ -55,6 +55,14 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
     _focusNode.addListener(_onFocusChange);
   }
 
+  @override
+  void didUpdateWidget(covariant AnimatedTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.obscureText != oldWidget.obscureText) {
+      _obscureText = widget.obscureText;
+    }
+  }
+
   void _onFocusChange() {
     if (mounted) {
       setState(() {});

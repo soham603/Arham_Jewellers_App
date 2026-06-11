@@ -420,223 +420,55 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         : Colors.red.shade600;
 
     return SafeArea(
-      child: Stack(
-        children: [
-          // --- 1. Top Image Section ---
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: context.getScreenHeight(60),
-            child: Stack(
-              children: [
-                IgnorePointer(
-                  child: Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: const Color(0xFFE6E1D9),
-                    child:
-                        product.displayImageUrl != null &&
-                            product.displayImageUrl!.trim().isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: product.displayImageUrl!,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: const Color(0xFFE7E2DB),
-                              highlightColor: const Color(0xFFF5F1EB),
-                              child: Container(color: Colors.white),
-                            ),
-                            errorWidget: (context, url, error) => Center(
-                              child: Icon(
-                                Icons.image_not_supported_outlined,
-                                size: context.getResponsiveSize(12),
-                                color: Colors.grey,
-                              ),
-                            ),
-                          )
-                        : Center(
-                            child: Text(
-                              '[ No Image ]',
-                              style: TextStyle(
-                                fontSize: context.getResponsiveSize(5),
-                                color: const Color(0xFF8C7E68),
-                              ),
-                            ),
-                          ),
-                  ),
-                ),
-
-                // Top Left: Back Button Only
-                Positioned(
-                  top: context.getScreenHeight(2),
-                  left: context.getResponsiveSize(4),
-                  child: GestureDetector(
-                    onTap: () => Get.back(),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            // --- 1. Image Section (scrolls with content) ---
+            SizedBox(
+              height: context.getScreenHeight(55),
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  Positioned.fill(
                     child: Container(
-                      padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: context.getResponsiveSize(5),
-                        color: AppColors.textDark,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Top Right: Wishlist Heart
-                if (!Get.find<AuthController>().isAdmin)
-                  Positioned(
-                    top: context.getScreenHeight(2),
-                    right: context.getResponsiveSize(4),
-                    child: Obx(() {
-                      final isWishlisted = WishlistController.instance.isWishlisted(product.id);
-                      return GestureDetector(
-                        onTap: () {
-                          if (isWishlisted) {
-                            WishlistController.instance.removeFromWishlist(product.id);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${product.name} removed from wishlist'),
-                                duration: const Duration(seconds: 3),
-                                behavior: SnackBarBehavior.floating,
-                                action: SnackBarAction(
-                                  label: 'Undo',
-                                  textColor: AppColors.primaryGold,
-                                  onPressed: () {
-                                    WishlistController.instance.addToWishlist(product);
-                                  },
+                      color: const Color(0xFFE6E1D9),
+                      child: product.displayImageUrl != null &&
+                              product.displayImageUrl!.trim().isNotEmpty
+                          ? CachedNetworkImage(
+                              imageUrl: product.displayImageUrl!,
+                              fit: BoxFit.contain,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: const Color(0xFFE7E2DB),
+                                highlightColor: const Color(0xFFF5F1EB),
+                                child: Container(color: Colors.white),
+                              ),
+                              errorWidget: (context, url, error) => Center(
+                                child: Icon(
+                                  Icons.image_not_supported_outlined,
+                                  size: context.getResponsiveSize(12),
+                                  color: Colors.grey,
                                 ),
                               ),
-                            );
-                          } else {
-                            WishlistController.instance.addToWishlist(product);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${product.name} added to wishlist'),
-                                duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
+                            )
+                          : Center(
+                              child: Text(
+                                '[ No Image ]',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(5),
+                                  color: const Color(0xFF8C7E68),
+                                ),
                               ),
-                            );
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            isWishlisted ? Icons.favorite : Icons.favorite_border,
-                            color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
-                            size: context.getResponsiveSize(5),
-                          ),
-                        ),
-                      );
-                    }),
+                            ),
+                    ),
                   ),
 
-                // Bottom Left: "Ribbon" Tags
-                Positioned(
-                  bottom: context.getScreenHeight(8),
-                  left: 0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                          bottom: context.getScreenHeight(0.8),
-                        ),
-                        padding: EdgeInsets.fromLTRB(
-                          context.getResponsiveSize(4),
-                          context.getScreenHeight(0.6),
-                          context.getResponsiveSize(3),
-                          context.getScreenHeight(0.6),
-                        ),
-                        decoration: BoxDecoration(
-                          color: stockColor,
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(2, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          stockText,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: context.getResponsiveSize(3),
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                      if (netWeight != null)
-                        Container(
-                          padding: EdgeInsets.fromLTRB(
-                            context.getResponsiveSize(4),
-                            context.getScreenHeight(0.6),
-                            context.getResponsiveSize(3),
-                            context.getScreenHeight(0.6),
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGold,
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 4,
-                                offset: const Offset(2, 2),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            "Net Wt.: $netWeight g",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: context.getResponsiveSize(3.2),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-
-                // Bottom Right: Zoom Icon
-                if (product.imageUrl != null)
+                  // Top Left: Back Button
                   Positioned(
-                    bottom: context.getScreenHeight(8),
-                    right: context.getResponsiveSize(4),
+                    top: context.getScreenHeight(2),
+                    left: context.getResponsiveSize(4),
                     child: GestureDetector(
-                      onTap: () => showImageZoomDialog(
-                        context,
-                        product.imageUrl!,
-                      ),
+                      onTap: () => Get.back(),
                       child: Container(
                         padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                         decoration: BoxDecoration(
@@ -644,242 +476,372 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 6,
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 4,
                             ),
                           ],
                         ),
                         child: Icon(
-                          Icons.open_in_full,
+                          Icons.arrow_back,
                           size: context.getResponsiveSize(5),
                           color: AppColors.textDark,
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          ),
 
-          // --- 2. Curved Bottom Sheet (Details) ---
-          Positioned(
-            top: context.getScreenHeight(55),
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
+                  // Top Right: Wishlist Heart
+                  if (!Get.find<AuthController>().isAdmin)
+                    Positioned(
+                      top: context.getScreenHeight(2),
+                      right: context.getResponsiveSize(4),
+                      child: Obx(() {
+                        final isWishlisted = WishlistController.instance.isWishlisted(product.id);
+                        return GestureDetector(
+                          onTap: () {
+                            if (isWishlisted) {
+                              WishlistController.instance.removeFromWishlist(product.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${product.name} removed from wishlist'),
+                                  duration: const Duration(seconds: 3),
+                                  behavior: SnackBarBehavior.floating,
+                                  action: SnackBarAction(
+                                    label: 'Undo',
+                                    textColor: AppColors.primaryGold,
+                                    onPressed: () {
+                                      WishlistController.instance.addToWishlist(product);
+                                    },
+                                  ),
+                                ),
+                              );
+                            } else {
+                              WishlistController.instance.addToWishlist(product);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${product.name} added to wishlist'),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.15),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isWishlisted ? Icons.favorite : Icons.favorite_border,
+                              color: isWishlisted ? Colors.redAccent : AppColors.primaryGold,
+                              size: context.getResponsiveSize(5),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                  // Bottom Left: Ribbon Tags
+                  Positioned(
+                    bottom: context.getScreenHeight(8),
+                    left: 0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(
+                            bottom: context.getScreenHeight(0.8),
+                          ),
+                          padding: EdgeInsets.fromLTRB(
+                            context.getResponsiveSize(4),
+                            context.getScreenHeight(0.6),
+                            context.getResponsiveSize(3),
+                            context.getScreenHeight(0.6),
+                          ),
+                          decoration: BoxDecoration(
+                            color: stockColor,
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(3, 3),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            stockText,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: context.getResponsiveSize(3),
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        if (netWeight != null)
+                          Container(
+                            padding: EdgeInsets.fromLTRB(
+                              context.getResponsiveSize(4),
+                              context.getScreenHeight(0.6),
+                              context.getResponsiveSize(3),
+                              context.getScreenHeight(0.6),
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGold,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                              ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(3, 3),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            "Net Wt.: $netWeight g",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: context.getResponsiveSize(3.2),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  // Bottom Right: Zoom Icon
+                  if (product.imageUrl != null)
+                    Positioned(
+                      bottom: context.getScreenHeight(8),
+                      right: context.getResponsiveSize(4),
+                      child: GestureDetector(
+                        onTap: () => showImageZoomDialog(
+                          context,
+                          product.imageUrl!,
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            Icons.open_in_full,
+                            size: context.getResponsiveSize(5),
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // --- 2. Product Details (curved top, scrolls after image) ---
+            Container(
+              width: double.infinity,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               ),
-              child: SingleChildScrollView(
-                  physics: const ClampingScrollPhysics(),
-                  padding: EdgeInsets.fromLTRB(
-                    context.getResponsiveSize(5),
-                    context.getScreenHeight(2),
-                    context.getResponsiveSize(5),
-                    context.getScreenHeight(3),
+              padding: EdgeInsets.fromLTRB(
+                context.getResponsiveSize(5),
+                context.getScreenHeight(3),
+                context.getResponsiveSize(5),
+                context.getScreenHeight(3),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Product Title
+                  Text(
+                    product.name
+                        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                        .replaceAll(
+                          RegExp(r'collection', caseSensitive: false),
+                          '',
+                        )
+                        .trim()
+                        .toUpperCase(),
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(5.5),
+                      fontWeight: FontWeight.w900,
+                      color: const Color(0xFF2C3E50),
+                      height: 1.2,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Product Title
-                    Text(
-                      product.name
-                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                          .replaceAll(
-                            RegExp(r'collection', caseSensitive: false),
-                            '',
-                          )
-                          .trim()
-                          .toUpperCase(),
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(5.5),
-                        fontWeight: FontWeight.w900,
-                        color: const Color(0xFF2C3E50),
-                        height: 1.2,
-                        letterSpacing: 0.5,
-                      ),
+
+                  SizedBox(height: context.getScreenHeight(0.3)),
+
+                  // Tag Number
+                  Text(
+                    "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.2),
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
 
-                    SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.getScreenHeight(1)),
 
-                    // Tag Number
-                    Text(
-                      "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w600,
+                  // Price
+                  if (price != null &&
+                      (Get.find<AuthController>().user?.isRetailer ==
+                              true ||
+                          Get.find<AuthController>().isAdmin))
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(4),
+                        vertical: context.getScreenHeight(0.8),
                       ),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(1)),
-
-                    // Price
-                    if (price != null &&
-                        (Get.find<AuthController>().user?.isRetailer ==
-                                true ||
-                            Get.find<AuthController>().isAdmin))
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getResponsiveSize(4),
-                          vertical: context.getScreenHeight(0.8),
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.primaryGold.withValues(alpha: 0.1),
-                              AppColors.primaryGold.withValues(alpha: 0.05),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: AppColors.primaryGold.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "PRICE",
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.2),
-                                    color: Colors.grey.shade500,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                Text(
-                                  _formatPrice(price),
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(6),
-                                    color: AppColors.primaryGold,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ],
-                            ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primaryGold.withValues(alpha: 0.1),
+                            AppColors.primaryGold.withValues(alpha: 0.05),
                           ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.primaryGold.withValues(alpha: 0.2),
                         ),
                       ),
-
-                    SizedBox(height: context.getScreenHeight(1.5)),
-
-                    // Specifications Header & Customize Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            "Specification",
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "PRICE",
                             style: TextStyle(
-                              fontSize: context.getResponsiveSize(4),
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF2C3E50),
+                              fontSize: context.getResponsiveSize(2.2),
+                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
+                          Text(
+                            _formatPrice(price),
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(6),
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  SizedBox(height: context.getScreenHeight(1.5)),
+
+                  // Specifications Header & Customize Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          "Specification",
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(4),
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF2C3E50),
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Get.to(
-                              () => CustomiseOrderPage(product: product),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.tune,
-                            size: context.getResponsiveSize(4),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Get.to(
+                            () => CustomiseOrderPage(product: product),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.tune,
+                          size: context.getResponsiveSize(4),
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          "Customize",
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(2.8),
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
-                          label: Text(
-                            "Customize",
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(2.8),
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGold,
+                          elevation: 3,
+                          shadowColor: AppColors.primaryGold.withValues(
+                            alpha: 0.4,
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGold,
-                            elevation: 3,
-                            shadowColor: AppColors.primaryGold.withValues(
-                              alpha: 0.4,
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: context.getResponsiveSize(4),
-                              vertical: context.getScreenHeight(0.8),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getResponsiveSize(4),
+                            vertical: context.getScreenHeight(0.8),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                      ],
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(1)),
-
-                    // 2x2 Specifications Grid
-                    if (grossWeight != null || netWeight != null) ...[
-                      Row(
-                        children: [
-                          if (netWeight != null)
-                            Expanded(
-                              child: _buildSpecBox(
-                                context,
-                                Icons.scale_outlined,
-                                "NET WT.",
-                                "$netWeight g",
-                              ),
-                            ),
-                          if (netWeight != null && displayGrossWeight != null)
-                            SizedBox(width: context.getResponsiveSize(3)),
-                          if (displayGrossWeight != null)
-                            Expanded(
-                              child: _buildSpecBox(
-                                context,
-                                Icons.work_outline,
-                                "GROSS WT.",
-                                "$displayGrossWeight g",
-                              ),
-                            ),
-                        ],
-                      ),
-                      SizedBox(height: context.getScreenHeight(1)),
-                      Row(
-                        children: [
-                          if (netWeight != null)
-                            Expanded(
-                              child: _buildSpecBox(
-                                context,
-                                Icons.diamond_outlined,
-                                "PURITY",
-                                purity,
-                              ),
-                            ),
-                          if (netWeight != null && displayGrossWeight != null)
-                            SizedBox(width: context.getResponsiveSize(3)),
-                          if (displayGrossWeight != null)
-                            Expanded(
-                              child: _buildSpecBox(
-                                context,
-                                Icons.grid_view_outlined,
-                                "PIECES",
-                                pieces,
-                              ),
-                            ),
-                        ],
                       ),
                     ],
-                    if (netWeight == null && grossWeight == null) ...[
-                      Row(
-                        children: [
+                  ),
+
+                  SizedBox(height: context.getScreenHeight(1)),
+
+                  // 2x2 Specifications Grid
+                  if (grossWeight != null || netWeight != null) ...[
+                    Row(
+                      children: [
+                        if (netWeight != null)
+                          Expanded(
+                            child: _buildSpecBox(
+                              context,
+                              Icons.scale_outlined,
+                              "NET WT.",
+                              "$netWeight g",
+                            ),
+                          ),
+                        if (netWeight != null && displayGrossWeight != null)
+                          SizedBox(width: context.getResponsiveSize(3)),
+                        if (displayGrossWeight != null)
+                          Expanded(
+                            child: _buildSpecBox(
+                              context,
+                              Icons.work_outline,
+                              "GROSS WT.",
+                              "$displayGrossWeight g",
+                            ),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: context.getScreenHeight(1)),
+                    Row(
+                      children: [
+                        if (netWeight != null)
                           Expanded(
                             child: _buildSpecBox(
                               context,
@@ -888,7 +850,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               purity,
                             ),
                           ),
+                        if (netWeight != null && displayGrossWeight != null)
                           SizedBox(width: context.getResponsiveSize(3)),
+                        if (displayGrossWeight != null)
                           Expanded(
                             child: _buildSpecBox(
                               context,
@@ -897,107 +861,130 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               pieces,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-
-                    SizedBox(height: context.getScreenHeight(1)),
-
-                    // Size (Full Width)
-                    if (size != null && size.isNotEmpty) ...[
-                      SizedBox(
-                        width: double.infinity,
-                        child: _buildSpecBox(
-                          context,
-                          Icons.straighten,
-                          "SIZE",
-                          size,
+                      ],
+                    ),
+                  ],
+                  if (netWeight == null && grossWeight == null) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSpecBox(
+                            context,
+                            Icons.diamond_outlined,
+                            "PURITY",
+                            purity,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: context.getScreenHeight(1)),
-                    ],
+                        SizedBox(width: context.getResponsiveSize(3)),
+                        Expanded(
+                          child: _buildSpecBox(
+                            context,
+                            Icons.grid_view_outlined,
+                            "PIECES",
+                            pieces,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
 
-                    // 5th Specification (Full Width Collection Name)
+                  SizedBox(height: context.getScreenHeight(1)),
+
+                  // Size (Full Width)
+                  if (size != null && size.isNotEmpty) ...[
                     SizedBox(
                       width: double.infinity,
                       child: _buildSpecBox(
                         context,
-                        Icons.category_outlined,
-                        "COLLECTION NAME",
-                        collectionName,
+                        Icons.straighten,
+                        "SIZE",
+                        size,
                       ),
                     ),
-
-                    SizedBox(height: context.getScreenHeight(1.5)),
-
-                    // Description Header
-                    Text(
-                      "Description",
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(4),
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF2C3E50),
-                      ),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(0.5)),
-
-                    // Dynamic Description Text
-                    Text(
-                      "Elegant ${product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        color: Colors.grey.shade700,
-                        height: 1.5,
-                      ),
-                    ),
-
-                    SizedBox(height: context.getScreenHeight(1.5)),
-
-                    // Trust Badges Box
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: context.getScreenHeight(1.2),
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9F6F0),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primaryGold.withValues(alpha: 0.1),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _buildTrustBadge(
-                              context,
-                              Icons.local_shipping_outlined,
-                              "Pan-India\nShipping",
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildTrustBadge(
-                              context,
-                              Icons.verified_outlined,
-                              "Certified\nQuality",
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildTrustBadge(
-                              context,
-                              Icons.star_border,
-                              "Premium\nFinish",
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: context.getScreenHeight(1)),
                   ],
-                ),
+
+                  // 5th Specification (Full Width Collection Name)
+                  SizedBox(
+                    width: double.infinity,
+                    child: _buildSpecBox(
+                      context,
+                      Icons.category_outlined,
+                      "COLLECTION NAME",
+                      collectionName,
+                    ),
+                  ),
+
+                  SizedBox(height: context.getScreenHeight(1.5)),
+
+                  // Description Header
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(4),
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+
+                  SizedBox(height: context.getScreenHeight(0.5)),
+
+                  // Dynamic Description Text
+                  Text(
+                    "Elegant ${product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.2),
+                      color: Colors.grey.shade700,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  SizedBox(height: context.getScreenHeight(1.5)),
+
+                  // Trust Badges Box
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.getScreenHeight(1.2),
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF9F6F0),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.primaryGold.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildTrustBadge(
+                            context,
+                            Icons.local_shipping_outlined,
+                            "Pan-India\nShipping",
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildTrustBadge(
+                            context,
+                            Icons.verified_outlined,
+                            "Certified\nQuality",
+                          ),
+                        ),
+                        Expanded(
+                          child: _buildTrustBadge(
+                            context,
+                            Icons.star_border,
+                            "Premium\nFinish",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(10)),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
