@@ -78,7 +78,7 @@ Returns a paginated list of products. Supports category and stock filtering.
 GET /api/v1/products/search
 ```
 
-Search products by text, barcode, karat, or category. Returns paginated or single results.
+Search products by text, barcode, tagId, karat, or category. Returns paginated or single results.
 
 #### Query Parameters
 
@@ -86,6 +86,7 @@ Search products by text, barcode, karat, or category. Returns paginated or singl
 |-----------|------|----------|---------|-------------|
 | `search` | string | No | — | Free-text search (matches name, tagNo, etc.) |
 | `barcode` | string | No | — | Exact barcode match (returns single product) |
+| `tagId` | string | No | — | Exact tagId match (returns single product) |
 | `karat` | string | No | — | Filter by karat (e.g. `"18K"`, `"22K"`) |
 | `categoryId` | string | No | — | Filter by level-3 category UUID |
 | `page` | int | No | `1` | Page number |
@@ -153,7 +154,33 @@ When `barcode` is provided, `data.data` is a **single object** (not an array):
 }
 ```
 
-**⚠️ Important:** Barcode search returns `data.data` as an **object**, not an array. Text/category search returns `data.data` as an **array**. The frontend must handle both shapes.
+#### Response (200) — TagId Search
+
+When `tagId` is provided, `data.data` is a **single object** (not an array):
+
+```json
+{
+  "success": true,
+  "message": "Products fetched successfully",
+  "data": {
+    "paginated": false,
+    "totalCount": 1,
+    "data": {
+      "id": "63d2ae53-...",
+      "tagId": "11354143108707",
+      "tagNo": "92BX-4594",
+      "name": "92 BOX PACKING",
+      "imageUrl": "https://...",
+      "karat": null,
+      "isActive": true,
+      "rawData": { ... },
+      "category": { ... }
+    }
+  }
+}
+```
+
+**⚠️ Important:** Barcode and tagId searches return `data.data` as a **single object**, not an array. Text/category search returns `data.data` as an **array**. The frontend must handle both shapes.
 
 ---
 
@@ -327,3 +354,4 @@ The `rawData` object contains 100+ fields from the inventory system. The most us
 | `GET /get-all` | Returns `data.data` as **array**, `totalCount`/`totalPages` for pagination |
 | `GET /search?search=` | Returns `data.data` as **array**, paginated |
 | `GET /search?barcode=` | Returns `data.data` as **single object**, `paginated: false` |
+| `GET /search?tagId=` | Returns `data.data` as **single object**, `paginated: false` |
