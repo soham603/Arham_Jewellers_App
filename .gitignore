@@ -58,3 +58,6 @@ AGENT.md
 *.keystore
 key.properties
 
+# Sensitive local notes
+gitignore/
+
