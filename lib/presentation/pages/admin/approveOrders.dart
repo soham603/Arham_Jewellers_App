@@ -107,34 +107,32 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
               SizedBox(height: context.getScreenHeight(1.5)),
 
               // STATUS FILTER
-              Obx(
-                () => Row(
-                  children: [
-                    _filterSegment(
-                      context,
-                      label: 'PENDING',
-                      isActive: controller.selectedStatus.value == 'PENDING',
-                      color: const Color(0xFFD4AF37),
-                      onTap: () => controller.changeStatus('PENDING'),
-                    ),
-                    SizedBox(width: context.getResponsiveSize(1)),
-                    _filterSegment(
-                      context,
-                      label: 'APPROVED',
-                      isActive: controller.selectedStatus.value == 'APPROVED',
-                      color: Colors.green,
-                      onTap: () => controller.changeStatus('APPROVED'),
-                    ),
-                    SizedBox(width: context.getResponsiveSize(1)),
-                    _filterSegment(
-                      context,
-                      label: 'REJECTED',
-                      isActive: controller.selectedStatus.value == 'REJECTED',
-                      color: Colors.red,
-                      onTap: () => controller.changeStatus('REJECTED'),
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  _filterSegment(
+                    context,
+                    label: 'PENDING',
+                    isActive: controller.selectedStatus.value == 'PENDING',
+                    color: const Color(0xFFD4AF37),
+                    onTap: () => controller.changeStatus('PENDING'),
+                  ),
+                  SizedBox(width: context.getResponsiveSize(1)),
+                  _filterSegment(
+                    context,
+                    label: 'APPROVED',
+                    isActive: controller.selectedStatus.value == 'APPROVED',
+                    color: Colors.green,
+                    onTap: () => controller.changeStatus('APPROVED'),
+                  ),
+                  SizedBox(width: context.getResponsiveSize(1)),
+                  _filterSegment(
+                    context,
+                    label: 'REJECTED',
+                    isActive: controller.selectedStatus.value == 'REJECTED',
+                    color: Colors.red,
+                    onTap: () => controller.changeStatus('REJECTED'),
+                  ),
+                ],
               ),
 
               SizedBox(height: context.getScreenHeight(2)),

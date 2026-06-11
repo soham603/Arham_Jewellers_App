@@ -207,8 +207,6 @@ class CategoryManagerController extends GetxController {
   Future<String?> editCategory({
     required String id,
     String? name,
-    String? description,
-    String? parentId,
     File? imageFile,
   }) async {
     _actionLoadingId.value = id;
@@ -216,8 +214,6 @@ class CategoryManagerController extends GetxController {
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        "description": ?description,
-        "parentId": ?parentId,
         if (imageFile != null) "file": await MultipartFile.fromFile((await _compressImageFile(imageFile)).path),
       });
 

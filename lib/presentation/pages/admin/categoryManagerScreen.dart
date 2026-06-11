@@ -861,7 +861,6 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
         ? await widget.ctrl.editCategory(
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
-            description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
             imageFile: _pickedImage,
           )
         : await widget.ctrl.createCategory(
@@ -924,15 +923,17 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                 ),
                 SizedBox(height: context.getScreenHeight(2)),
 
-                _label('Description (optional)'),
-                SizedBox(height: context.getScreenHeight(0.6)),
-                TextFormField(
-                  controller: _descCtrl,
-                  style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
-                  maxLines: 3,
-                  decoration: _inputDec(context, 'Brief description...'),
-                ),
-                SizedBox(height: context.getScreenHeight(2)),
+                if (!isEditing) ...[
+                  _label('Description (optional)'),
+                  SizedBox(height: context.getScreenHeight(0.6)),
+                  TextFormField(
+                    controller: _descCtrl,
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
+                    maxLines: 3,
+                    decoration: _inputDec(context, 'Brief description...'),
+                  ),
+                  SizedBox(height: context.getScreenHeight(2)),
+                ],
 
                 _label('Image (optional)'),
                 SizedBox(height: context.getScreenHeight(0.8)),
