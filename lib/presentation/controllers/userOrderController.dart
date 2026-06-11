@@ -2,7 +2,6 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
-import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -80,11 +79,7 @@ class UserOrderController extends GetxController {
 
   int _ordersPage = 1;
 
-  final _productDataCache = <String, ProductModel>{};
-  final _isFetchingProductDetails = false.obs;
-  bool get isFetchingProductDetails => _isFetchingProductDetails.value;
 
-  ProductModel? getProductData(String productId) => _productDataCache[productId];
 
   // ── Status filter ──────────────────────────────────────────────────────
 
@@ -267,46 +262,6 @@ class UserOrderController extends GetxController {
       ToastUtils.showError(errorMessage);
     } finally {
       _isFetchingOrders.value = false;
-    }
-  }
-
-  Future<void> fetchProductDetails(List<UserOrderItemModel> items) async {
-    final uncached = <String, String>{};
-    for (final item in items) {
-      final id = item.product.id;
-      if (!_productDataCache.containsKey(id) && !uncached.containsKey(id)) {
-        uncached[id] = item.product.name;
-      }
-    }
-    if (uncached.isEmpty) return;
-
-    _isFetchingProductDetails.value = true;
-    try {
-      final futures = uncached.entries.map((entry) async {
-        try {
-          final response = await _orderRepo.searchProducts(
-            query: entry.value,
-            queryParams: {
-              "page": 1,
-              "limit": 10,
-              "showAll": true,
-            },
-          );
-          final List raw = response['data']['data'] ?? [];
-          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
-                (p) => p?['id'] == entry.key,
-                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
-              );
-          if (match != null) {
-            _productDataCache[entry.key] = ProductModel.fromJson(match);
-          }
-        } catch (e) {
-          Logger.error("UserOrderController", "Product detail fetch failed for ${entry.key}: $e");
-        }
-      });
-      await Future.wait(futures);
-    } finally {
-      _isFetchingProductDetails.value = false;
     }
   }
 

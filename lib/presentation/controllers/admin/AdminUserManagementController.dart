@@ -51,7 +51,7 @@ class AdminUserManagementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUsers();
+    if (_users.isEmpty) fetchUsers();
   }
 
   @override
@@ -155,7 +155,6 @@ class AdminUserManagementController extends GetxController {
   void setFilter(String filter) {
     if (_activeFilter.value == filter) return;
     _activeFilter.value = filter;
-    fetchUsers();
   }
 
   List<UserSearchModel> get filteredUsers {
@@ -191,16 +190,17 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  /// Toggle staff status for a user
-  Future<bool> toggleStaff({
+  /// Create a new admin via /create-admin
+  Future<bool> createAdmin({
     required String userId,
-    required bool isStaff,
+    required String phoneNumber,
+    required String adminPassword,
   }) async {
     return _handleAction(
       userId: userId,
-      actionType: AdminAction.toggleStaff,
-      body: {'userId': userId, 'isStaff': isStaff},
-      actionLabel: isStaff ? 'granted staff' : 'removed staff',
+      actionType: AdminAction.createAdmin,
+      body: {'phoneNumber': phoneNumber, 'adminPassword': adminPassword},
+      actionLabel: 'created as admin',
     );
   }
 
@@ -243,8 +243,8 @@ class AdminUserManagementController extends GetxController {
 
       final Map<String, dynamic> response;
       switch (actionType) {
-        case AdminAction.toggleStaff:
-          response = await _adminAccessRepo.toggleStaff(data: body);
+        case AdminAction.createAdmin:
+          response = await _adminAccessRepo.createAdmin(data: body);
           break;
         case AdminAction.toggleRetailer:
           response = await _adminAccessRepo.toggleRetailer(data: body);
@@ -307,7 +307,7 @@ enum UserSearchMode {
 
 enum AdminAction {
   toggleActivation,
-  toggleStaff,
+  createAdmin,
   toggleRetailer,
   resetPassword,
 }

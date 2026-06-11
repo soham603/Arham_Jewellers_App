@@ -39,7 +39,7 @@ class AdminAccessRepository extends BaseRepository {
   Future<Map<String, dynamic>> toggleUserActivation({
     required Map<String, dynamic> data,
   }) async {
-    final response = await dio.post(
+    final response = await dio.patch(
       '/api/v1/admin-access/update-user-activation',
       data: data,
       options: Options(extra: {'requiresAuth': true}),
@@ -47,11 +47,11 @@ class AdminAccessRepository extends BaseRepository {
     return response.data;
   }
 
-  Future<Map<String, dynamic>> toggleStaff({
+  Future<Map<String, dynamic>> createAdmin({
     required Map<String, dynamic> data,
   }) async {
     final response = await dio.post(
-      ApiUrlConstants.ADMIN_ACCESS_TOGGLE_STAFF,
+      ApiUrlConstants.CREATE_ADMIN,
       data: data,
       options: Options(extra: {'requiresAuth': true}),
     );
@@ -72,7 +72,7 @@ class AdminAccessRepository extends BaseRepository {
   Future<Map<String, dynamic>> adminResetPassword({
     required Map<String, dynamic> data,
   }) async {
-    final response = await dio.post(
+    final response = await dio.patch(
       ApiUrlConstants.ADMIN_RESET_PASSWORD,
       data: data,
       options: Options(extra: {'requiresAuth': true}),

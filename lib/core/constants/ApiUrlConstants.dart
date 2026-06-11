@@ -9,7 +9,7 @@ class ApiUrlConstants {
   static const String REFRESH_TOKEN = '/api/v1/auth/refresh-token';
   static const String FORGOT_PASSWORD = '/api/v1/auth/forgot-password';
   static const String UPDATE_FCM_TOKEN = '/api/v1/auth/update-fcm-token';
-  static const String ADMIN_RESET_PASSWORD = '/api/v1/auth/admin-reset-password';
+  static const String ADMIN_RESET_PASSWORD = '/api/v1/admin-access/admin-reset-password';
   static const String DEVICE_CHANGE_REQUEST = '/api/v1/auth/device-change-request';
   static const String DEVICE_CHANGE_REQUEST_ACTION = '/api/v1/auth/device-change-request/action';
 
@@ -47,7 +47,7 @@ class ApiUrlConstants {
   static const String ADMIN_ACCESS_GET_ALL = '/api/v1/admin-access/get-all-access';
   static const String ADMIN_ACCESS_HANDLE = '/api/v1/admin-access/handle-access';
   static const String ADMIN_ACCESS_GET_ALL_USERS = '/api/v1/admin-access/get-all-users';
-  static const String ADMIN_ACCESS_TOGGLE_STAFF = '/api/v1/admin-access/toggle-staff';
+  static const String CREATE_ADMIN = '/api/v1/admin-access/create-admin';
   static const String ADMIN_ACCESS_TOGGLE_RETAILER = '/api/v1/admin-access/toggle-retailer';
 
   static String ancillaryGetPage(String page) => '/api/v1/ancillary/get-page/$page';

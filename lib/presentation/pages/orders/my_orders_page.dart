@@ -134,20 +134,24 @@ class _MyOrdersPageState extends State<MyOrdersPage>
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
-        final now = DateTime.now();
-        if (_lastBackPress != null && now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
-          SystemNavigator.pop();
+        if ((Get.key.currentState?.canPop() ?? false)) {
+          Get.back();
         } else {
-          _lastBackPress = now;
-          HapticFeedback.lightImpact();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Press back again to exit'),
-              duration: Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-              margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
-            ),
-          );
+          final now = DateTime.now();
+          if (_lastBackPress != null && now.difference(_lastBackPress!) < const Duration(seconds: 2)) {
+            SystemNavigator.pop();
+          } else {
+            _lastBackPress = now;
+            HapticFeedback.lightImpact();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Press back again to exit'),
+                duration: Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+                margin: EdgeInsets.only(bottom: 80, left: 16, right: 16),
+              ),
+            );
+          }
         }
       },
       child: Scaffold(
@@ -268,6 +272,31 @@ class _OrderCard extends StatelessWidget {
                               color: AppColors.textMuted,
                             ),
                           ),
+                          if (order.isCustomOrder) ...[
+                            SizedBox(height: context.getScreenHeight(0.6)),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSize(2),
+                                vertical: context.getScreenHeight(0.3),
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFFF3E0),
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(
+                                  color: AppColors.primaryGold.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                "CUSTOM",
+                                style: TextStyle(
+                                  color: AppColors.primaryGold,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: context.getResponsiveSize(2.4),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                       Row(
@@ -304,7 +333,9 @@ class _OrderCard extends StatelessWidget {
                           children: [
                             if (order.items.isEmpty)
                               Text(
-                                '${order.items.length} item(s)',
+                                order.isCustomOrder
+                                    ? (order.purity ?? 'Custom item')
+                                    : '${order.items.length} item(s)',
                                 style: TextStyle(
                                   fontSize: context.getResponsiveSize(3.8),
                                   color: AppColors.textMuted,
@@ -659,6 +690,22 @@ class _OrderImagesStack extends StatelessWidget {
         .toList();
 
     if (images.isEmpty) {
+      if (order.isCustomOrder && order.referenceImages.isNotEmpty) {
+        final refImages = order.referenceImages.take(3).toList();
+        return SizedBox(
+          width: size,
+          height: size,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: CachedNetworkImage(
+              imageUrl: refImages.first,
+              fit: BoxFit.cover,
+              placeholder: (_, _) => RatneshFallback.s(width: size, height: size),
+              errorWidget: (_, _, _) => RatneshFallback.s(width: size, height: size),
+            ),
+          ),
+        );
+      }
       return ClipRRect(
         borderRadius: BorderRadius.circular(14),
         child: RatneshFallback.s(width: size, height: size),

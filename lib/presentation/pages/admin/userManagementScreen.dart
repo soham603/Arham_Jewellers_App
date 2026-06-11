@@ -29,7 +29,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     super.initState();
     controller = Get.isRegistered<AdminUserManagementController>()
         ? Get.find<AdminUserManagementController>()
-        : Get.put(AdminUserManagementController());
+        : Get.put(AdminUserManagementController(), permanent: true);
   }
 
   @override
@@ -633,6 +633,27 @@ class _UserCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (user.forgotPasswordStatus == 'PENDING') ...[
+                    SizedBox(height: context.getScreenHeight(0.3)),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(2),
+                        vertical: context.getScreenHeight(0.2),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Password Pending',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.5),
+                          fontWeight: FontWeight.w700,
+                          color: Colors.orange,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -659,28 +680,6 @@ class _UserCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (user.forgotPasswordStatus == 'PENDING') ...[
-                  SizedBox(height: context.getScreenHeight(0.5)),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.getResponsiveSize(2.5),
-                      vertical: context.getScreenHeight(0.4),
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'PASSWORD PENDING',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontSize: context.getResponsiveSize(2),
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ],
                 SizedBox(height: context.getScreenHeight(0.5)),
                 Icon(
                   Icons.chevron_right_rounded,
@@ -725,7 +724,6 @@ class _UserDetailSheet extends StatefulWidget {
 
 class _UserDetailSheetState extends State<_UserDetailSheet> {
   late bool _isRetailer;
-  late bool _isStaff;
   final _newPasswordController = TextEditingController();
   bool _obscureNewPassword = true;
 
@@ -733,7 +731,6 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   void initState() {
     super.initState();
     _isRetailer = widget.user.isRetailer ?? false;
-    _isStaff = widget.user.role == 'ADMIN' || widget.user.role == 'SUPERADMIN';
   }
 
   @override
@@ -1108,18 +1105,19 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       ),
       child: Column(
         children: [
-          // Staff Toggle — visible only to SUPERADMIN
-          if (Get.find<AuthController>().user?.role == 'SUPERADMIN') ...[
-            _toggleRow(
+          // Create Admin — visible only to SUPERADMIN for non-admin users
+          if (Get.find<AuthController>().user?.role == 'SUPERADMIN' &&
+              widget.user.role != 'ADMIN' &&
+              widget.user.role != 'SUPERADMIN') ...[
+            _actionRow(
               context,
               icon: Icons.admin_panel_settings_outlined,
-              title: 'Staff Access',
-              subtitle: 'Grant admin privileges',
-              value: _isStaff,
-              activeColor: AppColors.primaryGold,
+              title: 'Create Admin',
+              subtitle: 'Promote to admin privileges',
+              color: AppColors.primaryGold,
               isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
                   widget.controller.actioningId == widget.user.id,
-              onChanged: (val) => _confirmStaffToggle(context, val),
+              onTap: () => _showCreateAdminDialog(context),
             ),
             _sheetDivider(context),
           ],
@@ -1261,64 +1259,68 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     required bool isLoading,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: isLoading ? null : onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
-        child: Row(
-          children: [
-            Container(
-              width: context.getResponsiveSize(10),
-              height: context.getResponsiveSize(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                icon,
-                size: context.getResponsiveSize(5),
-                color: color,
-              ),
-            ),
-            SizedBox(width: context.getResponsiveSize(3)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.8),
-                      fontWeight: FontWeight.w600,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(2.8),
-                      color: context.colorPalette.subTitleColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              SizedBox(
-                width: context.getResponsiveSize(5),
-                height: context.getResponsiveSize(5),
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
+          child: Row(
+            children: [
+              Container(
+                width: context.getResponsiveSize(10),
+                height: context.getResponsiveSize(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  size: context.getResponsiveSize(5),
                   color: color,
                 ),
-              )
-            else
-              Icon(
-                Icons.chevron_right_rounded,
-                color: context.colorPalette.subTitleColor,
-                size: context.getResponsiveSize(5),
               ),
-          ],
+              SizedBox(width: context.getResponsiveSize(3)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.8),
+                        fontWeight: FontWeight.w600,
+                        color: color,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(2.8),
+                        color: context.colorPalette.subTitleColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isLoading)
+                SizedBox(
+                  width: context.getResponsiveSize(5),
+                  height: context.getResponsiveSize(5),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: color,
+                  ),
+                )
+              else
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: context.colorPalette.subTitleColor,
+                  size: context.getResponsiveSize(5),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -1468,72 +1470,154 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     );
   }
 
-  void _confirmStaffToggle(BuildContext context, bool newValue) {
+  void _showCreateAdminDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+    var obscurePassword = true;
+
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: context.colorPalette.backgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGold.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primaryGold, size: 20),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final hasPassword = passwordController.text.trim().isNotEmpty;
+
+          return AlertDialog(
+            backgroundColor: context.colorPalette.backgroundColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGold.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primaryGold, size: 20),
+                ),
+                SizedBox(width: context.getResponsiveSize(2)),
+                Text(
+                  'Create Admin',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4.5),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: context.getResponsiveSize(2)),
-            Text(
-              newValue ? 'Grant Staff Access' : 'Remove Staff Access',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Promote ${widget.user.name} to admin.',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.8),
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(0.5)),
+                Text(
+                  'Phone: ${widget.user.phoneNumber}',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.5),
+                    color: context.colorPalette.subTitleColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: context.getScreenHeight(2)),
+                TextField(
+                  controller: passwordController,
+                  obscureText: obscurePassword,
+                  onChanged: (_) => setDialogState(() {}),
+                  style: TextStyle(
+                    color: AppColors.textDark,
+                    fontSize: context.getResponsiveSize(3.5),
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Admin Password',
+                    hintText: 'Set admin password',
+                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    prefixIcon: Icon(
+                      Icons.lock_outline_rounded,
+                      color: context.colorPalette.subTitleColor,
+                      size: context.getResponsiveSize(4.5),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey.shade500,
+                        size: context.getResponsiveSize(4.5),
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor: context.colorPalette.boxColor,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.getScreenHeight(1.2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppColors.primaryGold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        content: Text(
-          newValue
-              ? 'Grant staff privileges to ${widget.user.name}?'
-              : 'Remove staff privileges from ${widget.user.name}?',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            color: context.colorPalette.textColor,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor)),
-          ),
-          Obx(
-            () => ElevatedButton(
-              onPressed: widget.controller.actionState == CurrentAppState.LOADING
-                  ? null
-                  : () async {
-                      Navigator.of(dialogContext).pop();
-                      final ok = await widget.controller.toggleStaff(
-                        userId: widget.user.id,
-                        isStaff: newValue,
-                      );
-                      if (ok) setState(() => _isStaff = newValue);
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryGold,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor)),
               ),
-              child: widget.controller.actionState == CurrentAppState.LOADING
-                  ? const SizedBox(
-                      width: 16, height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Text('Confirm', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-            ),
-          ),
-        ],
+              Obx(
+                () => ElevatedButton(
+                  onPressed: hasPassword && widget.controller.actionState != CurrentAppState.LOADING
+                      ? () async {
+                          final password = passwordController.text.trim();
+                          Navigator.of(dialogContext).pop();
+                          await widget.controller.createAdmin(
+                            userId: widget.user.id,
+                            phoneNumber: widget.user.phoneNumber,
+                            adminPassword: password,
+                          );
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryGold,
+                    disabledBackgroundColor: AppColors.primaryGold.withValues(alpha: 0.35),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: widget.controller.actionState == CurrentAppState.LOADING
+                      ? const SizedBox(
+                          width: 16, height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Create Admin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

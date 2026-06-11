@@ -6,11 +6,11 @@ import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -22,18 +22,6 @@ class UserOrderDetailScreen extends StatefulWidget {
 }
 
 class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
-  late final UserOrderController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    if (Get.isRegistered<UserOrderController>()) {
-      controller = Get.find<UserOrderController>();
-    } else {
-      controller = Get.put(UserOrderController());
-    }
-    controller.fetchProductDetails(widget.order.items);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +136,14 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   }
 
   Widget _buildOrderItems(BuildContext context, UserOrderModel order) {
+    Logger.info("OrderDetail", "isCustomOrder=${order.isCustomOrder} purity=${order.purity} items=${order.items.length}");
+    if (order.isCustomOrder || order.purity != null) {
+      return _buildCustomOrderDetails(context, order);
+    }
+    return _buildStandardOrderItems(context, order);
+  }
+
+  Widget _buildStandardOrderItems(BuildContext context, UserOrderModel order) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -240,7 +236,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                       fontSize: context.getResponsiveSize(2.2),
                                     ),
                                   ),
-                                ),
+                              ),
                             ],
                           ),
                           SizedBox(height: context.getScreenHeight(0.5)),
@@ -256,24 +252,8 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                 context,
                                 label: "₹${item.price.toStringAsFixed(2)}",
                               ),
-                              ...() {
-                                final chips = <Widget>[];
-                                final isLoading = controller.isFetchingProductDetails;
-                                final productData = controller.getProductData(item.product.id);
-                                final purity = productData?.touch;
-                                if (purity != null && purity.isNotEmpty) {
-                                  chips.add(_itemDetailChip(
-                                    context,
-                                    label: "Purity: $purity",
-                                  ));
-                                } else if (isLoading) {
-                                  chips.add(_ShimmerChip(context: context));
-                                }
-                                return chips;
-                              }(),
                             ],
                           ),
-
                         ],
                       ),
                     ),
@@ -282,6 +262,106 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomOrderDetails(BuildContext context, UserOrderModel order) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE7DED2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.handyman_rounded,
+                size: context.getResponsiveSize(5),
+                color: AppColors.primaryGold,
+              ),
+              SizedBox(width: context.getResponsiveSize(2)),
+              Text(
+                "Custom Order Details",
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: context.getResponsiveSize(4.4),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.getScreenHeight(1.5)),
+          _customDetailRow(context, "Purity", order.purity ?? '-'),
+          _customDetailRow(context, "Style", order.style ?? '-'),
+          _customDetailRow(context, "Marking", order.marking ?? '-'),
+          if (order.referenceImages.isNotEmpty) ...[
+            SizedBox(height: context.getScreenHeight(1.5)),
+            Text(
+              "Reference Images",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: context.getResponsiveSize(3.8),
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(
+              height: context.getResponsiveSize(20),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: order.referenceImages.length,
+                separatorBuilder: (_, _) => SizedBox(
+                  width: context.getResponsiveSize(2),
+                ),
+                itemBuilder: (_, i) => ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: CachedNetworkImage(
+                    imageUrl: order.referenceImages[i],
+                    width: context.getResponsiveSize(20),
+                    height: context.getResponsiveSize(20),
+                    fit: BoxFit.cover,
+                    placeholder: (_, _) => const RatneshFallback.xs(),
+                    errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _customDetailRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+      child: Row(
+        children: [
+          SizedBox(
+            width: context.getResponsiveSize(18),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: context.getResponsiveSize(3.5),
+                color: AppColors.textMuted,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: context.getResponsiveSize(3.5),
+              color: AppColors.textDark,
+            ),
+          ),
         ],
       ),
     );
@@ -484,21 +564,16 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
   Future<void> _downloadOrderPdf(BuildContext context, UserOrderModel order) async {
     final ctx = context;
-    final controller = UserOrderController.instance;
     _shareWithLoading(
       ctx,
       () async {
         final items = order.items.map((item) {
-          final productData = controller.getProductData(item.product.id);
           return {
             'name': item.product.name,
             'imageUrl': item.product.displayImageUrl,
             'quantity': item.quantity,
             'price': item.price,
             'isRejected': item.isRejected,
-            'category': productData?.category?.name ?? '-',
-            'karat': productData?.touch ?? productData?.karat ?? '-',
-            'netWeight': productData?.netWeight,
           };
         }).toList();
 
@@ -748,19 +823,3 @@ class _StatusInfo {
   });
 }
 
-class _ShimmerChip extends StatelessWidget {
-  final BuildContext context;
-  const _ShimmerChip({required this.context});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: context.getResponsiveSize(18),
-      height: context.getResponsiveSize(5),
-      decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
-    );
-  }
-}

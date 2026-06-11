@@ -9,6 +9,11 @@ class UserOrderModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<UserOrderItemModel> items;
+  final bool isCustomOrder;
+  final String? purity;
+  final String? style;
+  final String? marking;
+  final List<String> referenceImages;
 
   UserOrderModel({
     required this.id,
@@ -19,9 +24,15 @@ class UserOrderModel {
     required this.createdAt,
     required this.updatedAt,
     required this.items,
+    this.isCustomOrder = false,
+    this.purity,
+    this.style,
+    this.marking,
+    this.referenceImages = const [],
   });
 
   factory UserOrderModel.fromJson(Map<String, dynamic> json) {
+    final isCustom = json["isCustomOrder"] ?? json["isCustom"] ?? false;
     return UserOrderModel(
       id: json["id"]?.toString() ?? '',
       orderToken: json["orderToken"],
@@ -40,6 +51,14 @@ class UserOrderModel {
                 (e) => UserOrderItemModel.fromJson(e),
               ),
             )
+          : [],
+      isCustomOrder: isCustom,
+      purity: json["purity"]?.toString(),
+      style: json["style"]?.toString(),
+      marking: json["marking"]?.toString(),
+      referenceImages: json["referenceImages"] != null
+          ? List<String>.from(
+              (json["referenceImages"] as List).map((e) => e.toString()))
           : [],
     );
   }

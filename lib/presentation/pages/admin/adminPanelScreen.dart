@@ -175,21 +175,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 child: Container(
                   padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                   decoration: BoxDecoration(
-                    color: _isGridView
-                        ? AppColors.primaryGold.withValues(alpha: 0.15)
-                        : Colors.white,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _isGridView
-                          ? AppColors.primaryGold
-                          : const Color(0xFFE7DED2),
-                    ),
+                    border: Border.all(color: const Color(0xFFE7DED2)),
                   ),
                   child: Icon(
                     _isGridView ? Icons.list_rounded : Icons.grid_view_rounded,
-                    color: _isGridView
-                        ? AppColors.primaryGold
-                        : AppColors.textMuted,
+                    color: AppColors.textMuted,
                     size: context.getResponsiveSize(5),
                   ),
                 ),

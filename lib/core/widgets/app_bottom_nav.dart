@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 class _NavItem {
   const _NavItem({
@@ -122,7 +123,8 @@ class AppBottomNav extends StatelessWidget {
                         unselectedBubbleColor: unselectedBubbleColor,
                         selectedIconColor: colorScheme.onPrimary,
                         selectedLabelColor: colorScheme.primary,
-                        unselectedContentColor: colorScheme.onSurfaceVariant,
+                        unselectedIconColor: context.colorPalette.goldDeep,
+                        unselectedLabelColor: colorScheme.onSurfaceVariant,
                       );
                     }),
                   ),
@@ -152,7 +154,8 @@ class _NavItemTile extends StatelessWidget {
     required this.unselectedBubbleColor,
     required this.selectedIconColor,
     required this.selectedLabelColor,
-    required this.unselectedContentColor,
+    required this.unselectedIconColor,
+    required this.unselectedLabelColor,
   });
 
   final _NavItem item;
@@ -169,7 +172,8 @@ class _NavItemTile extends StatelessWidget {
   final Color unselectedBubbleColor;
   final Color selectedIconColor;
   final Color selectedLabelColor;
-  final Color unselectedContentColor;
+  final Color unselectedIconColor;
+  final Color unselectedLabelColor;
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +197,8 @@ class _NavItemTile extends StatelessWidget {
               mouseCursor: SystemMouseCursors.click,
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              hoverColor: (isSelected ? selectedIconColor : unselectedContentColor).withOpacity(0.03),
-              focusColor: (isSelected ? selectedIconColor : unselectedContentColor).withOpacity(0.05),
+              hoverColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.03),
+              focusColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.05),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 child: Center(
@@ -221,7 +225,7 @@ class _NavItemTile extends StatelessWidget {
                             size: iconSize,
                             color: isSelected
                                 ? selectedIconColor
-                                : unselectedContentColor,
+                                : unselectedIconColor,
                           ),
                         ),
                       ),
@@ -238,7 +242,7 @@ class _NavItemTile extends StatelessWidget {
                                 isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected
                                 ? selectedLabelColor
-                                : unselectedContentColor,
+                                : unselectedLabelColor,
                           ),
                           child: Text(
                             item.label,

@@ -38,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String _selectedCountryCode = '+91';
   bool _isFormValid = false;
   bool _isSubmitting = false;
+  bool _obscurePassword = true;
 
   // ───────────────────────── India States & Cities ─────────────────────────
   static const Map<String, List<String>> _indiaData = {
@@ -402,8 +403,21 @@ class _RegisterPageState extends State<RegisterPage> {
                                 AnimatedTextField(
                                   controller: passwordController,
                                   hintText: 'Create Password *',
-                                  obscureText: true,
+                                  obscureText: _obscurePassword,
                                   isRequired: true,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
                                   validator: _validatePassword,
                                 ),
 

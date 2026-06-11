@@ -1,9 +1,12 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'dart:async';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -1571,6 +1574,7 @@ class _CarouselSection extends StatefulWidget {
 
 class _CarouselSectionState extends State<_CarouselSection> {
   final Map<int, VideoPlayerController> _videoControllers = {};
+  final Set<String> _failedVideoUrls = {};
 
   @override
   void didUpdateWidget(_CarouselSection oldWidget) {
@@ -1596,18 +1600,47 @@ class _CarouselSectionState extends State<_CarouselSection> {
 
   Future<void> _maybeInitVideo(int index, String url) async {
     if (_videoControllers.containsKey(index)) return;
-    final ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
-    _videoControllers[index] = ctrl;
+    if (_failedVideoUrls.contains(url)) return;
+
+    VideoPlayerController? ctrl;
+
     try {
+      ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoControllers[index] = ctrl;
       await ctrl.initialize();
-      ctrl.setLooping(true);
+    } catch (e) {
+      ctrl?.dispose();
+      _videoControllers.remove(index);
+      Logger.warning("HomePage", "Network video failed for index $index, trying download fallback...");
+
+      try {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/carousel_video_$index.mp4');
+        if (!await file.exists()) {
+          await Dio().download(url, file.path);
+        }
+        ctrl = VideoPlayerController.file(file);
+        _videoControllers[index] = ctrl;
+        await ctrl.initialize();
+      } catch (e2, st2) {
+        Logger.error("HomePage", "All video playback methods failed for carousel index $index", stackTrace: st2);
+        _failedVideoUrls.add(url);
+        _videoControllers.remove(index);
+        ctrl?.dispose();
+        return;
+      }
+    }
+
+    try {
+      ctrl!.setLooping(true);
       ctrl.setVolume(0);
       if (mounted && index == widget.currentIndex) {
         ctrl.play();
         setState(() {});
       }
     } catch (e, st) {
-      Logger.error("HomePage", "Failed to initialize video controller for carousel index $index", stackTrace: st);
+      Logger.error("HomePage", "Failed to setup video for carousel index $index", stackTrace: st);
+      _failedVideoUrls.add(url);
       _videoControllers.remove(index);
       ctrl.dispose();
     }
@@ -1626,6 +1659,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
       ctrl.dispose();
     }
     _videoControllers.clear();
+    _failedVideoUrls.clear();
     super.dispose();
   }
 

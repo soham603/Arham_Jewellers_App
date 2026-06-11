@@ -36,8 +36,9 @@ Future<void> main() async {
       }
     }
     Get.put(NotificationController());
-    runApp(const RatneshGoldApp());
   }, (error, stackTrace) {
     Logger.error('Uncaught Error', '$error\n$stackTrace');
   });
+
+  runApp(const RatneshGoldApp());
 }
