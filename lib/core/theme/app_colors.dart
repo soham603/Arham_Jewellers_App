@@ -31,4 +31,6 @@ abstract class AppColors {
   static const cardBgLight = Color(0xFFF8F5F0);
   static const categoryChipBg = Color(0xFFFFF6DD);
   static const whatsappGreen = Color(0xFF25D366);
+  static const goldDeep = Color(0xFF5C4209);
+  static const goldDark = Color(0xFF8B6914);
 }
