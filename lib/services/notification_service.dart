@@ -199,10 +199,14 @@ class NotificationService {
 
     if (title.isEmpty && body.isEmpty) return;
 
+    final payload = Map<String, dynamic>.from(message.data);
+    if (!payload.containsKey('title')) payload['title'] = title;
+    if (!payload.containsKey('body')) payload['body'] = body;
+
     showSystemNotification(
       title: title,
       body: body,
-      payload: message.data,
+      payload: payload,
     );
   }
 

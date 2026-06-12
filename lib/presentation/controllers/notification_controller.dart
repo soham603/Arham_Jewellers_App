@@ -41,7 +41,14 @@ class NotificationController extends GetxController {
     };
 
     _notificationService.onMessageReceived = (message) {
-      final notification = NotificationModel.fromFcmPayload(message.data);
+      final payload = Map<String, dynamic>.from(message.data);
+      if (message.notification?.title != null && message.notification!.title!.isNotEmpty) {
+        payload['title'] = message.notification!.title!;
+      }
+      if (message.notification?.body != null && message.notification!.body!.isNotEmpty) {
+        payload['body'] = message.notification!.body!;
+      }
+      final notification = NotificationModel.fromFcmPayload(payload);
       addNotification(notification);
     };
 

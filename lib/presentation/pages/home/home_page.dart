@@ -1467,21 +1467,21 @@ class _IconBtn extends StatelessWidget {
           ),
           if (badgeCount > 0)
             Positioned(
-              right: -4,
-              top: -4,
+              right: -2,
+              top: -2,
               child: Container(
-                padding: EdgeInsets.all(context.getResponsiveSize(1)),
-                constraints: BoxConstraints(minWidth: context.responsiveWidth(18, tabletVal: 24, largeTabletVal: 28), minHeight: context.responsiveWidth(18, tabletVal: 24, largeTabletVal: 28)),
+                padding: EdgeInsets.all(0),
+                constraints: BoxConstraints(minWidth: context.responsiveWidth(10, tabletVal: 13, largeTabletVal: 15), minHeight: context.responsiveWidth(10, tabletVal: 13, largeTabletVal: 15)),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(color: Colors.white, width: 1),
                 ),
                   child: Text(
                     badgeCount > 99 ? '99+' : '$badgeCount',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.responsiveFont(10, tabletMultiplier: 1.5, largeTabletMultiplier: 1.8),
+                      fontSize: context.responsiveFont(8, tabletMultiplier: 1.2, largeTabletMultiplier: 1.3),
                       fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,
