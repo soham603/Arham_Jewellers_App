@@ -15,8 +15,14 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class CategoryListingPage extends StatefulWidget {
   final List<Karat> karats;
   final String? title;
+  final bool showBothLogos;
 
-  const CategoryListingPage({super.key, required this.karats, this.title});
+  const CategoryListingPage({
+    super.key,
+    required this.karats,
+    this.title,
+    this.showBothLogos = false,
+  });
 
   @override
   State<CategoryListingPage> createState() => _CategoryListingPageState();
@@ -121,8 +127,10 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.title ??
-        '${widget.karats.map((k) => k.displayName).join(' & ')} Collection';
+    final title = widget.showBothLogos
+        ? 'Shree Arham Gold & Ratnesh Gold Design Catalog'
+        : (widget.title ??
+            '${widget.karats.map((k) => k.displayName).join(' & ')} Collection');
 
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
@@ -141,21 +149,44 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                             padding: EdgeInsets.only(
                               top: context.responsiveWidth(16, tabletVal: 24),
                             ),
-                            child: _is22kOnly
-                                ? LogoWidget(
-                                    showIcon: true,
-                                    showName: false,
-                                    showSubtitle: false,
-                                    logoSize: context.responsiveWidth(80, tabletVal: 110),
-                                    logoAsset: 'assets/images/arham-logo.png',
-                                    iconColor: context.colorPalette.goldDark,
+                            child: widget.showBothLogos
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      LogoWidget(
+                                        showIcon: true,
+                                        showName: false,
+                                        showSubtitle: false,
+                                        logoSize: context.responsiveWidth(60, tabletVal: 80),
+                                        logoAsset: 'assets/images/arham-logo.png',
+                                        iconColor: context.colorPalette.goldDark,
+                                      ),
+                                      SizedBox(width: context.responsiveWidth(16, tabletVal: 24)),
+                                      LogoWidget(
+                                        showIcon: true,
+                                        showName: false,
+                                        showSubtitle: false,
+                                        logoSize: context.responsiveWidth(60, tabletVal: 80),
+                                        logoAsset: 'assets/images/ratnesh-logo.png',
+                                        iconColor: context.colorPalette.goldDark,
+                                      ),
+                                    ],
                                   )
-                                : LogoWidget(
-                                    showIcon: true,
-                                    showName: true,
-                                    showSubtitle: false,
-                                    logoSize: context.responsiveWidth(80, tabletVal: 110),
-                                  ),
+                                : _is22kOnly
+                                    ? LogoWidget(
+                                        showIcon: true,
+                                        showName: false,
+                                        showSubtitle: false,
+                                        logoSize: context.responsiveWidth(80, tabletVal: 110),
+                                        logoAsset: 'assets/images/arham-logo.png',
+                                        iconColor: context.colorPalette.goldDark,
+                                      )
+                                    : LogoWidget(
+                                        showIcon: true,
+                                        showName: true,
+                                        showSubtitle: false,
+                                        logoSize: context.responsiveWidth(80, tabletVal: 110),
+                                      ),
                           ),
                         ),
                         Positioned(

@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:picons/picons.dart';
 
 class _NavItem {
   const _NavItem({
     required this.label,
-    required this.icon,
-  });
+    this.icon,
+    this.selectedIcon,
+    this.assetPath,
+    this.isCenter = false,
+  }) : assert(
+          assetPath != null || (icon != null && selectedIcon != null),
+          'Provide either assetPath or both icon and selectedIcon.',
+        );
 
   final String label;
-  final IconData icon;
+  final IconData? icon;
+  final IconData? selectedIcon;
+  final String? assetPath;
+  final bool isCenter;
 }
 
 class AppBottomNav extends StatelessWidget {
@@ -29,17 +39,54 @@ class AppBottomNav extends StatelessWidget {
   static const double _maxContentWidth = 720;
 
   static const List<_NavItem> _userItems = [
-    _NavItem(label: 'Home', icon: Icons.home_rounded),
-    _NavItem(label: 'Search', icon: Icons.search_rounded),
-    _NavItem(label: 'Cart', icon: Icons.shopping_cart_rounded),
-    _NavItem(label: 'Profile', icon: Icons.person_rounded),
+    _NavItem(
+      label: 'Home',
+      icon: PiconsRegular.house,
+      selectedIcon: PiconsRegular.house,
+    ),
+    _NavItem(
+      label: 'Search',
+      icon: PiconsRegular.magnifyingGlass,
+      selectedIcon: PiconsRegular.magnifyingGlass,
+    ),
+    _NavItem(
+      label: 'Catalog',
+      assetPath: 'assets/images/ratnesh-logo.png',
+      isCenter: true,
+    ),
+    _NavItem(
+      label: 'Cart',
+      icon: PiconsRegular.shoppingCart,
+      selectedIcon: PiconsRegular.shoppingCart,
+    ),
+    _NavItem(
+      label: 'Profile',
+      icon: PiconsRegular.user,
+      selectedIcon: PiconsRegular.user,
+    ),
   ];
 
   static const List<_NavItem> _adminItems = [
-    _NavItem(label: 'Home', icon: Icons.home_rounded),
-    _NavItem(label: 'Search', icon: Icons.search_rounded),
-    _NavItem(label: 'Share', icon: Icons.share_rounded),
-    _NavItem(label: 'Admin', icon: Icons.admin_panel_settings_rounded),
+    _NavItem(
+      label: 'Home',
+      icon: PiconsRegular.house,
+      selectedIcon: PiconsRegular.house,
+    ),
+    _NavItem(
+      label: 'Search',
+      icon: PiconsRegular.magnifyingGlass,
+      selectedIcon: PiconsRegular.magnifyingGlass,
+    ),
+    _NavItem(
+      label: 'Share',
+      icon: PiconsRegular.share,
+      selectedIcon: PiconsRegular.share,
+    ),
+    _NavItem(
+      label: 'Admin',
+      icon: PiconsRegular.gearSix,
+      selectedIcon: PiconsRegular.gearSix,
+    ),
   ];
 
   @override
@@ -58,38 +105,40 @@ class AppBottomNav extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isLargeScreen = MediaQuery.of(context).size.shortestSide >= 600;
 
-    final barHeight = isLargeScreen ? 80.0 : 72.0;
-    final bubbleSize = isLargeScreen ? 42.0 : 36.0;
-    final iconSize = isLargeScreen ? 22.0 : 20.0;
-    final labelFontSize = isLargeScreen ? 13.0 : 12.0;
+    final barHeight = isLargeScreen ? 76.0 : 68.0;
+    final bubbleSize = isLargeScreen ? 40.0 : 36.0;
+    final iconSize = isLargeScreen ? 26.0 : 24.0;
+    final labelFontSize = isLargeScreen ? 12.0 : 11.0;
 
-    final unselectedBubbleColor = Color.alphaBlend(
-      colorScheme.onSurface.withOpacity(
-        theme.brightness == Brightness.dark ? 0.14 : 0.05,
-      ),
-      colorScheme.surface,
-    );
-
-    return SizedBox(
-      height: barHeight,
-      child: Material(
-        color: colorScheme.surface,
-        elevation: 10,
-        shadowColor: Colors.black.withOpacity(
-          theme.brightness == Brightness.dark ? 0.24 : 0.08,
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+        child: SizedBox(
+          height: barHeight,
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
                 color: colorScheme.outline.withOpacity(0.10),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.20),
+                  blurRadius: 24,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
-          child: SafeArea(
-            top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+              padding: const EdgeInsets.fromLTRB(10, 2, 10, 4),
               child: Align(
                 alignment: Alignment.center,
                 child: ConstrainedBox(
@@ -99,35 +148,31 @@ class AppBottomNav extends StatelessWidget {
                       final item = items[index];
                       final isSelected = index == safeIndex;
 
-                      return _NavItemTile(
-                        item: item,
-                        index: index,
-                        totalCount: items.length,
-                        isSelected: isSelected,
-                        onTap: () {
-                          if (isSelected) {
-                            // Optional UX enhancement:
-                            // trigger scroll-to-top or pop-to-root here.
-                            return;
-                          }
+                    return _NavItemTile(
+                      item: item,
+                      index: index,
+                      totalCount: items.length,
+                      isSelected: isSelected,
+                      onTap: () {
+                        if (isSelected) return;
 
-                          HapticFeedback.selectionClick();
-                          onTap(index);
-                        },
-                        animationDuration: _animationDuration,
-                        animationCurve: _animationCurve,
-                        bubbleSize: bubbleSize,
-                        iconSize: iconSize,
-                        labelFontSize: labelFontSize,
-                        selectedBubbleColor: colorScheme.primary,
-                        unselectedBubbleColor: unselectedBubbleColor,
-                        selectedIconColor: colorScheme.onPrimary,
-                        selectedLabelColor: colorScheme.primary,
-                        unselectedIconColor: context.colorPalette.goldDeep.withOpacity(0.7),
-                        unselectedLabelColor: colorScheme.onSurfaceVariant,
-                      );
-                    }),
-                  ),
+                        HapticFeedback.selectionClick();
+                        onTap(index);
+                      },
+                      animationDuration: _animationDuration,
+                      animationCurve: _animationCurve,
+                      bubbleSize: bubbleSize,
+                      iconSize: iconSize,
+                      labelFontSize: labelFontSize,
+                      selectedBubbleColor:
+                          context.colorPalette.goldDark.withOpacity(0.06),
+                      unselectedBubbleColor: Colors.transparent,
+                      selectedIconColor: context.colorPalette.goldDark,
+                      selectedLabelColor: context.colorPalette.goldDark,
+                      unselectedIconColor: Colors.black.withOpacity(0.65),
+                      unselectedLabelColor: Colors.black.withOpacity(0.65),
+                    );
+                  }),
                 ),
               ),
             ),
@@ -177,7 +222,13 @@ class _NavItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(20);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final isCenterItem = item.isCenter && item.assetPath != null;
+    final borderRadius = BorderRadius.circular(isCenterItem ? 26 : 20);
+    final effectiveBubbleSize = isCenterItem ? bubbleSize + 12 : bubbleSize;
+    final centerLift = isCenterItem ? 12.0 : 0.0;
 
     return Expanded(
       child: Tooltip(
@@ -197,58 +248,118 @@ class _NavItemTile extends StatelessWidget {
               mouseCursor: SystemMouseCursors.click,
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              hoverColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.03),
-              focusColor: (isSelected ? selectedIconColor : unselectedLabelColor).withOpacity(0.05),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+              hoverColor:
+                  (isSelected ? selectedIconColor : unselectedLabelColor)
+                      .withOpacity(0.03),
+              focusColor:
+                  (isSelected ? selectedIconColor : unselectedLabelColor)
+                      .withOpacity(0.05),
+child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isCenterItem ? 2 : 4,
+                  vertical: 0,
+                ),
+                child: SizedBox(
+                  width: effectiveBubbleSize + 24,
+                  height: 48,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    clipBehavior: Clip.none,
                     children: [
-                      AnimatedScale(
+                      Positioned(
+                        bottom: isCenterItem ? 16 : 12,
+                      child: AnimatedScale(
                         duration: animationDuration,
                         curve: animationCurve,
-                        scale: isSelected ? 1.0 : 0.96,
-                        child: AnimatedContainer(
-                          duration: animationDuration,
-                          curve: animationCurve,
-                          width: bubbleSize,
-                          height: bubbleSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isSelected
-                                ? selectedBubbleColor
-                                : unselectedBubbleColor,
-                          ),
-                          child: Icon(
-                            item.icon,
-                            size: iconSize,
-                            color: isSelected
-                                ? selectedIconColor
-                                : unselectedIconColor,
-                          ),
+                        scale: isSelected ? 1.0 : (isCenterItem ? 0.98 : 0.96),
+                        child: isCenterItem
+                            ? Container(
+                                width: effectiveBubbleSize + 6,
+                                height: effectiveBubbleSize + 6,
+                                padding: const EdgeInsets.all(2),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: context.colorPalette.goldDark,
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(
+                                        theme.brightness == Brightness.dark
+                                            ? 0.22
+                                            : 0.10,
+                                      ),
+                                      blurRadius: 18,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: AnimatedContainer(
+                                  duration: animationDuration,
+                                  curve: animationCurve,
+                                  width: effectiveBubbleSize,
+                                  height: effectiveBubbleSize,
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: context.colorPalette.goldDark,
+                                  ),
+                                  child: Image.asset(
+                                    item.assetPath!,
+                                    fit: BoxFit.contain,
+                                    filterQuality: FilterQuality.high,
+                                    color: context.colorPalette.cream,
+                                    colorBlendMode: BlendMode.srcIn,
+                                  ),
+                                ),
+                              )
+                            : AnimatedContainer(
+                                duration: animationDuration,
+                                curve: animationCurve,
+                                width: effectiveBubbleSize,
+                                height: effectiveBubbleSize,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: isSelected
+                                      ? selectedBubbleColor
+                                      : unselectedBubbleColor,
+                                ),
+                                child: Icon(
+                                  isSelected
+                                      ? item.selectedIcon
+                                      : item.icon,
+                                  size: iconSize,
+                                  color: isSelected
+                                      ? selectedIconColor
+                                      : unselectedIconColor,
+                                ),
+                              ),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      SizedBox(
-                        width: bubbleSize + 24,
-                        child: AnimatedDefaultTextStyle(
-                          duration: animationDuration,
-                          curve: animationCurve,
-                          style: TextStyle(
-                            fontSize: labelFontSize,
-                            height: 1.1,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? selectedLabelColor
-                                : unselectedLabelColor,
-                          ),
-                          child: Text(
-                            item.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
+                      Positioned(
+                        bottom: 0,
+                        child: SizedBox(
+                          width: effectiveBubbleSize + 24,
+                          child: AnimatedDefaultTextStyle(
+                            duration: animationDuration,
+                            curve: animationCurve,
+                            style: TextStyle(
+                              fontSize: labelFontSize,
+                              height: 1.1,
+                              fontWeight:
+                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected
+                                  ? selectedLabelColor
+                                  : unselectedLabelColor,
+                            ),
+                            child: Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),

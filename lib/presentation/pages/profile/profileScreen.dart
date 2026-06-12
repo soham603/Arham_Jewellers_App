@@ -326,30 +326,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
 
-                          SizedBox(height: context.getScreenHeight(2.5)),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _profileStat(
-                                  context,
-                                  "Orders",
-                                  "${orderController.totalOrders}",
-                                ),
-                              ),
-
-                              SizedBox(width: context.getResponsiveSize(3)),
-
-                              Expanded(
-                                child: _profileStat(
-                                  context,
-                                  "Status",
-                                  "Active",
-                                ),
-                              ),
-                            ],
-                          ),
-
                           SizedBox(height: context.getScreenHeight(2)),
 
                           Container(
@@ -770,40 +746,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _profileStat(BuildContext context, String title, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.4)),
-
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-
-        borderRadius: BorderRadius.circular(18),
-      ),
-
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: context.getResponsiveSize(5),
-            ),
-          ),
-
-          SizedBox(height: context.getScreenHeight(0.4)),
-
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: context.getResponsiveSize(3.4),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _OrderCard extends StatelessWidget {
