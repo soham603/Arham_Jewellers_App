@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DatabaseKeyConstants {
   static const String ACCESS_TOKEN = 'access_token';
@@ -21,7 +21,7 @@ class SessionManager {
 
   SessionManager._internal();
 
-  Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
+  final _storage = const FlutterSecureStorage();
 
   // ── Token persistence 
   Future<bool> saveTokens({
@@ -36,13 +36,12 @@ class SessionManager {
       final refreshExpiry =
           DateTime.parse(refreshTokenExpiry).millisecondsSinceEpoch;
 
-      final prefs = await _prefs;
-      await prefs.setString(DatabaseKeyConstants.ACCESS_TOKEN, accessToken);
-      await prefs.setString(DatabaseKeyConstants.REFRESH_TOKEN, refreshToken);
-      await prefs.setString(
-          DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY, accessExpiry.toString());
-      await prefs.setString(
-          DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, refreshExpiry.toString());
+      await _storage.write(key: DatabaseKeyConstants.ACCESS_TOKEN, value: accessToken);
+      await _storage.write(key: DatabaseKeyConstants.REFRESH_TOKEN, value: refreshToken);
+      await _storage.write(
+          key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY, value: accessExpiry.toString());
+      await _storage.write(
+          key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, value: refreshExpiry.toString());
 
       Logger.info("SessionManager", "Tokens saved");
       return true;
@@ -54,30 +53,26 @@ class SessionManager {
   }
 
   Future<String?> getAccessToken() async {
-    final prefs = await _prefs;
-    final token = prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN);
+    final token = await _storage.read(key: DatabaseKeyConstants.ACCESS_TOKEN);
     Logger.info("SessionManager",
         "getAccessToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
   Future<String?> getRefreshToken() async {
-    final prefs = await _prefs;
-    final token = prefs.getString(DatabaseKeyConstants.REFRESH_TOKEN);
+    final token = await _storage.read(key: DatabaseKeyConstants.REFRESH_TOKEN);
     Logger.info("SessionManager",
         "getRefreshToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
   Future<int?> getAccessTokenExpiry() async {
-    final prefs = await _prefs;
-    final value = prefs.getString(DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
+    final value = await _storage.read(key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
     return value != null ? int.tryParse(value) : null;
   }
 
   Future<int?> getRefreshTokenExpiry() async {
-    final prefs = await _prefs;
-    final value = prefs.getString(DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
+    final value = await _storage.read(key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
     return value != null ? int.tryParse(value) : null;
   }
 
@@ -101,11 +96,10 @@ class SessionManager {
 
   Future<bool> clearTokens() async {
     try {
-      final prefs = await _prefs;
-      await prefs.remove(DatabaseKeyConstants.ACCESS_TOKEN);
-      await prefs.remove(DatabaseKeyConstants.REFRESH_TOKEN);
-      await prefs.remove(DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
-      await prefs.remove(DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
+      await _storage.delete(key: DatabaseKeyConstants.ACCESS_TOKEN);
+      await _storage.delete(key: DatabaseKeyConstants.REFRESH_TOKEN);
+      await _storage.delete(key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
+      await _storage.delete(key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
 
       Logger.info("SessionManager", "Tokens cleared");
       return true;
@@ -120,21 +114,19 @@ class SessionManager {
   static const _isAdminKey = 'IS_ADMIN';
 
   Future<void> saveIsAdmin(bool isAdmin) async {
-    final prefs = await _prefs;
-    await prefs.setBool(_isAdminKey, isAdmin);
+    await _storage.write(key: _isAdminKey, value: isAdmin.toString());
   }
 
   Future<bool> getIsAdmin() async {
-    final prefs = await _prefs;
-    return prefs.getBool(_isAdminKey) ?? false;
+    final value = await _storage.read(key: _isAdminKey);
+    return value == 'true';
   }
 
   // ── User data persistence 
   Future<bool> saveUserData(UserModel user) async {
     try {
       String userJson = jsonEncode(user.toJson());
-      final prefs = await _prefs;
-      await prefs.setString(DatabaseKeyConstants.USER, userJson);
+      await _storage.write(key: DatabaseKeyConstants.USER, value: userJson);
       Logger.info("SessionManager", "User saved");
       return true;
     } catch (e, st) {
@@ -145,29 +137,26 @@ class SessionManager {
   }
 
   Future<UserModel?> getUserData() async {
-    final prefs = await _prefs;
-    final jsonString = prefs.getString(DatabaseKeyConstants.USER);
+    final jsonString = await _storage.read(key: DatabaseKeyConstants.USER);
     if (jsonString == null) return null;
 
     try {
       return UserModel.fromJson(jsonDecode(jsonString));
     } catch (e, st) {
-      Logger.error("SessionManager", "Failed to parse user data from SharedPreferences", stackTrace: st);
+      Logger.error("SessionManager", "Failed to parse user data from secure storage", stackTrace: st);
       return null;
     }
   }
 
   Future<void> clearUser() async {
-    final prefs = await _prefs;
-    await prefs.remove(DatabaseKeyConstants.USER);
+    await _storage.delete(key: DatabaseKeyConstants.USER);
     Logger.info("SessionManager", "User cleared");
   }
 
   // ── FCM token persistence 
   Future<bool> saveFcmToken(String token) async {
     try {
-      final prefs = await _prefs;
-      await prefs.setString(DatabaseKeyConstants.FCM_TOKEN, token);
+      await _storage.write(key: DatabaseKeyConstants.FCM_TOKEN, value: token);
       Logger.info("SessionManager", "FCM token saved");
       return true;
     } catch (e, st) {
@@ -178,13 +167,11 @@ class SessionManager {
   }
 
   Future<String?> getFcmToken() async {
-    final prefs = await _prefs;
-    return prefs.getString(DatabaseKeyConstants.FCM_TOKEN);
+    return await _storage.read(key: DatabaseKeyConstants.FCM_TOKEN);
   }
 
   Future<void> clearFcmToken() async {
-    final prefs = await _prefs;
-    await prefs.remove(DatabaseKeyConstants.FCM_TOKEN);
+    await _storage.delete(key: DatabaseKeyConstants.FCM_TOKEN);
     Logger.info("SessionManager", "FCM token cleared");
   }
 

@@ -406,7 +406,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
+        crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
         crossAxisSpacing: context.getResponsiveSize(2.5),
         mainAxisSpacing: context.getScreenHeight(1),
         childAspectRatio: 1.8,
