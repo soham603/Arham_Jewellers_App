@@ -1,4 +1,4 @@
-package com.arhamjewellers.ratnesh_gold_app
+package com.shreearhamgold.ratneshgold
 
 import android.content.ContentValues
 import android.os.Build

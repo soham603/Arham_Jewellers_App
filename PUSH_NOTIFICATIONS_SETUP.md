@@ -268,7 +268,7 @@ Data: {
 
 ### Android
 
-1. In Firebase Console, create a project and register an Android app with package name `com.arhamjewellers.ratnesh_gold_app`
+1. In Firebase Console, create a project and register an Android app with package name `com.shreearhamgold.ratneshgold`
 2. Download `google-services.json` and place it at `android/app/google-services.json`
 3. Uncomment the Google Services plugin in `android/app/build.gradle.kts`:
    ```kotlin
