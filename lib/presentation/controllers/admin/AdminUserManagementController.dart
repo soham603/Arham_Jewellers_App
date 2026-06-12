@@ -60,7 +60,7 @@ class AdminUserManagementController extends GetxController {
     super.onClose();
   }
 
-  // ── Fetch users ──────────────────────────────────────────────────────────
+  // ── Fetch users 
   Future<void> fetchUsers({bool isPagination = false}) async {
     if (!_hasMore && isPagination) return;
 
@@ -125,7 +125,7 @@ class AdminUserManagementController extends GetxController {
     }
   }
 
-  // ── Search ───────────────────────────────────────────────────────────────
+  // ── Search 
   void onSearchChanged(String query) {
     _searchQuery.value = query;
     _debounce?.cancel();
@@ -170,7 +170,7 @@ class AdminUserManagementController extends GetxController {
     return _users.where((u) => u.role.toUpperCase() == _activeFilter.value.toUpperCase()).toList();
   }
 
-  // ── Pagination ───────────────────────────────────────────────────────────
+  // ── Pagination 
   Future<void> loadMore() async {
     if (!_hasMore || _state.value == CurrentAppState.LOADING) return;
     await fetchUsers(isPagination: true);
@@ -183,7 +183,7 @@ class AdminUserManagementController extends GetxController {
     await fetchUsers();
   }
 
-  // ── Actions ──────────────────────────────────────────────────────────────
+  // ── Actions 
 
   /// Toggle user activation status (ACTIVE / DEACTIVATED)
   Future<bool> toggleUserActivation({
@@ -238,7 +238,7 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  // ── Generic action handler ───────────────────────────────────────────────
+  // ── Generic action handler 
   Future<bool> _handleAction({
     required String userId,
     required AdminAction actionType,

@@ -159,7 +159,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     );
   }
 
-  // ── Filter Bar ────────────────────────────────────────────────────────────
+  // ── Filter Bar 
   Widget _filterBar(BuildContext context) {
     return Obx(
       () => Container(
@@ -207,7 +207,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     );
   }
 
-  // ── List Footer ───────────────────────────────────────────────────────────
+  // ── List Footer 
   Widget _listFooter(BuildContext context) {
     return Obx(() {
       if (controller.state == CurrentAppState.LOADING &&
@@ -244,7 +244,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     });
   }
 
-  // ── Shimmer ───────────────────────────────────────────────────────────────
+  // ── Shimmer 
   Widget _shimmerList(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -306,7 +306,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
     );
   }
 
-  // ── Error / Empty ─────────────────────────────────────────────────────────
+  // ── Error / Empty 
   Widget _errorView(BuildContext context) {
     return Center(
       child: Column(
@@ -402,7 +402,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   }
 }
 
-// ── Request Card ──────────────────────────────────────────────────────────────
+// ── Request Card 
 class _RequestCard extends StatefulWidget {
   final HandsetChangeRequestModel request;
   final HandsetChangeController controller;
@@ -444,7 +444,7 @@ class _RequestCardState extends State<_RequestCard> {
       ),
       child: Column(
         children: [
-          // ── Header row (always visible) ─────────────────────────────────
+          // ── Header row (always visible) 
           InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.circular(16),
@@ -532,7 +532,7 @@ class _RequestCardState extends State<_RequestCard> {
             ),
           ),
 
-          // ── Expanded detail ─────────────────────────────────────────────
+          // ── Expanded detail 
           if (_expanded) ...[
             Divider(
               height: 1,

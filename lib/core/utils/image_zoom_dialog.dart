@@ -32,7 +32,7 @@ void showImageZoomDialog(BuildContext context, String imageUrl) {
   );
 }
 
-// ── Private dialog widget ────────────────────────────────────────────────────
+// ── Private dialog widget ────
 
 class _ImageZoomDialog extends StatefulWidget {
   const _ImageZoomDialog({required this.imageUrl});
@@ -165,14 +165,14 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Background overlay that fades with drag ────────────────
+          // ── Background overlay that fades with drag 
           IgnorePointer(
             child: Container(
               color: Color.lerp(Colors.transparent, Colors.black, dragProgress),
             ),
           ),
 
-          // ── Draggable content ───────────────────────────────────────
+          // ── Draggable content 
           Transform.translate(
             offset: Offset(0, _dragOffset),
             child: Listener(
@@ -184,7 +184,7 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // ── Zoomable image ────────────────────────────────
+                    // ── Zoomable image 
                     GestureDetector(
                       onDoubleTapDown: _onDoubleTapDown,
                       onDoubleTap: _onDoubleTap,
@@ -250,7 +250,7 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
             ),
           ),
 
-          // ── Top bar ────────────────────────────────────────────────
+          // ── Top bar 
           Positioned(
             top: 0,
             left: 0,
@@ -268,7 +268,7 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
             ),
           ),
 
-          // ── Hint overlay ───────────────────────────────────────────
+          // ── Hint overlay 
           Positioned(
             bottom: 32,
             left: 0,
@@ -284,7 +284,7 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
   }
 }
 
-// ── Top bar ──────────────────────────────────────────────────────────────────
+// ── Top bar 
 
 class _TopBar extends StatelessWidget {
   const _TopBar({
@@ -364,7 +364,7 @@ class _IconButton extends StatelessWidget {
   }
 }
 
-// ── Zoom hint ────────────────────────────────────────────────────────────────
+// ── Zoom hint 
 
 class _ZoomHint extends StatefulWidget {
   const _ZoomHint();

@@ -298,7 +298,7 @@ class _ChainListingPageState extends State<ChainListingPage> {
   }
 }
 
-// ── _ChainCategoryGrid ────────────────────────────────────────────────────────
+// ── _ChainCategoryGrid 
 class _ChainCategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
   final Karat karat;
@@ -352,7 +352,7 @@ class _ChainCategoryGrid extends StatelessWidget {
   }
 }
 
-// ── _ChainCategoryCard ────────────────────────────────────────────────────────
+// ── _ChainCategoryCard 
 class _ChainCategoryCard extends StatelessWidget {
   final CategoryModel category;
   final Karat karat;
@@ -453,7 +453,7 @@ class _ChainCategoryCard extends StatelessWidget {
   }
 }
 
-// ── _ChainCategoryImage ───────────────────────────────────────────────────────
+// ── _ChainCategoryImage 
 class _ChainCategoryImage extends StatelessWidget {
   final CategoryModel cat;
 
@@ -475,7 +475,7 @@ class _ChainCategoryImage extends StatelessWidget {
   }
 }
 
-// ── _ChainKaratSectionHeader ──────────────────────────────────────────────────
+// ── _ChainKaratSectionHeader ──
 class _ChainKaratSectionHeader extends StatelessWidget {
   final Karat karat;
   final bool isExpanded;
@@ -595,7 +595,7 @@ class _ChainKaratSectionHeader extends StatelessWidget {
   }
 }
 
-// ── _ChainLevel3Sheet ─────────────────────────────────────────────────────────
+// ── _ChainLevel3Sheet 
 class _ChainLevel3Sheet extends StatelessWidget {
   final CategoryModel parent;
   final List<CategoryModel> children;

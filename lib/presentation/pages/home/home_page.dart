@@ -1921,9 +1921,9 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-// =====================================================
+
 // 🔥 CUSTOMISE ORDER BANNER COMPONENT
-// =====================================================
+
 class _CategoryQuickAccess extends StatelessWidget {
   final CategoryController controller;
 
@@ -2114,9 +2114,9 @@ class CustomiseOrderBanner extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // ==========================================
+            
             // "Bespoke Service" Ribbon (Top Right)
-            // ==========================================
+            
             Positioned(
               top: 0,
               right: 0,
@@ -2144,9 +2144,9 @@ class CustomiseOrderBanner extends StatelessWidget {
               ),
             ),
 
-            // ==========================================
+            
             // Main Content Layout
-            // ==========================================
+            
             Padding(
               padding: EdgeInsets.all(context.getResponsiveSize(5)),
               child: Row(

@@ -166,7 +166,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     }
   }
 
-  // ──────────────────────── Helpers ────────────────────────
+  //  Helpers 
 
   String _cleanCategoryName(String name) {
     return name
@@ -253,7 +253,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     return count;
   }
 
-  // ──────────────────────── Actions ────────────────────────
+  //  Actions 
 
   void _toggleKarat(String karat) {
     setState(() {
@@ -304,7 +304,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context);
   }
 
-  // ──────────────────────── Build ────────────────────────
+  //  Build 
 
   @override
   Widget build(BuildContext context) {

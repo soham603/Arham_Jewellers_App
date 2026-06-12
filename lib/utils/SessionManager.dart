@@ -23,7 +23,7 @@ class SessionManager {
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
-  // ── Token persistence ───────────────────────────────────────────────
+  // ── Token persistence 
   Future<bool> saveTokens({
     required String accessToken,
     required String refreshToken,
@@ -116,7 +116,7 @@ class SessionManager {
     }
   }
 
-  // ── Admin flag persistence ──────────────────────────────────────────
+  // ── Admin flag persistence 
   static const _isAdminKey = 'IS_ADMIN';
 
   Future<void> saveIsAdmin(bool isAdmin) async {
@@ -129,7 +129,7 @@ class SessionManager {
     return prefs.getBool(_isAdminKey) ?? false;
   }
 
-  // ── User data persistence ───────────────────────────────────────────
+  // ── User data persistence 
   Future<bool> saveUserData(UserModel user) async {
     try {
       String userJson = jsonEncode(user.toJson());
@@ -163,7 +163,7 @@ class SessionManager {
     Logger.info("SessionManager", "User cleared");
   }
 
-  // ── FCM token persistence ─────────────────────────────────────────
+  // ── FCM token persistence 
   Future<bool> saveFcmToken(String token) async {
     try {
       final prefs = await _prefs;

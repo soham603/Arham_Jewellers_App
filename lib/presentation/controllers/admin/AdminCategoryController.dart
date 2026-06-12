@@ -38,18 +38,18 @@ class CategoryManagerController extends GetxController {
   static CategoryManagerController get instance => Get.find();
   final _categoryRepo = CategoryRepository();
 
-  // ── All categories cache ──────────────────────────────────────────────────
+  // ── All categories cache ──
   final _allCategories = <CategoryModel>[].obs;
   List<CategoryModel> get allCategories => _allCategories;
 
   final _loading = false.obs;
   bool get loading => _loading.value;
 
-  // ── Action states ─────────────────────────────────────────────────────────
+  // ── Action states 
   final _actionLoadingId = ''.obs;
   String get actionLoadingId => _actionLoadingId.value;
 
-  // ── Image picker ──────────────────────────────────────────────────────────
+  // ── Image picker 
   final _pickedImage = Rxn<File>();
   File? get pickedImage => _pickedImage.value;
   final ImagePicker _picker = ImagePicker();
@@ -60,7 +60,7 @@ class CategoryManagerController extends GetxController {
     fetchAll();
   }
 
-  // ── Fetch ALL categories in one call ─────────────────────────────────────
+  // ── Fetch ALL categories in one call 
   Future<void> fetchAll({bool force = false}) async {
     if (!force && _allCategories.isNotEmpty) return;
     _loading.value = true;
@@ -77,7 +77,7 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Filtered views (client-side) ─────────────────────────────────────────
+  // ── Filtered views (client-side) 
   List<CategoryModel> byLevel(
     int level, {
     String? parentId,
@@ -147,7 +147,7 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Image picker ──────────────────────────────────────────────────────────
+  // ── Image picker 
   Future<void> pickImage() async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -169,7 +169,7 @@ class CategoryManagerController extends GetxController {
     return compressedFile;
   }
 
-  // ── Create ────────────────────────────────────────────────────────────────
+  // ── Create 
   Future<String?> createCategory({
     required String name,
     required String boxName,
@@ -205,7 +205,7 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Edit ──────────────────────────────────────────────────────────────────
+  // ── Edit 
   Future<String?> editCategory({
     required String id,
     String? name,
@@ -238,7 +238,7 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────────
+  // ── Delete 
   Future<bool> deleteCategory(String id) async {
     _actionLoadingId.value = id;
 
@@ -271,7 +271,7 @@ class CategoryManagerController extends GetxController {
     return false;
   }
 
-  // ── Restore ───────────────────────────────────────────────────────────────
+  // ── Restore 
   Future<bool> restoreCategory(String id) async {
     _actionLoadingId.value = id;
 

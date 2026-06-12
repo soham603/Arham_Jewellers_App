@@ -130,7 +130,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     );
   }
 
-  // ── Search + Filter bar ───────────────────────────────────────────────────
+  // ── Search + Filter bar ───
   Widget _buildSearchAndFilters(BuildContext context) {
     return Container(
       color: context.colorPalette.backgroundColor,
@@ -506,7 +506,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     );
   }
 
-  // ── Edit Bottom Sheet ─────────────────────────────────────────────────────
+  // ── Edit Bottom Sheet 
   void _showEditSheet(BuildContext context, ProductModel product) {
     final nameCtrl = TextEditingController(text: product.name);
     String? selectedKarat = product.karat;
@@ -624,7 +624,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   ),
                   SizedBox(height: context.getScreenHeight(2.5)),
 
-                  // ── Image ─────────────────────────────────────────────
+                  // ── Image 
                   _editLabel(context, 'Image'),
                   SizedBox(height: context.getScreenHeight(1)),
                   Obx(() {
@@ -771,13 +771,13 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   }),
                   SizedBox(height: context.getScreenHeight(2)),
 
-                  // ── Name ──────────────────────────────────────────────
+                  // ── Name 
                   _editLabel(context, 'Name'),
                   SizedBox(height: context.getScreenHeight(0.8)),
                   _textField(context, nameCtrl, 'Product name'),
                   SizedBox(height: context.getScreenHeight(2)),
 
-                  // ── Karat ─────────────────────────────────────────────
+                  // ── Karat 
                   _editLabel(context, 'Karat'),
                   SizedBox(height: context.getScreenHeight(0.8)),
                   Container(
@@ -819,7 +819,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   ),
                   SizedBox(height: context.getScreenHeight(2)),
 
-                  // ── Raw Data ──────────────────────────────────────────
+                  // ── Raw Data 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -873,7 +873,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   }),
                   SizedBox(height: context.getScreenHeight(3)),
 
-                  // ── Save ──────────────────────────────────────────────
+                  // ── Save 
                   Obx(() {
                     final loading = ctrl.actionLoadingId == product.id;
                     return SizedBox(
@@ -944,7 +944,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers 
   Widget _editLabel(BuildContext context, String label) {
     return Text(
       label,
@@ -995,7 +995,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     );
   }
 
-  // ── Shimmer grid ──────────────────────────────────────────────────────────
+  // ── Shimmer grid 
   Widget _buildShimmerGrid(BuildContext context) {
     return GridView.builder(
       padding: EdgeInsets.all(context.getResponsiveSize(3)),

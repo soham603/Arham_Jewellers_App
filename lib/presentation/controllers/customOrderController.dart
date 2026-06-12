@@ -33,9 +33,9 @@ class CustomOrderController extends GetxController {
   final _isDeleting = false.obs;
   bool get isDeleting => _isDeleting.value;
 
-  // =====================================================
+  
   // CREATE CUSTOM ORDER
-  // =====================================================
+  
 
   Future<bool> createCustomOrder({
     String? productId,
@@ -115,9 +115,9 @@ class CustomOrderController extends GetxController {
     }
   }
 
-  // =====================================================
+  
   // MODIFY CUSTOM ORDER
-  // =====================================================
+  
 
   Future<bool> modifyCustomOrder({
     required String orderId,
@@ -197,9 +197,9 @@ class CustomOrderController extends GetxController {
     }
   }
 
-  // =====================================================
+  
   // DELETE CUSTOM ORDER
-  // =====================================================
+  
 
   Future<bool> deleteCustomOrder(String orderId) async {
     if (_isDeleting.value) return false;
@@ -229,9 +229,9 @@ class CustomOrderController extends GetxController {
     }
   }
 
-  // =====================================================
+  
   // RESET
-  // =====================================================
+  
 
   void resetCreateState() {
     _createState.value = CurrentAppState.INITIAL;

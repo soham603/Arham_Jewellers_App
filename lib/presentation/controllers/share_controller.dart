@@ -26,15 +26,15 @@ class ShareController extends GetxController {
 
   final _categoryController = Get.find<CategoryController>();
 
-  // ── Karat selection ─────────────────────────────────────────
+  // ── Karat selection 
   final _selectedKarat = RxnString();
   String? get selectedKarat => _selectedKarat.value;
 
-  // ── Drill-down level: 2 = collections, 3 = styles ──────────
+  // ── Drill-down level: 2 = collections, 3 = styles 
   final _drillLevel = 2.obs;
   int get drillLevel => _drillLevel.value;
 
-  // ── Current level-2 being drilled into ──────────────────────
+  // ── Current level-2 being drilled into 
   final _currentLevel2 = Rxn<CategoryModel>();
   CategoryModel? get currentLevel2 => _currentLevel2.value;
 
@@ -58,7 +58,7 @@ class ShareController extends GetxController {
     return _selectedLevel3.containsKey(_selectionKey(karat, id));
   }
 
-  // ── Current level-2 list based on selected karat ────────────
+  // ── Current level-2 list based on selected karat 
   List<CategoryModel> get currentLevel2Categories {
     final karat = _selectedKarat.value;
     if (karat == null) return [];
@@ -74,20 +74,20 @@ class ShareController extends GetxController {
     }
   }
 
-  // ── Current level-3 list from cache ─────────────────────────
+  // ── Current level-3 list from cache 
   List<CategoryModel> get currentLevel3Categories {
     final level2 = _currentLevel2.value;
     if (level2 == null) return [];
     return _categoryController.level3Cache[level2.id] ?? [];
   }
 
-  // ── Selected categories info for share message ──────────────
+  // ── Selected categories info for share message 
   String get selectedCategoriesInfo {
     if (_selectedLevel3.isEmpty) return '';
     return _selectedLevel3.values.map((s) => s.displayName).join('\n');
   }
 
-  // ── Product count for selected categories ────────────────────
+  // ── Product count for selected categories 
   final _productCount = 0.obs;
   int get productCount => _productCount.value;
 
@@ -100,7 +100,7 @@ class ShareController extends GetxController {
     _productCount.value = await ShareService.fetchProductCount(ids);
   }
 
-  // ── Touch value mapping ─────────────────────────────────────
+  // ── Touch value mapping 
   static int _touchValueForKarat(String karat) {
     switch (karat) {
       case '18K':
@@ -114,7 +114,7 @@ class ShareController extends GetxController {
     }
   }
 
-  // ── Actions ─────────────────────────────────────────────────
+  // ── Actions ─
 
   Future<void> selectKarat(String karat) async {
     if (_selectedKarat.value == karat) return;

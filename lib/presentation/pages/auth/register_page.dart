@@ -39,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isFormValid = false;
   bool _isSubmitting = false;
 
-  // ───────────────────────── India States & Cities ─────────────────────────
+  //  India States & Cities 
   static const Map<String, List<String>> _indiaData = {
     'Andhra Pradesh': [
       'Visakhapatnam',
@@ -130,7 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
     'West Bengal': ['Kolkata', 'Howrah', 'Darjeeling', 'Siliguri', 'Asansol'],
   };
 
-  // ───────────────────────── Validators ─────────────────────────
+  //  Validators 
   static final RegExp _emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
   );
@@ -189,7 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
-  // ───────────────────────── Form State Helpers ─────────────────────────
+  //  Form State Helpers 
   void _onFieldChanged() {
     final valid =
         emailController.text.trim().isNotEmpty &&
@@ -250,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  // ───────────────────────── Submit (UPDATED FIX) ─────────────────────────
+  //  Submit (UPDATED FIX) 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) {
       ToastUtils.showError('Please fix the errors');
@@ -303,7 +303,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  // ───────────────────────── Modern Bottom Sheet with Search ─────────────────────────
+  //  Modern Bottom Sheet with Search 
   void _showSearchSelectionBottomSheet({
     required String title,
     required List<String> items,
@@ -406,7 +406,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // ───────────────────────── Compact Card Dropdown ─────────────────────────
+  //  Compact Card Dropdown 
   Widget _buildCompactDropdownCard({
     required String hintText,
     required String? value,
@@ -451,7 +451,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // ───────────────────────── Build ─────────────────────────
+  //  Build 
   @override
   Widget build(BuildContext context) {
     final safeHeight =

@@ -146,7 +146,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
+  // ── Search Bar 
   Widget _searchBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -392,7 +392,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     });
   }
 
-  // ── Filter Bar ────────────────────────────────────────────────────────────
+  // ── Filter Bar 
   Widget _filterBar(BuildContext context) {
     return Obx(
       () => Container(
@@ -440,7 +440,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Date Picker for Approve ───────────────────────────────────────────────
+  // ── Date Picker for Approve 
   Future<void> _showDatePicker(
     BuildContext context,
     AccessRequestModel req,
@@ -751,7 +751,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Footer (load more / end) ──────────────────────────────────────────────
+  // ── Footer (load more / end) 
   Widget _listFooter(BuildContext context) {
     return Obx(() {
       if (controller.state == CurrentAppState.LOADING &&
@@ -788,7 +788,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     });
   }
 
-  // ── Shimmer ───────────────────────────────────────────────────────────────
+  // ── Shimmer 
   Widget _shimmerList(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -850,7 +850,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Error / Empty ─────────────────────────────────────────────────────────
+  // ── Error / Empty 
   Widget _errorView(BuildContext context) {
     return Center(
       child: Column(
@@ -951,7 +951,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   }
 }
 
-// ── Request Card Widget ──────────────────────────────────────────────────────
+// ── Request Card Widget 
 class _RequestCard extends StatefulWidget {
   final AccessRequestModel request;
   final AdminUserController controller;
@@ -1020,7 +1020,7 @@ class _RequestCardState extends State<_RequestCard> {
       ),
       child: Column(
         children: [
-          // ── Header row (always visible) ─────────────────────────────────
+          // ── Header row (always visible) 
           InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.circular(16),
@@ -1127,7 +1127,7 @@ class _RequestCardState extends State<_RequestCard> {
             ),
           ),
 
-          // ── Expanded detail ─────────────────────────────────────────────
+          // ── Expanded detail 
           if (_expanded) ...[
             Divider(
               height: 1,
@@ -1828,7 +1828,7 @@ class _RequestCardState extends State<_RequestCard> {
   }
 }
 
-// ── Search Result Tile ──────────────────────────────────────────────────────
+// ── Search Result Tile 
 class _SearchResultTile extends StatelessWidget {
   final UserSearchModel user;
   final VoidCallback onTap;

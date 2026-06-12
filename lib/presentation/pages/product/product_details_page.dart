@@ -258,9 +258,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
 
-      // =====================================================
+      
       // PREMIUM BOTTOM ACTION BAR
-      // =====================================================
+      
       bottomNavigationBar: Get.find<AuthController>().isAdmin
           ? const SizedBox.shrink()
           : Obx(() {
@@ -367,9 +367,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               );
             }),
 
-      // =====================================================
+      
       // MODERN CURVED BODY LAYOUT
-      // =====================================================
+      
       body: _canSwipe
           ? (() {
               final products = _effectiveProducts;

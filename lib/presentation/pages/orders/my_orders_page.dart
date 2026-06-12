@@ -184,7 +184,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
       body: ResponsiveWrapper(
         child: Column(
         children: [
-          // ── Filter buttons ─────────────────────────────────────────
+          // ── Filter buttons 
           Padding(
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
@@ -245,7 +245,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   }
 }
 
-// ── Order Card ──────────────────────────────────────────────────────────────
+// ── Order Card 
 
 class _OrderCard extends StatelessWidget {
   final UserOrderModel order;
@@ -278,7 +278,7 @@ class _OrderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Header row: order token + status badge ───────────
+                  // ── Header row: order token + status badge 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,7 +353,7 @@ class _OrderCard extends StatelessWidget {
                   Container(height: 1, color: AppColors.divider),
                   SizedBox(height: context.getScreenHeight(1.5)),
 
-                  // ── Product thumbnail + items list ───────────────────
+                  // ── Product thumbnail + items list 
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -420,7 +420,7 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
 
-                  // ── Admin message if present ─────────────────────────
+                  // ── Admin message if present 
                   if (order.adminMessage != null &&
                       order.adminMessage!.isNotEmpty) ...[
                     SizedBox(height: context.getScreenHeight(1.5)),
@@ -455,7 +455,7 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ],
 
-                  // ── Total amount if present ──────────────────────────
+                  // ── Total amount if present ─
                   if (order.totalAmount != null) ...[
                     SizedBox(height: context.getScreenHeight(1.5)),
                     Container(height: 1, color: AppColors.divider),
@@ -515,7 +515,7 @@ class _OrderCard extends StatelessWidget {
   }
 }
 
-// ── Loading Shimmer ──────────────────────────────────────────────────────────
+// ── Loading Shimmer 
 
 class _OrdersShimmer extends StatelessWidget {
   final BuildContext context;
@@ -663,7 +663,7 @@ class _ShimmerBlock extends StatelessWidget {
   }
 }
 
-// ── Empty State ──────────────────────────────────────────────────────────────
+// ── Empty State 
 
 class _EmptyOrdersView extends StatelessWidget {
   final BuildContext context;
@@ -739,7 +739,7 @@ class _EmptyOrdersView extends StatelessWidget {
   }
 }
 
-// ── Error State ──────────────────────────────────────────────────────────────
+// ── Error State 
 
 class _ErrorView extends StatelessWidget {
   final BuildContext context;
@@ -817,7 +817,7 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// ── Order Images Stack ───────────────────────────────────────────────────────
+// ── Order Images Stack 
 
 class _OrderImagesStack extends StatelessWidget {
   const _OrderImagesStack({required this.order});
@@ -915,7 +915,7 @@ class _OrderImagesStack extends StatelessWidget {
   }
 }
 
-// ── Product Image Widget ─────────────────────────────────────────────────────
+// ── Product Image Widget 
 
 class _ProductImage extends StatelessWidget {
   final String? url;

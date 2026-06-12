@@ -189,7 +189,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
   }
 }
 
-// ── Animated Hero Section ──────────────────────────────────────────────────
+// ── Animated Hero Section ──
 
 class _AnimatedHero extends StatelessWidget {
   final AnimationController controller;
@@ -270,7 +270,7 @@ class _AnimatedHero extends StatelessWidget {
   }
 }
 
-// ── Order Detail Card ──────────────────────────────────────────────────────
+// ── Order Detail Card 
 
 class _OrderDetailCard extends StatelessWidget {
   final String orderId;
@@ -581,7 +581,7 @@ class _OrderDetailCard extends StatelessWidget {
   }
 }
 
-// ── Copyable Order ID ────────────────────────────────────────────────────────
+// ── Copyable Order ID 
 
 class _CopyableOrderId extends StatefulWidget {
   final String orderId;
@@ -652,7 +652,7 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
   }
 }
 
-// ── Next Steps Card ─────────────────────────────────────────────────────────
+// ── Next Steps Card 
 
 class _NextStepsCard extends StatelessWidget {
   @override
@@ -785,7 +785,7 @@ class _NextStepsCard extends StatelessWidget {
   }
 }
 
-// ── Contact Admin Card ─────────────────────────────────────────────────────
+// ── Contact Admin Card 
 
 class _ContactAdminCard extends StatelessWidget {
   final String orderId;
@@ -897,7 +897,7 @@ class _ContactAdminCard extends StatelessWidget {
   }
 }
 
-// ── Reusable Contact Button ─────────────────────────────────────────────────
+// ── Reusable Contact Button ─
 
 class _ContactButton extends StatelessWidget {
   final Widget icon;
@@ -958,7 +958,7 @@ class _ContactButton extends StatelessWidget {
   }
 }
 
-// ── Primary Button ──────────────────────────────────────────────────────────
+// ── Primary Button 
 
 class _PrimaryButton extends StatelessWidget {
   final String label;
@@ -1013,7 +1013,7 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-// ── Secondary Button ────────────────────────────────────────────────────────
+// ── Secondary Button 
 
 class _SecondaryButton extends StatelessWidget {
   final String label;
@@ -1050,7 +1050,7 @@ class _SecondaryButton extends StatelessWidget {
   }
 }
 
-// ── Shared Card Container ───────────────────────────────────────────────────
+// ── Shared Card Container ───
 
 class _CardContainer extends StatelessWidget {
   final Widget child;
@@ -1084,7 +1084,7 @@ class _CardContainer extends StatelessWidget {
   }
 }
 
-// ── Shared Divider ──────────────────────────────────────────────────────────
+// ── Shared Divider 
 
 class _Divider extends StatelessWidget {
   @override
@@ -1104,7 +1104,7 @@ class _Divider extends StatelessWidget {
   }
 }
 
-// ── Status Badge ────────────────────────────────────────────────────────────
+// ── Status Badge 
 
 class _StatusBadge extends StatelessWidget {
   final String label;

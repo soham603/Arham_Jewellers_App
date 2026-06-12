@@ -41,9 +41,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =====================================================
+          
           // ADMIN HEADER CARD
-          // =====================================================
+          
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.getResponsiveSize(5)),
@@ -156,9 +156,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
           SizedBox(height: context.getScreenHeight(3)),
 
-          // =====================================================
+          
           // ADMIN MENU GRID / LIST
-          // =====================================================
+          
           Row(
             children: [
               Text(

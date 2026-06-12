@@ -81,7 +81,7 @@ class UserOrderController extends GetxController {
 
 
 
-  // ── Status filter ──────────────────────────────────────────────────────
+  // ── Status filter 
 
   final _selectedFilter = 'all'.obs;
   String get selectedFilter => _selectedFilter.value;
@@ -265,9 +265,9 @@ class UserOrderController extends GetxController {
     }
   }
 
-  // =====================================================
+  
   // LOAD MORE ORDERS
-  // =====================================================
+  
 
   Future<void> loadMoreOrders() async {
     if (_isFetchingOrders.value) return;
@@ -277,9 +277,9 @@ class UserOrderController extends GetxController {
     await fetchUserOrders(isPagination: true);
   }
 
-  // =====================================================
+  
   // REFRESH ORDERS
-  // =====================================================
+  
 
   Future<void> refreshOrders() async {
     _ordersPage = 1;
@@ -291,9 +291,9 @@ class UserOrderController extends GetxController {
     await fetchUserOrders();
   }
 
-  // =====================================================
+  
   // RESET ORDER STATE
-  // =====================================================
+  
 
   void resetOrderState() {
     _createOrderState.value = CurrentAppState.INITIAL;

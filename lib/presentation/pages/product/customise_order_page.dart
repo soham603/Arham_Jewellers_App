@@ -265,9 +265,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         ),
       ),
 
-      // =====================================================
+      
       // BOTTOM ACTION BAR
-      // =====================================================
+      
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: EdgeInsets.fromLTRB(
@@ -424,9 +424,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // =====================================================
+              
               // 1. CUSTOMER INFORMATION
-              // =====================================================
+              
               _buildSectionHeader("Customer Information"),
               _buildCard(
                 child: Column(
@@ -444,9 +444,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.getScreenHeight(0.5)),
 
-              // =====================================================
+              
               // 2. PRODUCT SPECIFICATIONS
-              // =====================================================
+              
               _buildSectionHeader("Product Specifications"),
               _buildCard(
                 child: Column(
@@ -587,9 +587,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.getScreenHeight(0.5)),
 
-              // =====================================================
+              
               // 3. CUSTOMIZATION OPTIONS
-              // =====================================================
+              
               _buildSectionHeader("Customization Options"),
               _buildCard(
                 child: Column(

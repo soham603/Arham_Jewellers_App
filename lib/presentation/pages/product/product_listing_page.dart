@@ -50,7 +50,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double _priceMax = 5000000;
   List<String> _selectedSizes = [];
 
-  // ── Selection state ──────────────────────────────────────────
+  // ── Selection state 
   final Set<String> _selectedProductIds = {};
   bool get _isSelectMode => _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
@@ -1045,7 +1045,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  // ── Selection bottom bar ──────────────────────────────────────
+  // ── Selection bottom bar 
   Widget _buildSelectionBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1138,7 +1138,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  // ── Share options dialog ──────────────────────────────────────
+  // ── Share options dialog 
   void _showShareOptionsDialog(BuildContext context) {
     final selectedProducts = _getSelectedProducts();
     if (selectedProducts.isEmpty) return;

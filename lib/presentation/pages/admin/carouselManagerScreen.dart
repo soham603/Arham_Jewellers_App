@@ -116,7 +116,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Active Tab ─────────────────────────────────────────────────────────────
+  // ── Active Tab 
   Widget _activeTab(BuildContext context) {
     return Obx(() {
       final state = controller.adminState;
@@ -162,7 +162,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     });
   }
 
-  // ── Deleted Tab ────────────────────────────────────────────────────────────
+  // ── Deleted Tab 
   Widget _deletedTab(BuildContext context) {
     return Obx(() {
       final state = controller.deletedState;
@@ -336,7 +336,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ],
           ),
 
-          // ── Info ──────────────────────────────────────────────────────────
+          // ── Info 
           Padding(
             padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
             child: Column(
@@ -365,7 +365,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 ],
                 SizedBox(height: context.getScreenHeight(1.2)),
 
-                // ── Action Row ────────────────────────────────────────────
+                // ── Action Row 
                 Row(
                   children: [
                     // Toggle active
@@ -439,7 +439,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Deleted Carousel Card ─────────────────────────────────────────────────
+  // ── Deleted Carousel Card ─
   Widget _deletedCarouselCard(BuildContext context, CarouselModel item) {
     return Container(
       decoration: BoxDecoration(
@@ -609,7 +609,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Create Bottom Sheet ───────────────────────────────────────────────────
+  // ── Create Bottom Sheet ───
   void _showCreateSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -652,7 +652,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Edit Bottom Sheet ─────────────────────────────────────────────────────
+  // ── Edit Bottom Sheet 
   void _showEditSheet(BuildContext context, CarouselModel item) {
     showModalBottomSheet(
       context: context,
@@ -689,7 +689,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Restore + Re-upload Image Sheet ──────────────────────────────────────
+  // ── Restore + Re-upload Image Sheet 
   void _showRestoreWithImageSheet(BuildContext context, CarouselModel item) {
     File? newImage;
     showModalBottomSheet(
@@ -863,7 +863,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Confirm Delete Dialog ─────────────────────────────────────────────────
+  // ── Confirm Delete Dialog ─
   void _confirmDelete(BuildContext context, CarouselModel item) {
     showDialog(
       context: context,
@@ -929,7 +929,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers 
   Widget _actionChip(
     BuildContext context, {
     required IconData icon,
@@ -1062,7 +1062,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
   }
 }
 
-// ── Reusable Form Sheet ────────────────────────────────────────────────────
+// ── Reusable Form Sheet ────
 class _CarouselFormSheet extends StatefulWidget {
   final CarouselModel? existing;
   final Future<void> Function({
@@ -1481,7 +1481,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(2)),
 
-              // ── Media Picker ────────────────────────────────────────────────
+              // ── Media Picker 
               AspectRatio(
                 aspectRatio: 2.0,
                 child: GestureDetector(
@@ -1526,7 +1526,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1)),
 
-              // ── Title ─────────────────────────────────────────────────────
+              // ── Title 
               _buildField(
                 context,
                 'Title (optional)',
@@ -1534,7 +1534,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // ── Description ───────────────────────────────────────────────
+              // ── Description 
               _buildField(
                 context,
                 'Description (optional)',
@@ -1543,7 +1543,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // ── Link URL ─────────────────────────────────────────────────
+              // ── Link URL ─
               _buildField(
                 context,
                 'Link URL (optional)',
@@ -1552,7 +1552,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // ── Inline Error ──────────────────────────────────────────────
+              // ── Inline Error 
               Obx(
                 () => _formError.value.isNotEmpty
                     ? Container(
@@ -1594,7 +1594,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     : const SizedBox.shrink(),
               ),
 
-              // ── isActive toggle ───────────────────────────
+              // ── isActive toggle ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1615,7 +1615,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.getScreenHeight(1.5)),
 
-              // ── Submit ───────────────────────────────────────────────────
+              // ── Submit ───
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

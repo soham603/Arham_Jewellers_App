@@ -129,7 +129,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  // ── Search Bar ────────────────────────────────────────────────────────────
+  // ── Search Bar 
   Widget _searchBar(BuildContext context) {
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -229,7 +229,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     }
   }
 
-  // ── Filter Bar ────────────────────────────────────────────────────────────
+  // ── Filter Bar 
   Widget _filterBar(BuildContext context) {
     return Obx(
       () => Container(
@@ -290,7 +290,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     }
   }
 
-  // ── List Footer ───────────────────────────────────────────────────────────
+  // ── List Footer 
   Widget _listFooter(BuildContext context) {
     return Obx(() {
       final isLoading = controller.state == CurrentAppState.LOADING &&
@@ -349,7 +349,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     });
   }
 
-  // ── Shimmer ───────────────────────────────────────────────────────────────
+  // ── Shimmer 
   Widget _shimmerList(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -406,7 +406,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  // ── Error / Empty ─────────────────────────────────────────────────────────
+  // ── Error / Empty 
   Widget _errorView(BuildContext context) {
     return Center(
       child: Column(
@@ -491,7 +491,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   }
 }
 
-// ── User Card ───────────────────────────────────────────────────────────────
+// ── User Card 
 class _UserCard extends StatelessWidget {
   final UserSearchModel user;
   final AdminUserManagementController controller;
@@ -698,7 +698,7 @@ class _UserCard extends StatelessWidget {
     );
   }
 
-  // ── Detail Sheet ──────────────────────────────────────────────────────────
+  // ── Detail Sheet 
   void _showUserDetailSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -712,7 +712,7 @@ class _UserCard extends StatelessWidget {
   }
 }
 
-// ── Detail Bottom Sheet ─────────────────────────────────────────────────────
+// ── Detail Bottom Sheet 
 class _UserDetailSheet extends StatefulWidget {
   final UserSearchModel user;
   final AdminUserManagementController controller;
@@ -1102,7 +1102,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     }
   }
 
-  // ── Action Card ───────────────────────────────────────────────────────────
+  // ── Action Card 
   Widget _actionCard(BuildContext context, bool isActive) {
     return Container(
       width: double.infinity,
@@ -1348,7 +1348,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     );
   }
 
-  // ── Confirmation Dialogs ──────────────────────────────────────────────────
+  // ── Confirmation Dialogs ──
   void _confirmDeactivate(BuildContext context) {
     showDialog(
       context: context,

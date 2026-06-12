@@ -39,9 +39,9 @@ class ProductModel {
     this.updatedBy,
   });
 
-  // =========================================================
+  
   // FROM JSON
-  // =========================================================
+  
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
@@ -83,9 +83,9 @@ class ProductModel {
     );
   }
 
-  // =========================================================
+  
   // TO JSON
-  // =========================================================
+  
 
   Map<String, dynamic> toJson() {
     return {
@@ -106,9 +106,9 @@ class ProductModel {
     };
   }
 
-  // =========================================================
+  
   // COPY WITH
-  // =========================================================
+  
 
   ProductModel copyWith({
     String? id,

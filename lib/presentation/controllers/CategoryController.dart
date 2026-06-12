@@ -38,7 +38,7 @@ class CategoryController extends GetxController {
   static CategoryController get instance => Get.find();
   final _categoryRepo = CategoryRepository();
 
-  // ── Level-2 lists per karat ───────────────────────────────────────────────
+  // ── Level-2 lists per karat 
   final _k18Categories = <CategoryModel>[].obs;
   final _k20Categories = <CategoryModel>[].obs;
   final _k22Categories = <CategoryModel>[].obs;
@@ -55,21 +55,21 @@ class CategoryController extends GetxController {
   CurrentAppState get k20State => _k20State.value;
   CurrentAppState get k22State => _k22State.value;
 
-  // ── Latest level-3 categories (for search page) ─────────────────────────
+  // ── Latest level-3 categories (for search page) 
   final _latestLevel3Categories = <CategoryModel>[].obs;
   List<CategoryModel> get latestLevel3Categories => _latestLevel3Categories;
 
   final _latestLevel3State = CurrentAppState.INITIAL.obs;
   CurrentAppState get latestLevel3State => _latestLevel3State.value;
 
-  // ── All level-3 categories (for search results) ─────────────────────────
+  // ── All level-3 categories (for search results) 
   final _allLevel3Categories = <CategoryModel>[].obs;
   List<CategoryModel> get allLevel3Categories => _allLevel3Categories;
 
   final _level3KaratMap = <String, String>{}.obs;
   String? getLevel3Karat(String level3Id) => _level3KaratMap[level3Id];
 
-  // ── Expansion state ───────────────────────────────────────────────────────
+  // ── Expansion state 
   final _expandedCategoryId = RxnString();
   String? get expandedCategoryId => _expandedCategoryId.value;
 
@@ -81,14 +81,14 @@ class CategoryController extends GetxController {
   final _level3LoadingIds = <String>{}.obs;
   bool isLevel3Loading(String parentId) => _level3LoadingIds.contains(parentId);
 
-  // ── Selected level-3 category (triggers product section) ─────────────────
+  // ── Selected level-3 category (triggers product section) 
   final _selectedLevel3 = Rxn<CategoryModel>();
   CategoryModel? get selectedLevel3 => _selectedLevel3.value;
 
   final _showProductSection = false.obs;
   bool get showProductSection => _showProductSection.value;
 
-  // ── Admin ─────────────────────────────────────────────────────────────────
+  // ── Admin 
   final _adminCategoryList = <CategoryModel>[].obs;
   List<CategoryModel> get adminCategoryList => _adminCategoryList;
 
@@ -114,14 +114,14 @@ class CategoryController extends GetxController {
   final _error = ''.obs;
   String get error => _error.value;
 
-  // ── Karat name → Karat enum mapping ─────────────────────────────────────
+  // ── Karat name → Karat enum mapping 
   static const _karatNameMap = {
     '18K': Karat.k18,
     '20K': Karat.k20,
     '22K': Karat.k22,
   };
 
-  // ── Single API call: fetch full category tree ────────────────────────────
+  // ── Single API call: fetch full category tree ───
   // Replaces: _getKaratId × 3 + fetchCategoriesForKarat × 3 + _fetchSubcategories per tap
   Future<void>? _treeFetchFuture;
   bool _treeHasFullData = false;
@@ -226,7 +226,7 @@ class CategoryController extends GetxController {
     _latestLevel3State.value = CurrentAppState.SUCCESS;
   }
 
-  // ── Fetch latest level-3 categories (for search page) ───────────────────
+  // ── Fetch latest level-3 categories (for search page) 
   // Now just extracts from tree if available, otherwise falls back to API
   Future<void> fetchLatestLevel3Categories() async {
     if (_latestLevel3State.value == CurrentAppState.LOADING) return;
@@ -239,7 +239,7 @@ class CategoryController extends GetxController {
     await fetchCategoryTree();
   }
 
-  // ── Toggle expansion of a level-2 category ───────────────────────────────
+  // ── Toggle expansion of a level-2 category 
   // Level-3 data is pre-cached from tree; falls back to fetching tree if empty
   Future<void> toggleExpand(CategoryModel category) async {
     final id = category.id;
@@ -264,7 +264,7 @@ class CategoryController extends GetxController {
     }
   }
 
-  // ── Select a level-3 category → show products ────────────────────────────
+  // ── Select a level-3 category → show products ───
   void selectLevel3Category(CategoryModel category) {
     _selectedLevel3.value = category;
     _showProductSection.value = true;
@@ -277,7 +277,7 @@ class CategoryController extends GetxController {
     SearchProductController.instance.clearCategoryProducts();
   }
 
-  // ── Admin ─────────────────────────────────────────────────────────────────
+  // ── Admin 
   Future<void> fetchAdminCategories({
     bool isPagination = false,
     int? filterLevel,
@@ -352,7 +352,7 @@ class CategoryController extends GetxController {
     return _fetchLevelFlat(level: 3, parentId: parentId);
   }
 
-  // ── CRUD ──────────────────────────────────────────────────────────────────
+  // ── CRUD 
   Future<bool> createCategory({
     required String name,
     required String boxName,
@@ -443,7 +443,7 @@ class CategoryController extends GetxController {
     return false;
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Helpers 
   Future<List<CategoryModel>> _fetchLevelFlat({
     required int level,
     String? parentId,
