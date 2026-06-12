@@ -54,4 +54,7 @@ class ApiUrlConstants {
   static String ancillaryUpdatePage(String page) => '/api/v1/ancillary/update-page/$page';
 
   static const String CRAFTSMAN_GET_ALL = '/api/v1/craftsman/get-All';
+
+  static const String NOTIFICATION_SEND = '/api/v1/notifications/send';
+  static const String NOTIFICATION_HISTORY = '/api/v1/notifications/history';
 }

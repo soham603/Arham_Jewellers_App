@@ -154,6 +154,15 @@ class _NotificationList extends StatelessWidget {
 
   const _NotificationList({required this.controller});
 
+  void _handleTap(NotificationModel notification) {
+    controller.markAsRead(notification.id);
+
+    final route = notification.data?['route']?.toString();
+    if (route != null && NotificationController.allowedRoutes.contains(route)) {
+      Get.toNamed(route, arguments: notification.data);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -166,9 +175,7 @@ class _NotificationList extends StatelessWidget {
         final notification = controller.notifications[index];
         return _NotificationCard(
           notification: notification,
-          onTap: () {
-            controller.markAsRead(notification.id);
-          },
+          onTap: () => _handleTap(notification),
         );
       },
     );

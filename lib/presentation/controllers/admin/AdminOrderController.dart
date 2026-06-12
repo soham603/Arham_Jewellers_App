@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -62,6 +64,21 @@ class AdminOrderController extends GetxController {
     _debounce?.cancel();
     searchController.dispose();
     super.onClose();
+  }
+
+  String _buildOrderActionLabel(String action) {
+    final upperAction = action.toUpperCase();
+    switch (upperAction) {
+      case 'APPROVE':
+      case 'APPROVE_AND_ASSIGN':
+        return 'Approved';
+      case 'REJECT':
+        return 'Rejected';
+      case 'COMPLETE':
+        return 'Completed';
+      default:
+        return upperAction;
+    }
   }
 
   Future<void> fetchOrders({bool isPagination = false}) async {
@@ -240,6 +257,18 @@ class AdminOrderController extends GetxController {
       );
 
       await fetchOrders();
+
+      if (Get.isRegistered<NotificationController>()) {
+        final actionLabel = _buildOrderActionLabel(action);
+        Get.find<NotificationController>().addLocalNotification(
+          title: 'Order $actionLabel',
+          body: 'Order ${orderId.length > 8 ? orderId.substring(0, 8) : orderId} has been ${actionLabel.toLowerCase()}.',
+          data: {
+            'route': AppRoutes.adminOrderDetail,
+            'orderId': orderId,
+          },
+        );
+      }
     } catch (e) {
       String errorMessage = "Something went wrong";
       if (e is DioException) {
@@ -288,6 +317,18 @@ class AdminOrderController extends GetxController {
       );
 
       await fetchOrders();
+
+      if (Get.isRegistered<NotificationController>()) {
+        final actionLabel = _buildOrderActionLabel(action);
+        Get.find<NotificationController>().addLocalNotification(
+          title: 'Custom Order $actionLabel',
+          body: 'Custom order ${orderId.length > 8 ? orderId.substring(0, 8) : orderId} has been ${actionLabel.toLowerCase()} successfully.',
+          data: {
+            'route': AppRoutes.adminOrderDetail,
+            'orderId': orderId,
+          },
+        );
+      }
 
       ToastUtils.showSuccess(responseData['message'] ?? "Order updated");
       return true;

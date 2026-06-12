@@ -43,6 +43,16 @@ class NotificationService {
   Function(String)? onTokenRefreshed;
 
   Future<void> init() async {
+    // Local notifications are independent of Firebase — always initialize them.
+    try {
+      await _setupLocalNotifications();
+      await _loadNotificationIdCounter();
+    } catch (e, st) {
+      _initError = e.toString();
+      Logger.error("NotificationService", "Local notification init failed: $e", stackTrace: st);
+    }
+
+    // Firebase / FCM setup — may fail without google-services.json.
     try {
       await Firebase.initializeApp();
       _messaging = FirebaseMessaging.instance;
@@ -50,16 +60,15 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       await _requestPermission();
-      await _setupLocalNotifications();
-      await _loadNotificationIdCounter();
       await _getFcmToken();
       _setupMessageListeners();
 
       _isInitialized = true;
-      Logger.info("NotificationService", "Initialized successfully");
-    } catch (e, st) {
+      Logger.info("NotificationService", "Initialized successfully (FCM enabled)");
+    } catch (e) {
       _initError = e.toString();
-      Logger.error("NotificationService", "Initialization failed: $e", stackTrace: st);
+      Logger.warning("NotificationService", "Firebase init failed (FCM disabled, local notifications still work): $e");
+      // _isInitialized stays false for FCM, but local notifications are ready.
     }
   }
 
@@ -190,6 +199,22 @@ class NotificationService {
 
     if (title.isEmpty && body.isEmpty) return;
 
+    showSystemNotification(
+      title: title,
+      body: body,
+      payload: message.data,
+    );
+  }
+
+  /// Show a system-level notification (notification shade) without needing FCM.
+  /// Used by in-app triggers such as order status changes and gold rate updates.
+  Future<void> showSystemNotification({
+    required String title,
+    required String body,
+    Map<String, dynamic>? payload,
+  }) async {
+    if (title.isEmpty && body.isEmpty) return;
+
     final androidDetails = AndroidNotificationDetails(
       _channelId,
       _channelName,
@@ -211,14 +236,14 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    _localNotifications.show(
+    await _localNotifications.show(
       _notificationIdCounter++,
       title,
       body,
       details,
-      payload: jsonEncode(message.data),
+      payload: payload != null ? jsonEncode(payload) : null,
     );
-    _saveNotificationIdCounter();
+    await _saveNotificationIdCounter();
   }
 
   void _onNotificationTapped(NotificationResponse response) {
@@ -265,16 +290,43 @@ class NotificationService {
   }
 
   Future<void> subscribeToTopic(String topic) async {
-    await _messaging?.subscribeToTopic(topic);
+    if (_messaging == null) {
+      Logger.info("NotificationService", "Firebase not configured, skipping topic subscription: $topic");
+      return;
+    }
+    await _messaging!.subscribeToTopic(topic);
     Logger.info("NotificationService", "Subscribed to topic: $topic");
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
-    await _messaging?.unsubscribeFromTopic(topic);
+    if (_messaging == null) {
+      Logger.info("NotificationService", "Firebase not configured, skipping topic unsubscription: $topic");
+      return;
+    }
+    await _messaging!.unsubscribeFromTopic(topic);
     Logger.info("NotificationService", "Unsubscribed from topic: $topic");
+  }
+
+  Future<void> subscribeUserTopics() async {
+    await subscribeToTopic('all_users');
+  }
+
+  Future<void> subscribeAdminTopics() async {
+    await subscribeToTopic('admin_notifications');
+  }
+
+  Future<void> unsubscribeAllTopics() async {
+    await unsubscribeFromTopic('all_users');
+    await unsubscribeFromTopic('admin_notifications');
   }
 
   Future<void> clearAllNotifications() async {
     await _localNotifications.cancelAll();
+  }
+
+  Future<void> resetIdCounter() async {
+    _notificationIdCounter = 0;
+    await _saveNotificationIdCounter();
+    Logger.info("NotificationService", "Notification ID counter reset to 0");
   }
 }

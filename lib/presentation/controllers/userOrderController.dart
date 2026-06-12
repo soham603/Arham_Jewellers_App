@@ -1,9 +1,11 @@
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
@@ -169,6 +171,17 @@ class UserOrderController extends GetxController {
         cartController.clearCart();
 
         Logger.info("UserOrderController", "Order created successfully");
+
+        if (Get.isRegistered<NotificationController>()) {
+          Get.find<NotificationController>().addLocalNotification(
+            title: 'Order Placed',
+            body: 'Your order has been placed successfully. We\'ll notify you once it\'s reviewed.',
+            data: {
+              'route': AppRoutes.userOrderDetail,
+              'orderId': _createdOrderId.value,
+            },
+          );
+        }
 
         return true;
     } catch (e, st) {

@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 
 class AuthController extends GetxController {
   final _authRepo = AuthRepository();
@@ -62,6 +63,11 @@ class AuthController extends GetxController {
     if (userData != null) {
       _user.value = userData;
       _isAdmin.value = isAdminFlag;
+      if (isAdminFlag) {
+        await NotificationService().subscribeAdminTopics();
+      } else {
+        await NotificationService().subscribeUserTopics();
+      }
     }
   }
 
@@ -108,6 +114,7 @@ class AuthController extends GetxController {
           
           response.data['message'] ?? "Login successful!",
         );
+        await NotificationService().subscribeUserTopics();
         onSuccess?.call();
         return true;
       } else if (response.statusCode == 202) {
@@ -178,6 +185,7 @@ class AuthController extends GetxController {
           
           response.data['message'] ?? "Admin login successful!",
         );
+        await NotificationService().subscribeAdminTopics();
         onSuccess?.call();
         return true;
       } else if (response.statusCode == 202) {
@@ -236,6 +244,12 @@ class AuthController extends GetxController {
   }) async {
     final sessionManager = SessionManager();
     try {
+      await NotificationService().unsubscribeAllTopics();
+      await NotificationService().clearAllNotifications();
+      await NotificationService().resetIdCounter();
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().clearAll();
+      }
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;
@@ -252,6 +266,12 @@ class AuthController extends GetxController {
   }) async {
     final sessionManager = SessionManager();
     try {
+      await NotificationService().unsubscribeAllTopics();
+      await NotificationService().clearAllNotifications();
+      await NotificationService().resetIdCounter();
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().clearAll();
+      }
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;

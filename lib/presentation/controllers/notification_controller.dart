@@ -16,16 +16,13 @@ class NotificationController extends GetxController {
   final _notificationRepo = NotificationRepository();
 
   static const Set<String> _allowedRoutes = {
-    AppRoutes.splash,
-    AppRoutes.login,
-    AppRoutes.home,
-    AppRoutes.details,
-    AppRoutes.checkout,
-    AppRoutes.orderSuccess,
+    AppRoutes.userOrderDetail,
+    AppRoutes.adminOrderDetail,
+    AppRoutes.goldRateDetail,
     AppRoutes.myOrders,
-    AppRoutes.register,
-    AppRoutes.notifications,
   };
+
+  static Set<String> get allowedRoutes => _allowedRoutes;
 
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
   final RxInt unreadCount = 0.obs;
@@ -89,6 +86,22 @@ class NotificationController extends GetxController {
     _saveNotifications();
   }
 
+  void addLocalNotification({
+    required String title,
+    required String body,
+    Map<String, dynamic>? data,
+  }) {
+    final notification = NotificationModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: title,
+      body: body,
+      timestamp: DateTime.now(),
+      isRead: false,
+      data: data,
+    );
+    addNotification(notification);
+  }
+
   void markAsRead(String id) {
     final index = notifications.indexWhere((n) => n.id == id);
     if (index != -1) {
@@ -134,11 +147,10 @@ class NotificationController extends GetxController {
 
   void _handleNotificationTap(Map<String, dynamic> data) {
     final route = data['route'];
-    final id = data['id'];
 
     if (route != null && route is String && _allowedRoutes.contains(route)) {
       try {
-        Get.toNamed(route, arguments: id);
+        Get.toNamed(route, arguments: data);
       } catch (e) {
         Logger.error("NotificationController", "Failed to navigate to route '$route': $e");
       }

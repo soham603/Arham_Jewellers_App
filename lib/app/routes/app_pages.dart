@@ -1,7 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../presentation/controllers/navigation_controller.dart';
+import '../../presentation/controllers/userOrderController.dart';
+import '../../presentation/controllers/admin/AdminOrderController.dart';
 import '../../presentation/pages/admin/handsetChangeScreen.dart';
+import '../../presentation/pages/admin/orderDetailScreen.dart';
+import '../../presentation/pages/admin/adminCustomOrderDetailPage.dart';
 import '../../presentation/pages/auth/change_handset_page.dart';
 import '../../presentation/pages/auth/forgot_password_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
@@ -12,13 +17,16 @@ import '../../presentation/pages/notifications/notifications_page.dart';
 import '../../presentation/pages/orders/customOrderSuccessPage.dart';
 import '../../presentation/pages/orders/my_orders_page.dart';
 import '../../presentation/pages/orders/order_success_page.dart';
+import '../../presentation/pages/orders/userOrderDetailScreen.dart';
 import '../../presentation/pages/product/product_details_page.dart';
 import '../../presentation/pages/ancillary/ancillary_page_screen.dart';
 import '../../presentation/pages/share/share_page.dart';
 import '../../presentation/pages/splash/splash_page.dart';
 import '../../presentation/pages/chat/chat_screen.dart';
 import '../../presentation/pages/wishlist/wishlist_page.dart';
+import '../../presentation/pages/profile/goldRateDetailScreen.dart';
 import 'app_routes.dart';
+import '../../utils/ToastUtil.dart';
 
 class _MainShellBinding extends Bindings {
   @override
@@ -53,5 +61,44 @@ abstract class AppPages {
     GetPage(name: AppRoutes.chat, page: ChatScreen.new),
     GetPage(name: AppRoutes.wishlist, page: WishlistPage.new),
     GetPage(name: AppRoutes.customOrderSuccess, page: CustomOrderSuccessPage.new),
+    GetPage(name: AppRoutes.userOrderDetail, page: _resolveUserOrderDetail),
+    GetPage(name: AppRoutes.adminOrderDetail, page: _resolveAdminOrderDetail),
+    GetPage(name: AppRoutes.goldRateDetail, page: GoldRateDetailScreen.new),
   ];
+}
+
+Widget _resolveUserOrderDetail() {
+  final orderId = (Get.arguments?['orderId'] ?? Get.arguments?['id'])?.toString();
+  if (orderId != null && Get.isRegistered<UserOrderController>()) {
+    final controller = Get.find<UserOrderController>();
+    final order = controller.userOrders.cast<dynamic>().firstWhere(
+      (o) => o.id?.toString() == orderId,
+      orElse: () => null,
+    );
+    if (order != null) {
+      return UserOrderDetailScreen(order: order);
+    }
+  }
+  ToastUtils.showError('Order not found');
+  return MyOrdersPage();
+}
+
+Widget _resolveAdminOrderDetail() {
+  final orderId = (Get.arguments?['orderId'] ?? Get.arguments?['id'])?.toString();
+  if (orderId != null && Get.isRegistered<AdminOrderController>()) {
+    final controller = Get.find<AdminOrderController>();
+    final order = controller.orders.cast<dynamic>().firstWhere(
+      (o) => o.id?.toString() == orderId,
+      orElse: () => null,
+    );
+    if (order != null) {
+      if (order.isCustom == true) {
+        return AdminCustomOrderDetailPage(order: order);
+      } else {
+        return OrderDetailScreen(order: order);
+      }
+    }
+  }
+  ToastUtils.showError('Order not found');
+  return MyOrdersPage();
 }

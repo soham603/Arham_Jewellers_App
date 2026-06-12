@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/data/repositories/gold_rate_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
@@ -250,6 +252,15 @@ class GoldRateController extends GetxController {
         _actionState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess('Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g');
         fetchHistory();
+
+        if (Get.isRegistered<NotificationController>()) {
+          Get.find<NotificationController>().addLocalNotification(
+            title: 'Gold Rate Updated',
+            body: 'Gold rate has been updated to ₹${rate.toStringAsFixed(0)}/10g.',
+            data: {'route': AppRoutes.goldRateDetail},
+          );
+        }
+
         return true;
       } else {
         _actionState.value = CurrentAppState.ERROR;

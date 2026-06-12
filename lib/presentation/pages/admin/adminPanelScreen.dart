@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/notificationManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
@@ -301,6 +302,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Set daily rate",
                   onTap: () => Get.to(() => const GoldRateScreen()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.notifications_active_rounded,
+                  title: "Notifications",
+                  subtitle: "Send & history",
+                  onTap: () => Get.to(() => const NotificationManagerScreen()),
+                ),
 
                 _adminTile(
                   context,
@@ -365,6 +373,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             "Change requests", () => Get.to(() => const HandsetChangeScreen())),
         _ManagementItem(Icons.monetization_on_rounded, "Gold Rate",
             "Set daily rate", () => Get.to(() => const GoldRateScreen())),
+        _ManagementItem(Icons.notifications_active_rounded, "Notifications",
+            "Send & history", () => Get.to(() => const NotificationManagerScreen())),
         _ManagementItem(Icons.play_circle_outline_rounded, "View Splash",
             "Preview splash screen", () => Get.to(() => const SplashPage())),
         _ManagementItem(Icons.notifications_active_rounded, "Test Toast",

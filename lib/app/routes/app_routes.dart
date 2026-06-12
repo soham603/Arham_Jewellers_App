@@ -16,4 +16,7 @@ abstract class AppRoutes {
   static const customOrderSuccess = '/custom-order-success';
   static const forgotPassword = '/forgot-password';
   static const wishlist = '/wishlist';
+  static const userOrderDetail = '/user-order-detail';
+  static const adminOrderDetail = '/admin-order-detail';
+  static const goldRateDetail = '/gold-rate-detail';
 }
