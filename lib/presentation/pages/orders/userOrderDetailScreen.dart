@@ -634,12 +634,20 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       ctx,
       () async {
         final items = order.items.map((item) {
+          final name = item.product.name ?? '';
+          String? karat;
+          final karatMatch = RegExp(r'(\d{2})\s*[Kk]').firstMatch(name);
+          if (karatMatch != null) {
+            karat = '${karatMatch.group(1)}K';
+          }
           return {
-            'name': item.product.name,
+            'name': name,
             'imageUrl': item.product.displayImageUrl,
             'quantity': item.quantity,
             'price': item.price,
             'isRejected': item.isRejected,
+            'netWeight': item.product.karigarNetWt,
+            'karat': karat,
           };
         }).toList();
 
