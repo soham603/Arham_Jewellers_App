@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
-import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -12,8 +13,9 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -526,12 +528,11 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
-  void _shareWithLoading(
+  Future<void> _downloadPdf(
     BuildContext context,
-    Future<void> Function() shareFn,
-    String message, {
-    VoidCallback? onComplete,
-  }) {
+    List<ProductModel> products,
+    List<int> quantities,
+  ) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -557,7 +558,7 @@ class _CartPageState extends State<CartPage> {
                 ),
                 SizedBox(height: context.getScreenHeight(1.5)),
                 Text(
-                  message,
+                  'Generating enquiry PDF...',
                   style: TextStyle(
                     fontSize: context.getResponsiveSize(3.5),
                     fontWeight: FontWeight.w500,
@@ -569,102 +570,33 @@ class _CartPageState extends State<CartPage> {
           ),
         ),
       ),
-    );
+      );
 
     final navigator = Navigator.of(context);
+    bool dialogDismissed = false;
+    try {
+      final pdfBytes = await ShareService.generateCartEnquiryPdfBytes(
+        products: products,
+        quantities: quantities,
+      );
 
-    shareFn().whenComplete(() {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/Cart_Enquiry.pdf');
+      await file.writeAsBytes(pdfBytes);
+
+      navigator.pop();
+      dialogDismissed = true;
+
       if (mounted) {
-        navigator.pop();
-        onComplete?.call();
-      }
-    });
-  }
-
-  Future<void> _downloadPdf(
-    BuildContext context,
-    List<ProductModel> products,
-    List<int> quantities,
-  ) async {
-    _shareWithLoading(
-      context,
-      () async {
-        await ShareService.saveCartEnquiryPdfToDownloads(
-          products: products,
-          quantities: quantities,
+        await Share.shareXFiles(
+          [XFile(file.path, name: 'Cart_Enquiry.pdf', mimeType: 'application/pdf')],
+          subject: 'Cart Enquiry PDF',
         );
-      },
-      'Generating enquiry PDF...',
-      onComplete: () => _showSharePdfHint(context),
-    );
-  }
-
-  void _showSharePdfHint(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 24),
-            SizedBox(width: 8),
-            Text(
-              'PDF Ready',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4.5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Your enquiry PDF has been saved to your Downloads folder. Share it with us on WhatsApp so we can assist you with pricing and availability.',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            color: AppColors.textMuted,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Later',
-              style: TextStyle(color: AppColors.textMuted),
-            ),
-          ),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.whatsappGreen,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () async {
-              Navigator.pop(context);
-              final message = Uri.encodeComponent(
-                'Hi, I would like to enquire about the following items from my cart. Please find the attached PDF for details.',
-              );
-              final phone =
-                  AdminConstants.adminPhone.replaceAll('+', '');
-              final uri = Uri.parse(
-                  'https://wa.me/$phone?text=$message');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri,
-                    mode: LaunchMode.externalApplication);
-              }
-            },
-            icon: FaIcon(FontAwesomeIcons.whatsapp, size: 16),
-            label: Text(
-              'Open WhatsApp',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
+      }
+    } catch (e) {
+      if (!dialogDismissed && mounted) navigator.pop();
+      if (mounted) ToastUtils.showError('Failed to generate or share PDF');
+    }
   }
 
   Widget _emptyCart(BuildContext context) {

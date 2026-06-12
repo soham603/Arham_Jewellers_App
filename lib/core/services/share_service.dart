@@ -451,7 +451,7 @@ class ShareService {
     return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
   }
 
-  static Future<String?> saveCartEnquiryPdfToDownloads({
+  static Future<Uint8List> generateCartEnquiryPdfBytes({
     required List<ProductModel> products,
     required List<int> quantities,
   }) async {
@@ -488,6 +488,18 @@ class ShareService {
       'rows': rows,
       'imageBytesList': imageBytesList,
     });
+
+    return Uint8List.fromList(pdfBytes);
+  }
+
+  static Future<String?> saveCartEnquiryPdfToDownloads({
+    required List<ProductModel> products,
+    required List<int> quantities,
+  }) async {
+    final pdfBytes = await generateCartEnquiryPdfBytes(
+      products: products,
+      quantities: quantities,
+    );
 
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final fileName = 'Cart_Enquiry_$timestamp.pdf';

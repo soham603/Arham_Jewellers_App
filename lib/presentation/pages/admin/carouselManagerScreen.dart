@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_compress/video_compress.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -1111,7 +1112,25 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
     _descriptionController.dispose();
     _linkController.dispose();
     _videoPreviewController?.dispose();
+    VideoCompress.cancelCompression();
     super.dispose();
+  }
+
+  Future<File?> _compressVideo(File file) async {
+    try {
+      final info = await VideoCompress.compressVideo(
+        file.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      if (info != null && info.file != null) {
+        return info.file!;
+      }
+      return file;
+    } catch (e) {
+      return file;
+    }
   }
 
   Future<void> _pickMedia() async {
@@ -1628,6 +1647,10 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             return;
                           }
                           setState(() => _isSubmitting = true);
+                          File? fileToUpload = _pickedImage;
+                          if (fileToUpload != null && _localMediaType == 'video') {
+                            fileToUpload = await _compressVideo(fileToUpload);
+                          }
                           await widget.onSubmit(
                             title: _titleController.text.trim().isEmpty
                                 ? null
@@ -1638,7 +1661,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             linkUrl: _linkController.text.trim().isEmpty
                                 ? null
                                 : _linkController.text.trim(),
-                            imageFile: _pickedImage,
+                            imageFile: fileToUpload,
                             isActive: _isActive,
                             mediaType: _localMediaType,
                           );

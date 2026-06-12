@@ -413,8 +413,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final size = product.size?.toString();
     final price = _calculatePriceForProduct(product);
 
-    final bool inStock = product.isActive;
-    final String stockText = inStock ? "IN STOCK" : "OUT OF STOCK";
+    final isStockField = product.rawData?['IsStock'];
+    final bool inStock = isStockField != null
+        ? (isStockField == 1 || isStockField == true || isStockField == '1')
+        : product.isActive;
+    final String stockText = inStock ? "READY STOCK" : "OUT OF STOCK";
     final Color stockColor = inStock
         ? AppColors.primaryGold
         : Colors.red.shade600;

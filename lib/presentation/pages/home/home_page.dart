@@ -1578,12 +1578,16 @@ class _CarouselSectionState extends State<_CarouselSection> {
   final Map<int, VideoPlayerController> _videoControllers = {};
   final Set<String> _failedVideoUrls = {};
   final Set<String> _pendingVideoUrls = {};
+  bool _hasPreloaded = false;
 
   @override
   void didUpdateWidget(_CarouselSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentIndex != widget.currentIndex) {
       _updateVideoPlayback();
+    }
+    if (oldWidget.controller.list.length != widget.controller.list.length) {
+      _hasPreloaded = false;
     }
   }
 
@@ -1661,6 +1665,41 @@ class _CarouselSectionState extends State<_CarouselSection> {
     }
   }
 
+  static const int _batchSize = 3;
+
+  void _preloadAllMedia(List<CarouselModel> list) {
+    if (_hasPreloaded || list.isEmpty || !mounted) return;
+    _hasPreloaded = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _preloadBatch(list, 0);
+    });
+  }
+
+  void _preloadBatch(List<CarouselModel> list, int startIndex) {
+    if (!mounted || startIndex >= list.length) return;
+
+    final end = (startIndex + _batchSize).clamp(0, list.length);
+    for (int i = startIndex; i < end; i++) {
+      final item = list[i];
+      if (item.mediaType == 'video') {
+        _maybeInitVideo(i, item.imageUrl);
+      } else if (item.imageUrl.isNotEmpty) {
+        precacheImage(
+          CachedNetworkImageProvider(item.imageUrl),
+          context,
+        );
+      }
+    }
+
+    if (end < list.length) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _preloadBatch(list, end);
+      });
+    }
+  }
+
   @override
   void dispose() {
     for (final ctrl in _videoControllers.values) {
@@ -1699,6 +1738,10 @@ class _CarouselSectionState extends State<_CarouselSection> {
       final list = widget.controller.list;
 
       if (list.isEmpty) return const SizedBox();
+
+      if (!_hasPreloaded) {
+        _preloadAllMedia(list);
+      }
 
       return Column(
         children: [
