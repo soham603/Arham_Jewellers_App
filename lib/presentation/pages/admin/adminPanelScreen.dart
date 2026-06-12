@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserManagementController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
@@ -26,6 +31,32 @@ class AdminPanelScreen extends StatefulWidget {
 
 class _AdminPanelScreenState extends State<AdminPanelScreen> {
   bool _isGridView = true;
+
+  late final AdminOrderController _adminOrderController;
+  late final AdminUserController _adminUserController;
+  late final AdminUserManagementController _userManagementController;
+  late final GoldRateController _goldRateController;
+  late final HandsetChangeController _handsetChangeController;
+
+  @override
+  void initState() {
+    super.initState();
+    _adminOrderController = Get.isRegistered<AdminOrderController>()
+        ? Get.find<AdminOrderController>()
+        : Get.put(AdminOrderController());
+    _adminUserController = Get.isRegistered<AdminUserController>()
+        ? Get.find<AdminUserController>()
+        : Get.put(AdminUserController());
+    _userManagementController = Get.isRegistered<AdminUserManagementController>()
+        ? Get.find<AdminUserManagementController>()
+        : Get.put(AdminUserManagementController());
+    _goldRateController = Get.isRegistered<GoldRateController>()
+        ? Get.find<GoldRateController>()
+        : Get.put(GoldRateController());
+    _handsetChangeController = Get.isRegistered<HandsetChangeController>()
+        ? Get.find<HandsetChangeController>()
+        : Get.put(HandsetChangeController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +184,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               ],
             ),
           ),
+
+          SizedBox(height: context.getScreenHeight(3)),
+
+          
+          // ADMIN STATS GRID
+          
+          _buildStatsRow(context),
 
           SizedBox(height: context.getScreenHeight(3)),
 
@@ -413,6 +451,151 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     );
   }
 
+  Widget _buildStatsRow(BuildContext context) {
+    final pendingOrdersCount = _adminOrderController.orders
+        .where((o) => o.status.toUpperCase() == 'PENDING')
+        .length;
+    final pendingUsersCount = _adminUserController.total;
+    final currentGoldRate = _goldRateController.currentRate?.rate;
+    final pendingHandsetCount = _handsetChangeController.total;
+    final totalRetailers = _userManagementController.users
+        .where((u) => u.isRetailer == true)
+        .length;
+    final pendingForgotPassword = _userManagementController.users
+        .where((u) => u.forgotPasswordStatus != null &&
+            u.forgotPasswordStatus!.toUpperCase() == 'PENDING')
+        .length;
+
+    final stats = [
+      _StatData(
+        icon: Icons.inventory_2_rounded,
+        label: 'Pending Orders',
+        value: '$pendingOrdersCount',
+        color: const Color(0xFFF59E0B),
+      ),
+      _StatData(
+        icon: Icons.people_rounded,
+        label: 'Pending Users',
+        value: '$pendingUsersCount',
+        color: const Color(0xFF8B5CF6),
+      ),
+      _StatData(
+        icon: Icons.storefront_rounded,
+        label: 'Total Retailers',
+        value: '$totalRetailers',
+        color: const Color(0xFF0D9488),
+      ),
+      _StatData(
+        icon: Icons.monetization_on_rounded,
+        label: 'Gold Rate',
+        value: currentGoldRate != null
+            ? '₹${currentGoldRate.toStringAsFixed(0)}'
+            : '--',
+        color: const Color(0xFFD4AF37),
+      ),
+      _StatData(
+        icon: Icons.phone_android_rounded,
+        label: 'Handset Requests',
+        value: '$pendingHandsetCount',
+        color: const Color(0xFF3B82F6),
+      ),
+      _StatData(
+        icon: Icons.lock_reset_rounded,
+        label: 'Forgot Password',
+        value: '$pendingForgotPassword',
+        color: const Color(0xFFEF4444),
+      ),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
+        crossAxisSpacing: context.getResponsiveSize(2.5),
+        mainAxisSpacing: context.getScreenHeight(1),
+        childAspectRatio: 1.8,
+      ),
+      itemCount: stats.length,
+      itemBuilder: (context, index) {
+        final s = stats[index];
+        return _statCard(
+          context,
+          icon: s.icon,
+          label: s.label,
+          value: s.value,
+          color: s.color,
+        );
+      },
+    );
+  }
+
+  Widget _statCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(context.getResponsiveSize(3)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: context.getResponsiveSize(5),
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ),
+              SizedBox(width: context.getResponsiveSize(1.5)),
+              Container(
+                padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: context.getResponsiveSize(3.5),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.getScreenHeight(0.3)),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontSize: context.getResponsiveSize(2.8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showToastTestSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -590,4 +773,18 @@ class _ManagementItem {
   final VoidCallback onTap;
 
   const _ManagementItem(this.icon, this.title, this.subtitle, this.onTap);
+}
+
+class _StatData {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatData({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 }

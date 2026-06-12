@@ -361,7 +361,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'No products found',
+                        _stockFilter == 'ready'
+                            ? 'No ready stock items available'
+                            : _stockFilter == 'out'
+                                ? 'No out of stock items found'
+                                : 'No products found',
                         style: TextStyle(
                           color: context.colorPalette.goldDark,
                           fontSize: 16,

@@ -541,7 +541,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       pageKey: "CONTACT",
                     ),
 
-                    SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.getScreenHeight(12)),
+
                   ],
                 ),
               );

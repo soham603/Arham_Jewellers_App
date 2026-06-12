@@ -187,7 +187,7 @@ class _SplashPageState extends State<SplashPage>
                         logoSize: context.getResponsiveSize(18),
                         iconColor: context.colorPalette.gold,
                         nameColor: context.colorPalette.goldDark,
-                        nameFontSize: context.getResponsiveSize(4),
+                        nameFontSize: context.getResponsiveSize(3),
                         nameLetterSpacing: 1,
                         subtitleColor: palette.subTitleColor,
                         subtitleFontSize: context.getResponsiveSize(2.2),

@@ -616,7 +616,7 @@ GestureDetector(
 
                         const CustomiseOrderBanner(),
 
-                        SizedBox(height: context.getScreenHeight(4)),
+                        SizedBox(height: context.getScreenHeight(12)),
                       ],
                     ),
                   ),
@@ -1736,7 +1736,9 @@ class _CarouselSectionState extends State<_CarouselSection> {
                     child: _CarouselMediaItem(
                       item: item,
                       isActive: index == widget.currentIndex,
-                      onVisible: () => _maybeInitVideo(index, item.imageUrl),
+                      onVisible: item.mediaType == 'video'
+                          ? () => _maybeInitVideo(index, item.imageUrl)
+                          : () {},
                       onInvisible: () => _disposeVideoIfNeeded(index),
                       videoController: _videoControllers[index],
                     ),
@@ -1952,7 +1954,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
       if (unique.isEmpty) {
         return SizedBox(
-          height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(3),
+          height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(5),
           child: Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,
@@ -1975,7 +1977,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                     const SizedBox(height: 7),
                     Container(
                       width: context.responsiveWidth(60, tabletVal: 115, largeTabletVal: 90),
-                      height: context.getScreenHeight(1.5),
+                      height: context.getScreenHeight(3),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(4),
@@ -1990,7 +1992,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
 
       return SizedBox(
-        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(3),
+        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(5),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
@@ -2037,9 +2039,10 @@ class _CategoryQuickAccess extends StatelessWidget {
                         fontSize: context.responsiveFont(11),
                         fontWeight: FontWeight.w600,
                         color: context.colorPalette.goldDeep,
+                        height: 1.2,
                       ),
                       textAlign: TextAlign.center,
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -2292,15 +2295,15 @@ class CustomiseOrderBanner extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+                   ),
+                 ],
+               ),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
 
   // --- Helper Widgets for the UI ---
   Widget _buildBulletDot(BuildContext context) {

@@ -373,42 +373,55 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     final pendingUsersCount = _adminUserController.total;
     final currentGoldRate = _goldRateController.currentRate?.rate;
 
-    return Row(
-      children: [
-        _statCard(
+    final stats = [
+      _StatData(
+        icon: Icons.inventory_2_rounded,
+        label: 'Pending Orders',
+        value: '$pendingOrdersCount',
+        color: const Color(0xFFF59E0B),
+      ),
+      _StatData(
+        icon: Icons.inventory_rounded,
+        label: 'Total Products',
+        value: '$totalProducts',
+        color: const Color(0xFF3B82F6),
+      ),
+      _StatData(
+        icon: Icons.people_rounded,
+        label: 'Pending Users',
+        value: '$pendingUsersCount',
+        color: const Color(0xFF8B5CF6),
+      ),
+      _StatData(
+        icon: Icons.monetization_on_rounded,
+        label: 'Gold Rate',
+        value: currentGoldRate != null
+            ? '₹${currentGoldRate.toStringAsFixed(0)}'
+            : '--',
+        color: const Color(0xFFD4AF37),
+      ),
+    ];
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
+        crossAxisSpacing: context.getResponsiveSize(2.5),
+        mainAxisSpacing: context.getScreenHeight(1),
+        childAspectRatio: 1.8,
+      ),
+      itemCount: stats.length,
+      itemBuilder: (context, index) {
+        final s = stats[index];
+        return _statCard(
           context,
-          icon: Icons.inventory_2_rounded,
-          label: 'Pending\nOrders',
-          value: '$pendingOrdersCount',
-          color: const Color(0xFFF59E0B),
-        ),
-        SizedBox(width: context.getResponsiveSize(2.5)),
-        _statCard(
-          context,
-          icon: Icons.inventory_rounded,
-          label: 'Total\nProducts',
-          value: '$totalProducts',
-          color: const Color(0xFF3B82F6),
-        ),
-        SizedBox(width: context.getResponsiveSize(2.5)),
-        _statCard(
-          context,
-          icon: Icons.people_rounded,
-          label: 'Pending\nUsers',
-          value: '$pendingUsersCount',
-          color: const Color(0xFF8B5CF6),
-        ),
-        SizedBox(width: context.getResponsiveSize(2.5)),
-        _statCard(
-          context,
-          icon: Icons.monetization_on_rounded,
-          label: 'Gold\nRate',
-          value: currentGoldRate != null
-              ? '₹${currentGoldRate.toStringAsFixed(0)}'
-              : '--',
-          color: const Color(0xFFD4AF37),
-        ),
-      ],
+          icon: s.icon,
+          label: s.label,
+          value: s.value,
+          color: s.color,
+        );
+      },
     );
   }
 
@@ -419,61 +432,61 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     required String value,
     required Color color,
   }) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(2.5),
-          vertical: context.getScreenHeight(1.2),
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE7DED2)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    return Container(
+      padding: EdgeInsets.all(context.getResponsiveSize(3)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: context.getResponsiveSize(5),
+                    color: AppColors.textDark,
+                  ),
+                ),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: context.getResponsiveSize(4.5),
+              SizedBox(width: context.getResponsiveSize(1.5)),
+              Container(
+                padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: context.getResponsiveSize(3.5),
+                ),
               ),
+            ],
+          ),
+          SizedBox(height: context.getScreenHeight(0.3)),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppColors.textMuted,
+              fontSize: context.getResponsiveSize(2.8),
             ),
-            SizedBox(height: context.getScreenHeight(0.8)),
-            Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: context.getResponsiveSize(5),
-                color: AppColors.textDark,
-              ),
-            ),
-            SizedBox(height: context.getScreenHeight(0.3)),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AppColors.textMuted,
-                fontSize: context.getResponsiveSize(2.5),
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -634,4 +647,18 @@ class _ManagementItem {
   final VoidCallback onTap;
 
   const _ManagementItem(this.icon, this.title, this.subtitle, this.onTap);
+}
+
+class _StatData {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatData({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 }

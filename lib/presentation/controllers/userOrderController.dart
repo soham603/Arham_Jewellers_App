@@ -55,7 +55,7 @@ class UserOrderController extends GetxController {
   DateTime get lastOrderCreatedAt => _lastOrderCreatedAt;
 
 
-  static const int _ordersLimit = 5;
+  static const int _ordersLimit = 10;
 
   final _userOrders = <UserOrderModel>[].obs;
 

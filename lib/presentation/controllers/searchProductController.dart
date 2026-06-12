@@ -125,6 +125,7 @@ class SearchProductController extends GetxController {
     super.onInit();
     filterState = FilterStateController();
     recentSearchesController = RecentSearchesController();
+    recentSearchesController.loadRecentSearches();
     filterState.setProductsProvider(() => allProducts);
   }
 
@@ -530,9 +531,10 @@ class SearchProductController extends GetxController {
     if (!_karatHasMore && isPagination) return;
     if (_karatState.value == CurrentAppState.LOADING) return;
 
+    _karatState.value = CurrentAppState.LOADING;
+
     if (!isPagination) {
       _currentKarats = karats;
-      _karatState.value = CurrentAppState.LOADING;
       _karatPage = 1;
       _karatHasMore = true;
       _karatProducts.clear();
@@ -704,10 +706,11 @@ class SearchProductController extends GetxController {
     if (!_filteredHasMore && isPagination) return;
     if (_filteredState.value == CurrentAppState.LOADING) return;
 
+    _filteredState.value = CurrentAppState.LOADING;
+
     if (!isPagination) {
       _currentFilterCategoryId = categoryId;
       _currentFilterKarat = targetKarat;
-      _filteredState.value = CurrentAppState.LOADING;
       _filteredPage = 1;
       _filteredHasMore = true;
       _filteredProducts.clear();

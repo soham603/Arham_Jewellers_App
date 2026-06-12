@@ -105,10 +105,10 @@ class AppBottomNav extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isLargeScreen = MediaQuery.of(context).size.shortestSide >= 600;
 
-    final barHeight = isLargeScreen ? 76.0 : 68.0;
-    final bubbleSize = isLargeScreen ? 40.0 : 36.0;
-    final iconSize = isLargeScreen ? 26.0 : 24.0;
-    final labelFontSize = isLargeScreen ? 12.0 : 11.0;
+    final barHeight = isLargeScreen ? 100.0 : 68.0;
+    final bubbleSize = isLargeScreen ? 50.0 : 36.0;
+    final iconSize = isLargeScreen ? 32.0 : 24.0;
+    final labelFontSize = isLargeScreen ? 14.0 : 11.0;
 
     return SafeArea(
       top: false,
@@ -117,7 +117,7 @@ class AppBottomNav extends StatelessWidget {
           height: barHeight,
           child: Container(
             decoration: BoxDecoration(
-              color: colorScheme.surface,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: colorScheme.outline.withOpacity(0.10),

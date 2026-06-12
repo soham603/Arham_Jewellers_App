@@ -49,28 +49,21 @@ class MainShellView extends GetView<NavigationController> {
         final isAdmin = authController.isAdmin;
         final pages = isAdmin ? _adminPages : _regularPages;
         final navIndex = isAdmin ? index : (index >= 2 ? index + 1 : index);
+
         return Scaffold(
           backgroundColor: Colors.white,
-          body: Stack(
-            children: [
-              SafeArea(
-                bottom: false,
-                child: IndexedStack(
-                  index: index,
-                  children: pages,
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: AppBottomNav(
-                  currentIndex: navIndex,
-                  onTap: (i) => controller.switchTab(i, isAdmin: isAdmin),
-                  isAdmin: isAdmin,
-                ),
-              ),
-            ],
+          extendBody: true,
+          body: SafeArea(
+            bottom: false,
+            child: IndexedStack(
+              index: index,
+              children: pages,
+            ),
+          ),
+          bottomNavigationBar: AppBottomNav(
+            currentIndex: navIndex,
+            onTap: (i) => controller.switchTab(i, isAdmin: isAdmin),
+            isAdmin: isAdmin,
           ),
         );
       }),

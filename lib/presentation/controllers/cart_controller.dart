@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/cart_item.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,11 +25,13 @@ class CartController extends GetxController {
   double get subtotal {
     return _items.fold(
       0,
-      (sum, item) =>
-          sum +
-          ((item.product.rawData?["TagSalesAmount"] ?? 0)
-                  .toDouble() *
-              item.quantity),
+      (sum, item) {
+        final price = GoldRateController.calculatePrice(
+          fineWeight: item.product.karigarNetWt ?? 0,
+          ratePer10Gram: Get.find<GoldRateController>().currentRate?.rate ?? 0,
+        );
+        return sum + ((price ?? 0) * item.quantity);
+      },
     );
   }
 

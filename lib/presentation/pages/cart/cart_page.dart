@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
@@ -26,13 +27,25 @@ class _CartPageState extends State<CartPage> {
 
   bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
-  String _formatPrice(num value) {
-    if (value >= 10000000) {
-      return '${(value / 10000000).toStringAsFixed(2)} Cr';
-    } else if (value >= 100000) {
-      return '${(value / 100000).toStringAsFixed(2)} L';
+  String _formatPrice(double price) {
+    final rounded = price.round();
+    final parts = rounded.toStringAsFixed(0).split('.');
+    final intPart = parts[0];
+    final buffer = StringBuffer();
+    for (int i = 0; i < intPart.length; i++) {
+      if (i > 0 && (intPart.length - i) % 3 == 0) buffer.write(',');
+      buffer.write(intPart[i]);
     }
-    return value.toStringAsFixed(0);
+    return buffer.toString();
+  }
+
+  double? _calculateItemPrice(ProductModel product) {
+    final goldRate = Get.find<GoldRateController>().currentRate;
+    if (goldRate == null || product.karigarNetWt == null) return null;
+    return GoldRateController.calculatePrice(
+      fineWeight: product.karigarNetWt ?? 0,
+      ratePer10Gram: goldRate.rate,
+    );
   }
 
   @override
@@ -76,7 +89,7 @@ class _CartPageState extends State<CartPage> {
             context.getResponsiveSize(4),
             context.getScreenHeight(1),
             context.getResponsiveSize(4),
-            context.getScreenHeight(1.5),
+            context.getScreenHeight(3),
           ),
           child: Column(
             children: [
@@ -90,10 +103,8 @@ class _CartPageState extends State<CartPage> {
                     children: [
                       ...List.generate(cartController.items.length, (index) {
                         final item = cartController.items[index];
-                        final rawData = item.product.rawData ?? {};
-                        final price =
-                            (rawData["TagSalesAmount"] ?? 0).toDouble();
                         final imageURL = item.product.displayImageUrl;
+                        final price = _calculateItemPrice(item.product);
 
                         return Dismissible(
                           key: ValueKey(item.product.id),
@@ -265,7 +276,7 @@ class _CartPageState extends State<CartPage> {
                                             ),
                                           ),
                                         ],
-                                        if (_isRetailer) ...[
+                                        if (_isRetailer && price != null) ...[
                                           SizedBox(
                                               height:
                                                   context.getScreenHeight(0.5)),
