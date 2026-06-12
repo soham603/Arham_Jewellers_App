@@ -3,14 +3,16 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/auth_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 
-class AuthController extends GetxController {
+class AuthController extends GetxController with WidgetsBindingObserver {
   final _authRepo = AuthRepository();
 
   final _userLoginState = CurrentAppState.INITIAL.obs;
@@ -53,7 +55,33 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     _restoreSession();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _onAppResumed();
+    }
+  }
+
+  void _onAppResumed() async {
+    try {
+      final isAccessExpired = await SessionManager().isAccessTokenExpired();
+      if (isAccessExpired) {
+        Logger.info('AuthController', 'App resumed with expired access token, refreshing...');
+        await baseHttpService.proactiveTokenRefresh();
+      }
+    } catch (e) {
+      Logger.error('AuthController', 'Error during app resume token refresh: $e');
+    }
   }
 
   void _restoreSession() async {

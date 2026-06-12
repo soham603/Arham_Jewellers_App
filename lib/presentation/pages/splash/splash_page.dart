@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import '../../../core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -92,16 +93,26 @@ class _SplashPageState extends State<SplashPage>
       final isAccessExpired = await sessionManager.isAccessTokenExpired();
       final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
 
-      final elapsed = stopwatch.elapsedMilliseconds;
-      final remaining = 3500 - elapsed;
-
-      if (remaining > 0) {
-        await Future.delayed(Duration(milliseconds: remaining));
-      }
-
-      if (token != null && (!isAccessExpired || !isRefreshExpired)) {
+      if (token != null && !isAccessExpired) {
+        final elapsed = stopwatch.elapsedMilliseconds;
+        final remaining = 3500 - elapsed;
+        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
         Get.offNamed(AppRoutes.home);
+      } else if (token != null && !isRefreshExpired) {
+        Logger.info('SplashPage', 'Access token expired, proactively refreshing...');
+        final refreshed = await baseHttpService.proactiveTokenRefresh();
+        final elapsed = stopwatch.elapsedMilliseconds;
+        final remaining = 3500 - elapsed;
+        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
+        if (refreshed) {
+          Get.offNamed(AppRoutes.home);
+        } else {
+          Get.offNamed(AppRoutes.login);
+        }
       } else {
+        final elapsed = stopwatch.elapsedMilliseconds;
+        final remaining = 3500 - elapsed;
+        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
         Get.offNamed(AppRoutes.login);
       }
     } catch (e, stackTrace) {

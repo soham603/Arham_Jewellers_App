@@ -269,5 +269,14 @@ class BaseHttpService {
     Get.offAllNamed(AppRoutes.login);
   }
 
+  /// Proactively refresh the access token before it expires.
+  /// Returns true if refresh succeeded, false otherwise.
+  Future<bool> proactiveTokenRefresh() async {
+    final isAccessExpired = await sessionManager.isAccessTokenExpired();
+    if (!isAccessExpired) return true;
+
+    return _handleTokenRefresh();
+  }
+
   dio.Dio get client => _dio;
 }
