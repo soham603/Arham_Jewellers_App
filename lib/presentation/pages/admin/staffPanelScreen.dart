@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/adminProductController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
@@ -21,6 +25,28 @@ class StaffPanelScreen extends StatefulWidget {
 class _StaffPanelScreenState extends State<StaffPanelScreen> {
   bool _isGridView = true;
 
+  late final AdminOrderController _adminOrderController;
+  late final AdminProductController _adminProductController;
+  late final AdminUserController _adminUserController;
+  late final GoldRateController _goldRateController;
+
+  @override
+  void initState() {
+    super.initState();
+    _adminOrderController = Get.isRegistered<AdminOrderController>()
+        ? Get.find<AdminOrderController>()
+        : Get.put(AdminOrderController());
+    _adminProductController = Get.isRegistered<AdminProductController>()
+        ? Get.find<AdminProductController>()
+        : Get.put(AdminProductController());
+    _adminUserController = Get.isRegistered<AdminUserController>()
+        ? Get.find<AdminUserController>()
+        : Get.put(AdminUserController());
+    _goldRateController = Get.isRegistered<GoldRateController>()
+        ? Get.find<GoldRateController>()
+        : Get.put(GoldRateController());
+  }
+
   @override
   Widget build(BuildContext context) {
     final authController = Get.isRegistered<AuthController>()
@@ -35,9 +61,9 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =====================================================
+          
           // STAFF HEADER CARD
-          // =====================================================
+          
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.getResponsiveSize(5)),
@@ -113,6 +139,59 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                     ),
                   ],
                 ),
+                if (authController.user != null) ...[
+                  SizedBox(height: context.getScreenHeight(1.5)),
+                  if (authController.user!.email.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.email_rounded,
+                            color: Colors.white60,
+                            size: context.getResponsiveSize(3.8),
+                          ),
+                          SizedBox(width: context.getResponsiveSize(1.5)),
+                          Expanded(
+                            child: Text(
+                              authController.user!.email,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: context.getResponsiveSize(3.2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (authController.user!.phoneNumber.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.phone_rounded,
+                            color: Colors.white60,
+                            size: context.getResponsiveSize(3.8),
+                          ),
+                          SizedBox(width: context.getResponsiveSize(1.5)),
+                          Expanded(
+                            child: Text(
+                              authController.user!.phoneNumber,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: context.getResponsiveSize(3.2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
                 SizedBox(height: context.getScreenHeight(2)),
                 Container(
                   width: double.infinity,
@@ -150,9 +229,16 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
 
           SizedBox(height: context.getScreenHeight(3)),
 
-          // =====================================================
+          
+          // QUICK STATS ROW
+          
+          _buildStatsRow(context),
+
+          SizedBox(height: context.getScreenHeight(3)),
+
+          
           // STAFF MENU GRID / LIST
-          // =====================================================
+          
           Row(
             children: [
               Text(
@@ -278,6 +364,119 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
             "Terms, About, Policies",
             () => Get.to(() => const AncillarySelectionScreen())),
       ];
+
+  Widget _buildStatsRow(BuildContext context) {
+    final pendingOrdersCount = _adminOrderController.orders
+        .where((o) => o.status.toUpperCase() == 'PENDING')
+        .length;
+    final totalProducts = _adminProductController.total;
+    final pendingUsersCount = _adminUserController.total;
+    final currentGoldRate = _goldRateController.currentRate?.rate;
+
+    return Row(
+      children: [
+        _statCard(
+          context,
+          icon: Icons.inventory_2_rounded,
+          label: 'Pending\nOrders',
+          value: '$pendingOrdersCount',
+          color: const Color(0xFFF59E0B),
+        ),
+        SizedBox(width: context.getResponsiveSize(2.5)),
+        _statCard(
+          context,
+          icon: Icons.inventory_rounded,
+          label: 'Total\nProducts',
+          value: '$totalProducts',
+          color: const Color(0xFF3B82F6),
+        ),
+        SizedBox(width: context.getResponsiveSize(2.5)),
+        _statCard(
+          context,
+          icon: Icons.people_rounded,
+          label: 'Pending\nUsers',
+          value: '$pendingUsersCount',
+          color: const Color(0xFF8B5CF6),
+        ),
+        SizedBox(width: context.getResponsiveSize(2.5)),
+        _statCard(
+          context,
+          icon: Icons.monetization_on_rounded,
+          label: 'Gold\nRate',
+          value: currentGoldRate != null
+              ? '₹${currentGoldRate.toStringAsFixed(0)}'
+              : '--',
+          color: const Color(0xFFD4AF37),
+        ),
+      ],
+    );
+  }
+
+  Widget _statCard(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(2.5),
+          vertical: context.getScreenHeight(1.2),
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: context.getResponsiveSize(4.5),
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(0.8)),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: context.getResponsiveSize(5),
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(0.3)),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontSize: context.getResponsiveSize(2.5),
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _staffListTile(
     BuildContext context, {

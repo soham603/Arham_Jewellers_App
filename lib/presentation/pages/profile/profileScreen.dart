@@ -242,9 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // =====================================================
                     // PROFILE CARD
-                    // =====================================================
                     Container(
                       width: double.infinity,
 
@@ -401,7 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.getScreenHeight(2)),
 
                     Divider(color: Colors.grey.shade300),
 
@@ -411,9 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.getScreenHeight(1)),
 
-                    // =====================================================
                     // MY ORDERS CARD
-                    // =====================================================
                     GestureDetector(
                       onTap: () => Get.to(() => const MyOrdersPage()),
                       child: Container(
@@ -481,6 +477,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     ),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    Divider(color: Colors.grey.shade300),
+
+                    SizedBox(height: context.getScreenHeight(2)),
+
+                    // USER DETAILS CARD
+                    _buildUserDetailsCard(context),
 
                     SizedBox(height: context.getScreenHeight(2)),
 
@@ -690,6 +695,175 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildUserDetailsCard(BuildContext context) {
+    final user = authController.user;
+    if (user == null) return const SizedBox.shrink();
+
+    final details = <_DetailItem>[];
+
+    details.add(_DetailItem(
+      icon: Icons.email_rounded,
+      label: 'Email',
+      value: user.email,
+    ));
+
+    details.add(_DetailItem(
+      icon: Icons.phone_rounded,
+      label: 'Phone',
+      value: user.phoneNumber,
+    ));
+
+    if (user.companyName != null && user.companyName!.isNotEmpty) {
+      details.add(_DetailItem(
+        icon: Icons.business_rounded,
+        label: 'Company',
+        value: user.companyName!,
+      ));
+    }
+
+    if (user.gstNumber != null && user.gstNumber!.isNotEmpty) {
+      details.add(_DetailItem(
+        icon: Icons.receipt_rounded,
+        label: 'GST Number',
+        value: user.gstNumber!,
+      ));
+    }
+
+    final locationParts = <String>[];
+    if (user.area != null && user.area!.isNotEmpty) locationParts.add(user.area!);
+    if (user.city != null && user.city!.isNotEmpty) locationParts.add(user.city!);
+    if (user.pincode != null && user.pincode!.isNotEmpty) locationParts.add(user.pincode!);
+    if (locationParts.isNotEmpty) {
+      details.add(_DetailItem(
+        icon: Icons.location_on_rounded,
+        label: 'Location',
+        value: locationParts.join(', '),
+      ));
+    }
+
+    if (user.createdAt.isNotEmpty) {
+      try {
+        final parsed = DateTime.parse(user.createdAt);
+        final formatted = DateFormat('MMM yyyy').format(parsed);
+        details.add(_DetailItem(
+          icon: Icons.calendar_today_rounded,
+          label: 'Member Since',
+          value: formatted,
+        ));
+      } catch (_) {}
+    }
+
+    if (details.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(context.getResponsiveSize(4)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.person_rounded,
+                  color: AppColors.primaryGold,
+                  size: context.getResponsiveSize(4.5),
+                ),
+              ),
+              SizedBox(width: context.getResponsiveSize(2)),
+              Text(
+                'Personal Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: context.getResponsiveSize(4.5),
+                  color: AppColors.textDark,
+                ),
+              ),
+              const Spacer(),
+              if (user.accountStatus != null)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(2.5),
+                    vertical: context.getScreenHeight(0.3),
+                  ),
+                  decoration: BoxDecoration(
+                    color: user.accountStatus!.toLowerCase() == 'active'
+                        ? const Color(0xFFE6F7EE)
+                        : const Color(0xFFFFF4E5),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    user.accountStatus![0].toUpperCase() + user.accountStatus!.substring(1),
+                    style: TextStyle(
+                      color: user.accountStatus!.toLowerCase() == 'active'
+                          ? const Color(0xFF2D8C56)
+                          : Colors.orange,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getResponsiveSize(2.8),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: context.getScreenHeight(2)),
+          ...details.map((detail) => Padding(
+                padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      detail.icon,
+                      color: AppColors.textMuted,
+                      size: context.getResponsiveSize(4.5),
+                    ),
+                    SizedBox(width: context.getResponsiveSize(2.5)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            detail.label,
+                            style: TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: context.getResponsiveSize(2.8),
+                            ),
+                          ),
+                          SizedBox(height: context.getScreenHeight(0.2)),
+                          Text(
+                            detail.value,
+                            style: TextStyle(
+                              color: AppColors.textDark,
+                              fontWeight: FontWeight.w600,
+                              fontSize: context.getResponsiveSize(3.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
   Widget _ancillaryLink(
     BuildContext context, {
     required IconData icon,
@@ -878,7 +1052,7 @@ class _OrderCard extends StatelessWidget {
   }
 }
 
-// ── Order Images Stack ───────────────────────────────────────────────────────
+// ── Order Images Stack 
 
 class _OrderImagesStack extends StatelessWidget {
   const _OrderImagesStack({required this.order});
@@ -960,7 +1134,7 @@ class _OrderImagesStack extends StatelessWidget {
   }
 }
 
-// ── Product Image Widget ─────────────────────────────────────────────────────
+// ── Product Image Widget 
 
 class _ProductImage extends StatelessWidget {
   final String? url;
@@ -982,7 +1156,7 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
-// ── Status Info Model ────────────────────────────────────────────────────────
+// ── Status Info Model 
 
 class _StatusInfo {
   final String label;
@@ -993,5 +1167,17 @@ class _StatusInfo {
     required this.label,
     required this.color,
     required this.bgColor,
+  });
+}
+
+class _DetailItem {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DetailItem({
+    required this.icon,
+    required this.label,
+    required this.value,
   });
 }
