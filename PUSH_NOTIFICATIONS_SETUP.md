@@ -278,18 +278,59 @@ Data: {
 
 ### iOS
 
-1. Register an iOS app in Firebase Console
-2. Download `GoogleService-Info.plist` and place it at `ios/Runner/GoogleService-Info.plist`
-3. Add to `ios/Runner/Info.plist`:
-   ```xml
-   <key>UIBackgroundModes</key>
-   <array>
-     <string>fetch</string>
-     <string>remote-notification</string>
-   </array>
-   ```
-4. Enable Push Notifications capability in Xcode
-5. Upload APNs authentication key to Firebase Console
+#### Prerequisites
+- [ ] Apple Developer Account ($99/year) - **Required for push notifications**
+- [ ] Firebase project created
+- [ ] Firebase CLI installed (`npm install -g firebase-tools`)
+
+#### Setup Steps
+
+**1. Register iOS App in Firebase Console**
+- Go to Firebase Console > Project Settings > Add App > iOS
+- Enter Bundle ID: `com.shreearhamgold.ratneshgold`
+- Download `GoogleService-Info.plist`
+
+**2. Configure Firebase in Project**
+```bash
+# Login to Firebase
+firebase login
+
+# Configure FlutterFire (generates firebase_options.dart and places GoogleService-Info.plist)
+flutterfire configure
+```
+
+**3. iOS Configuration (Already Done)**
+- ✅ `UIBackgroundModes` with `remote-notification` added to `Info.plist`
+- ✅ `Runner.entitlements` created with `aps-environment`
+- ✅ `AppDelegate.swift` updated with push notification handlers
+
+**4. Enable Push Notifications in Xcode**
+- Open `ios/Runner.xcproj` in Xcode
+- Select Runner target > Signing & Capabilities
+- Click "+ Capability" > Push Notifications
+- This enables the `aps-environment` entitlement
+
+**5. Upload APNs Key to Firebase**
+- Go to Apple Developer > Keys > Create Key
+- Enable "Apple Push Notifications service (APNs)"
+- Download the `.p8` key file
+- In Firebase Console > Project Settings > Cloud Messaging > iOS app configuration
+- Upload the APNs Authentication Key (.p8 file)
+- Enter Key ID and Team ID
+
+**6. Install iOS Dependencies**
+```bash
+cd ios
+pod install
+cd ..
+```
+
+**7. Build and Test**
+```bash
+flutter build ios --debug
+# Or run on physical iOS device
+flutter run
+```
 
 ---
 
@@ -315,3 +356,33 @@ Data: {
 | Topic subscriptions | No | Skipped gracefully, logged as info |
 | Admin notification composer | Depends on backend | Shows error toast if backend is unreachable |
 | Notification history | Depends on backend | Shows error state in UI |
+
+---
+
+## iOS Push Notifications - Completion Checklist
+
+### ✅ Completed (Code Changes)
+- [x] Added `UIBackgroundModes` with `remote-notification` to `ios/Runner/Info.plist`
+- [x] Created `ios/Runner/Runner.entitlements` with `aps-environment` entitlement
+- [x] Updated `ios/Runner/AppDelegate.swift` with push notification handlers
+- [x] Dart notification service fully implemented (`notification_service.dart`)
+- [x] FCM token management and backend sync implemented
+- [x] Topic subscriptions (`all_users`, `admin_notifications`) implemented
+
+### ⏳ Pending (Requires Apple Developer Account)
+- [ ] Purchase Apple Developer Account ($99/year)
+- [ ] Register iOS app in Firebase Console
+- [ ] Run `flutterfire configure` to generate `firebase_options.dart` and `GoogleService-Info.plist`
+- [ ] Enable Push Notifications capability in Xcode
+- [ ] Upload APNs Authentication Key (.p8) to Firebase Console
+- [ ] Run `cd ios && pod install`
+- [ ] Build and test on physical iOS device
+
+### 📋 Testing Steps (After Setup Complete)
+1. Run app on physical iOS device (simulator won't work for push)
+2. Accept notification permission prompt
+3. Verify FCM token is generated (check logs)
+4. Send test notification from Firebase Console
+5. Verify notification appears in notification shade
+6. Test foreground notification display
+7. Test notification tap and deep-link navigation

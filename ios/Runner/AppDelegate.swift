@@ -1,13 +1,17 @@
 import Flutter
 import UIKit
+import UserNotifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, UNUserNotificationCenterDelegate {
   
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    
+    // Set UNUserNotificationCenter delegate for foreground notification handling
+    UNUserNotificationCenter.current().delegate = self
     
     // 1. ALWAYS register standard plugins first to prevent channel errors
     GeneratedPluginRegistrant.register(with: self)
@@ -51,6 +55,46 @@ import UIKit
     })
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+  
+  // MARK: - Push Notification Handlers
+  
+  override func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+  ) {
+    // Forward token to Firebase/Messaging if available
+    // The firebase_messaging plugin handles this automatically
+    super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+  }
+  
+  override func application(
+    _ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error
+  ) {
+    print("Failed to register for remote notifications: \(error.localizedDescription)")
+  }
+  
+  // MARK: - UNUserNotificationCenterDelegate
+  
+  // Handle notifications when app is in foreground
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    // Show notification even when app is in foreground
+    completionHandler([.banner, .badge, .sound])
+  }
+  
+  // Handle notification tap when app is in background or terminated
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    // The firebase_messaging plugin handles notification tap routing
+    completionHandler()
   }
 
   // MARK: - Helper Methods
