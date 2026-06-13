@@ -191,7 +191,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           
           // ADMIN STATS GRID
           
-          _buildStatsRow(context),
+          Obx(() => _buildStatsRow(context)),
 
           SizedBox(height: context.getScreenHeight(3)),
 

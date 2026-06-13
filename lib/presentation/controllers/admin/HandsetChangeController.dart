@@ -48,6 +48,12 @@ class HandsetChangeController extends GetxController {
   Timer? _debounce;
 
   @override
+  void onInit() {
+    super.onInit();
+    fetchRequests();
+  }
+
+  @override
   void onClose() {
     _debounce?.cancel();
     super.onClose();
