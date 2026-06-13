@@ -517,20 +517,30 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       ),
     ];
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
-      crossAxisSpacing: context.getResponsiveSize(2.5),
-      mainAxisSpacing: context.getScreenHeight(1),
-      childAspectRatio: 1.8,
-      children: stats.map((s) => _statCard(
-        context,
-        icon: s.icon,
-        label: s.label,
-        value: s.value,
-        color: s.color,
-      )).toList(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth >= 600 ? 3 : 2;
+        final spacing = context.getResponsiveSize(2.5);
+        final itemWidth =
+            (constraints.maxWidth - spacing * (crossAxisCount - 1)) / crossAxisCount;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: context.getScreenHeight(1),
+          children: stats
+              .map((s) => SizedBox(
+                    width: itemWidth,
+                    child: _statCard(
+                      context,
+                      icon: s.icon,
+                      label: s.label,
+                      value: s.value,
+                      color: s.color,
+                    ),
+                  ))
+              .toList(),
+        );
+      },
     );
   }
 
@@ -573,17 +583,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 ),
               ),
               SizedBox(width: context.getResponsiveSize(1.5)),
-              Container(
-                padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: context.getResponsiveSize(3.5),
-                ),
+              Icon(
+                icon,
+                color: color,
+                size: context.getResponsiveSize(3.5),
               ),
             ],
           ),

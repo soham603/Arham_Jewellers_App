@@ -402,24 +402,28 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
       ),
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
-        crossAxisSpacing: context.getResponsiveSize(2.5),
-        mainAxisSpacing: context.getScreenHeight(1),
-        childAspectRatio: 1.8,
-      ),
-      itemCount: stats.length,
-      itemBuilder: (context, index) {
-        final s = stats[index];
-        return _statCard(
-          context,
-          icon: s.icon,
-          label: s.label,
-          value: s.value,
-          color: s.color,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth >= 600 ? 3 : 2;
+        final spacing = context.getResponsiveSize(2.5);
+        final itemWidth =
+            (constraints.maxWidth - spacing * (crossAxisCount - 1)) / crossAxisCount;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: context.getScreenHeight(1),
+          children: stats
+              .map((s) => SizedBox(
+                    width: itemWidth,
+                    child: _statCard(
+                      context,
+                      icon: s.icon,
+                      label: s.label,
+                      value: s.value,
+                      color: s.color,
+                    ),
+                  ))
+              .toList(),
         );
       },
     );
@@ -464,17 +468,10 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                 ),
               ),
               SizedBox(width: context.getResponsiveSize(1.5)),
-              Container(
-                padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: context.getResponsiveSize(3.5),
-                ),
+              Icon(
+                icon,
+                color: color,
+                size: context.getResponsiveSize(3.5),
               ),
             ],
           ),
