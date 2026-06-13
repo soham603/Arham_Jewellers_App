@@ -135,15 +135,20 @@ class FilterStateController extends GetxController {
     required double wMax,
     required List<String> sizes,
   }) {
+    final karatsCopy = List<String>.from(karats);
+    final categoryIdsCopy = List<String>.from(categoryIds);
+    final categoryNamesCopy = List<String>.from(categoryNames);
+    final sizesCopy = List<String>.from(sizes);
+
     selectedKarats
       ..clear()
-      ..addAll(karats);
+      ..addAll(karatsCopy);
     selectedCategoryIds
       ..clear()
-      ..addAll(categoryIds);
+      ..addAll(categoryIdsCopy);
     selectedCategoryNames
       ..clear()
-      ..addAll(categoryNames);
+      ..addAll(categoryNamesCopy);
     selectedCategoryId.value = null;
     selectedCategoryName.value = '';
     stockFilter.value = stock;
@@ -151,6 +156,6 @@ class FilterStateController extends GetxController {
     weightMax.value = wMax;
     selectedSizes
       ..clear()
-      ..addAll(sizes);
+      ..addAll(sizesCopy);
   }
 }
