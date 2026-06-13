@@ -517,26 +517,20 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
       ),
     ];
 
-    return GridView.builder(
+    return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
-        crossAxisSpacing: context.getResponsiveSize(2.5),
-        mainAxisSpacing: context.getScreenHeight(1),
-        childAspectRatio: 1.8,
-      ),
-      itemCount: stats.length,
-      itemBuilder: (context, index) {
-        final s = stats[index];
-        return _statCard(
-          context,
-          icon: s.icon,
-          label: s.label,
-          value: s.value,
-          color: s.color,
-        );
-      },
+      crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
+      crossAxisSpacing: context.getResponsiveSize(2.5),
+      mainAxisSpacing: context.getScreenHeight(1),
+      childAspectRatio: 1.8,
+      children: stats.map((s) => _statCard(
+        context,
+        icon: s.icon,
+        label: s.label,
+        value: s.value,
+        color: s.color,
+      )).toList(),
     );
   }
 
