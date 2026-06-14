@@ -32,6 +32,8 @@ class _RegisterPageState extends State<RegisterPage> {
   late final TextEditingController areaController;
   late final TextEditingController pincodeController;
   late final TextEditingController companyNameController;
+  late final TextEditingController staffNameController;
+  late final TextEditingController staffPhoneController;
 
   String? _selectedState;
   String? _selectedCity;
@@ -219,6 +221,8 @@ class _RegisterPageState extends State<RegisterPage> {
     areaController,
     pincodeController,
     companyNameController,
+    staffNameController,
+    staffPhoneController,
   ];
 
   @override
@@ -235,6 +239,8 @@ class _RegisterPageState extends State<RegisterPage> {
     areaController = TextEditingController();
     pincodeController = TextEditingController();
     companyNameController = TextEditingController();
+    staffNameController = TextEditingController();
+    staffPhoneController = TextEditingController();
 
     for (final c in _allControllers) {
       c.addListener(_onFieldChanged);
@@ -290,6 +296,8 @@ class _RegisterPageState extends State<RegisterPage> {
         area: areaController.text.trim(),
         pincode: pincodeController.text.trim(),
         companyName: companyNameController.text.trim(),
+        staffName: staffNameController.text.trim(),
+        staffPhoneNumber: staffPhoneController.text.trim(),
         fcmToken: fcmToken,
         context: context,
         onSuccess: () => Get.offNamed(AppRoutes.login),
@@ -649,6 +657,30 @@ class _RegisterPageState extends State<RegisterPage> {
                                   isRequired: true,
                                   validator: (v) =>
                                       _validateRequired('Company Name', v),
+                                ),
+
+                                SizedBox(height: context.getScreenHeight(2)),
+
+                                Text(
+                                  'Staff Details (Optional)',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(3.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textDark,
+                                  ),
+                                ),
+                                SizedBox(height: context.getScreenHeight(1)),
+
+                                AnimatedTextField(
+                                  controller: staffNameController,
+                                  hintText: 'Staff Name',
+                                  textCapitalization: TextCapitalization.words,
+                                ),
+                                AnimatedTextField(
+                                  controller: staffPhoneController,
+                                  hintText: 'Staff Phone Number',
+                                  keyboardType: TextInputType.phone,
+                                  maxLength: 10,
                                 ),
 
                                 SizedBox(height: context.getScreenHeight(1)),

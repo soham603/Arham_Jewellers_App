@@ -325,6 +325,8 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     required String companyName,
     required String deviceName,
     String? fcmToken,
+    String? staffName,
+    String? staffPhoneNumber,
     required BuildContext context,
     VoidCallback? onSuccess,
   }) async {
@@ -348,6 +350,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         "companyName": companyName,
         "deviceName": deviceName,
         if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
+        if (staffName != null && staffName.isNotEmpty) "staffName": staffName,
+        if (staffPhoneNumber != null && staffPhoneNumber.isNotEmpty)
+          "staffPhoneNumber": staffPhoneNumber,
       });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
