@@ -6,6 +6,8 @@ import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:shimmer/shimmer.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -16,6 +18,7 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   late final NotificationController _controller;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -23,6 +26,21 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _controller = Get.isRegistered<NotificationController>()
         ? Get.find<NotificationController>()
         : Get.put(NotificationController());
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _controller.loadMore();
+    }
   }
 
   @override
@@ -50,13 +68,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
         ),
         actions: [
           Obx(() {
-            if (_controller.notifications.isEmpty) return const SizedBox();
+            if (_controller.unreadCount.value == 0) return const SizedBox();
             return IconButton(
-              onPressed: () {
-                _showClearAllDialog();
-              },
+              onPressed: () => _showMarkAllAsReadDialog(),
               icon: Icon(
-                Icons.delete_outline_rounded,
+                Icons.done_all_rounded,
                 color: AppColors.primaryGold,
                 size: context.getResponsiveSize(6),
               ),
@@ -67,28 +83,55 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
       body: ResponsiveWrapper(
         child: Column(
-        children: [
-          Container(height: 3, color: AppColors.divider),
-          Expanded(
-            child: Obx(() {
-              if (_controller.notifications.isEmpty) {
-                return _EmptyState();
-              }
-              return _NotificationList(controller: _controller);
-            }),
-          ),
-        ],
-      ),
+          children: [
+            Container(height: 3, color: AppColors.divider),
+            Expanded(
+              child: Obx(() {
+                // Subscribe Obx to loadMoreError so list rebuilds when pagination fails
+                _controller.loadMoreError.value;
+                switch (_controller.state.value) {
+                  case CurrentAppState.INITIAL:
+                  case CurrentAppState.LOADING:
+                    if (_controller.notifications.isEmpty) {
+                      return _LoadingShimmer();
+                    }
+                    return _NotificationList(
+                      controller: _controller,
+                      scrollController: _scrollController,
+                    );
+                  case CurrentAppState.ERROR:
+                    if (_controller.notifications.isEmpty) {
+                      return _ErrorState(
+                        onRetry: () => _controller.refreshNotifications(),
+                      );
+                    }
+                    return _NotificationList(
+                      controller: _controller,
+                      scrollController: _scrollController,
+                    );
+                  case CurrentAppState.SUCCESS:
+                    if (_controller.notifications.isEmpty) {
+                      return _EmptyState();
+                    }
+                    return _NotificationList(
+                      controller: _controller,
+                      scrollController: _scrollController,
+                    );
+                }
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _showClearAllDialog() {
+  void _showMarkAllAsReadDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear All Notifications'),
-        content: const Text('Are you sure you want to clear all notifications?'),
+        title: const Text('Mark All As Read'),
+        content: const Text('Mark all notifications as read?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -99,15 +142,154 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
           TextButton(
             onPressed: () {
-              _controller.clearAll();
+              _controller.markAllAsRead();
               Navigator.pop(context);
             },
             child: Text(
-              'Clear',
+              'Mark All',
               style: TextStyle(color: AppColors.primaryGold),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LoadingShimmer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: AppColors.divider.withValues(alpha: 0.3),
+      highlightColor: AppColors.divider.withValues(alpha: 0.1),
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(4),
+          vertical: context.getScreenHeight(1),
+        ),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+            padding: EdgeInsets.all(context.getResponsiveSize(4)),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: context.getResponsiveSize(10),
+                  height: context.getResponsiveSize(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                  ),
+                ),
+                SizedBox(width: context.getResponsiveSize(3)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: context.getResponsiveSize(3.5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                        ),
+                      ),
+                      SizedBox(height: context.getScreenHeight(1)),
+                      Container(
+                        width: double.infinity,
+                        height: context.getResponsiveSize(3),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                        ),
+                      ),
+                      SizedBox(height: context.getScreenHeight(0.8)),
+                      Container(
+                        width: context.getResponsiveSize(20),
+                        height: context.getResponsiveSize(2.5),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _ErrorState({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(8)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: context.getResponsiveSize(16),
+              color: AppColors.textMuted.withValues(alpha: 0.5),
+            ),
+            SizedBox(height: context.getScreenHeight(2)),
+            Text(
+              'Something went wrong',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(4.5),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1)),
+            Text(
+              'Failed to load notifications',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.5),
+                color: AppColors.textMuted,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(3)),
+            GestureDetector(
+              onTap: onRetry,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.getResponsiveSize(6),
+                  vertical: context.getResponsiveSize(3),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold,
+                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                ),
+                child: Text(
+                  'Retry',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.5),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -151,8 +333,12 @@ class _EmptyState extends StatelessWidget {
 
 class _NotificationList extends StatelessWidget {
   final NotificationController controller;
+  final ScrollController scrollController;
 
-  const _NotificationList({required this.controller});
+  const _NotificationList({
+    required this.controller,
+    required this.scrollController,
+  });
 
   void _handleTap(NotificationModel notification) {
     controller.markAsRead(notification.id);
@@ -165,19 +351,57 @@ class _NotificationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.getResponsiveSize(4),
-        vertical: context.getScreenHeight(1),
+    return RefreshIndicator(
+      color: AppColors.primaryGold,
+      onRefresh: () => controller.refreshNotifications(),
+      child: ListView.builder(
+        controller: scrollController,
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(4),
+          vertical: context.getScreenHeight(1),
+        ),
+        itemCount: controller.notifications.length + (controller.hasMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == controller.notifications.length) {
+            if (controller.loadMoreError.value.isNotEmpty) {
+              return GestureDetector(
+                onTap: () => controller.loadMore(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+                  child: Center(
+                    child: Text(
+                      'Tap to retry',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.2),
+                        color: AppColors.primaryGold,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+              child: Center(
+                child: SizedBox(
+                  width: context.getResponsiveSize(5),
+                  height: context.getResponsiveSize(5),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primaryGold,
+                  ),
+                ),
+              ),
+            );
+          }
+          final notification = controller.notifications[index];
+          return _NotificationCard(
+            notification: notification,
+            onTap: () => _handleTap(notification),
+          );
+        },
       ),
-      itemCount: controller.notifications.length,
-      itemBuilder: (context, index) {
-        final notification = controller.notifications[index];
-        return _NotificationCard(
-          notification: notification,
-          onTap: () => _handleTap(notification),
-        );
-      },
     );
   }
 }

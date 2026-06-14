@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
+import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NotificationController extends GetxController {
   static const String _storageKey = 'notifications_list';
   static const int _maxNotifications = 100;
+  static const int _pageSize = 20;
 
   final _notificationRepo = NotificationRepository();
 
@@ -26,13 +28,24 @@ class NotificationController extends GetxController {
 
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
   final RxInt unreadCount = 0.obs;
+  final Rx<CurrentAppState> state = CurrentAppState.INITIAL.obs;
+  final RxString errorMessage = ''.obs;
+  final RxString loadMoreError = ''.obs;
+
+  final RxBool _hasMore = true.obs;
+  bool get hasMore => _hasMore.value;
+  int _currentPage = 1;
+
+  int _fetchGeneration = 0;
+  bool _isFetching = false;
+  bool _fetchDirty = false;
 
   final NotificationService _notificationService = NotificationService();
 
   @override
   void onInit() {
     super.onInit();
-    _loadNotifications().then((_) => _setupListeners());
+    _loadLocalNotifications().then((_) => _setupListeners());
   }
 
   void _setupListeners() {
@@ -41,56 +54,158 @@ class NotificationController extends GetxController {
     };
 
     _notificationService.onMessageReceived = (message) {
-      final payload = Map<String, dynamic>.from(message.data);
-      if (message.notification?.title != null && message.notification!.title!.isNotEmpty) {
-        payload['title'] = message.notification!.title!;
+      if (_isFetching) {
+        _fetchDirty = true;
+      } else {
+        fetchNotifications();
       }
-      if (message.notification?.body != null && message.notification!.body!.isNotEmpty) {
-        payload['body'] = message.notification!.body!;
-      }
-      final notification = NotificationModel.fromFcmPayload(payload);
-      addNotification(notification);
     };
 
     _notificationService.onMessageOpenedApp = (message) {
       final data = message.data;
       _handleNotificationTap(data);
     };
+
+    fetchNotifications();
   }
 
-  Future<void> _loadNotifications() async {
+  Future<void> fetchNotifications({bool append = false}) async {
+    if (_isFetching) return;
+    _isFetching = true;
+
+    final generation = ++_fetchGeneration;
+
+    if (!append) {
+      state.value = CurrentAppState.LOADING;
+      _currentPage = 1;
+      _hasMore.value = true;
+    }
+
+    loadMoreError.value = '';
+
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_storageKey);
-      if (jsonString != null) {
-        final List<dynamic> jsonList = jsonDecode(jsonString);
-        notifications.value = jsonList
-            .map((json) => NotificationModel.fromJson(json))
-            .toList();
-        _updateUnreadCount();
+      final queryParams = <String, dynamic>{
+        'page': _currentPage,
+        'limit': _pageSize,
+      };
+
+      final responseData = await _notificationRepo.getAllNotifications(
+        queryParams: queryParams,
+      );
+
+      if (generation != _fetchGeneration) return;
+
+      final List<dynamic> items = responseData['data'] ?? responseData['notifications'] ?? [];
+      final fetched = items.map((json) => NotificationModel.fromJson(json)).toList();
+
+      if (append) {
+        notifications.addAll(fetched);
+      } else {
+        notifications.value = fetched;
       }
+
+      _hasMore.value = fetched.length >= _pageSize;
+      _currentPage++;
+      _updateUnreadCount();
+      _saveNotifications();
+      state.value = CurrentAppState.SUCCESS;
     } catch (e) {
-      Logger.error("NotificationController", "Failed to load notifications: $e");
+      if (generation != _fetchGeneration) return;
+      Logger.error("NotificationController", "Failed to fetch notifications: $e");
+      errorMessage.value = e.toString();
+      if (append) {
+        loadMoreError.value = 'Failed to load more notifications';
+      } else {
+        state.value = CurrentAppState.ERROR;
+      }
+    } finally {
+      if (generation == _fetchGeneration) {
+        _isFetching = false;
+        if (_fetchDirty) {
+          _fetchDirty = false;
+          fetchNotifications();
+        }
+      }
     }
   }
 
-  void _saveNotifications() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final jsonList = notifications.map((n) => n.toJson()).toList();
-      await prefs.setString(_storageKey, jsonEncode(jsonList));
-    } catch (e) {
-      Logger.error("NotificationController", "Failed to save notifications: $e");
-    }
+  Future<void> refreshNotifications() async {
+    await fetchNotifications();
   }
 
-  void addNotification(NotificationModel notification) {
-    notifications.insert(0, notification);
-    if (notifications.length > _maxNotifications) {
-      notifications.removeRange(_maxNotifications, notifications.length);
-    }
+  Future<void> loadMore() async {
+    if (!_hasMore.value || _isFetching) return;
+    await fetchNotifications(append: true);
+  }
+
+  Future<void> markAsRead(String id) async {
+    final index = notifications.indexWhere((n) => n.id == id);
+    if (index == -1 || notifications[index].isRead) return;
+
+    final previousState = notifications.toList();
+
+    final old = notifications[index];
+    notifications[index] = NotificationModel(
+      id: old.id,
+      title: old.title,
+      body: old.body,
+      timestamp: old.timestamp,
+      isRead: true,
+      data: old.data,
+    );
     _updateUnreadCount();
-    _saveNotifications();
+
+    try {
+      await _notificationRepo.markNotificationsAsRead(
+        data: {'notificationIds': [id]},
+      );
+      _saveNotifications();
+    } catch (e) {
+      Logger.error("NotificationController", "Failed to mark notification as read on backend: $e");
+      notifications.value = previousState;
+      _updateUnreadCount();
+      _saveNotifications();
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    final unreadIds = notifications
+        .where((n) => !n.isRead)
+        .map((n) => n.id)
+        .toList();
+
+    if (unreadIds.isEmpty) return;
+
+    final previousState = notifications.toList();
+
+    final updated = notifications.map((n) {
+      if (!n.isRead) {
+        return NotificationModel(
+          id: n.id,
+          title: n.title,
+          body: n.body,
+          timestamp: n.timestamp,
+          isRead: true,
+          data: n.data,
+        );
+      }
+      return n;
+    }).toList();
+
+    notifications.value = updated;
+    _updateUnreadCount();
+
+    try {
+      await _notificationRepo.markNotificationsAsRead(
+        data: {'notificationIds': unreadIds},
+      );
+      _saveNotifications();
+    } catch (e) {
+      Logger.error("NotificationController", "Failed to mark all as read on backend: $e");
+      notifications.value = previousState;
+      _updateUnreadCount();
+      _saveNotifications();
+    }
   }
 
   void addLocalNotification({
@@ -106,37 +221,9 @@ class NotificationController extends GetxController {
       isRead: false,
       data: data,
     );
-    addNotification(notification);
-  }
-
-  void markAsRead(String id) {
-    final index = notifications.indexWhere((n) => n.id == id);
-    if (index != -1) {
-      final old = notifications[index];
-      notifications[index] = NotificationModel(
-        id: old.id,
-        title: old.title,
-        body: old.body,
-        timestamp: old.timestamp,
-        isRead: true,
-        data: old.data,
-      );
-      _updateUnreadCount();
-      _saveNotifications();
-    }
-  }
-
-  void markAllAsRead() {
-    for (var i = 0; i < notifications.length; i++) {
-      final old = notifications[i];
-      notifications[i] = NotificationModel(
-        id: old.id,
-        title: old.title,
-        body: old.body,
-        timestamp: old.timestamp,
-        isRead: true,
-        data: old.data,
-      );
+    notifications.insert(0, notification);
+    if (notifications.length > _maxNotifications) {
+      notifications.removeRange(_maxNotifications, notifications.length);
     }
     _updateUnreadCount();
     _saveNotifications();
@@ -161,6 +248,32 @@ class NotificationController extends GetxController {
       } catch (e) {
         Logger.error("NotificationController", "Failed to navigate to route '$route': $e");
       }
+    }
+  }
+
+  Future<void> _loadLocalNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString(_storageKey);
+      if (jsonString != null) {
+        final List<dynamic> jsonList = jsonDecode(jsonString);
+        notifications.value = jsonList
+            .map((json) => NotificationModel.fromJson(json))
+            .toList();
+        _updateUnreadCount();
+      }
+    } catch (e) {
+      Logger.error("NotificationController", "Failed to load notifications: $e");
+    }
+  }
+
+  Future<void> _saveNotifications() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = notifications.map((n) => n.toJson()).toList();
+      await prefs.setString(_storageKey, jsonEncode(jsonList));
+    } catch (e) {
+      Logger.error("NotificationController", "Failed to save notifications: $e");
     }
   }
 

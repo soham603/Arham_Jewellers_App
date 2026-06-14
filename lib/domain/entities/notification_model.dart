@@ -19,8 +19,8 @@ class NotificationModel {
     return NotificationModel(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
-      body: json['body'] ?? '',
-      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
+      body: json['message'] ?? json['body'] ?? '',
+      timestamp: DateTime.tryParse(json['createdAt'] ?? json['timestamp'] ?? '') ?? DateTime.now(),
       isRead: json['isRead'] ?? false,
       data: json['data'],
     );

@@ -55,6 +55,8 @@ class ApiUrlConstants {
 
   static const String CRAFTSMAN_GET_ALL = '/api/v1/craftsman/get-All';
 
+  static const String NOTIFICATION_GET_ALL = '/api/v1/notifications/get-all';
+  static const String NOTIFICATION_ACTION = '/api/v1/notifications/action';
   static const String NOTIFICATION_SEND = '/api/v1/notifications/send';
   static const String NOTIFICATION_HISTORY = '/api/v1/notifications/history';
 }
