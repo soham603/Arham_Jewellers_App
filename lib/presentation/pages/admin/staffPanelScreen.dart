@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 
 import 'ancillary_selection_screen.dart';
 
@@ -232,7 +233,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
           
           // QUICK STATS ROW
           
-          _buildStatsRow(context),
+          Obx(() => _buildStatsRow(context)),
 
           SizedBox(height: context.getScreenHeight(3)),
 
@@ -374,25 +375,25 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     final currentGoldRate = _goldRateController.currentRate?.rate;
 
     final stats = [
-      _StatData(
+      StatData(
         icon: Icons.inventory_2_rounded,
         label: 'Pending Orders',
         value: '$pendingOrdersCount',
         color: const Color(0xFFF59E0B),
       ),
-      _StatData(
+      StatData(
         icon: Icons.inventory_rounded,
         label: 'Total Products',
         value: '$totalProducts',
         color: const Color(0xFF3B82F6),
       ),
-      _StatData(
+      StatData(
         icon: Icons.people_rounded,
         label: 'Pending Users',
         value: '$pendingUsersCount',
         color: const Color(0xFF8B5CF6),
       ),
-      _StatData(
+      StatData(
         icon: Icons.monetization_on_rounded,
         label: 'Gold Rate',
         value: currentGoldRate != null
@@ -415,76 +416,11 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
           children: stats
               .map((s) => SizedBox(
                     width: itemWidth,
-                    child: _statCard(
-                      context,
-                      icon: s.icon,
-                      label: s.label,
-                      value: s.value,
-                      color: s.color,
-                    ),
+                    child: StatCard(data: s),
                   ))
               .toList(),
         );
       },
-    );
-  }
-
-  Widget _statCard(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(context.getResponsiveSize(3)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withValues(alpha: 0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: context.getResponsiveSize(5),
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ),
-              SizedBox(width: context.getResponsiveSize(1.5)),
-              Icon(
-                icon,
-                color: color,
-                size: context.getResponsiveSize(3.5),
-              ),
-            ],
-          ),
-          SizedBox(height: context.getScreenHeight(0.3)),
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.textMuted,
-              fontSize: context.getResponsiveSize(2.8),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -646,16 +582,4 @@ class _ManagementItem {
   const _ManagementItem(this.icon, this.title, this.subtitle, this.onTap);
 }
 
-class _StatData {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
 
-  const _StatData({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-}
