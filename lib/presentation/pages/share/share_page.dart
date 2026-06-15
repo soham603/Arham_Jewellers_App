@@ -802,13 +802,18 @@ class _SharePageState extends State<SharePage> {
     final categoryIds = controller.selectedCategoryIds;
     final filterInfo = controller.selectedCategoriesInfo;
 
-    _showLoadingDialog(context, 'Preparing images...');
+    final cancelled = ValueNotifier(false);
+
+    _showLoadingDialog(context, 'Preparing images...', onCancel: () {
+      cancelled.value = true;
+    });
 
     ShareService.shareImagesFromCategories(
       categoryIds: categoryIds,
       filterInfo: filterInfo,
+      cancelled: cancelled,
     ).whenComplete(() {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
     });
   }
 
@@ -816,18 +821,23 @@ class _SharePageState extends State<SharePage> {
     final categoryIds = controller.selectedCategoryIds;
     final filterInfo = controller.selectedCategoriesInfo;
 
-    _showLoadingDialog(context, 'Generating PDF...');
+    final cancelled = ValueNotifier(false);
+
+    _showLoadingDialog(context, 'Generating PDF...', onCancel: () {
+      cancelled.value = true;
+    });
 
     ShareService.sharePdfFromCategories(
       categoryIds: categoryIds,
       filterInfo: filterInfo,
       productsPerPage: productsPerPage,
+      cancelled: cancelled,
     ).whenComplete(() {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
     });
   }
 
-  void _showLoadingDialog(BuildContext context, String message) {
+  void _showLoadingDialog(BuildContext context, String message, {VoidCallback? onCancel}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -860,6 +870,23 @@ class _SharePageState extends State<SharePage> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
+                if (onCancel != null) ...[
+                  SizedBox(height: context.getScreenHeight(2)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      onCancel();
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.2),
+                        fontWeight: FontWeight.w600,
+                        color: context.colorPalette.subTitleColor,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

@@ -143,6 +143,11 @@ class SearchProductController extends GetxController {
     _isGrid.value = !_isGrid.value;
   }
 
+  List<ProductModel> _dedupe(List<ProductModel> incoming, List<ProductModel> existing) {
+    final existingIds = existing.map((p) => p.id).toSet();
+    return incoming.where((p) => existingIds.add(p.id)).toList();
+  }
+
   List<ProductModel> sortProducts(
     List<ProductModel> products,
     SortOption sortBy,
@@ -208,7 +213,7 @@ class SearchProductController extends GetxController {
         final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
         if (isPagination) {
-          _initialProducts.addAll(fetched);
+          _initialProducts.addAll(_dedupe(fetched, _initialProducts));
         } else {
           _initialProducts.value = fetched;
         }
@@ -360,7 +365,7 @@ class SearchProductController extends GetxController {
       }
 
       if (isPagination) {
-        _filteredInitialProducts.addAll(allFetched);
+        _filteredInitialProducts.addAll(_dedupe(allFetched, _filteredInitialProducts));
       } else {
         _filteredInitialProducts.value = allFetched;
       }
@@ -487,7 +492,7 @@ class SearchProductController extends GetxController {
       }
 
       if (isPagination) {
-        _searchResults.addAll(allFetched);
+        _searchResults.addAll(_dedupe(allFetched, _searchResults));
       } else {
         _searchResults.value = allFetched;
       }
@@ -566,7 +571,7 @@ class SearchProductController extends GetxController {
         return <ProductModel>[];
       });
       final results = await Future.wait(karatFutures);
-      final allFetched = results.expand((list) => list).toList();
+      final allFetched = _dedupe(results.expand((list) => list).toList(), _karatProducts);
 
       if (isPagination) {
         _karatProducts.addAll(allFetched);
@@ -733,7 +738,7 @@ class SearchProductController extends GetxController {
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
         if (isPagination) {
-          _filteredProducts.addAll(allFetched);
+          _filteredProducts.addAll(_dedupe(allFetched, _filteredProducts));
         } else {
           _filteredProducts.value = allFetched;
         }

@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:image/image.dart' as img;
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:image/image.dart' as img;
+import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -112,6 +112,7 @@ class ShareService {
     required List<ProductModel> products,
     required String filterInfo,
     String? title,
+    ValueNotifier<bool>? cancelled,
   }) async {
     final tempDir = await getTemporaryDirectory();
 
@@ -139,6 +140,8 @@ class ShareService {
 
     if (files.isEmpty) return;
 
+    if (cancelled?.value == true) return;
+
     final shareText = _buildShareText(filterInfo, title: title);
 
     await Share.shareXFiles(
@@ -153,6 +156,7 @@ class ShareService {
     required String filterInfo,
     String? title,
     int productsPerPage = 1,
+    ValueNotifier<bool>? cancelled,
   }) async {
     final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
     final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
@@ -169,6 +173,8 @@ class ShareService {
 
     final imageBytesList = await Future.wait(imageFutures);
 
+    if (cancelled?.value == true) return;
+
     final pdfBytes = await compute(_buildPdfInIsolate, {
       'arhamLogoBytes': arhamLogoBytes,
       'ratneshLogoBytes': ratneshLogoBytes,
@@ -177,6 +183,8 @@ class ShareService {
       'totalProducts': products.length,
       'productsPerPage': productsPerPage,
     });
+
+    if (cancelled?.value == true) return;
 
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -188,6 +196,8 @@ class ShareService {
         : '${_brandName.replaceAll(' ', '')}_Products_$timestamp.pdf';
     final file = File('${tempDir.path}/$fileName');
     await file.writeAsBytes(pdfBytes);
+
+    if (cancelled?.value == true) return;
 
     final shareFileName = safeTitle != null
         ? '$safeTitle Products.pdf'
@@ -205,10 +215,12 @@ class ShareService {
     required List<String> categoryIds,
     required String filterInfo,
     String? title,
+    ValueNotifier<bool>? cancelled,
   }) async {
     final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
-    await shareImagesDirectly(products: products, filterInfo: filterInfo, title: title);
+    if (cancelled?.value == true) return;
+    await shareImagesDirectly(products: products, filterInfo: filterInfo, title: title, cancelled: cancelled);
   }
 
   /// Fetches products for the given category IDs, deduplicates, and shares as PDF.
@@ -217,14 +229,17 @@ class ShareService {
     required String filterInfo,
     String? title,
     int productsPerPage = 1,
+    ValueNotifier<bool>? cancelled,
   }) async {
     final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
+    if (cancelled?.value == true) return;
     await shareAsPdf(
       products: products,
       filterInfo: filterInfo,
       title: title,
       productsPerPage: productsPerPage,
+      cancelled: cancelled,
     );
   }
 

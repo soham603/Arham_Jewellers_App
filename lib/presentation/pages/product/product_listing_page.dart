@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
@@ -1161,7 +1162,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             20,
             20,
             20,
-            20 + MediaQuery.of(ctx).padding.bottom,
+            20 + MediaQuery.of(ctx).padding.bottom + MediaQuery.of(ctx).viewInsets.bottom,
           ),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -1244,13 +1245,27 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 subtitle: 'Create a branded product catalog',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _shareAsPdf(context, titleController.text.trim());
+                  _showProductsPerPageDialog(context, titleController.text.trim());
                 },
               ),
               const SizedBox(height: 12),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showProductsPerPageDialog(BuildContext context, String title) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => ShareProductsPerPageSheet(
+        onSelected: (productsPerPage) {
+          Navigator.pop(ctx);
+          _shareAsPdf(context, title, productsPerPage: productsPerPage);
+        },
       ),
     );
   }
@@ -1338,35 +1353,46 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
-    _showLoadingDialog(context, 'Preparing images...');
+    final cancelled = ValueNotifier(false);
+
+    _showLoadingDialog(context, 'Preparing images...', onCancel: () {
+      cancelled.value = true;
+    });
 
     ShareService.shareImagesDirectly(
       products: products,
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
+      cancelled: cancelled,
     ).whenComplete(() {
-      if (mounted) Navigator.of(context).pop();
-      _clearSelection();
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
+      if (!cancelled.value) _clearSelection();
     });
   }
 
-  void _shareAsPdf(BuildContext context, String title) {
+  void _shareAsPdf(BuildContext context, String title, {int productsPerPage = 1}) {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
-    _showLoadingDialog(context, 'Generating PDF...');
+    final cancelled = ValueNotifier(false);
+
+    _showLoadingDialog(context, 'Generating PDF...', onCancel: () {
+      cancelled.value = true;
+    });
 
     ShareService.shareAsPdf(
       products: products,
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
+      productsPerPage: productsPerPage,
+      cancelled: cancelled,
     ).whenComplete(() {
-      if (mounted) Navigator.of(context).pop();
-      _clearSelection();
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
+      if (!cancelled.value) _clearSelection();
     });
   }
 
-  void _showLoadingDialog(BuildContext context, String message) {
+  void _showLoadingDialog(BuildContext context, String message, {VoidCallback? onCancel}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1399,6 +1425,23 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
+                if (onCancel != null) ...[
+                  SizedBox(height: context.getScreenHeight(2)),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      onCancel();
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.2),
+                        fontWeight: FontWeight.w600,
+                        color: context.colorPalette.subTitleColor,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
