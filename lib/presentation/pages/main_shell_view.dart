@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/widgets/app_bottom_nav.dart';
+import '../controllers/admin/GoldRateController.dart';
 import '../controllers/navigation_controller.dart';
 import '../controllers/AuthController.dart';
+import '../controllers/notification_controller.dart';
 import '../controllers/share_controller.dart';
 import 'home/home_page.dart';
 import 'search/search_page.dart';
@@ -31,6 +33,14 @@ class MainShellView extends GetView<NavigationController> {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<GoldRateController>()) {
+        Get.find<GoldRateController>().enableAutoFetchOnInit();
+      }
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().enableAutoFetchOnInit();
+      }
+    });
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -55,10 +65,7 @@ class MainShellView extends GetView<NavigationController> {
           extendBody: true,
           body: SafeArea(
             bottom: false,
-            child: IndexedStack(
-              index: index,
-              children: pages,
-            ),
+            child: IndexedStack(index: index, children: pages),
           ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: navIndex,

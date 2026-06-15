@@ -1718,6 +1718,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   void _showResetPasswordDialog(BuildContext context) {
     _newPasswordController.clear();
     _obscureNewPassword = true;
+    String? apiError;
 
     showDialog(
       context: context,
@@ -1786,7 +1787,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                 TextField(
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
-                  onChanged: (_) => setDialogState(() {}),
+                  onChanged: (_) => setDialogState(() {
+                    apiError = null;
+                  }),
                   style: TextStyle(
                     color: AppColors.textDark,
                     fontSize: context.getResponsiveSize(3.5),
@@ -1839,6 +1842,17 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     ),
                   ),
                 ),
+                if (apiError != null) ...[
+                  SizedBox(height: context.getScreenHeight(0.8)),
+                  Text(
+                    apiError!,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(2.8),
+                      color: Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
                 SizedBox(height: context.getScreenHeight(2)),
               ],
             ),
@@ -1865,12 +1879,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   onPressed: hasPassword && widget.controller.actionState != CurrentAppState.LOADING
                       ? () async {
                           final password = _newPasswordController.text.trim();
-                          Navigator.of(dialogContext).pop();
-                          await widget.controller.adminResetPassword(
+                          setDialogState(() => apiError = null);
+                          final result = await widget.controller.adminResetPassword(
                             userId: widget.user.id,
                             newPassword: password,
                           );
-                          if (context.mounted) Navigator.of(context).pop();
+                          if (result) {
+                            if (dialogContext.mounted) Navigator.of(dialogContext).pop();
+                            if (context.mounted) Navigator.of(context).pop();
+                          } else {
+                            setDialogState(() {
+                              apiError = widget.controller.error.isNotEmpty
+                                  ? widget.controller.error
+                                  : 'Password reset failed';
+                            });
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

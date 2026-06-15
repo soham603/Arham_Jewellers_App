@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
-import '../../../core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import '../../../core/widgets/logo_widget.dart';
 
 import '../../../app/routes/app_routes.dart';
 import '../../../utils/Logger.dart';
@@ -18,7 +19,7 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
-  final SessionManager sessionManager = SessionManager();
+  static const _storage = FlutterSecureStorage();
 
   late AnimationController _controller;
   late Animation<double> _logoFade;
@@ -26,6 +27,8 @@ class _SplashPageState extends State<SplashPage>
   late Animation<double> _dividerHeight;
   late Animation<double> _barProgress;
   bool _imagePrecached = false;
+
+  Size? _screenSize;
 
   @override
   void initState() {
@@ -79,45 +82,56 @@ class _SplashPageState extends State<SplashPage>
           context,
         ),
       ]).then((_) {
-        _controller.forward();
         _initFlow();
       });
     }
   }
 
   Future<void> _initFlow() async {
+    _controller.forward();
+    final routeFuture = _determineTargetRoute();
+    await Future.delayed(const Duration(seconds: 4));
+    final targetRoute = await routeFuture;
+    Get.offNamed(targetRoute);
+  }
+
+  Future<String> _determineTargetRoute() async {
     try {
-      final stopwatch = Stopwatch()..start();
-
-      final token = await sessionManager.getAccessToken();
-      final isAccessExpired = await sessionManager.isAccessTokenExpired();
-      final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
-
-      if (token != null && !isAccessExpired) {
-        final elapsed = stopwatch.elapsedMilliseconds;
-        final remaining = 3500 - elapsed;
-        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
-        Get.offNamed(AppRoutes.home);
-      } else if (token != null && !isRefreshExpired) {
-        Logger.info('SplashPage', 'Access token expired, proactively refreshing...');
-        final refreshed = await baseHttpService.proactiveTokenRefresh();
-        final elapsed = stopwatch.elapsedMilliseconds;
-        final remaining = 3500 - elapsed;
-        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
-        if (refreshed) {
-          Get.offNamed(AppRoutes.home);
-        } else {
-          Get.offNamed(AppRoutes.login);
-        }
-      } else {
-        final elapsed = stopwatch.elapsedMilliseconds;
-        final remaining = 3500 - elapsed;
-        if (remaining > 0) await Future.delayed(Duration(milliseconds: remaining));
-        Get.offNamed(AppRoutes.login);
+      final all = await _storage.readAll();
+      final token = all[DatabaseKeyConstants.ACCESS_TOKEN];
+      if (token == null || token.isEmpty) {
+        return AppRoutes.login;
       }
+
+      final now = DateTime.now().toUtc().millisecondsSinceEpoch;
+      final accessExpiry = int.tryParse(
+        all[DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY] ?? '',
+      );
+      final refreshExpiry = int.tryParse(
+        all[DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY] ?? '',
+      );
+
+      if (accessExpiry != null && now < accessExpiry) {
+        return AppRoutes.home;
+      }
+
+      if (refreshExpiry != null && now < refreshExpiry) {
+        Logger.info(
+          'SplashPage',
+          'Access token expired, proactively refreshing...',
+        );
+        final refreshed = await baseHttpService.proactiveTokenRefresh();
+        return refreshed ? AppRoutes.home : AppRoutes.login;
+      }
+
+      return AppRoutes.login;
     } catch (e, stackTrace) {
-      Logger.error('SplashPage', 'Initialization flow failed', stackTrace: stackTrace);
-      Get.offNamed(AppRoutes.login);
+      Logger.error(
+        'SplashPage',
+        'Initialization flow failed',
+        stackTrace: stackTrace,
+      );
+      return AppRoutes.login;
     }
   }
 
@@ -130,6 +144,21 @@ class _SplashPageState extends State<SplashPage>
   @override
   Widget build(BuildContext context) {
     final palette = context.colorPalette;
+    final size = _screenSize ??= MediaQuery.of(context).size;
+
+    final horizontalPadding = size.width * 0.06;
+    final logoBox = size.width * 0.28;
+    final dividerBox = size.width * 0.20;
+    final dividerSpacing = size.width * 0.06;
+    final barHeight = size.height * 0.005;
+    final barWidthBase = size.width;
+    final logoNameSize = size.width * 0.18;
+    final nameFontSize = size.width * 0.03;
+    final subtitleFontSize = size.width * 0.022;
+    final iconNameSpacing = size.height * 0.008;
+    final nameSubtitleSpacing = size.height * 0.005;
+    final topGap = size.height * 0.01;
+    final bottomGap = size.height * 0.02;
 
     return PopScope(
       canPop: false,
@@ -138,108 +167,106 @@ class _SplashPageState extends State<SplashPage>
         backgroundColor: palette.pageBackgroundColor,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               children: [
-              const Spacer(flex: 2),
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Opacity(
-                    opacity: _logoFade.value,
-                    child: Transform.scale(
-                      scale: _logoScale.value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: context.getResponsiveSize(28),
-                        height: context.getResponsiveSize(28),
-                        child: Image.asset(
-                          'assets/images/arham-logo.png',
-                          fit: BoxFit.contain,
-                          color: context.colorPalette.goldDark,
-                          colorBlendMode: BlendMode.srcIn,
+                const Spacer(flex: 2),
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: _logoFade.value,
+                      child: Transform.scale(
+                        scale: _logoScale.value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: logoBox,
+                          height: logoBox,
+                          child: Image.asset(
+                            'assets/images/arham-logo.png',
+                            fit: BoxFit.contain,
+                            color: palette.goldDark,
+                            colorBlendMode: BlendMode.srcIn,
+                          ),
                         ),
-                      ),
-                      AnimatedBuilder(
-                        animation: _controller,
-                        builder: (context, child) {
-                          return Container(
-                            width: 1,
-                            height:
-                                context.getResponsiveSize(20) * _dividerHeight.value,
-                            margin: EdgeInsets.symmetric(
-                              horizontal: context.getResponsiveSize(6),
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  context.colorPalette.gold.withValues(alpha: 0.6),
-                                  context.colorPalette.gold,
-                                  context.colorPalette.gold.withValues(alpha: 0.6),
-                                  Colors.transparent,
-                                ],
+                        AnimatedBuilder(
+                          animation: _controller,
+                          builder: (context, child) {
+                            return Container(
+                              width: 1,
+                              height: dividerBox * _dividerHeight.value,
+                              margin: EdgeInsets.symmetric(
+                                horizontal: dividerSpacing,
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                      LogoWidget(
-                        logoSize: context.getResponsiveSize(18),
-                        iconColor: context.colorPalette.gold,
-                        nameColor: context.colorPalette.goldDark,
-                        nameFontSize: context.getResponsiveSize(3),
-                        nameLetterSpacing: 1,
-                        subtitleColor: palette.subTitleColor,
-                        subtitleFontSize: context.getResponsiveSize(2.2),
-                        iconNameSpacing: context.getScreenHeight(0.8),
-                        nameSubtitleSpacing: context.getScreenHeight(0.5),
-                        showSubtitle: false,
-                      ),
-                    ],
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.transparent,
+                                    palette.gold.withValues(alpha: 0.6),
+                                    palette.gold,
+                                    palette.gold.withValues(alpha: 0.6),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        LogoWidget(
+                          logoSize: logoNameSize,
+                          iconColor: palette.gold,
+                          nameColor: palette.goldDark,
+                          nameFontSize: nameFontSize,
+                          nameLetterSpacing: 1,
+                          subtitleColor: palette.subTitleColor,
+                          subtitleFontSize: subtitleFontSize,
+                          iconNameSpacing: iconNameSpacing,
+                          nameSubtitleSpacing: nameSubtitleSpacing,
+                          showSubtitle: false,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const Spacer(flex: 2),
-              SizedBox(height: context.getScreenHeight(1)),
-              AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      height: context.getScreenHeight(0.5),
-                      width:
-                          context.getScreenWidth(100) * _barProgress.value,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFB8860B),
-                            Color(0xFFD4AF37),
-                            Color(0xFFB8860B),
-                          ],
+                const Spacer(flex: 2),
+                SizedBox(height: topGap),
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        height: barHeight,
+                        width: barWidthBase * _barProgress.value,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFB8860B),
+                              Color(0xFFD4AF37),
+                              Color(0xFFB8860B),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: context.getScreenHeight(2)),
-            ],
+                    );
+                  },
+                ),
+                SizedBox(height: bottomGap),
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }

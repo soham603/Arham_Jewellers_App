@@ -153,7 +153,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.trim().isEmpty) return 'Password is required';
-    if (value.trim().length < 8) return 'Minimum 8 characters required';
     return null;
   }
 
@@ -543,6 +542,21 @@ class _RegisterPageState extends State<RegisterPage> {
                                   isRequired: true,
                                   validator: _validatePassword,
                                 ),
+                                Obx(() {
+                                  final errorMsg = authController.userRegisterErrorMsg;
+                                  if (errorMsg.isEmpty) return const SizedBox.shrink();
+                                  return Padding(
+                                    padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                                    child: Text(
+                                      errorMsg,
+                                      style: TextStyle(
+                                        fontSize: context.getResponsiveSize(3),
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }),
                                 AnimatedTextField(
                                   controller: nameController,
                                   hintText: 'Full Name *',

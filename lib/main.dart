@@ -23,22 +23,26 @@ Future<void> main() async {
 
   await dotenv.load();
 
-  runZonedGuarded(() async {
-    Get.put(CartController());
-    Get.put(WishlistController());
-    Get.put(AuthController());
-    Get.put(GoldRateController());
-    Get.put(NotificationController());
-    if (!kIsWeb) {
-      try {
-        await NotificationService().init();
-      } catch (e) {
-        Logger.error('Main', 'NotificationService init failed: $e');
-      }
-    }
-  }, (error, stackTrace) {
-    Logger.error('Uncaught Error', '$error\n$stackTrace');
-  });
+  Get.put(CartController());
+  Get.put(WishlistController());
+  Get.put(AuthController());
+  Get.put(GoldRateController());
+  Get.put(NotificationController());
 
-  runApp(const RatneshGoldApp());
+  if (!kIsWeb) {
+    try {
+      await NotificationService().init();
+    } catch (e) {
+      Logger.error('Main', 'NotificationService init failed: $e');
+    }
+  }
+
+  runZonedGuarded(
+    () {
+      runApp(const RatneshGoldApp());
+    },
+    (error, stackTrace) {
+      Logger.error('Uncaught Error', '$error\n$stackTrace');
+    },
+  );
 }

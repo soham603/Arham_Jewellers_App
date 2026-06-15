@@ -76,11 +76,17 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     try {
       final isAccessExpired = await SessionManager().isAccessTokenExpired();
       if (isAccessExpired) {
-        Logger.info('AuthController', 'App resumed with expired access token, refreshing...');
+        Logger.info(
+          'AuthController',
+          'App resumed with expired access token, refreshing...',
+        );
         await baseHttpService.proactiveTokenRefresh();
       }
     } catch (e) {
-      Logger.error('AuthController', 'Error during app resume token refresh: $e');
+      Logger.error(
+        'AuthController',
+        'Error during app resume token refresh: $e',
+      );
     }
   }
 
@@ -91,11 +97,13 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     if (userData != null) {
       _user.value = userData;
       _isAdmin.value = isAdminFlag;
-      if (isAdminFlag) {
-        await NotificationService().subscribeAdminTopics();
-      } else {
-        await NotificationService().subscribeUserTopics();
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (isAdminFlag) {
+          NotificationService().subscribeAdminTopics();
+        } else {
+          NotificationService().subscribeUserTopics();
+        }
+      });
     }
   }
 
@@ -138,18 +146,15 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         );
 
         _userLoginState.value = CurrentAppState.SUCCESS;
-        ToastUtils.showSuccess(
-          
-          response.data['message'] ?? "Login successful!",
-        );
+        ToastUtils.showSuccess(response.data['message'] ?? "Login successful!");
         await NotificationService().subscribeUserTopics();
         onSuccess?.call();
         return true;
       } else if (response.statusCode == 202) {
         _userLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showInfo(
-          
-          response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
+          response.data['message'] ??
+              "Your approval request has been sent. Please wait for admin approval.",
         );
       } else {
         _scheduleError(
@@ -210,7 +215,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
 
         _adminLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
-          
           response.data['message'] ?? "Admin login successful!",
         );
         await NotificationService().subscribeAdminTopics();
@@ -219,8 +223,8 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       } else if (response.statusCode == 202) {
         _adminLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showInfo(
-          
-          response.data['message'] ?? "Your approval request has been sent. Please wait for admin approval.",
+          response.data['message'] ??
+              "Your approval request has been sent. Please wait for admin approval.",
         );
       } else {
         _scheduleError(
@@ -245,15 +249,15 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     final errorMsg = DioErrorHelper.getMessage(e);
     final ctx = Get.context;
     if (ctx != null) {
-      _scheduleError(
-        ctx,
-        errorMsg,
-        isUserLogin: isUserLogin,
-      );
+      _scheduleError(ctx, errorMsg, isUserLogin: isUserLogin);
     }
   }
 
-  void _scheduleError(BuildContext context, String message, {required bool isUserLogin}) {
+  void _scheduleError(
+    BuildContext context,
+    String message, {
+    required bool isUserLogin,
+  }) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isUserLogin) {
         _userLoginErrorMsg.value = message;
@@ -336,41 +340,45 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _userRegisterState.value = CurrentAppState.LOADING;
       _userRegisterErrorMsg.value = "";
 
-      final response = await _authRepo.registerUser(userData: {
-        "email": email,
-        "password": password,
-        "name": name,
-        "phoneNumber": phoneNumber,
-        "deviceId": deviceId,
-        "gstNumber": gstNumber,
-        "state": state,
-        "city": city,
-        "area": area,
-        "pincode": pincode,
-        "companyName": companyName,
-        "deviceName": deviceName,
-        if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
-        if (staffName != null && staffName.isNotEmpty) "staffName": staffName,
-        if (staffPhoneNumber != null && staffPhoneNumber.isNotEmpty)
-          "staffPhoneNumber": staffPhoneNumber,
-      });
+      final response = await _authRepo.registerUser(
+        userData: {
+          "email": email,
+          "password": password,
+          "name": name,
+          "phoneNumber": phoneNumber,
+          "deviceId": deviceId,
+          "gstNumber": gstNumber,
+          "state": state,
+          "city": city,
+          "area": area,
+          "pincode": pincode,
+          "companyName": companyName,
+          "deviceName": deviceName,
+          if (fcmToken != null && fcmToken.isNotEmpty) "fcmToken": fcmToken,
+          if (staffName != null && staffName.isNotEmpty) "staffName": staffName,
+          if (staffPhoneNumber != null && staffPhoneNumber.isNotEmpty)
+            "staffPhoneNumber": staffPhoneNumber,
+        },
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (response.data['success'] == true || response.data['success'] == null) {
+        if (response.data['success'] == true ||
+            response.data['success'] == null) {
           _userRegisterState.value = CurrentAppState.SUCCESS;
           ToastUtils.showSuccess(
-            
             response.data['message'] ?? "Registration successful!",
           );
           onSuccess?.call();
           return true;
         } else {
-          _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
+          _userRegisterErrorMsg.value =
+              response.data['message'] ?? "Registration failed";
           _userRegisterState.value = CurrentAppState.ERROR;
           ToastUtils.showError(_userRegisterErrorMsg.value);
         }
       } else {
-        _userRegisterErrorMsg.value = response.data['message'] ?? "Registration failed";
+        _userRegisterErrorMsg.value =
+            response.data['message'] ?? "Registration failed";
         _userRegisterState.value = CurrentAppState.ERROR;
         ToastUtils.showError(_userRegisterErrorMsg.value);
       }
@@ -402,7 +410,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       if (response.statusCode == 200 && response.data['success'] == true) {
         _forgotPasswordState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
-          
           response.data['message'] ?? "Reset request submitted successfully!",
         );
         onSuccess?.call();
@@ -410,7 +417,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       } else {
         _forgotPasswordState.value = CurrentAppState.ERROR;
         ToastUtils.showError(
-          
           response.data['message'] ?? "Failed to submit reset request",
         );
       }

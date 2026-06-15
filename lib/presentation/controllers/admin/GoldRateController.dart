@@ -53,10 +53,21 @@ class GoldRateController extends GetxController {
 
   bool _isInitialized = false;
 
+  bool _autoFetchOnInit = false;
+
+  void enableAutoFetchOnInit() {
+    _autoFetchOnInit = true;
+    if (!_isInitialized) {
+      _isInitialized = true;
+      fetchCurrentRate();
+      fetchHistory();
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
-    if (!_isInitialized) {
+    if (_autoFetchOnInit && !_isInitialized) {
       _isInitialized = true;
       fetchCurrentRate();
       fetchHistory();
@@ -250,13 +261,16 @@ class GoldRateController extends GetxController {
           _currentRate.value = GoldRateModel.fromJson(data);
         }
         _actionState.value = CurrentAppState.SUCCESS;
-        ToastUtils.showSuccess('Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g');
+        ToastUtils.showSuccess(
+          'Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g',
+        );
         fetchHistory();
 
         if (Get.isRegistered<NotificationController>()) {
           Get.find<NotificationController>().addLocalNotification(
             title: 'Gold Rate Updated',
-            body: 'Gold rate has been updated to ₹${rate.toStringAsFixed(0)}/10g.',
+            body:
+                'Gold rate has been updated to ₹${rate.toStringAsFixed(0)}/10g.',
             data: {'route': AppRoutes.goldRateDetail},
           );
         }
@@ -270,7 +284,9 @@ class GoldRateController extends GetxController {
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'setRate Dio: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
-      ToastUtils.showError(e.response?.data?['message'] ?? e.message ?? 'Failed to update rate');
+      ToastUtils.showError(
+        e.response?.data?['message'] ?? e.message ?? 'Failed to update rate',
+      );
       return false;
     } catch (e, st) {
       Logger.error('GoldRateController', 'setRate: $e\n$st');

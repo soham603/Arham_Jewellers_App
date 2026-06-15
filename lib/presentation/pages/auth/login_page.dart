@@ -271,12 +271,27 @@ class _LoginPageState extends State<LoginPage> {
               if (value == null || value.trim().isEmpty) {
                 return "Password is required";
               }
-              if (value.length < 8) {
-                return "Password must be at least 8 characters";
-              }
               return null;
             },
           ),
+
+          Obx(() {
+            final errorMsg = isAdminLogin
+                ? authController.adminLoginErrorMsg
+                : authController.userLoginErrorMsg;
+            if (errorMsg.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+              child: Text(
+                errorMsg,
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3),
+                  color: Colors.red,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+          }),
 
           SizedBox(height: context.getScreenHeight(0.5)),
 

@@ -8,8 +8,6 @@ import '../core/theme/app_theme.dart';
 class RatneshGoldApp extends StatelessWidget {
   const RatneshGoldApp({super.key});
 
-  static bool _precacheDone = false;
-
   @override
   Widget build(BuildContext context) {
     return SecureWidget(
@@ -19,14 +17,6 @@ class RatneshGoldApp extends StatelessWidget {
         theme: AppTheme.theme,
         initialRoute: AppPages.initial,
         getPages: AppPages.routes,
-        builder: (context, child) {
-          if (!_precacheDone) {
-            _precacheDone = true;
-            precacheImage(const AssetImage('assets/images/arham-logo.png'), context);
-            precacheImage(const AssetImage('assets/images/ratnesh-logo.png'), context);
-          }
-          return child!;
-        },
       ),
     );
   }
