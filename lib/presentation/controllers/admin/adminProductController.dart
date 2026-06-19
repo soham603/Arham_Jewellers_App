@@ -10,6 +10,13 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
+/// Tracks original file + edit state for re-edit support.
+class ProductImageMeta {
+  File originalFile;
+  CropResult lastResult;
+  ProductImageMeta({required this.originalFile, required this.lastResult});
+}
+
 class AdminProductController extends GetxController {
   static AdminProductController get instance => Get.find();
 
@@ -60,6 +67,9 @@ class AdminProductController extends GetxController {
   final _pickedImage = Rxn<File>();
   File? get pickedImage => _pickedImage.value;
   final ImagePicker _picker = ImagePicker();
+
+  ProductImageMeta? _imageMeta;
+  ProductImageMeta? get imageMeta => _imageMeta;
 
   @override
   void onInit() {
@@ -215,11 +225,25 @@ class AdminProductController extends GetxController {
     );
     if (picked == null) return;
     if (!context.mounted) return;
-    final cropped = await cropImage(context, imageFile: File(picked.path));
-    if (cropped != null) _pickedImage.value = cropped;
+    final result = await cropImage(context, imageFile: File(picked.path));
+    if (result != null) {
+      _pickedImage.value = result.file;
+      _imageMeta = ProductImageMeta(
+        originalFile: File(picked.path),
+        lastResult: result,
+      );
+    }
   }
 
-  void clearPickedImage() => _pickedImage.value = null;
+  void clearPickedImage() {
+    _pickedImage.value = null;
+    _imageMeta = null;
+  }
+
+  void setPickedImage(File file, {ProductImageMeta? meta}) {
+    _pickedImage.value = file;
+    _imageMeta = meta;
+  }
 
   Future<bool> updateProduct({
     required String id,

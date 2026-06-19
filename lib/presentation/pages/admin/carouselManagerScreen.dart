@@ -10,8 +10,17 @@ import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.da
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
+import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
+import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
 import '../../../core/theme/app_colors.dart';
+
+/// Tracks original file + edit state for re-edit support.
+class _CarouselImageMeta {
+  File originalFile;
+  CropResult lastResult;
+  _CarouselImageMeta({required this.originalFile, required this.lastResult});
+}
 
 class CarouselManagerScreen extends StatefulWidget {
   const CarouselManagerScreen({super.key});
@@ -626,6 +635,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required File? imageFile,
               required bool? isActive,
               String? mediaType,
+              bool deleteImage = false,
             }) async {
               if (imageFile == null) {
                 _showSnack(context, 'Please select an image or video', isError: true);
@@ -670,6 +680,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required File? imageFile,
               required bool? isActive,
               String? mediaType,
+              bool deleteImage = false,
             }) async {
               final ok = await controller.editCarousel(
                 id: item.id,
@@ -679,6 +690,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 imageFile: imageFile,
                 isActive: isActive,
                 mediaType: mediaType,
+                deleteImage: deleteImage,
               );
               if (ok && context.mounted) {
                 Get.back();
@@ -750,9 +762,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   );
                   if (picked != null) {
                     if (!context.mounted) return;
-                    final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
-                    if (cropped != null) {
-                      setInner(() => newImage = cropped);
+                    final result = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
+                    if (result != null) {
+                      setInner(() => newImage = result.file);
                     }
                   }
                 },
@@ -1078,6 +1090,7 @@ class _CarouselFormSheet extends StatefulWidget {
     required File? imageFile,
     required bool? isActive,
     String? mediaType,
+    bool deleteImage,
   })
   onSubmit;
 
@@ -1094,9 +1107,11 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
   final _linkController = TextEditingController();
   final _formError = ''.obs;
   File? _pickedImage;
+  _CarouselImageMeta? _imageMeta;
   VideoPlayerController? _videoPreviewController;
   bool _isActive = true;
   bool _isSubmitting = false;
+  bool _deleteImage = false;
   String? _localMediaType;
 
   @override
@@ -1198,11 +1213,16 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
       );
       if (picked != null) {
         if (!mounted) return;
-        final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
-        if (cropped != null) {
+        final result = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
+        if (result != null) {
           setState(() {
-            _pickedImage = cropped;
+            _pickedImage = result.file;
             _localMediaType = 'image';
+            _deleteImage = false;
+            _imageMeta = _CarouselImageMeta(
+              originalFile: File(picked.path),
+              lastResult: result,
+            );
           });
         }
       }
@@ -1218,6 +1238,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
         setState(() {
           _pickedImage = File(picked.path);
           _localMediaType = 'video';
+          _deleteImage = false;
         });
       }
     }
@@ -1513,7 +1534,107 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               AspectRatio(
                 aspectRatio: 2.0,
                 child: GestureDetector(
-                  onTap: _pickMedia,
+                  onTap: () {
+                    final isEdit = widget.existing != null;
+                    final hasExistingMedia = isEdit &&
+                        widget.existing!.imageUrl.isNotEmpty &&
+                        _pickedImage == null;
+                    final hasPickedMedia = _pickedImage != null;
+                    final hasAnyMedia = hasPickedMedia || hasExistingMedia;
+
+                    if (hasAnyMedia) {
+                      final isVideo = hasPickedMedia
+                          ? _localMediaType == 'video'
+                          : widget.existing!.mediaType == 'video';
+
+                      showImageActionSheet(
+                        context,
+                        isVideo: isVideo,
+                        onEdit: () async {
+                          if (isVideo) {
+                            // Video — open video picker to replace
+                            final picked = await ImagePicker().pickVideo(
+                              source: ImageSource.gallery,
+                              maxDuration: const Duration(seconds: 60),
+                            );
+                            if (picked != null) {
+                              await _videoPreviewController?.dispose();
+                              _videoPreviewController =
+                                  VideoPlayerController.file(File(picked.path));
+                              await _videoPreviewController!.initialize();
+                              setState(() {
+                                _pickedImage = File(picked.path);
+                                _localMediaType = 'video';
+                                _deleteImage = false;
+                              });
+                            }
+                          } else {
+                            // Image — download then crop
+                            if (hasPickedMedia) {
+                              // Local image already picked — re-edit from original
+                              final meta = _imageMeta;
+                              final originalFile = meta?.originalFile ?? _pickedImage!;
+                              final initialState = meta != null
+                                  ? CropInitialState(
+                                      rotationDegrees: meta.lastResult.rotationDegrees,
+                                      flipY: meta.lastResult.flipY,
+                                    )
+                                  : null;
+                              final result = await cropImage(
+                                context,
+                                imageFile: originalFile,
+                                aspectRatio: 16 / 9,
+                                initialState: initialState,
+                              );
+                              if (result != null) {
+                                setState(() {
+                                  _pickedImage = result.file;
+                                  _localMediaType = 'image';
+                                  _deleteImage = false;
+                                  _imageMeta = _CarouselImageMeta(
+                                    originalFile: originalFile,
+                                    lastResult: result,
+                                  );
+                                });
+                              }
+                            } else {
+                              // Network image — download then crop
+                              final localFile =
+                                  await downloadNetworkImageToFile(
+                                      widget.existing!.imageUrl);
+                              if (localFile != null && context.mounted) {
+                                final result = await cropImage(
+                                  context,
+                                  imageFile: localFile,
+                                  aspectRatio: 16 / 9,
+                                );
+                                if (result != null) {
+                                  setState(() {
+                                    _pickedImage = result.file;
+                                    _localMediaType = 'image';
+                                    _deleteImage = false;
+                                    _imageMeta = _CarouselImageMeta(
+                                      originalFile: localFile,
+                                      lastResult: result,
+                                    );
+                                  });
+                                }
+                              }
+                            }
+                          }
+                        },
+                        onUpload: _pickMedia,
+                        onRemove: () {
+                          setState(() {
+                            _pickedImage = null;
+                            _deleteImage = true;
+                          });
+                        },
+                      );
+                    } else {
+                      _pickMedia();
+                    }
+                  },
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -1673,6 +1794,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                             imageFile: fileToUpload,
                             isActive: _isActive,
                             mediaType: _localMediaType,
+                            deleteImage: _deleteImage,
                           );
                           if (mounted) {
                             setState(() => _isSubmitting = false);

@@ -1,5 +1,6 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'dart:async';
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,9 @@ import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/adminProductController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
+import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
+import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
 
 class AdminProductScreen extends StatefulWidget {
@@ -506,6 +510,10 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
     );
   }
 
+  void _setCroppedProductImage(AdminProductController ctrl, File file, {ProductImageMeta? meta}) {
+    ctrl.setPickedImage(file, meta: meta);
+  }
+
   // ── Edit Bottom Sheet 
   void _showEditSheet(BuildContext context, ProductModel product) {
     final nameCtrl = TextEditingController(text: product.name);
@@ -629,11 +637,83 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                   SizedBox(height: context.getScreenHeight(1)),
                   Obx(() {
                     final picked = ctrl.pickedImage;
+                    final hasExistingImage = product.imageUrl != null &&
+                        product.imageUrl!.isNotEmpty &&
+                        !deleteImg;
+                    final hasAnyImage = picked != null || hasExistingImage;
+
                     return GestureDetector(
-                      onTap: () async {
-                        await ctrl.pickImage(context);
-                        setSheet(() {});
-                      },
+                      onTap: hasAnyImage
+                          ? () {
+                              showImageActionSheet(
+                                context,
+                                onEdit: () async {
+                                  // Edit: re-edit from original with previous state
+                                  if (picked != null) {
+                                    // Local image already picked — re-edit from original
+                                    final meta = ctrl.imageMeta;
+                                    final originalFile = meta?.originalFile ?? picked;
+                                    final initialState = meta != null
+                                        ? CropInitialState(
+                                            rotationDegrees: meta.lastResult.rotationDegrees,
+                                            flipY: meta.lastResult.flipY,
+                                          )
+                                        : null;
+                                    if (!context.mounted) return;
+                                    final result = await cropImage(
+                                      context,
+                                      imageFile: originalFile,
+                                      initialState: initialState,
+                                    );
+                                    if (result != null) {
+                                      ctrl.clearPickedImage();
+                                      final newMeta = ProductImageMeta(
+                                        originalFile: originalFile,
+                                        lastResult: result,
+                                      );
+                                      _setCroppedProductImage(ctrl, result.file, meta: newMeta);
+                                      setSheet(() => deleteImg = false);
+                                    }
+                                  } else if (hasExistingImage) {
+                                    // Network image — download then crop
+                                    if (!context.mounted) return;
+                                    final localFile =
+                                        await downloadNetworkImageToFile(
+                                            product.imageUrl!);
+                                    if (localFile != null && context.mounted) {
+                                      final result = await cropImage(
+                                        context,
+                                        imageFile: localFile,
+                                      );
+                                      if (result != null) {
+                                        final newMeta = ProductImageMeta(
+                                          originalFile: localFile,
+                                          lastResult: result,
+                                        );
+                                        _setCroppedProductImage(ctrl, result.file, meta: newMeta);
+                                        setSheet(() => deleteImg = false);
+                                      }
+                                    }
+                                  }
+                                },
+                                onUpload: () async {
+                                  // Upload: open picker
+                                  await ctrl.pickImage(context);
+                                  setSheet(() => deleteImg = false);
+                                },
+                                onRemove: () {
+                                  setSheet(() {
+                                    deleteImg = true;
+                                    ctrl.clearPickedImage();
+                                  });
+                                },
+                              );
+                            }
+                          : () async {
+                              // No image — open picker directly
+                              await ctrl.pickImage(context);
+                              setSheet(() {});
+                            },
                       child: Container(
                         height: context.getScreenHeight(18),
                         width: double.infinity,
@@ -676,9 +756,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                                     ),
                                   ),
                                 ])
-                              : (product.imageUrl != null &&
-                                          product.imageUrl!.isNotEmpty &&
-                                          !deleteImg
+                              : (hasExistingImage
                                       ? Stack(children: [
                                           CachedNetworkImage(
                                             imageUrl: product.imageUrl!,

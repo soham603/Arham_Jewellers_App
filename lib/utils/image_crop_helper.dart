@@ -1,36 +1,54 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 
-import 'package:croppy/croppy.dart';
 import 'package:flutter/material.dart';
+import 'package:ratnesh_gold_app/utils/crop_editor_page.dart';
 
-/// Opens a Material-style crop/rotate/flip editor and returns the edited
-/// [File], or `null` if the user cancelled.
-Future<File?> cropImage(
+/// Initial state for the crop editor (rotation + flip).
+/// Optionally carries an initial crop rect.
+class CropInitialState {
+  final double rotationDegrees;
+  final bool flipY;
+  final Rect? cropRect;
+
+  const CropInitialState({
+    this.rotationDegrees = 0,
+    this.flipY = false,
+    this.cropRect,
+  });
+}
+
+/// Result returned by the crop editor: the edited file + edit state.
+class CropResult {
+  final File file;
+  final double rotationDegrees;
+  final bool flipY;
+
+  const CropResult({
+    required this.file,
+    this.rotationDegrees = 0,
+    this.flipY = false,
+  });
+}
+
+/// Opens a crop/rotate/flip editor and returns the edited [CropResult],
+/// or `null` if the user cancelled.
+Future<CropResult?> cropImage(
   BuildContext context, {
   required File imageFile,
   double? aspectRatio,
   bool circleUi = false,
+  CropInitialState? initialState,
 }) async {
-  final allowedAspectRatios = aspectRatio != null
-      ? [
-          CropAspectRatio(width: aspectRatio.round(), height: 1),
-          CropAspectRatio(width: 1, height: aspectRatio.round()),
-        ]
-      : null;
-
-  final result = await showMaterialImageCropper(
-    context,
-    imageProvider: FileImage(imageFile),
-    allowedAspectRatios: allowedAspectRatios,
+  final result = await Navigator.of(context).push<CropResult>(
+    MaterialPageRoute(
+      fullscreenDialog: true,
+      builder: (_) => CropEditorPage(
+        imageFile: imageFile,
+        aspectRatio: aspectRatio,
+        initialState: initialState,
+      ),
+    ),
   );
 
-  if (result == null) return null;
-
-  final byteData = await result.uiImage.toByteData(
-    format: ui.ImageByteFormat.png,
-  );
-  if (byteData == null) return null;
-
-  return File.fromRawPath(byteData.buffer.asUint8List());
+  return result;
 }

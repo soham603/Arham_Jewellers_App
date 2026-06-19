@@ -5,6 +5,21 @@ enum CurrentAppState {
   ERROR
 }
 
+enum LayoutType { grid, list, fullScreen }
+
+extension LayoutTypeLabel on LayoutType {
+  String get label {
+    switch (this) {
+      case LayoutType.grid:
+        return 'Grid';
+      case LayoutType.list:
+        return 'List';
+      case LayoutType.fullScreen:
+        return 'Full Width';
+    }
+  }
+}
+
 enum SortOption {
   weightAsc,
   weightDesc,

@@ -290,7 +290,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 filteredProducts,
                 _controller.sortBy,
               );
-              final isGrid = _controller.isGrid;
+              final layoutType = _controller.layoutType;
 
               if (state == CurrentAppState.LOADING && products.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
@@ -377,7 +377,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 );
               }
 
-              if (!isGrid) {
+              if (layoutType == LayoutType.list) {
                 return ListView.builder(
                   controller: _scrollController,
                   padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
@@ -394,6 +394,59 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
                     final product = products[index];
                     return ProductListTile(
+                      product: product,
+                      isSelected: _selectedProductIds.contains(product.id),
+                      onTap: _isSelectMode
+                          ? () => _toggleSelection(product.id)
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      ProductDetailsPage(
+                                        product: product,
+                                        products: products,
+                                        initialIndex: index,
+                                        controller: _controller,
+                                        listType: _isCategoryOnly
+                                            ? 'category'
+                                            : _isCategoryFilter
+                                                ? 'filtered'
+                                                : 'karat',
+                                      ),
+                                ),
+                              );
+                            },
+                      onLongPress: _isAdmin
+                          ? () => _toggleSelection(product.id)
+                          : null,
+                    );
+                  },
+                );
+              }
+
+              if (layoutType == LayoutType.fullScreen) {
+                return GridView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: products.length + (hasMore ? 1 : 0),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                        ? 0.7
+                        : MediaQuery.of(context).size.width >= 600
+                            ? 0.68
+                            : 0.65,
+                  ),
+                  itemBuilder: (_, index) {
+                    if (index >= products.length) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    final product = products[index];
+                    return ProductCard(
                       product: product,
                       isSelected: _selectedProductIds.contains(product.id),
                       onTap: _isSelectMode
@@ -566,7 +619,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   Widget _buildSortLayoutBar(BuildContext context) {
     return Obx(() {
       final currentSort = _controller.sortBy;
-      final isGrid = _controller.isGrid;
+      final layoutType = _controller.layoutType;
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -719,7 +772,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       border: Border.all(color: context.colorPalette.border),
                     ),
                     child: Icon(
-                      isGrid ? Icons.list_rounded : Icons.grid_view_rounded,
+                      layoutType == LayoutType.grid
+                          ? Icons.list_rounded
+                          : layoutType == LayoutType.list
+                              ? Icons.view_agenda_rounded
+                              : Icons.grid_view_rounded,
                       size: context.responsiveWidth(20, largeTabletVal: 32),
                       color: context.colorPalette.goldDark,
                     ),

@@ -210,12 +210,14 @@ class CategoryManagerController extends GetxController {
     required String id,
     String? name,
     File? imageFile,
+    bool deleteImage = false,
   }) async {
     _actionLoadingId.value = id;
 
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
+        if (deleteImage) "deleteImage": "true",
         if (imageFile != null)
           "file": await MultipartFile.fromFile(
             (await _compressImageFile(imageFile)).path,

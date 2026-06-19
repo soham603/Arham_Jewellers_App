@@ -13,6 +13,15 @@ import 'package:ratnesh_gold_app/presentation/controllers/customOrderController.
 import 'package:ratnesh_gold_app/presentation/pages/orders/customOrderSuccessPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
+import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
+import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
+
+/// Tracks the original file + edit state per image slot for re-edit support.
+class _RefImageMeta {
+  File originalFile;
+  CropResult lastResult;
+  _RefImageMeta({required this.originalFile, required this.lastResult});
+}
 
 class CustomiseOrderPage extends StatefulWidget {
   final ProductModel? product;
@@ -44,6 +53,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];
+  List<_RefImageMeta?> _imageMeta = [null, null, null, null];
   bool _networkImageFailed = false;
   final ImagePicker _picker = ImagePicker();
 
@@ -231,10 +241,14 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       );
       if (image == null) return;
       if (!mounted) return;
-      final cropped = await cropImage(context, imageFile: File(image.path));
-      if (cropped != null) {
+      final result = await cropImage(context, imageFile: File(image.path));
+      if (result != null) {
         setState(() {
-          referenceImages[index] = cropped;
+          referenceImages[index] = result.file;
+          _imageMeta[index] = _RefImageMeta(
+            originalFile: File(image.path),
+            lastResult: result,
+          );
         });
       }
     } catch (e) {
@@ -895,7 +909,72 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     return AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
-        onTap: hasNetworkImage ? null : () => _showImageSourceActionSheet(context, index),
+        onTap: hasImage
+            ? () {
+                showImageActionSheet(
+                  context,
+                  onEdit: () async {
+                    if (hasLocalImage) {
+                      // Local image — re-edit from original with previous state
+                      final meta = _imageMeta[index];
+                      final originalFile = meta?.originalFile ?? referenceImages[index]!;
+                      final initialState = meta != null
+                          ? CropInitialState(
+                              rotationDegrees: meta.lastResult.rotationDegrees,
+                              flipY: meta.lastResult.flipY,
+                            )
+                          : null;
+                      final result = await cropImage(
+                        context,
+                        imageFile: originalFile,
+                        initialState: initialState,
+                      );
+                      if (result != null) {
+                        setState(() {
+                          referenceImages[index] = result.file;
+                          _imageMeta[index] = _RefImageMeta(
+                            originalFile: originalFile,
+                            lastResult: result,
+                          );
+                        });
+                      }
+                    } else if (hasNetworkImage) {
+                      // Network image — download then crop
+                      final localFile = await downloadNetworkImageToFile(
+                          _existingImageUrls[index]);
+                      if (localFile != null && context.mounted) {
+                        final result = await cropImage(
+                          context,
+                          imageFile: localFile,
+                        );
+                        if (result != null) {
+                          setState(() {
+                            referenceImages[index] = result.file;
+                            _imageMeta[index] = _RefImageMeta(
+                              originalFile: localFile,
+                              lastResult: result,
+                            );
+                            _existingImageUrls[index] = '';
+                            _removeOldImages = true;
+                          });
+                        }
+                      }
+                    }
+                  },
+                  onUpload: () => _showImageSourceActionSheet(context, index),
+                  onRemove: () {
+                    setState(() {
+                      if (hasLocalImage) {
+                        referenceImages[index] = null;
+                      } else if (hasNetworkImage) {
+                        _existingImageUrls[index] = '';
+                        _removeOldImages = true;
+                      }
+                    });
+                  },
+                );
+              }
+            : () => _showImageSourceActionSheet(context, index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
@@ -957,7 +1036,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  _existingImageUrls.removeAt(index);
+                                  _existingImageUrls[index] = '';
                                   _removeOldImages = true;
                                 });
                               },

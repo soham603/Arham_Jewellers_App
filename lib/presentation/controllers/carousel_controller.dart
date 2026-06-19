@@ -219,6 +219,7 @@ class CarouselsController extends GetxController {
     bool? isActive,
     File? imageFile,
     String? mediaType,
+    bool deleteImage = false,
   }) async {
     try {
       _editLoadingId.value = id;
@@ -233,6 +234,7 @@ class CarouselsController extends GetxController {
         "mobileImageUrl": ?mobileImageUrl,
         "position": ?position,
         "isActive": ?isActive,
+        if (deleteImage) "deleteImage": "true",
         if (mediaType != null) "mediaType": mediaType,
       };
 

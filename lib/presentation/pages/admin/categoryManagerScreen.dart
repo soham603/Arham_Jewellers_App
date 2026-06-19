@@ -8,6 +8,15 @@ import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
+import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
+
+/// Tracks original file + edit state for re-edit support.
+class _CategoryImageMeta {
+  File originalFile;
+  CropResult lastResult;
+  _CategoryImageMeta({required this.originalFile, required this.lastResult});
+}
 
 class CategoryManagerScreen extends StatefulWidget {
   const CategoryManagerScreen({super.key});
@@ -829,6 +838,8 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   final _descCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   File? _pickedImage;
+  _CategoryImageMeta? _imageMeta;
+  bool _deleteImage = false;
   bool _submitting = false;
 
   bool get isEditing => !widget.isCreate;
@@ -853,8 +864,17 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (picked == null) return;
     if (!mounted) return;
-    final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 1);
-    if (cropped != null) setState(() => _pickedImage = cropped);
+    final result = await cropImage(context, imageFile: File(picked.path), aspectRatio: 1);
+    if (result != null) {
+      setState(() {
+        _pickedImage = result.file;
+        _deleteImage = false;
+        _imageMeta = _CategoryImageMeta(
+          originalFile: File(picked.path),
+          lastResult: result,
+        );
+      });
+    }
   }
 
   Future<void> _submit() async {
@@ -866,6 +886,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
             imageFile: _pickedImage,
+            deleteImage: _deleteImage,
           )
         : await widget.ctrl.createCategory(
             name: _nameCtrl.text.trim(),
@@ -947,7 +968,78 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                     child: AspectRatio(
                       aspectRatio: 1,
                       child: GestureDetector(
-                        onTap: _pickImage,
+                        onTap: () {
+                          final hasExistingImage = isEditing &&
+                              widget.existing!.imageUrl.isNotEmpty;
+                          final hasPickedImage = _pickedImage != null;
+                          final hasAnyImage = hasPickedImage || hasExistingImage;
+
+                          if (hasAnyImage) {
+                            showImageActionSheet(
+                              context,
+                              onEdit: () async {
+                                if (hasPickedImage) {
+                                  // Local image — re-edit from original with previous state
+                                  final meta = _imageMeta;
+                                  final originalFile = meta?.originalFile ?? _pickedImage!;
+                                  final initialState = meta != null
+                                      ? CropInitialState(
+                                          rotationDegrees: meta.lastResult.rotationDegrees,
+                                          flipY: meta.lastResult.flipY,
+                                        )
+                                      : null;
+                                  final result = await cropImage(
+                                    context,
+                                    imageFile: originalFile,
+                                    aspectRatio: 1,
+                                    initialState: initialState,
+                                  );
+                                  if (result != null) {
+                                    setState(() {
+                                      _pickedImage = result.file;
+                                      _deleteImage = false;
+                                      _imageMeta = _CategoryImageMeta(
+                                        originalFile: originalFile,
+                                        lastResult: result,
+                                      );
+                                    });
+                                  }
+                                } else if (hasExistingImage) {
+                                  // Network image — download then crop
+                                  final localFile =
+                                      await downloadNetworkImageToFile(
+                                          widget.existing!.imageUrl);
+                                  if (localFile != null && context.mounted) {
+                                    final result = await cropImage(
+                                      context,
+                                      imageFile: localFile,
+                                      aspectRatio: 1,
+                                    );
+                                    if (result != null) {
+                                      setState(() {
+                                        _pickedImage = result.file;
+                                        _deleteImage = false;
+                                        _imageMeta = _CategoryImageMeta(
+                                          originalFile: localFile,
+                                          lastResult: result,
+                                        );
+                                      });
+                                    }
+                                  }
+                                }
+                              },
+                              onUpload: _pickImage,
+                              onRemove: () {
+                                setState(() {
+                                  _pickedImage = null;
+                                  _deleteImage = true;
+                                });
+                              },
+                            );
+                          } else {
+                            _pickImage();
+                          }
+                        },
                         child: Container(
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(

@@ -23,9 +23,10 @@ class SearchProductController extends GetxController {
   SortOption get sortBy => _sortBy.value;
   Rx<SortOption> get sortByObs => _sortBy;
 
-  final _isGrid = RxBool(true);
-  bool get isGrid => _isGrid.value;
-  RxBool get isGridObs => _isGrid;
+  final _layoutType = Rx<LayoutType>(LayoutType.grid);
+  LayoutType get layoutType => _layoutType.value;
+  Rx<LayoutType> get layoutTypeObs => _layoutType;
+  bool get isGrid => _layoutType.value == LayoutType.grid;
 
   final _initialProducts = <ProductModel>[].obs;
   List<ProductModel> get initialProducts => _initialProducts;
@@ -140,7 +141,17 @@ class SearchProductController extends GetxController {
   }
 
   void toggleLayout() {
-    _isGrid.value = !_isGrid.value;
+    switch (_layoutType.value) {
+      case LayoutType.grid:
+        _layoutType.value = LayoutType.list;
+        break;
+      case LayoutType.list:
+        _layoutType.value = LayoutType.fullScreen;
+        break;
+      case LayoutType.fullScreen:
+        _layoutType.value = LayoutType.grid;
+        break;
+    }
   }
 
   List<ProductModel> _dedupe(List<ProductModel> incoming, List<ProductModel> existing) {
