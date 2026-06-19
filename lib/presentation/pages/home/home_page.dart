@@ -32,7 +32,6 @@ import 'package:shimmer/shimmer.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/custom_divider.dart';
 import '../../../core/widgets/home_search_bar.dart';
-import '../../controllers/navigation_controller.dart';
 import '../../controllers/AuthController.dart';
 
 // Imported the Customise Order Page
@@ -1425,9 +1424,9 @@ class _TopBar extends StatelessWidget {
           Obx(() {
             final auth = Get.find<AuthController>();
             return auth.isAdmin ? const SizedBox() : _IconBtn(
-              icon: Icons.shopping_bag_outlined,
+              icon: Icons.favorite_border,
               onTap: () {
-                Get.find<NavigationController>().switchTab(2);
+                Get.toNamed(AppRoutes.wishlist);
               },
             );
           }),
