@@ -187,8 +187,7 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colorPalette.backgroundColor,
-      body: SafeArea(
-        child: Column(
+      body: Column(
           children: [
             Obx(() => SearchBarWidget(
               controller: _textController,
@@ -421,7 +420,6 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ],
         ),
-      ),
     );
   }
 

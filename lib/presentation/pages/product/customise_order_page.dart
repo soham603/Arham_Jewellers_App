@@ -286,8 +286,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       
       // BOTTOM ACTION BAR
       
-      bottomNavigationBar: SafeArea(
-        child: Container(
+      bottomNavigationBar: Container(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
             context.getScreenHeight(1.2),
@@ -431,10 +430,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             ],
           ),
         ),
-      ),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
@@ -713,7 +710,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             ],
           ),
         ),
-      ),
     );
   }
 

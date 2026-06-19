@@ -165,105 +165,103 @@ class _SplashPageState extends State<SplashPage>
       onPopInvokedWithResult: (didPop, _) {},
       child: Scaffold(
         backgroundColor: palette.pageBackgroundColor,
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Column(
-              children: [
-                const Spacer(flex: 2),
-                AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _logoFade.value,
-                      child: Transform.scale(
-                        scale: _logoScale.value,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: logoBox,
-                          height: logoBox,
-                          child: Image.asset(
-                            'assets/images/arham-logo.png',
-                            fit: BoxFit.contain,
-                            color: palette.goldDark,
-                            colorBlendMode: BlendMode.srcIn,
-                          ),
-                        ),
-                        AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return Container(
-                              width: 1,
-                              height: dividerBox * _dividerHeight.value,
-                              margin: EdgeInsets.symmetric(
-                                horizontal: dividerSpacing,
-                              ),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    palette.gold.withValues(alpha: 0.6),
-                                    palette.gold,
-                                    palette.gold.withValues(alpha: 0.6),
-                                    Colors.transparent,
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        LogoWidget(
-                          logoSize: logoNameSize,
-                          iconColor: palette.gold,
-                          nameColor: palette.goldDark,
-                          nameFontSize: nameFontSize,
-                          nameLetterSpacing: 1,
-                          subtitleColor: palette.subTitleColor,
-                          subtitleFontSize: subtitleFontSize,
-                          iconNameSpacing: iconNameSpacing,
-                          nameSubtitleSpacing: nameSubtitleSpacing,
-                          showSubtitle: false,
-                        ),
-                      ],
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Column(
+            children: [
+              const Spacer(flex: 2),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _logoFade.value,
+                    child: Transform.scale(
+                      scale: _logoScale.value,
+                      child: child,
                     ),
+                  );
+                },
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: logoBox,
+                        height: logoBox,
+                        child: Image.asset(
+                          'assets/images/arham-logo.png',
+                          fit: BoxFit.contain,
+                          color: palette.goldDark,
+                          colorBlendMode: BlendMode.srcIn,
+                        ),
+                      ),
+                      AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          return Container(
+                            width: 1,
+                            height: dividerBox * _dividerHeight.value,
+                            margin: EdgeInsets.symmetric(
+                              horizontal: dividerSpacing,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  palette.gold.withValues(alpha: 0.6),
+                                  palette.gold,
+                                  palette.gold.withValues(alpha: 0.6),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      LogoWidget(
+                        logoSize: logoNameSize,
+                        iconColor: palette.gold,
+                        nameColor: palette.goldDark,
+                        nameFontSize: nameFontSize,
+                        nameLetterSpacing: 1,
+                        subtitleColor: palette.subTitleColor,
+                        subtitleFontSize: subtitleFontSize,
+                        iconNameSpacing: iconNameSpacing,
+                        nameSubtitleSpacing: nameSubtitleSpacing,
+                        showSubtitle: false,
+                      ),
+                    ],
                   ),
                 ),
-                const Spacer(flex: 2),
-                SizedBox(height: topGap),
-                AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        height: barHeight,
-                        width: barWidthBase * _barProgress.value,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFB8860B),
-                              Color(0xFFD4AF37),
-                              Color(0xFFB8860B),
-                            ],
-                          ),
+              ),
+              const Spacer(flex: 2),
+              SizedBox(height: topGap),
+              AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: barHeight,
+                      width: barWidthBase * _barProgress.value,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFB8860B),
+                            Color(0xFFD4AF37),
+                            Color(0xFFB8860B),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
-                SizedBox(height: bottomGap),
-              ],
-            ),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: bottomGap),
+            ],
           ),
         ),
       ),

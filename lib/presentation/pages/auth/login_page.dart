@@ -85,50 +85,48 @@ class _LoginPageState extends State<LoginPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
-        body: SafeArea(
-          child: GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.getResponsiveSize(5),
-                          vertical: context.getScreenHeight(2),
-                        ),
-                        child: Column(
-                          children: [
-                            // 1. Logo & Header
-                            _buildTopSection(context, hasKeyboard: hasKeyboard),
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(5),
+                        vertical: context.getScreenHeight(2),
+                      ),
+                      child: Column(
+                        children: [
+                          // 1. Logo & Header
+                          _buildTopSection(context, hasKeyboard: hasKeyboard),
 
-                            SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.getScreenHeight(2)),
 
-                            // 2. Form
-                            Expanded(
-                              child: Center(
-                                child: Form(
-                                  key: _formKey,
-                                  child: _buildFormSection(context),
-                                ),
+                          // 2. Form
+                          Expanded(
+                            child: Center(
+                              child: Form(
+                                key: _formKey,
+                                child: _buildFormSection(context),
                               ),
                             ),
+                          ),
 
-                            SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.getScreenHeight(2)),
 
-                            // 3. Bottom Links & Terms
-                            _buildBottomSection(context),
-                          ],
-                        ),
+                          // 3. Bottom Links & Terms
+                          _buildBottomSection(context),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

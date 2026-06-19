@@ -10,8 +10,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
-      body: SafeArea(
-        child: Center(
+      body: Center(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(8)),
             child: Column(
@@ -88,7 +87,6 @@ class CustomOrderSuccessPage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

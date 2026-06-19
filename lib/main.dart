@@ -14,31 +14,31 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'app/app.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    Logger.error('FlutterError', details.exception.toString());
-  };
-
-  await dotenv.load();
-
-  Get.put(CartController());
-  Get.put(WishlistController());
-  Get.put(AuthController());
-  Get.put(GoldRateController());
-  Get.put(NotificationController());
-
-  if (!kIsWeb) {
-    try {
-      await NotificationService().init();
-    } catch (e) {
-      Logger.error('Main', 'NotificationService init failed: $e');
-    }
-  }
-
   runZonedGuarded(
-    () {
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
+
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FlutterError.presentError(details);
+        Logger.error('FlutterError', details.exception.toString());
+      };
+
+      await dotenv.load();
+
+      Get.put(CartController());
+      Get.put(WishlistController());
+      Get.put(AuthController());
+      Get.put(GoldRateController());
+      Get.put(NotificationController());
+
+      if (!kIsWeb) {
+        try {
+          await NotificationService().init();
+        } catch (e) {
+          Logger.error('Main', 'NotificationService init failed: $e');
+        }
+      }
+
       runApp(const RatneshGoldApp());
     },
     (error, stackTrace) {

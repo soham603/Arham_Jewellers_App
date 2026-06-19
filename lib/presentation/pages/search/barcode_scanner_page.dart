@@ -211,8 +211,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
             onDetect: _onDetect,
           ),
           const _ScannerOverlay(),
-          SafeArea(
-            child: Padding(
+          Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
@@ -252,7 +251,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
                 ],
               ),
             ),
-          ),
           if (_isProcessing)
             ColoredBox(
               color: Colors.black54,

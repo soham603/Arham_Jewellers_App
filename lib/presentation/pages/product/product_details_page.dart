@@ -269,8 +269,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               );
               final isInCart = quantity > 0;
 
-              return SafeArea(
-                child: Container(
+              return Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
@@ -363,7 +362,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ],
                   ),
-                ),
               );
             }),
 
@@ -393,7 +391,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 },
               );
             })()
-          : SafeArea(child: _buildProductContent(widget.product)),
+          : _buildProductContent(widget.product),
     );
   }
 
@@ -422,8 +420,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ? AppColors.primaryGold
         : Colors.red.shade600;
 
-    return SafeArea(
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -988,7 +985,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ),
           ],
         ),
-      ),
     );
   }
 

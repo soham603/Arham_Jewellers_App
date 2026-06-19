@@ -163,8 +163,7 @@ class _ChainListingPageState extends State<ChainListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -262,7 +261,6 @@ class _ChainListingPageState extends State<ChainListingPage> {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -325,7 +323,7 @@ class _ChainCategoryGrid extends StatelessWidget {
           ),
         ),
       );
-    }
+  }
 
     final controller = Get.find<CategoryController>();
 

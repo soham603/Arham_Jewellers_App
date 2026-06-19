@@ -134,8 +134,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
     return Scaffold(
       backgroundColor: context.colorPalette.cream,
-      body: SafeArea(
-        child: Column(
+      body: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -368,8 +367,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Future<void> _showLevel3Sheet(CategoryModel parent, Karat karat) async {

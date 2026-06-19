@@ -84,8 +84,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
       },
       child: Scaffold(
         backgroundColor: AppColors.pageBg,
-        body: SafeArea(
-          child: Column(
+        body: Column(
             children: [
               Container(height: 4, color: AppColors.primaryGold),
               Expanded(
@@ -184,8 +183,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

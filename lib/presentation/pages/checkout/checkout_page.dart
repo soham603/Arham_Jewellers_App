@@ -63,8 +63,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         titleSpacing: context.getResponsiveSize(4),
       ),
 
-      body: SafeArea(
-        child: ResponsiveWrapper(
+      body: ResponsiveWrapper(
           child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
@@ -299,11 +298,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
             );
           }),
         ),
-        ),
       ),
 
-      bottomNavigationBar: SafeArea(
-        child: Container(
+        bottomNavigationBar: Container(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
             context.getScreenHeight(0.8),
@@ -522,8 +519,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _summaryRow(BuildContext context, String left, String right) {

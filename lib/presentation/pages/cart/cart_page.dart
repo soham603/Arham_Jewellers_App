@@ -85,15 +85,14 @@ class _CartPageState extends State<CartPage> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.getResponsiveSize(4),
-            context.getScreenHeight(1),
-            context.getResponsiveSize(4),
-            context.getScreenHeight(3),
-          ),
-          child: Column(
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.getResponsiveSize(4),
+          context.getScreenHeight(1),
+          context.getResponsiveSize(4),
+          context.getScreenHeight(3),
+        ),
+        child: Column(
             children: [
               Expanded(
                 child: Obx(() {
@@ -332,8 +331,7 @@ class _CartPageState extends State<CartPage> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _quantityControls(
