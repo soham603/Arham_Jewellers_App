@@ -631,7 +631,7 @@ class _AdminProductScreenState extends State<AdminProductScreen> {
                     final picked = ctrl.pickedImage;
                     return GestureDetector(
                       onTap: () async {
-                        await ctrl.pickImage();
+                        await ctrl.pickImage(context);
                         setSheet(() {});
                       },
                       child: Container(

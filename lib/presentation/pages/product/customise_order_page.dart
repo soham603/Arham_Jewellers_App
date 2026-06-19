@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/customOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/customOrderSuccessPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
 class CustomiseOrderPage extends StatefulWidget {
   final ProductModel? product;
@@ -228,9 +229,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         maxHeight: 1600,
         imageQuality: 90,
       );
-      if (image != null) {
+      if (image == null) return;
+      if (!mounted) return;
+      final cropped = await cropImage(context, imageFile: File(image.path));
+      if (cropped != null) {
         setState(() {
-          referenceImages[index] = File(image.path);
+          referenceImages[index] = cropped;
         });
       }
     } catch (e) {

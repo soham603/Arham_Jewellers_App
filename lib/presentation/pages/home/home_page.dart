@@ -821,14 +821,18 @@ class _KaratSection extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
 
-                                child: CachedNetworkImage(
-                                  imageUrl: cat.imageUrl,
-                                  fit: BoxFit.cover,
+                                child: cat.imageUrl.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: cat.imageUrl,
+                                        fit: BoxFit.cover,
 
-                                  errorWidget: (_, _, _) => RatneshFallback(
-                                    logoSize: context.getResponsiveSize(5),
-                                  ),
-                                ),
+                                        errorWidget: (_, _, _) => RatneshFallback(
+                                          logoSize: context.getResponsiveSize(5),
+                                        ),
+                                      )
+                                    : RatneshFallback(
+                                        logoSize: context.getResponsiveSize(5),
+                                      ),
                               ),
                             ),
 
@@ -1020,17 +1024,19 @@ class _Level3Panel extends StatelessWidget {
                     child: Column(
                       children: [
                         Expanded(
-                          child: ClipRRect(
+                            child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
 
-                            child: CachedNetworkImage(
-                              imageUrl: cat.imageUrl,
+                            child: cat.imageUrl.isNotEmpty
+                                ? CachedNetworkImage(
+                                    imageUrl: cat.imageUrl,
 
-                              width: double.infinity,
-                              fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
 
-                              errorWidget: (_, _, _) => const RatneshFallback.s(),
-                            ),
+                                    errorWidget: (_, _, _) => const RatneshFallback.s(),
+                                  )
+                                : const RatneshFallback.s(),
                           ),
                         ),
 

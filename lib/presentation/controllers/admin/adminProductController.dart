@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
 class AdminProductController extends GetxController {
   static AdminProductController get instance => Get.find();
@@ -206,12 +208,15 @@ class AdminProductController extends GetxController {
     exitSearch();
   }
 
-  Future<void> pickImage() async {
+  Future<void> pickImage(BuildContext context) async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 80,
     );
-    if (picked != null) _pickedImage.value = File(picked.path);
+    if (picked == null) return;
+    if (!context.mounted) return;
+    final cropped = await cropImage(context, imageFile: File(picked.path));
+    if (cropped != null) _pickedImage.value = cropped;
   }
 
   void clearPickedImage() => _pickedImage.value = null;

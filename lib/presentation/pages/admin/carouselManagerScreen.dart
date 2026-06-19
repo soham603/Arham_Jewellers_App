@@ -9,6 +9,7 @@ import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
 import '../../../core/theme/app_colors.dart';
 
@@ -748,7 +749,11 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     imageQuality: 80,
                   );
                   if (picked != null) {
-                    setInner(() => newImage = File(picked.path));
+                    if (!context.mounted) return;
+                    final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
+                    if (cropped != null) {
+                      setInner(() => newImage = cropped);
+                    }
                   }
                 },
                 child: Container(
@@ -1192,10 +1197,14 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
         imageQuality: 80,
       );
       if (picked != null) {
-        setState(() {
-          _pickedImage = File(picked.path);
-          _localMediaType = 'image';
-        });
+        if (!mounted) return;
+        final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 16 / 9);
+        if (cropped != null) {
+          setState(() {
+            _pickedImage = cropped;
+            _localMediaType = 'image';
+          });
+        }
       }
     } else {
       final picked = await ImagePicker().pickVideo(

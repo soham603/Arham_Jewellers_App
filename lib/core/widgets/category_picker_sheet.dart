@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
@@ -294,12 +295,12 @@ class _CategoryPickerSheetState extends State<CategoryPickerSheet> {
                 if (cat.imageUrl.isNotEmpty) ...[
                   ClipRRect(
                     borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      cat.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: cat.imageUrl,
                       width: context.responsiveWidth(28, tabletVal: 32),
                       height: context.responsiveWidth(28, tabletVal: 32),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
+                      errorWidget: (_, _, _) => Container(
                         width: context.responsiveWidth(28, tabletVal: 32),
                         height: context.responsiveWidth(28, tabletVal: 32),
                         decoration: BoxDecoration(

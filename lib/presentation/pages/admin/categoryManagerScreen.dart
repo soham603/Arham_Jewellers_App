@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -850,7 +851,10 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
 
   Future<void> _pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (picked != null) setState(() => _pickedImage = File(picked.path));
+    if (picked == null) return;
+    if (!mounted) return;
+    final cropped = await cropImage(context, imageFile: File(picked.path), aspectRatio: 1);
+    if (cropped != null) setState(() => _pickedImage = cropped);
   }
 
   Future<void> _submit() async {
@@ -996,7 +1000,14 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Stack(fit: StackFit.expand, children: [
-          CachedNetworkImage(imageUrl: widget.existing!.imageUrl, fit: BoxFit.cover),
+          CachedNetworkImage(
+            imageUrl: widget.existing!.imageUrl,
+            fit: BoxFit.cover,
+            errorWidget: (_, _, _) => Container(
+              color: context.colorPalette.backgroundColor,
+              child: Icon(Icons.broken_image_outlined, size: context.getResponsiveSize(6), color: context.colorPalette.subTitleColor),
+            ),
+          ),
           Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withValues(alpha: 0.35))),
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getResponsiveSize(6)),
