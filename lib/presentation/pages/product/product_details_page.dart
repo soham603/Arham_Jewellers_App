@@ -413,7 +413,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     final isStockField = product.rawData?['IsStock'];
     final bool inStock = isStockField != null
-        ? (isStockField == 1 || isStockField == true || isStockField == '1')
+        ? (isStockField == 0 || isStockField == false || isStockField == '0')
         : product.isActive;
     final String stockText = inStock ? "READY STOCK" : "OUT OF STOCK";
     final Color stockColor = inStock
