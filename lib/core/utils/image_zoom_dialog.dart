@@ -405,22 +405,25 @@ class _ZoomHintState extends State<_ZoomHint>
     return FadeTransition(
       opacity: _opacity,
       child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black54,
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.pinch_outlined, color: Colors.white70, size: 16),
-              SizedBox(width: 6),
-              Text(
-                'Pinch or double-tap to zoom',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.pinch_outlined, color: Colors.white70, size: 16),
+                SizedBox(width: 6),
+                Text(
+                  'Pinch or double-tap to zoom',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
           ),
         ),
       ),
