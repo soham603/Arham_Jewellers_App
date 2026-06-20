@@ -81,6 +81,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     } else {
       cartController = Get.put(CartController());
     }
+
+    if (widget.product.isOld22kReadyStock) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Get.back();
+          Get.snackbar('Not Available', 'This item is no longer available');
+        }
+      });
+    }
   }
 
   RxList<ProductModel> _getControllerObservable() {

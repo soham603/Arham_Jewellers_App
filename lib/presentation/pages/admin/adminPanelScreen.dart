@@ -20,6 +20,7 @@ import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
+import 'package:ratnesh_gold_app/app/app.dart';
 
 import 'ancillary_selection_screen.dart';
 
@@ -32,6 +33,7 @@ class AdminPanelScreen extends StatefulWidget {
 
 class _AdminPanelScreenState extends State<AdminPanelScreen> {
   bool _isGridView = true;
+  bool _screenshotProtectionEnabled = true;
 
   late final AdminOrderController _adminOrderController;
   late final AdminUserController _adminUserController;
@@ -42,6 +44,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   @override
   void initState() {
     super.initState();
+    _loadScreenshotProtectionSetting();
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController());
@@ -57,6 +60,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
     _handsetChangeController = Get.isRegistered<HandsetChangeController>()
         ? Get.find<HandsetChangeController>()
         : Get.put(HandsetChangeController());
+  }
+
+  Future<void> _loadScreenshotProtectionSetting() async {
+    final enabled = await RatneshGoldApp.isScreenshotProtectionEnabled();
+    setState(() => _screenshotProtectionEnabled = enabled);
   }
 
   @override
@@ -326,6 +334,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Preview toasts",
                   onTap: () => _showToastTestSheet(context),
                 ),
+
+                // ── Screenshot Protection Toggle ──
+                _screenshotProtectionTile(context),
               ],
             )
           else
@@ -700,6 +711,81 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 color: AppColors.textMuted,
                 fontSize: context.getResponsiveSize(3),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _screenshotProtectionTile(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        final newValue = !_screenshotProtectionEnabled;
+        await RatneshGoldApp.setScreenshotProtectionEnabled(newValue);
+        setState(() => _screenshotProtectionEnabled = newValue);
+        ToastUtils.showSuccess(
+          newValue ? 'Screenshot protection enabled' : 'Screenshot protection disabled',
+          title: 'Screenshot Setting',
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: context.getResponsiveSize(14),
+              height: context.getResponsiveSize(14),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5EFE7),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.screenshot_rounded,
+                color: _screenshotProtectionEnabled
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFF2E7D32),
+                size: context.getResponsiveSize(7),
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1.5)),
+            Text(
+              "Screenshot",
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+                fontSize: context.getResponsiveSize(3.8),
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(0.4)),
+            Switch(
+              value: _screenshotProtectionEnabled,
+              onChanged: (value) async {
+                await RatneshGoldApp.setScreenshotProtectionEnabled(value);
+                setState(() => _screenshotProtectionEnabled = value);
+                ToastUtils.showSuccess(
+                  value ? 'Screenshot protection enabled' : 'Screenshot protection disabled',
+                  title: 'Screenshot Setting',
+                );
+              },
+              activeThumbColor: const Color(0xFFEF4444),
+              inactiveThumbColor: const Color(0xFF2E7D32),
             ),
           ],
         ),

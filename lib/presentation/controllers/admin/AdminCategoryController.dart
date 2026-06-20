@@ -210,19 +210,21 @@ class CategoryManagerController extends GetxController {
     required String id,
     String? name,
     File? imageFile,
-    bool deleteImage = false,
+    bool isDeleteImage = false,
   }) async {
     _actionLoadingId.value = id;
 
     try {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        if (deleteImage) "deleteImage": "true",
+        if (isDeleteImage) "isDeleteImage": true,
         if (imageFile != null)
           "file": await MultipartFile.fromFile(
             (await _compressImageFile(imageFile)).path,
           ),
       });
+
+      Logger.info("CategoryManagerController", "editCategory fields: name=${name}, isDeleteImage=${isDeleteImage}, hasFile=${imageFile != null}");
 
       final response = await _categoryRepo.editCategory(id: id, data: formData);
 
@@ -241,7 +243,7 @@ class CategoryManagerController extends GetxController {
   }
 
   // ── Delete 
-  Future<bool> deleteCategory(String id) async {
+  Future<String?> deleteCategory(String id) async {
     _actionLoadingId.value = id;
 
     try {
@@ -264,17 +266,17 @@ class CategoryManagerController extends GetxController {
         );
       }
       Logger.info("CategoryManagerController", "Category $id deleted");
-      return true;
+      return null;
     } catch (e) {
       Logger.error("CategoryManagerController", "delete error: $e");
+      return DioErrorHelper.getMessage(e);
     } finally {
       _actionLoadingId.value = '';
     }
-    return false;
   }
 
   // ── Restore 
-  Future<bool> restoreCategory(String id) async {
+  Future<String?> restoreCategory(String id) async {
     _actionLoadingId.value = id;
 
     try {
@@ -284,12 +286,12 @@ class CategoryManagerController extends GetxController {
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
       Logger.info("CategoryManagerController", "Category $id restored");
-      return true;
+      return null;
     } catch (e) {
       Logger.error("CategoryManagerController", "restore error: $e");
+      return DioErrorHelper.getMessage(e);
     } finally {
       _actionLoadingId.value = '';
     }
-    return false;
   }
 }

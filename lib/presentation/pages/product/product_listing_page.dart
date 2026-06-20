@@ -872,6 +872,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
       result = result.where((p) => p.rawData?['IsStock'] == 0).toList();
     }
 
+    result = result.where((p) => !p.isOld22kReadyStock).toList();
+
     if (_weightMin > 0 || _weightMax < _displayedWeightMax) {
       result = result.where((p) {
         final gw = p.fineWeight;

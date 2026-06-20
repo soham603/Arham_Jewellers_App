@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/core/widgets/carousel_indicator.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
@@ -21,6 +22,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_pag
 import 'package:ratnesh_gold_app/presentation/pages/product/chain_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
+import 'package:ratnesh_gold_app/presentation/shimmers/carouselIndicatorShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
     categoryController = Get.isRegistered<CategoryController>()
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) setState(() => _showCollectionShimmer = false);
     });
     // CategoryController fetches tree eagerly in onInit()
@@ -1721,9 +1723,25 @@ class _CarouselSectionState extends State<_CarouselSection> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (widget.controller.getCarouselState == CurrentAppState.LOADING && widget.controller.list.isEmpty) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
-          child: CarouselShimmer(),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AspectRatio(
+              aspectRatio: 2.0,
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: const CarouselShimmer(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            const CarouselIndicatorShimmer(),
+          ],
         );
       }
 
@@ -1799,28 +1817,9 @@ class _CarouselSectionState extends State<_CarouselSection> {
 
           const SizedBox(height: 6),
 
-          Container(
-            padding: const EdgeInsets.only(top: 6, bottom: 0),
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(list.length, (i) {
-                final active = i == widget.currentIndex;
-
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: context.responsiveWidth(active ? 22 : 6, tabletVal: active ? 36 : 10),
-                  height: context.responsiveWidth(6, tabletVal: 12),
-                  decoration: BoxDecoration(
-                    color: active
-                        ? context.colorPalette.gold
-                        : context.colorPalette.border,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                );
-              }),
-            ),
+          CarouselIndicator(
+            itemCount: list.length,
+            currentIndex: widget.currentIndex,
           ),
         ],
       );

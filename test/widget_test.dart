@@ -11,7 +11,7 @@ import 'package:ratnesh_gold_app/app/app.dart';
 
 void main() {
   testWidgets('Splash loads brand text', (WidgetTester tester) async {
-    await tester.pumpWidget(const RatneshGoldApp());
+    await tester.pumpWidget(RatneshGoldApp());
 
     expect(find.text('RATNESHGOLD'), findsOneWidget);
     expect(find.text('Purity  •  Quality  •  Trust'), findsOneWidget);

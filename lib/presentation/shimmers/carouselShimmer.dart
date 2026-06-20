@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 
 class CarouselShimmer extends StatelessWidget {
   const CarouselShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.colorPalette;
-
     return Shimmer.fromColors(
-      baseColor: palette.shimmerBaseColor,
-      highlightColor: palette.shimmerHighLightColor,
+      baseColor: AppColors.warmShimmerBase,
+      highlightColor: AppColors.warmShimmerHighlight,
       child: Container(
         width: double.infinity,
-        height: context.getScreenHeight(22),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-        ),
+        height: double.infinity,
+        color: Colors.white,
       ),
     );
   }

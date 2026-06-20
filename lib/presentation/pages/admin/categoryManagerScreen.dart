@@ -839,7 +839,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   final _formKey = GlobalKey<FormState>();
   File? _pickedImage;
   _CategoryImageMeta? _imageMeta;
-  bool _deleteImage = false;
+  bool _isDeleteImage = false;
   bool _submitting = false;
 
   bool get isEditing => !widget.isCreate;
@@ -868,7 +868,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     if (result != null) {
       setState(() {
         _pickedImage = result.file;
-        _deleteImage = false;
+        _isDeleteImage = false;
         _imageMeta = _CategoryImageMeta(
           originalFile: File(picked.path),
           lastResult: result,
@@ -886,7 +886,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
             imageFile: _pickedImage,
-            deleteImage: _deleteImage,
+            isDeleteImage: _isDeleteImage,
           )
         : await widget.ctrl.createCategory(
             name: _nameCtrl.text.trim(),
@@ -898,8 +898,8 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
           );
 
     if (error == null && mounted) {
-      Navigator.of(context).pop();
       ToastUtils.showSuccess(isEditing ? 'Updated' : 'Created');
+      Navigator.of(context).pop();
     } else if (mounted) {
       ToastUtils.showError(error ?? 'Something went wrong');
     }
@@ -997,7 +997,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                                   if (result != null) {
                                     setState(() {
                                       _pickedImage = result.file;
-                                      _deleteImage = false;
+                                      _isDeleteImage = false;
                                       _imageMeta = _CategoryImageMeta(
                                         originalFile: originalFile,
                                         lastResult: result,
@@ -1018,7 +1018,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                                     if (result != null) {
                                       setState(() {
                                         _pickedImage = result.file;
-                                        _deleteImage = false;
+                                        _isDeleteImage = false;
                                         _imageMeta = _CategoryImageMeta(
                                           originalFile: localFile,
                                           lastResult: result,
@@ -1032,7 +1032,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                               onRemove: () {
                                 setState(() {
                                   _pickedImage = null;
-                                  _deleteImage = true;
+                                  _isDeleteImage = true;
                                 });
                               },
                             );
@@ -1088,7 +1088,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   }
 
   Widget _imagePlaceholder(BuildContext context) {
-    if (isEditing && widget.existing!.imageUrl.isNotEmpty) {
+    if (isEditing && !_isDeleteImage && widget.existing!.imageUrl.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Stack(fit: StackFit.expand, children: [
@@ -1143,8 +1143,12 @@ void _confirmDelete(BuildContext context, CategoryManagerController ctrl, Catego
         Obx(() => TextButton(
           onPressed: ctrl.actionLoadingId == cat.id ? null : () async {
             Navigator.pop(context);
-            final ok = await ctrl.deleteCategory(cat.id);
-            if (ok && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"${cat.name}" deleted'), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+            final error = await ctrl.deleteCategory(cat.id);
+            if (error == null) {
+              ToastUtils.showSuccess('"${cat.name}" deleted');
+            } else {
+              ToastUtils.showError(error);
+            }
           },
           child: ctrl.actionLoadingId == cat.id
               ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red))
@@ -1168,8 +1172,12 @@ void _confirmRestore(BuildContext context, CategoryManagerController ctrl, Categ
         TextButton(
           onPressed: () async {
             Navigator.pop(context);
-            final ok = await ctrl.restoreCategory(cat.id);
-            if (ok && context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('"${cat.name}" restored'), backgroundColor: Colors.green, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+            final error = await ctrl.restoreCategory(cat.id);
+            if (error == null) {
+              ToastUtils.showSuccess('"${cat.name}" restored');
+            } else {
+              ToastUtils.showError(error);
+            }
           },
           child: const Text('Restore', style: TextStyle(color: Colors.green)),
         ),

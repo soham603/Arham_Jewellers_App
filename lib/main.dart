@@ -39,7 +39,7 @@ Future<void> main() async {
         }
       }
 
-      runApp(const RatneshGoldApp());
+      runApp(RatneshGoldApp());
     },
     (error, stackTrace) {
       Logger.error('Uncaught Error', '$error\n$stackTrace');

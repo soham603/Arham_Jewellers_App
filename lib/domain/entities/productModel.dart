@@ -405,4 +405,9 @@ class ProductModel {
 
     return double.tryParse(value.toString());
   }
+
+  /// Returns true if this product starts with "OLD " and is 22K —
+  /// these should be hidden from ready stock listings and details.
+  bool get isOld22kReadyStock =>
+      name.startsWith('OLD ') && karatNumber == 22;
 }
