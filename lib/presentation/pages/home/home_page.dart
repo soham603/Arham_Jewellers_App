@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       await Future.wait([
         carouselController.getAllCarousels(),
         // On pull-to-refresh, refresh tree data
-        categoryController.fetchCategoryTree(),
+        categoryController.fetchCategoryTree(force: true),
         carouselController.loadLatestProducts(),
       ]);
     } catch (e, stackTrace) {

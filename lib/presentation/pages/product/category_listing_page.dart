@@ -41,7 +41,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
     _loadAll();
   }
 
-  Future<void> _loadAll() async {
+  Future<void> _loadAll({bool force = false}) async {
     _isLoading.value = true;
     _hasError.value = false;
 
@@ -49,9 +49,9 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
         _stateForKarat(k) == CurrentAppState.SUCCESS &&
         _listForKarat(k).isNotEmpty);
 
-    if (!allHaveData) {
+    if (!allHaveData || force) {
       try {
-        await controller.fetchAllKaratCategories().timeout(
+        await controller.fetchAllKaratCategories(force: force).timeout(
               const Duration(seconds: 15),
             );
       } catch (e) {
@@ -75,6 +75,10 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 
     _isLoading.value = false;
     _hasError.value = anyError;
+  }
+
+  Future<void> _onRefresh() async {
+    await _loadAll(force: true);
   }
 
   CurrentAppState _stateForKarat(Karat karat) {
@@ -137,10 +141,12 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
       body: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+              child: RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                     Stack(
                       children: [
                         Align(
@@ -362,6 +368,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
                       );
                     }),
                   ],
+                  ),
                 ),
               ),
             ),

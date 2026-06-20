@@ -139,10 +139,13 @@ class CategoryController extends GetxController {
 
   /// Fetches the full category tree in a single API call.
   /// Always fetches full data (all 3 levels) to avoid redundant refetches.
-  Future<void> fetchCategoryTree() async {
-    // If already fetching or have data, return early
-    if (_treeFetchFuture != null) return _treeFetchFuture!;
-    if (_treeHasFullData && _k18Categories.isNotEmpty) return;
+  Future<void> fetchCategoryTree({bool force = false}) async {
+    // If already fetching or have data, return early (unless forced)
+    if (!force) {
+      if (_treeFetchFuture != null) return _treeFetchFuture!;
+      if (_treeHasFullData && _k18Categories.isNotEmpty) return;
+    }
+    if (force) _treeHasFullData = false;
 
     _k18State.value = CurrentAppState.LOADING;
     _k20State.value = CurrentAppState.LOADING;
@@ -195,7 +198,7 @@ class CategoryController extends GetxController {
   }
 
   // Backward-compatible alias (always fetches full tree)
-  Future<void> fetchAllKaratCategories() => fetchCategoryTree();
+  Future<void> fetchAllKaratCategories({bool force = false}) => fetchCategoryTree(force: force);
 
   void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
     final allLevel3 = <CategoryModel>[];
