@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/share_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
@@ -217,7 +218,7 @@ class _SharePageState extends State<SharePage> {
       onRefresh: () => categoryController.fetchCategoryTree(),
       color: context.colorPalette.gold,
       child: ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.5)),
+        padding: EdgeInsets.fromLTRB(0, context.getScreenHeight(0.5), 0, NavBarSpacer.heightOf(context)),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final cat = categories[index];
@@ -366,7 +367,7 @@ class _SharePageState extends State<SharePage> {
         // Level 3 items
         Expanded(
           child: ListView.builder(
-            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.3)),
+            padding: EdgeInsets.fromLTRB(0, context.getScreenHeight(0.3), 0, NavBarSpacer.heightOf(context)),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final cat = categories[index];

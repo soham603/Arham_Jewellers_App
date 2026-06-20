@@ -277,7 +277,7 @@ The `rawData` object contains 100+ fields from the inventory system. The most us
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `IsStock` | int | Stock status: `0` = in stock, `1` = out of stock |
+| `IsStock` | int | Stock status: `1` = Ready Stock / Available, `0` = Order Item / Not in stock |
 | `Barcode` | string | Barcode number |
 | `CounterName` | string? | Counter location (e.g. `"MAIN STOCK"`) |
 | `VoucherNo` | string? | Voucher number |

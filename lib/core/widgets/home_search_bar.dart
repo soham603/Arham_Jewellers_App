@@ -10,10 +10,12 @@ import '../../presentation/controllers/navigation_controller.dart';
 
 class HomeSearchBar extends StatefulWidget {
   final VoidCallback? onScannerTap;
+  final CategoryController? categoryController;
 
   const HomeSearchBar({
     super.key,
     this.onScannerTap,
+    this.categoryController,
   });
 
   @override
@@ -74,7 +76,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
     final fontSize = context.responsiveWidth(14, tabletVal: 19);
     final stackHeight = context.responsiveWidth(20, tabletVal: 30);
 
-    final categoryController = Get.find<CategoryController>();
+    final categoryController = widget.categoryController ?? Get.find<CategoryController>();
 
     return GestureDetector(
       onTap: () {

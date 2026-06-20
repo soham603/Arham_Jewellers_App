@@ -34,6 +34,10 @@ class CustomiseOrderPage extends StatefulWidget {
 }
 
 class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
+  // Form key
+  final _formKey = GlobalKey<FormState>();
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   // Edit mode
   bool get _isEditMode => widget.existingOrder != null;
 
@@ -54,12 +58,16 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];
   List<_RefImageMeta?> _imageMeta = [null, null, null, null];
-  bool _networkImageFailed = false;
+  final ValueNotifier<bool> _networkImageFailed = ValueNotifier(false);
   final ImagePicker _picker = ImagePicker();
 
   // Edit mode: track existing network images and removal
   List<String> _existingImageUrls = [];
   bool _removeOldImages = false;
+
+  // Per-slot loading states
+  final List<bool> _isDownloadingForEdit = [false, false, false, false];
+  final List<bool> _isMigratingImages = [false, false, false, false];
 
   // Controller
   late final CustomOrderController _customOrderController;
@@ -77,13 +85,52 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   final TextEditingController productDescriptionCtrl = TextEditingController();
 
   bool _isValid(String? value) =>
-      value != null && value.trim().isNotEmpty && value.trim().toLowerCase() != 'nan';
+      value != null &&
+      value.trim().isNotEmpty &&
+      value.trim().toLowerCase() != 'nan';
+
+  // --- Validators ---
+
+  String? _requiredValidator(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    return null;
+  }
+
+  String? _contactValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Contact number is required';
+    }
+    final digits = value.trim().replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 10) {
+      return 'Enter a valid 10-digit number';
+    }
+    return null;
+  }
+
+  String? _weightValidator(String? value) {
+    if (value == null || value.trim().isEmpty) return null; // optional
+    final parsed = double.tryParse(value.trim());
+    if (parsed == null || parsed <= 0) {
+      return 'Enter a valid weight';
+    }
+    return null;
+  }
+
+  String? _numericOptionalValidator(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) return null; // optional
+    final parsed = int.tryParse(value.trim());
+    if (parsed == null || parsed <= 0) {
+      return 'Enter a valid $fieldName';
+    }
+    return null;
+  }
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize CustomOrderController
     _customOrderController = Get.isRegistered<CustomOrderController>()
         ? Get.find<CustomOrderController>()
         : Get.put(CustomOrderController());
@@ -98,7 +145,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   void _initEditMode() {
     final order = widget.existingOrder!;
 
-    // Pre-fill from existing order
     partyCodeCtrl.text = order.partyCode;
     partyNameCtrl.text = order.partyName;
     if (order.area != null) areaCtrl.text = order.area!;
@@ -107,11 +153,11 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     if (order.weight != null) weightCtrl.text = order.weight!;
     if (order.noOfPieces != null) noOfPcCtrl.text = order.noOfPieces!;
     if (order.size != null) sizeCtrl.text = order.size!;
-    if (order.lengthBroadness != null) lengthBroadnessCtrl.text = order.lengthBroadness!;
-    if (order.productDescription != null) productDescriptionCtrl.text = order.productDescription!;
+    if (order.lengthBroadness != null)
+      lengthBroadnessCtrl.text = order.lengthBroadness!;
+    if (order.productDescription != null)
+      productDescriptionCtrl.text = order.productDescription!;
 
-    // Set chip selections from order
-    // Try exact match first, then partial match on the K number
     if (_caratOptions.contains(order.purity)) {
       selectedCarat = order.purity;
     } else {
@@ -125,12 +171,10 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     if (order.style.isNotEmpty) selectedStyle = order.style;
     if (order.marking.isNotEmpty) selectedMarking = order.marking;
 
-    // Load existing images
     _existingImageUrls = List<String>.from(order.referenceImages);
   }
 
   void _initCreateMode() {
-    // ── Pre-fill from logged-in user ──
     if (Get.isRegistered<AuthController>()) {
       final user = Get.find<AuthController>().user;
       if (user != null) {
@@ -141,22 +185,15 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 ? user.name
                 : '';
         partyNameCtrl.text = partyName;
-        if (_isValid(user.area)) {
-          areaCtrl.text = user.area!;
-        }
-        if (user.phoneNumber.isNotEmpty) {
-          contactCtrl.text = user.phoneNumber;
-        }
+        if (_isValid(user.area)) areaCtrl.text = user.area!;
+        if (user.phoneNumber.isNotEmpty) contactCtrl.text = user.phoneNumber;
       }
     }
 
-    // ── Pre-fill from product ──
     if (widget.product != null) {
       final p = widget.product!;
 
-      if (p.name.isNotEmpty) {
-        itemNameCtrl.text = p.name;
-      }
+      if (p.name.isNotEmpty) itemNameCtrl.text = p.name;
 
       if (p.karigarNetWt != null && p.karigarNetWt! > 0) {
         weightCtrl.text = p.karigarNetWt!.toStringAsFixed(2);
@@ -168,17 +205,13 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         weightCtrl.text = p.rawData!['GrossWt'].toString();
       }
 
-      if (p.size != null && p.size!.isNotEmpty) {
-        sizeCtrl.text = p.size!;
-      }
+      if (p.size != null && p.size!.isNotEmpty) sizeCtrl.text = p.size!;
 
       if (p.karat != null) {
         final karatNum = RegExp(r'(\d+)').firstMatch(p.karat!)?.group(1);
         if (karatNum != null) {
           final match = _caratOptions.where((c) => c.startsWith('${karatNum}K'));
-          if (match.isNotEmpty) {
-            selectedCarat = match.first;
-          }
+          if (match.isNotEmpty) selectedCarat = match.first;
         }
       }
     }
@@ -186,6 +219,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   @override
   void dispose() {
+    _networkImageFailed.dispose();
     partyNameCtrl.dispose();
     partyCodeCtrl.dispose();
     areaCtrl.dispose();
@@ -199,7 +233,69 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     super.dispose();
   }
 
+  // --- Validate & Submit ---
+
+  Future<void> _handleSubmit() async {
+    // Enable inline errors on all fields after first submit attempt
+    setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
+
+    if (!_formKey.currentState!.validate()) {
+      ToastUtils.showWarning("Please fix the errors before submitting");
+      return;
+    }
+
+    if (_isEditMode) {
+      if (_customOrderController.isModifying) return;
+    } else {
+      if (_customOrderController.isCreating) return;
+    }
+
+    final newImages =
+        referenceImages.where((f) => f != null).cast<File>().toList();
+
+    if (_isEditMode) {
+      final success = await _customOrderController.modifyCustomOrder(
+        orderId: widget.existingOrder!.id,
+        partyCode: partyCodeCtrl.text.trim(),
+        partyName: partyNameCtrl.text.trim(),
+        area: areaCtrl.text.trim(),
+        contactNumber: contactCtrl.text.trim(),
+        itemName: itemNameCtrl.text.trim(),
+        weight: weightCtrl.text.trim(),
+        noOfPieces: noOfPcCtrl.text.trim(),
+        size: sizeCtrl.text.trim(),
+        lengthBroadness: lengthBroadnessCtrl.text.trim(),
+        productDescription: productDescriptionCtrl.text.trim(),
+        purity: selectedCarat,
+        style: selectedStyle,
+        marking: selectedMarking,
+        newImages: newImages.isNotEmpty ? newImages : null,
+        removeOldImages: _removeOldImages,
+      );
+
+      if (success && mounted) Get.back();
+    } else {
+      final success = await _customOrderController.createCustomOrder(
+        productId: widget.product?.id,
+        partyCode: partyCodeCtrl.text.trim(),
+        itemName: itemNameCtrl.text.trim(),
+        weight: weightCtrl.text.trim(),
+        noOfPieces: noOfPcCtrl.text.trim(),
+        size: sizeCtrl.text.trim(),
+        lengthBroadness: lengthBroadnessCtrl.text.trim(),
+        productDescription: productDescriptionCtrl.text.trim(),
+        purity: selectedCarat,
+        style: selectedStyle,
+        marking: selectedMarking,
+        images: newImages.isNotEmpty ? newImages : null,
+      );
+
+      if (success && mounted) Get.off(() => const CustomOrderSuccessPage());
+    }
+  }
+
   // --- Image Picking Logic ---
+
   void _showImageSourceActionSheet(BuildContext context, int index) {
     showModalBottomSheet(
       context: context,
@@ -213,15 +309,16 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               leading: Icon(Icons.camera_alt, color: AppColors.primaryGold),
               title: const Text('Take a Photo'),
               onTap: () {
-                Navigator.of(context).pop();
+                Get.back();
                 _pickImage(ImageSource.camera, index);
               },
             ),
             ListTile(
-              leading: Icon(Icons.photo_library, color: AppColors.primaryGold),
+              leading:
+                  Icon(Icons.photo_library, color: AppColors.primaryGold),
               title: const Text('Choose from Gallery'),
               onTap: () {
-                Navigator.of(context).pop();
+                Get.back();
                 _pickImage(ImageSource.gallery, index);
               },
             ),
@@ -256,6 +353,50 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     }
   }
 
+  /// When an old image is removed, download the remaining old images to local
+  /// files so they're preserved as "new" images on submit. The API only supports
+  /// a boolean [removeOldImages] flag, so we must re-upload any images we want
+  /// to keep.
+  Future<void> _migrateRemainingOldImages({int? excludeIndex}) async {
+    final remaining = <int>[];
+    for (var i = 0; i < _existingImageUrls.length; i++) {
+      if (i != excludeIndex &&
+          i < _existingImageUrls.length &&
+          _existingImageUrls[i].isNotEmpty) {
+        remaining.add(i);
+      }
+    }
+    if (remaining.isEmpty) return;
+
+    for (final i in remaining) {
+      final url = _existingImageUrls[i];
+      final slot = referenceImages.indexWhere((f) => f == null);
+      if (slot == -1) break;
+
+      if (mounted) setState(() => _isMigratingImages[slot] = true);
+      try {
+        final file = await downloadNetworkImageToFile(url);
+        if (file != null && mounted) {
+          setState(() {
+            referenceImages[slot] = file;
+            _imageMeta[slot] = _RefImageMeta(
+              originalFile: file,
+              lastResult: CropResult(file: file),
+            );
+          });
+        }
+      } catch (_) {
+        // If download fails, slot stays empty — user can re-add manually
+      } finally {
+        if (mounted) setState(() => _isMigratingImages[slot] = false);
+      }
+    }
+
+    // Clear all existing URLs and flag for server-side removal
+    _existingImageUrls = List.filled(_existingImageUrls.length, '');
+    _removeOldImages = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -283,155 +424,97 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         ),
       ),
 
-      
       // BOTTOM ACTION BAR
-      
       bottomNavigationBar: Container(
-          padding: EdgeInsets.fromLTRB(
-            context.getResponsiveSize(4),
-            context.getScreenHeight(1.2),
-            context.getResponsiveSize(4),
-            context.getScreenHeight(1.2),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryGold.withValues(alpha: 0.08),
-                blurRadius: 24,
-                offset: const Offset(0, -8),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "By continuing you agree to our Terms & Privacy Policy",
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(2.8),
-                  color: AppColors.textMuted,
-                ),
-              ),
-              SizedBox(height: context.getScreenHeight(1.5)),
-              SizedBox(
-                width: double.infinity,
-                height: context.getScreenHeight(6),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    elevation: 6,
-                    shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
-                    backgroundColor: AppColors.primaryGold,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  onPressed: () async {
-                    if (_isEditMode) {
-                      if (_customOrderController.isModifying) return;
-                    } else {
-                      if (_customOrderController.isCreating) return;
-                    }
-
-                    // Validate required fields
-                    if (itemNameCtrl.text.trim().isEmpty) {
-                      ToastUtils.showWarning("Please enter item name");
-                      return;
-                    }
-
-                    final newImages = referenceImages
-                        .where((f) => f != null)
-                        .cast<File>()
-                        .toList();
-
-                    if (_isEditMode) {
-                      final success = await _customOrderController.modifyCustomOrder(
-                        orderId: widget.existingOrder!.id,
-                        partyCode: partyCodeCtrl.text.trim(),
-                        partyName: partyNameCtrl.text.trim(),
-                        area: areaCtrl.text.trim(),
-                        contactNumber: contactCtrl.text.trim(),
-                        itemName: itemNameCtrl.text.trim(),
-                        weight: weightCtrl.text.trim(),
-                        noOfPieces: noOfPcCtrl.text.trim(),
-                        size: sizeCtrl.text.trim(),
-                        lengthBroadness: lengthBroadnessCtrl.text.trim(),
-                        productDescription: productDescriptionCtrl.text.trim(),
-                        purity: selectedCarat,
-                        style: selectedStyle,
-                        marking: selectedMarking,
-                        newImages: newImages.isNotEmpty ? newImages : null,
-                        removeOldImages: _removeOldImages,
-                      );
-
-                      if (success && mounted) {
-                        Get.back();
-                      }
-                    } else {
-                      final success = await _customOrderController.createCustomOrder(
-                        productId: widget.product?.id,
-                        partyCode: partyCodeCtrl.text.trim(),
-                        itemName: itemNameCtrl.text.trim(),
-                        weight: weightCtrl.text.trim(),
-                        noOfPieces: noOfPcCtrl.text.trim(),
-                        size: sizeCtrl.text.trim(),
-                        lengthBroadness: lengthBroadnessCtrl.text.trim(),
-                        productDescription: productDescriptionCtrl.text.trim(),
-                        purity: selectedCarat,
-                        style: selectedStyle,
-                        marking: selectedMarking,
-                        images: newImages.isNotEmpty ? newImages : null,
-                      );
-
-                      if (success && mounted) {
-                        Get.off(() => const CustomOrderSuccessPage());
-                      }
-                    }
-                  },
-                  child: Obx(() {
-                    final isLoading = _isEditMode
-                        ? _customOrderController.isModifying
-                        : _customOrderController.isCreating;
-                    return isLoading
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.5,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                _isEditMode ? 'Updating...' : 'Submitting...',
-                                style: TextStyle(
-                                  fontSize: context.getResponsiveSize(4.2),
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            _isEditMode ? 'Update Custom Order' : 'Confirm Custom Order',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(4.2),
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          );
-                  }),
-                ),
-              ),
-            ],
-          ),
+        padding: EdgeInsets.fromLTRB(
+          context.getResponsiveSize(4),
+          context.getScreenHeight(1.2),
+          context.getResponsiveSize(4),
+          context.getScreenHeight(1.2),
         ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryGold.withValues(alpha: 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "By continuing you agree to our Terms & Privacy Policy",
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(2.8),
+                color: AppColors.textMuted,
+              ),
+            ),
+            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(
+              width: double.infinity,
+              height: context.getScreenHeight(6),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 6,
+                  shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
+                  backgroundColor: AppColors.primaryGold,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: _handleSubmit,
+                child: Obx(() {
+                  final isLoading = _isEditMode
+                      ? _customOrderController.isModifying
+                      : _customOrderController.isCreating;
+                  return isLoading
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              _isEditMode ? 'Updating...' : 'Submitting...',
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(4.2),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          _isEditMode
+                              ? 'Update Custom Order'
+                              : 'Confirm Custom Order',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(4.2),
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ),
 
-      body: SingleChildScrollView(
+      body: Form(
+        key: _formKey,
+        autovalidateMode: _autovalidateMode,
+        child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
             vertical: context.getScreenHeight(1),
@@ -439,9 +522,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               // 1. CUSTOMER INFORMATION
-              
               _buildSectionHeader("Customer Information"),
               _buildCard(
                 child: Column(
@@ -459,49 +540,62 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.getScreenHeight(0.5)),
 
-              
               // 2. PRODUCT SPECIFICATIONS
-              
               _buildSectionHeader("Product Specifications"),
               _buildCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (widget.product?.imageUrl != null &&
-                        !_networkImageFailed) ...[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: context.responsiveWidth(100, tabletVal: 120),
-                            width: context.responsiveWidth(100, tabletVal: 120),
-                            decoration: BoxDecoration(
-                              color: AppColors.pageBg,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color:
-                                    AppColors.primaryGold.withValues(alpha: 0.25),
-                                width: 1.5,
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _networkImageFailed,
+                      builder: (context, networkFailed, _) {
+                        if (widget.product?.imageUrl != null &&
+                            !networkFailed) {
+                          return Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: context.responsiveWidth(100,
+                                        tabletVal: 120),
+                                    width: context.responsiveWidth(100,
+                                        tabletVal: 120),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.pageBg,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: AppColors.primaryGold
+                                            .withValues(alpha: 0.25),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: _buildMainImageDisplay(),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: _buildTextField(
+                                      "Item Name *",
+                                      controller: itemNameCtrl,
+                                      validator: (v) =>
+                                          _requiredValidator(v, 'Item name'),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            child: _buildMainImageDisplay(),
-                          ),
-                          SizedBox(width: 14),
-                          Expanded(
-                            child: _buildTextField(
-                              "Item Name",
-                              controller: itemNameCtrl,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 14),
-                    ] else
-                      _buildTextField(
-                        "Item Name",
-                        controller: itemNameCtrl,
-                      ),
-                    SizedBox(height: 14),
+                              const SizedBox(height: 14),
+                            ],
+                          );
+                        }
+                        return _buildTextField(
+                          "Item Name *",
+                          controller: itemNameCtrl,
+                          validator: (v) =>
+                              _requiredValidator(v, 'Item name'),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -510,19 +604,22 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                             "Weight (g)",
                             controller: weightCtrl,
                             keyboardType: TextInputType.number,
+                            validator: _weightValidator,
                           ),
                         ),
-                        SizedBox(width: 14),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: _buildTextField(
                             "No. of PC",
                             controller: noOfPcCtrl,
                             keyboardType: TextInputType.number,
+                            validator: (v) =>
+                                _numericOptionalValidator(v, 'No. of PC'),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 14),
+                    const SizedBox(height: 14),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -532,171 +629,167 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                             controller: sizeCtrl,
                           ),
                         ),
-                        SizedBox(width: 14),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: _buildTextField(
                             "Length/Broad (in)",
                             controller: lengthBroadnessCtrl,
+                            keyboardType: TextInputType.number,
+                            validator: _weightValidator,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 14),
+                    const SizedBox(height: 14),
                     _buildTextField(
                       "Product Description & Requirements",
                       controller: productDescriptionCtrl,
                       maxLines: 3,
                     ),
-                    SizedBox(height: 18),
+                    const SizedBox(height: 18),
 
                     // Upload Reference Images
                     _buildLabel("Upload Reference Images (Max 4)"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(child: _buildImageUploadBox(context, 0)),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(child: _buildImageUploadBox(context, 1)),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(child: _buildImageUploadBox(context, 2)),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(child: _buildImageUploadBox(context, 3)),
                       ],
                     ),
 
-                    // Edit mode: Remove all existing images checkbox
-                    if (_isEditMode && _existingImageUrls.isNotEmpty) ...[
-                      SizedBox(height: 12),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: Checkbox(
-                              value: _removeOldImages,
-                              onChanged: (val) {
-                                setState(() {
-                                  _removeOldImages = val ?? false;
-                                });
-                              },
-                              activeColor: AppColors.primaryGold,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "Remove existing images",
-                              style: TextStyle(
-                                fontSize: context.getResponsiveSize(3.2),
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+
                   ],
                 ),
               ),
 
               SizedBox(height: context.getScreenHeight(0.5)),
 
-              
               // 3. CUSTOMIZATION OPTIONS
-              
               _buildSectionHeader("Customization Options"),
               _buildCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel("Purity"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Column(
                       children: [
                         Row(
                           children: [
                             Expanded(
-                              child: _buildChip("9K  (38%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "9K  (38%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("14K (60%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "14K (60%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("18K (76%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "18K (76%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
                             Expanded(
-                              child: _buildChip("20K (84%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "20K (84%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("22K (92%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "22K (92%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: _buildChip("24K (100%)", selectedCarat,
-                                  (val) => setState(() => selectedCarat = val)),
+                              child: _buildChip(
+                                  "24K (100%)",
+                                  selectedCarat,
+                                  (val) =>
+                                      setState(() => selectedCarat = val)),
                             ),
                           ],
                         ),
                       ],
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Divider(height: 1, color: AppColors.divider),
                     ),
-
                     _buildLabel("Style"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
-                          child: _buildChip("Bhungdi", selectedStyle,
+                          child: _buildChip(
+                              "Bhungdi",
+                              selectedStyle,
                               (val) => setState(() => selectedStyle = val)),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
-                          child: _buildChip("English (Pech)", selectedStyle,
+                          child: _buildChip(
+                              "English (Pech)",
+                              selectedStyle,
                               (val) => setState(() => selectedStyle = val)),
                         ),
                       ],
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Divider(height: 1, color: AppColors.divider),
                     ),
-
                     _buildLabel("Marking"),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
-                          child: _buildChip("No Marking", selectedMarking,
-                              (val) => setState(() => selectedMarking = val)),
+                          child: _buildChip(
+                              "No Marking",
+                              selectedMarking,
+                              (val) =>
+                                  setState(() => selectedMarking = val)),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: _buildChip("Hallmark", selectedMarking,
-                              (val) => setState(() => selectedMarking = val)),
+                          child: _buildChip(
+                              "Hallmark",
+                              selectedMarking,
+                              (val) =>
+                                  setState(() => selectedMarking = val)),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: _buildChip("HUID", selectedMarking,
-                              (val) => setState(() => selectedMarking = val)),
+                          child: _buildChip(
+                              "HUID",
+                              selectedMarking,
+                              (val) =>
+                                  setState(() => selectedMarking = val)),
                         ),
                       ],
                     ),
@@ -705,11 +798,11 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               ),
 
               SizedBox(height: context.getScreenHeight(0.5)),
-
               SizedBox(height: context.getScreenHeight(3)),
             ],
           ),
         ),
+      ),
     );
   }
 
@@ -722,11 +815,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         imageUrl: widget.product!.imageUrl!,
         fit: BoxFit.cover,
         errorWidget: (context, url, error) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted && !_networkImageFailed) {
-              setState(() => _networkImageFailed = true);
-            }
-          });
+          if (mounted && !_networkImageFailed.value) {
+            _networkImageFailed.value = true;
+          }
           return const SizedBox.shrink();
         },
       ),
@@ -735,7 +826,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 10, top: 14),
+      padding: const EdgeInsets.only(bottom: 10, top: 14),
       child: Row(
         children: [
           Container(
@@ -746,7 +837,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             title,
             style: TextStyle(
@@ -764,8 +855,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   Widget _buildCard({required Widget child}) {
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: 8),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -787,7 +878,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   Widget _buildInfoTile(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -838,13 +929,15 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
     bool readOnly = false,
+    // Validator is optional — null means no validation on this field
+    String? Function(String?)? validator,
   }) {
     if (readOnly) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildLabel(label),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             controller.text,
             style: TextStyle(
@@ -861,11 +954,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildLabel(label),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           maxLines: maxLines,
+          validator: validator,
           style: TextStyle(
             fontSize: context.getResponsiveSize(3.3),
             color: AppColors.textDark,
@@ -875,7 +969,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
             isDense: true,
             filled: true,
             fillColor: AppColors.pageBg,
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
@@ -891,6 +986,19 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 width: 1.5,
               ),
             ),
+            // Red border + error text when invalid
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+            ),
+            errorStyle: TextStyle(
+              fontSize: context.getResponsiveSize(2.8),
+              color: Colors.red,
+            ),
           ),
         ),
       ],
@@ -898,22 +1006,26 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   }
 
   Widget _buildImageUploadBox(BuildContext context, int index) {
-    bool hasLocalImage = referenceImages[index] != null;
-    bool hasNetworkImage = _isEditMode && index < _existingImageUrls.length && _existingImageUrls[index].isNotEmpty;
-    bool hasImage = hasLocalImage || hasNetworkImage;
+    final bool hasLocalImage = referenceImages[index] != null;
+    final bool hasNetworkImage = _isEditMode &&
+        index < _existingImageUrls.length &&
+        _existingImageUrls[index].isNotEmpty;
+    final bool hasImage = hasLocalImage || hasNetworkImage;
+    final bool isLoading = _isDownloadingForEdit[index] ||
+        _isMigratingImages[index];
 
     return AspectRatio(
       aspectRatio: 1,
       child: GestureDetector(
-        onTap: hasImage
+        onTap: (hasImage && !isLoading)
             ? () {
                 showImageActionSheet(
                   context,
                   onEdit: () async {
                     if (hasLocalImage) {
-                      // Local image — re-edit from original with previous state
                       final meta = _imageMeta[index];
-                      final originalFile = meta?.originalFile ?? referenceImages[index]!;
+                      final originalFile =
+                          meta?.originalFile ?? referenceImages[index]!;
                       final initialState = meta != null
                           ? CropInitialState(
                               rotationDegrees: meta.lastResult.rotationDegrees,
@@ -935,42 +1047,46 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         });
                       }
                     } else if (hasNetworkImage) {
-                      // Network image — download then crop
-                      final localFile = await downloadNetworkImageToFile(
-                          _existingImageUrls[index]);
-                      if (localFile != null && context.mounted) {
-                        final result = await cropImage(
-                          context,
-                          imageFile: localFile,
-                        );
-                        if (result != null) {
-                          setState(() {
-                            referenceImages[index] = result.file;
-                            _imageMeta[index] = _RefImageMeta(
-                              originalFile: localFile,
-                              lastResult: result,
-                            );
-                            _existingImageUrls[index] = '';
-                            _removeOldImages = true;
-                          });
+                      if (mounted) setState(() => _isDownloadingForEdit[index] = true);
+                      try {
+                        final localFile = await downloadNetworkImageToFile(
+                            _existingImageUrls[index]);
+                        if (localFile != null && context.mounted) {
+                          final result = await cropImage(
+                            context,
+                            imageFile: localFile,
+                          );
+                          if (result != null) {
+                            setState(() {
+                              referenceImages[index] = result.file;
+                              _imageMeta[index] = _RefImageMeta(
+                                originalFile: localFile,
+                                lastResult: result,
+                              );
+                              _existingImageUrls[index] = '';
+                              _removeOldImages = true;
+                            });
+                          }
                         }
+                      } finally {
+                        if (mounted) setState(() => _isDownloadingForEdit[index] = false);
                       }
                     }
                   },
-                  onUpload: () => _showImageSourceActionSheet(context, index),
+                  onUpload: () =>
+                      _showImageSourceActionSheet(context, index),
                   onRemove: () {
-                    setState(() {
-                      if (hasLocalImage) {
-                        referenceImages[index] = null;
-                      } else if (hasNetworkImage) {
-                        _existingImageUrls[index] = '';
-                        _removeOldImages = true;
-                      }
-                    });
+                    if (hasLocalImage) {
+                      setState(() => referenceImages[index] = null);
+                    } else if (hasNetworkImage) {
+                      _migrateRemainingOldImages(excludeIndex: index);
+                    }
                   },
                 );
               }
-            : () => _showImageSourceActionSheet(context, index),
+            : !isLoading
+                ? () => _showImageSourceActionSheet(context, index)
+                : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
@@ -983,95 +1099,103 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               width: hasImage ? 1.5 : 1,
             ),
           ),
-          child: hasLocalImage
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(13),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.file(referenceImages[index]!, fit: BoxFit.cover),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() => referenceImages[index] = null);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+          child: isLoading
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primaryGold,
+                    ),
                   ),
                 )
-              : hasNetworkImage
+              : hasLocalImage
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(13),
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          CachedNetworkImage(
-                            imageUrl: _existingImageUrls[index],
-                            fit: BoxFit.cover,
-                            placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                            errorWidget: (_, _, _) => const RatneshFallback.xs(),
-                          ),
+                          Image.file(referenceImages[index]!,
+                              fit: BoxFit.cover),
                           Positioned(
                             top: 4,
                             right: 4,
                             child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _existingImageUrls[index] = '';
-                                  _removeOldImages = true;
-                                });
-                              },
+                              onTap: () => setState(
+                                  () => referenceImages[index] = null),
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.5),
+                                  color:
+                                      Colors.black.withValues(alpha: 0.5),
                                   shape: BoxShape.circle,
                                 ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
+                                child: const Icon(Icons.close,
+                                    size: 12, color: Colors.white),
                               ),
                             ),
                           ),
                         ],
                       ),
                     )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_photo_alternate_outlined,
-                          color: AppColors.primaryGold.withValues(alpha: 0.6),
-                          size: 24,
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "Add",
-                          style: TextStyle(
-                            color: AppColors.textMuted,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                  : hasNetworkImage
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(13),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: _existingImageUrls[index],
+                                fit: BoxFit.cover,
+                                placeholder: (_, _) => const Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2)),
+                                errorWidget: (_, _, _) =>
+                                    const RatneshFallback.xs(),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _migrateRemainingOldImages(
+                                        excludeIndex: index);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black
+                                          .withValues(alpha: 0.5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.close,
+                                        size: 12, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              color: AppColors.primaryGold
+                                  .withValues(alpha: 0.6),
+                              size: 24,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Add",
+                              style: TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
         ),
       ),
     );
@@ -1082,19 +1206,17 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     String groupValue,
     Function(String) onSelected,
   ) {
-    bool isSelected = label == groupValue;
+    final bool isSelected = label == groupValue;
     return GestureDetector(
       onTap: () => onSelected(label),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryGold : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primaryGold
-                : AppColors.divider,
+            color: isSelected ? AppColors.primaryGold : AppColors.divider,
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected

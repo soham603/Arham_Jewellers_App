@@ -53,7 +53,7 @@ From the sample:
 
 ### 6. `IsStock` Is an Integer, Not Boolean
 
-`IsStock` is `0` (in stock) or `1` (out of stock), not a boolean. The frontend uses `product.rawData?['IsStock'] == 0` for stock checks.
+`IsStock` is `1` (Ready Stock / Available) or `0` (Order Item / Not in stock), not a boolean. The frontend uses `product.rawData?['IsStock'] == 1` for stock checks.
 
 ### 7. `SalesWastagePrc` Is Always `6`
 

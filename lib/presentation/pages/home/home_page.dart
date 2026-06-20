@@ -32,6 +32,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/widgets/custom_divider.dart';
 import '../../../core/widgets/home_search_bar.dart';
+import '../../../core/widgets/nav_bar_spacer.dart';
 import '../../controllers/AuthController.dart';
 
 // Imported the Customise Order Page
@@ -188,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                           child: Row(
                             children: [
                               Expanded(
-                                child: HomeSearchBar(onScannerTap: _openScanner),
+                                child: HomeSearchBar(onScannerTap: _openScanner, categoryController: categoryController),
                               ),
                               SizedBox(width: context.getResponsiveSize(2.5)),
 GestureDetector(
@@ -615,7 +616,7 @@ GestureDetector(
 
                         const CustomiseOrderBanner(),
 
-                        SizedBox(height: context.getScreenHeight(12)),
+                        const NavBarSpacer(),
                       ],
                     ),
                   ),

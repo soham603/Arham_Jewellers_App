@@ -867,9 +867,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     var result = products;
 
     if (_stockFilter == 'ready') {
-      result = result.where((p) => p.rawData?['IsStock'] == 0).toList();
-    } else if (_stockFilter == 'out') {
       result = result.where((p) => p.rawData?['IsStock'] == 1).toList();
+    } else if (_stockFilter == 'out') {
+      result = result.where((p) => p.rawData?['IsStock'] == 0).toList();
     }
 
     if (_weightMin > 0 || _weightMax < _displayedWeightMax) {

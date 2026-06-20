@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/category_picker_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
+import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
@@ -412,7 +413,7 @@ class _SearchPageState extends State<SearchPage> {
                       _level3CategoryResultsSliver(context),
 
                     SliverToBoxAdapter(
-                      child: SizedBox(height: context.getScreenHeight(2)),
+                      child: NavBarSpacer(),
                     ),
                   ],
                 );

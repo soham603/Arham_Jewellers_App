@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -541,7 +542,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       pageKey: "CONTACT",
                     ),
 
-                    SizedBox(height: context.getScreenHeight(12)),
+                    const NavBarSpacer(),
 
                   ],
                 ),

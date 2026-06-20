@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -90,7 +91,7 @@ class _CartPageState extends State<CartPage> {
           context.getResponsiveSize(4),
           context.getScreenHeight(1),
           context.getResponsiveSize(4),
-          context.getScreenHeight(3),
+          NavBarSpacer.heightOf(context),
         ),
         child: Column(
             children: [
