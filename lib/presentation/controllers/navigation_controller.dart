@@ -4,14 +4,30 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+
 
 class NavigationController extends GetxController {
   final selectedIndex = 0.obs;
 
+  late final PageController pageController;
+
   static const int collectionsIndex = 2;
 
   DateTime? _lastBackPress;
+
+  bool _isAnimatingToPage = false;
+
+  @override
+  void onInit() {
+    super.onInit();
+    pageController = PageController(initialPage: 0);
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    super.onClose();
+  }
 
   void switchTab(int index, {bool isAdmin = false}) {
     if (!isAdmin && index == collectionsIndex) {
@@ -22,14 +38,26 @@ class NavigationController extends GetxController {
           ));
       return;
     }
-    final page_index = isAdmin ? index : (index > collectionsIndex ? index - 1 : index);
-    if (page_index == selectedIndex.value) return;
-    selectedIndex.value = page_index;
+    final pageIndex =
+        isAdmin ? index : (index > collectionsIndex ? index - 1 : index);
+    if (pageIndex == selectedIndex.value) return;
+    selectedIndex.value = pageIndex;
+    _isAnimatingToPage = true;
+    pageController.jumpToPage(pageIndex);
+    _isAnimatingToPage = false;
+  }
+
+  void onPageChanged(int index) {
+    if (_isAnimatingToPage) return;
+    selectedIndex.value = index;
   }
 
   void handleBack() {
     if (selectedIndex.value != 0) {
       selectedIndex.value = 0;
+      _isAnimatingToPage = true;
+      pageController.jumpToPage(0);
+      _isAnimatingToPage = false;
       return;
     }
     final now = DateTime.now();

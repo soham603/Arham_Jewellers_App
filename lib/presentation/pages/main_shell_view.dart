@@ -63,7 +63,12 @@ class MainShellView extends GetView<NavigationController> {
         return Scaffold(
           backgroundColor: Colors.white,
           extendBody: true,
-          body: IndexedStack(index: index, children: pages),
+          body: PageView(
+            controller: controller.pageController,
+            onPageChanged: controller.onPageChanged,
+            physics: const NeverScrollableScrollPhysics(),
+            children: pages,
+          ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: navIndex,
             onTap: (i) => controller.switchTab(i, isAdmin: isAdmin),
