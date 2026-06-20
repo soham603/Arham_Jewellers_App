@@ -2139,10 +2139,11 @@ class CustomiseOrderBanner extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1),
+          vertical: context.getScreenHeight(0.5),
         ),
+        padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           gradient: const LinearGradient(
             colors: [
               AppColors.goldGradientLight,
@@ -2154,8 +2155,8 @@ class CustomiseOrderBanner extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: context.colorPalette.goldDeep.withValues(alpha: 0.2),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
           border: Border.all(
@@ -2165,29 +2166,26 @@ class CustomiseOrderBanner extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            
-            // "Bespoke Service" Ribbon (Top Right)
-            
             Positioned(
               top: 0,
               right: 0,
               child: Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(3),
-                  vertical: context.getScreenHeight(0.6),
+                  horizontal: context.getResponsiveSize(2.5),
+                  vertical: context.getScreenHeight(0.4),
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.goldDeep,
                   borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(12),
+                    topRight: Radius.circular(16),
+                    bottomLeft: Radius.circular(10),
                   ),
                 ),
                 child: Text(
                   "Bespoke Service",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: context.responsiveFont(10),
+                    fontSize: context.responsiveFont(9),
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
@@ -2195,136 +2193,122 @@ class CustomiseOrderBanner extends StatelessWidget {
               ),
             ),
 
-            
-            // Main Content Layout
-            
-            Padding(
-              padding: EdgeInsets.all(context.getResponsiveSize(5)),
-              child: Row(
-                children: [
-                  // Left Side: Text Content
-                  Expanded(
-                    flex: 6,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Overline Text
-                        Text(
-                          "BRING IDEAS TO LIFE",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: context.responsiveFont(11),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                          ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 6,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "BRING IDEAS TO LIFE",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: context.responsiveFont(9),
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
                         ),
-                        SizedBox(height: context.getScreenHeight(1)),
+                      ),
+                      SizedBox(height: context.getScreenHeight(0.5)),
 
-                        // Main Headlines
-                        Text(
-                          "Craft Your",
-                          style: TextStyle(
-                            color: const Color(
-                              0xFF3E2723,
-                            ), // Deep Espresso Brown
-                            fontSize: context.responsiveFont(22),
-                            fontWeight: FontWeight.w900,
-                            height: 1.1,
-                          ),
+                      Text(
+                        "Craft Your",
+                        style: TextStyle(
+                          color: const Color(0xFF3E2723),
+                          fontSize: context.responsiveFont(18),
+                          fontWeight: FontWeight.w900,
+                          height: 1.1,
                         ),
-                        Text(
-                          "Dream Jewelry",
-                          style: TextStyle(
-                            color: AppColors.deepEspresso.withValues(alpha: 0.8),
-                            fontSize: context.responsiveFont(16),
-                            fontWeight: FontWeight.w700,
-                          ),
+                      ),
+                      Text(
+                        "Dream Jewelry",
+                        style: TextStyle(
+                          color: AppColors.deepEspresso.withValues(alpha: 0.8),
+                          fontSize: context.responsiveFont(14),
+                          fontWeight: FontWeight.w700,
                         ),
+                      ),
 
-                        SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.getScreenHeight(0.8)),
 
-                        // Feature Bullet Points
-                        Row(
-                          children: [
-                            _buildBulletDot(context),
-                            _buildFeatureText(context, "Imagine"),
-                            _buildBulletDot(context),
-                            _buildFeatureText(context, "Upload"),
-                            _buildBulletDot(context),
-                            _buildFeatureText(context, "Craft"),
+                      Row(
+                        children: [
+                          _buildBulletDot(context),
+                          _buildFeatureText(context, "Imagine"),
+                          _buildBulletDot(context),
+                          _buildFeatureText(context, "Upload"),
+                          _buildBulletDot(context),
+                          _buildFeatureText(context, "Craft"),
+                        ],
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(0.8)),
+
+                      Text(
+                        "Turn your unique inspirations into stunning gold masterpieces.",
+                        style: TextStyle(
+                          color: AppColors.espressoMuted,
+                          fontSize: context.responsiveFont(10),
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                        ),
+                      ),
+
+                      SizedBox(height: context.getScreenHeight(1.2)),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(3),
+                          vertical: context.getScreenHeight(0.6),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: context.colorPalette.gold.withValues(alpha: 0.5),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.colorPalette.gold.withValues(alpha: 0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
                           ],
                         ),
-
-                        SizedBox(height: context.getScreenHeight(1.5)),
-
-                        // Tagline
-                        Text(
-                          "Turn your unique inspirations into stunning gold masterpieces.",
-                          style: TextStyle(
-                            color: AppColors.espressoMuted,
-                            fontSize: context.responsiveFont(11),
-                            fontWeight: FontWeight.w600,
-                            height: 1.3,
-                          ),
-                        ),
-
-                        SizedBox(height: context.getScreenHeight(2)),
-
-                        // CTA Button
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.getResponsiveSize(3.5),
-                            vertical: context.getScreenHeight(0.8),
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: context.colorPalette.gold.withValues(alpha: 0.5),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: context.colorPalette.gold.withValues(
-                                  alpha: 0.1,
-                                ),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "Start Designing",
-                                style: TextStyle(
-                                  color: context.colorPalette.goldDeep,
-                                  fontSize: context.responsiveFont(12),
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              SizedBox(width: context.getResponsiveSize(1.5)),
-                              Icon(
-                                Icons.arrow_forward_rounded,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Start Designing",
+                              style: TextStyle(
                                 color: context.colorPalette.goldDeep,
-                                size: context.responsiveWidth(14, tabletVal: 18),
+                                fontSize: context.responsiveFont(11),
+                                fontWeight: FontWeight.w900,
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(1)),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: context.colorPalette.goldDeep,
+                              size: context.responsiveWidth(12, tabletVal: 16),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  // Right Side: Bespoke Icon
-                  Expanded(
-                    flex: 4,
+                Expanded(
+                  flex: 4,
+                  child: Center(
                     child: Container(
-                      height: context.responsiveWidth(120, tabletVal: 160),
+                      width: context.responsiveWidth(80, tabletVal: 120),
+                      height: context.responsiveWidth(80, tabletVal: 120),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.7),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
+                        border: Border.all(color: Colors.white, width: 1.5),
                       ),
                       child: Center(
                         child: ClipOval(
@@ -2335,29 +2319,28 @@ class CustomiseOrderBanner extends StatelessWidget {
                             ),
                             child: Image.asset(
                               'assets/images/bespoke-icon.png',
-                              width: context.responsiveWidth(80, tabletVal: 100),
-                              height: context.responsiveWidth(80, tabletVal: 100),
+                              width: context.responsiveWidth(50, tabletVal: 75),
+                              height: context.responsiveWidth(50, tabletVal: 75),
                               fit: BoxFit.contain,
                             ),
                           ),
                         ),
                       ),
                     ),
-                   ),
-                 ],
-               ),
-             ),
-           ],
-         ),
-       ),
-     );
-   }
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  // --- Helper Widgets for the UI ---
   Widget _buildBulletDot(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Icon(Icons.circle, size: context.responsiveWidth(4, tabletVal: 5), color: AppColors.deepEspresso),
+      padding: const EdgeInsets.symmetric(horizontal: 3.0),
+      child: Icon(Icons.circle, size: context.responsiveWidth(3, tabletVal: 4), color: AppColors.deepEspresso),
     );
   }
 
@@ -2366,7 +2349,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       text,
       style: TextStyle(
         color: AppColors.deepEspresso,
-        fontSize: context.responsiveFont(10),
+        fontSize: context.responsiveFont(9),
         fontWeight: FontWeight.w800,
       ),
     );

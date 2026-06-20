@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
@@ -57,14 +58,24 @@ class CategoryManagerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAll();
   }
 
-  // ── Fetch ALL categories in one call 
+  // ── Fetch ALL categories — reuses tree from CategoryController
   Future<void> fetchAll({bool force = false}) async {
     if (!force && _allCategories.isNotEmpty) return;
     _loading.value = true;
     try {
+      if (!force) {
+        // Reuse tree already fetched on app build
+        final catCtrl = Get.isRegistered<CategoryController>()
+            ? CategoryController.instance
+            : null;
+        if (catCtrl != null && catCtrl.hasTreeData) {
+          _allCategories.value = catCtrl.allCategoriesFlat;
+          return;
+        }
+      }
+      // Force refresh or tree not available: fetch directly
       final data = await _categoryRepo.fetchCategories(
         queryParams: {"full": true},
       );

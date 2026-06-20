@@ -4,13 +4,12 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserController.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/admin/adminProductController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 
@@ -27,7 +26,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
   bool _isGridView = true;
 
   late final AdminOrderController _adminOrderController;
-  late final AdminProductController _adminProductController;
   late final AdminUserController _adminUserController;
   late final GoldRateController _goldRateController;
 
@@ -37,9 +35,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController());
-    _adminProductController = Get.isRegistered<AdminProductController>()
-        ? Get.find<AdminProductController>()
-        : Get.put(AdminProductController());
     _adminUserController = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());
@@ -292,8 +287,11 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                   context,
                   icon: Icons.production_quantity_limits_rounded,
                   title: "Products",
-                  subtitle: "Manage products",
-                  onTap: () => Get.to(() => AdminProductScreen()),
+                  subtitle: "Browse & edit products",
+                  onTap: () {
+                    Get.find<NavigationController>().switchTab(1, isAdmin: true);
+                    Get.back();
+                  },
                 ),
                 _staffTile(
                   context,
@@ -354,7 +352,10 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
         _ManagementItem(Icons.inventory_2_rounded, "Approve Orders",
             "Verify orders", () => Get.to(() => const ApproveOrdersScreen())),
         _ManagementItem(Icons.production_quantity_limits_rounded, "Products",
-            "Manage products", () => Get.to(() => AdminProductScreen())),
+            "Browse & edit products", () {
+          Get.find<NavigationController>().switchTab(1, isAdmin: true);
+          Get.back();
+        }),
         _ManagementItem(Icons.category_rounded, "Categories",
             "Manage categories", () => Get.to(() => CategoryManagerScreen())),
         _ManagementItem(Icons.view_carousel_rounded, "Carousel",
@@ -370,7 +371,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     final pendingOrdersCount = _adminOrderController.orders
         .where((o) => o.status.toUpperCase() == 'PENDING')
         .length;
-    final totalProducts = _adminProductController.total;
     final pendingUsersCount = _adminUserController.total;
     final currentGoldRate = _goldRateController.currentRate?.rate;
 
@@ -380,12 +380,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
         label: 'Pending Orders',
         value: '$pendingOrdersCount',
         color: const Color(0xFFF59E0B),
-      ),
-      StatData(
-        icon: Icons.inventory_rounded,
-        label: 'Total Products',
-        value: '$totalProducts',
-        color: const Color(0xFF3B82F6),
       ),
       StatData(
         icon: Icons.people_rounded,

@@ -10,6 +10,7 @@ class RatneshGoldApp extends StatefulWidget {
   const RatneshGoldApp({super.key});
 
   static const String screenshotProtectionKey = 'screenshot_protection_enabled';
+  static const String screenshotProtectionExpiryKey = 'screenshot_protection_expiry';
 
   static Future<bool> isScreenshotProtectionEnabled() async {
     final prefs = await SharedPreferences.getInstance();
@@ -20,9 +21,32 @@ class RatneshGoldApp extends StatefulWidget {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(screenshotProtectionKey, enabled);
     if (enabled) {
+      await prefs.remove(screenshotProtectionExpiryKey);
       await NoScreenshot.instance.screenshotOff();
     } else {
       await NoScreenshot.instance.screenshotOn();
+    }
+  }
+
+  static Future<void> setScreenshotProtectionDisabledWithDuration(Duration duration) async {
+    final prefs = await SharedPreferences.getInstance();
+    final expiryTime = DateTime.now().add(duration).millisecondsSinceEpoch;
+    await prefs.setBool(screenshotProtectionKey, false);
+    await prefs.setInt(screenshotProtectionExpiryKey, expiryTime);
+    await NoScreenshot.instance.screenshotOn();
+  }
+
+  static Future<void> checkAndReenableScreenshotProtection() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool(screenshotProtectionKey) ?? true;
+    if (enabled) return;
+
+    final expiryTimestamp = prefs.getInt(screenshotProtectionExpiryKey);
+    if (expiryTimestamp == null) return;
+
+    final expiryTime = DateTime.fromMillisecondsSinceEpoch(expiryTimestamp);
+    if (DateTime.now().isAfter(expiryTime)) {
+      await setScreenshotProtectionEnabled(true);
     }
   }
 
@@ -38,6 +62,7 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> {
   }
 
   Future<void> _initScreenshotProtection() async {
+    await RatneshGoldApp.checkAndReenableScreenshotProtection();
     final enabled = await RatneshGoldApp.isScreenshotProtectionEnabled();
     if (enabled) {
       await NoScreenshot.instance.screenshotOff();

@@ -127,6 +127,10 @@ class CategoryController extends GetxController {
   bool _treeHasFullData = false;
   bool _isInitialized = false;
 
+  // Flat list of all categories from tree, for admin reuse
+  List<CategoryModel> _allCategoriesFlat = [];
+  List<CategoryModel> get allCategoriesFlat => _allCategoriesFlat;
+
   @override
   void onInit() {
     super.onInit();
@@ -160,9 +164,18 @@ class CategoryController extends GetxController {
     _treeFetchFuture = null;
   }
 
+  bool get hasTreeData => _treeHasFullData;
+
   Future<void> _doFetchCategoryTree() async {
     try {
       final results = await _categoryRepo.fetchCategoryTree();
+
+      // Build flat list from tree for admin reuse
+      final flat = <CategoryModel>[];
+      for (final item in results) {
+        _flattenTreeNode(item, flat);
+      }
+      _allCategoriesFlat = flat;
 
       for (final item in results) {
         final karatCat = CategoryModel.fromJson(item);
@@ -194,6 +207,14 @@ class CategoryController extends GetxController {
       _k20State.value = CurrentAppState.ERROR;
       _k22State.value = CurrentAppState.ERROR;
       Logger.error('CategoryController', 'fetchCategoryTree error: $e\n$st');
+    }
+  }
+
+  void _flattenTreeNode(dynamic node, List<CategoryModel> flat) {
+    flat.add(CategoryModel.fromJson(node));
+    final children = node['children'] as List? ?? [];
+    for (final child in children) {
+      _flattenTreeNode(child, flat);
     }
   }
 

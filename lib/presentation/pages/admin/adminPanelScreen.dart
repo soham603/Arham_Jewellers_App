@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserControl
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserManagementController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
@@ -14,7 +15,6 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/notificationManagerScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/productManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -279,8 +279,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   context,
                   icon: Icons.production_quantity_limits_rounded,
                   title: "Products",
-                  subtitle: "Manage products",
-                  onTap: () => Get.to(() => AdminProductScreen()),
+                  subtitle: "Browse & edit products",
+                  onTap: () {
+                    Get.find<NavigationController>().switchTab(1, isAdmin: true);
+                    Get.back();
+                  },
                 ),
                 _adminTile(
                   context,
@@ -310,31 +313,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Set daily rate",
                   onTap: () => Get.to(() => const GoldRateScreen()),
                 ),
-                _adminTile(
-                  context,
-                  icon: Icons.notifications_active_rounded,
-                  title: "Notifications",
-                  subtitle: "Send & history",
-                  onTap: () => Get.to(() => const NotificationManagerScreen()),
-                ),
-
-                _adminTile(
-                  context,
-                  icon: Icons.play_circle_outline_rounded,
-                  title: "View Splash",
-                  subtitle: "Preview splash screen",
-                  onTap: () => Get.to(() => const SplashPage()),
-                ),
-
-                // ── Temporary: Toast Test ──
-                _adminTile(
-                  context,
-                  icon: Icons.notifications_active_rounded,
-                  title: "Test Toast",
-                  subtitle: "Preview toasts",
-                  onTap: () => _showToastTestSheet(context),
-                ),
-
                 // ── Screenshot Protection Toggle ──
                 _screenshotProtectionTile(context),
               ],
@@ -374,7 +352,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         _ManagementItem(Icons.category_rounded, "Categories",
             "Manage categories", () => Get.to(() => CategoryManagerScreen())),
         _ManagementItem(Icons.production_quantity_limits_rounded, "Products",
-            "Manage products", () => Get.to(() => AdminProductScreen())),
+            "Browse & edit products", () {
+          Get.find<NavigationController>().switchTab(1, isAdmin: true);
+          Get.back();
+        }),
         _ManagementItem(Icons.view_carousel_rounded, "Carousel",
             "Manage banners", () => Get.to(() => CarouselManagerScreen())),
         _ManagementItem(Icons.text_snippet_rounded, "Ancillary Data",
@@ -384,12 +365,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             "Change requests", () => Get.to(() => const HandsetChangeScreen())),
         _ManagementItem(Icons.monetization_on_rounded, "Gold Rate",
             "Set daily rate", () => Get.to(() => const GoldRateScreen())),
-        _ManagementItem(Icons.notifications_active_rounded, "Notifications",
-            "Send & history", () => Get.to(() => const NotificationManagerScreen())),
-        _ManagementItem(Icons.play_circle_outline_rounded, "View Splash",
-            "Preview splash screen", () => Get.to(() => const SplashPage())),
-        _ManagementItem(Icons.notifications_active_rounded, "Test Toast",
-            "Preview toasts", () => _showToastTestSheet(context)),
       ];
 
   Widget _adminListTile(
@@ -720,14 +695,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
 
   Widget _screenshotProtectionTile(BuildContext context) {
     return GestureDetector(
-      onTap: () async {
-        final newValue = !_screenshotProtectionEnabled;
-        await RatneshGoldApp.setScreenshotProtectionEnabled(newValue);
-        setState(() => _screenshotProtectionEnabled = newValue);
-        ToastUtils.showSuccess(
-          newValue ? 'Screenshot protection enabled' : 'Screenshot protection disabled',
-          title: 'Screenshot Setting',
-        );
+      onTap: () {
+        if (_screenshotProtectionEnabled) {
+          _showDisableDurationDialog(context);
+        } else {
+          _toggleScreenshotProtection(context, true);
+        }
       },
       child: Container(
         padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -776,13 +749,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             SizedBox(height: context.getScreenHeight(0.4)),
             Switch(
               value: _screenshotProtectionEnabled,
-              onChanged: (value) async {
-                await RatneshGoldApp.setScreenshotProtectionEnabled(value);
-                setState(() => _screenshotProtectionEnabled = value);
-                ToastUtils.showSuccess(
-                  value ? 'Screenshot protection enabled' : 'Screenshot protection disabled',
-                  title: 'Screenshot Setting',
-                );
+              onChanged: (value) {
+                if (!value) {
+                  _showDisableDurationDialog(context);
+                } else {
+                  _toggleScreenshotProtection(context, true);
+                }
               },
               activeThumbColor: const Color(0xFFEF4444),
               inactiveThumbColor: const Color(0xFF2E7D32),
@@ -790,6 +762,249 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _toggleScreenshotProtection(BuildContext context, bool enable, {Duration? duration}) async {
+    if (enable) {
+      await RatneshGoldApp.setScreenshotProtectionEnabled(true);
+    } else {
+      await RatneshGoldApp.setScreenshotProtectionDisabledWithDuration(duration!);
+    }
+    setState(() => _screenshotProtectionEnabled = enable);
+    ToastUtils.showSuccess(
+      enable ? 'Screenshot protection enabled' : 'Screenshot protection disabled',
+      title: 'Screenshot Setting',
+    );
+  }
+
+  void _showDisableDurationDialog(BuildContext context) {
+    int selectedHours = 0;
+    int selectedMinutes = 30;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: context.colorPalette.backgroundColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.screenshot_rounded, color: Color(0xFFEF4444), size: 20),
+                  ),
+                  SizedBox(width: context.getResponsiveSize(2)),
+                  Expanded(
+                    child: Text(
+                      'Disable Screenshot Protection',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(4.5),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'For how long do you want to disable screenshot protection?',
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.8),
+                      color: context.colorPalette.textColor,
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(2)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Hours',
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.2),
+                                fontWeight: FontWeight.w600,
+                                color: context.colorPalette.subTitleColor,
+                              ),
+                            ),
+                            SizedBox(height: context.getScreenHeight(0.5)),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFE7DED2)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      iconSize: 22,
+                                      icon: const Icon(Icons.remove_circle_outline, color: Color(0xFF8B7355)),
+                                      onPressed: selectedHours > 0
+                                          ? () => setDialogState(() => selectedHours--)
+                                          : null,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      '$selectedHours',
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: context.getResponsiveSize(4.5),
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textDark,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      iconSize: 22,
+                                      icon: const Icon(Icons.add_circle_outline, color: Color(0xFF8B7355)),
+                                      onPressed: selectedHours < 23
+                                          ? () => setDialogState(() => selectedHours++)
+                                          : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: context.getScreenWidth(3)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Minutes',
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.2),
+                                fontWeight: FontWeight.w600,
+                                color: context.colorPalette.subTitleColor,
+                              ),
+                            ),
+                            SizedBox(height: context.getScreenHeight(0.5)),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFE7DED2)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      iconSize: 22,
+                                      icon: const Icon(Icons.remove_circle_outline, color: Color(0xFF8B7355)),
+                                      onPressed: selectedMinutes > 0
+                                          ? () => setDialogState(() => selectedMinutes = (selectedMinutes - 5) % 60)
+                                          : null,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      '$selectedMinutes',
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: context.getResponsiveSize(4.5),
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.textDark,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      iconSize: 22,
+                                      icon: const Icon(Icons.add_circle_outline, color: Color(0xFF8B7355)),
+                                      onPressed: selectedMinutes < 55
+                                          ? () => setDialogState(() => selectedMinutes = (selectedMinutes + 5) % 60)
+                                          : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.getScreenHeight(1.5)),
+                  Container(
+                    padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Color(0xFFEF4444), size: 18),
+                        SizedBox(width: context.getResponsiveSize(2)),
+                        Expanded(
+                          child: Text(
+                            'Protection will auto-enable after the selected duration',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(3),
+                              color: const Color(0xFFEF4444),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor)),
+                ),
+                ElevatedButton(
+                  onPressed: (selectedHours == 0 && selectedMinutes == 0)
+                      ? null
+                      : () {
+                          Navigator.of(dialogContext).pop();
+                          final duration = Duration(hours: selectedHours, minutes: selectedMinutes);
+                          _toggleScreenshotProtection(context, false, duration: duration);
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFEF4444),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('Disable', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

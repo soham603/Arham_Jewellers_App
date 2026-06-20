@@ -36,6 +36,7 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
     ctrl = Get.isRegistered<CategoryManagerController>()
         ? Get.find<CategoryManagerController>()
         : Get.put(CategoryManagerController());
+    ctrl.fetchAll();
     _tabController = TabController(length: 2, vsync: this);
   }
 

@@ -15,6 +15,7 @@ import 'package:shimmer/shimmer.dart';
 
 // Import your new Customise Order Page here
 import 'customise_order_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/product_edit_page.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   const ProductDetailsPage({
@@ -267,6 +268,32 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
 
+      floatingActionButton: Get.find<AuthController>().isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductEditPage(product: _currentProduct),
+                  ),
+                );
+                if (result == true && mounted) {
+                  setState(() {});
+                }
+              },
+              backgroundColor: AppColors.primaryGold,
+              icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+              label: Text(
+                'Edit',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: context.getResponsiveSize(3.5),
+                ),
+              ),
+            )
+          : null,
+
       
       // PREMIUM BOTTOM ACTION BAR
       
@@ -435,7 +462,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           children: [
             // --- 1. Image Section (scrolls with content) ---
             SizedBox(
-              height: context.getScreenHeight(55),
+              height: context.getScreenHeight(65),
               width: double.infinity,
               child: Stack(
                 children: [
@@ -612,16 +639,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 topRight: Radius.circular(20),
                                 bottomRight: Radius.circular(20),
                               ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(3, 3),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            "Net Wt.: $netWeight g",
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(3, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "Net Wt.: $netWeight g",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: context.getResponsiveSize(3.2),
@@ -683,87 +710,89 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Product Title
-                  Text(
-                    product.name
-                        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                        .replaceAll(
-                          RegExp(r'collection', caseSensitive: false),
-                          '',
-                        )
-                        .trim()
-                        .toUpperCase(),
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(5.5),
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF2C3E50),
-                      height: 1.2,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-
-                  SizedBox(height: context.getScreenHeight(0.3)),
-
-                  // Tag Number
-                  Text(
-                    "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.2),
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  SizedBox(height: context.getScreenHeight(1)),
-
-                  // Price
-                  if (price != null &&
-                      (Get.find<AuthController>().user?.isRetailer ==
-                              true ||
-                          Get.find<AuthController>().isAdmin))
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getResponsiveSize(4),
-                        vertical: context.getScreenHeight(0.8),
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            AppColors.primaryGold.withValues(alpha: 0.1),
-                            AppColors.primaryGold.withValues(alpha: 0.05),
+                  // Product Title & Price Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name
+                                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
+                                  .replaceAll(
+                                    RegExp(r'collection', caseSensitive: false),
+                                    '',
+                                  )
+                                  .trim()
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(5.5),
+                                fontWeight: FontWeight.w900,
+                                color: const Color(0xFF2C3E50),
+                                height: 1.2,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(height: context.getScreenHeight(0.3)),
+                            Text(
+                              "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.2),
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primaryGold.withValues(alpha: 0.2),
                         ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "PRICE",
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(2.2),
-                              color: Colors.grey.shade500,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.5,
+                      if (price != null &&
+                          (Get.find<AuthController>().user?.isRetailer == true ||
+                              Get.find<AuthController>().isAdmin))
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.getResponsiveSize(4),
+                            vertical: context.getScreenHeight(0.8),
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.primaryGold.withValues(alpha: 0.1),
+                                AppColors.primaryGold.withValues(alpha: 0.05),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.primaryGold.withValues(alpha: 0.2),
                             ),
                           ),
-                          Text(
-                            _formatPrice(price),
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(6),
-                              color: AppColors.primaryGold,
-                              fontWeight: FontWeight.w900,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "PRICE",
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.2),
+                                  color: Colors.grey.shade500,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              Text(
+                                _formatPrice(price),
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(5),
+                                  color: AppColors.primaryGold,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                    ],
+                  ),
 
                   SizedBox(height: context.getScreenHeight(1.5)),
 
