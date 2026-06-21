@@ -74,9 +74,36 @@ class SearchProductController extends GetxController {
   CurrentAppState get karatState => _karatState.value;
 
   List<String> _currentKarats = [];
-  int _karatPage = 1;
   bool _karatHasMore = true;
   bool get karatHasMore => _karatHasMore;
+
+  final _karatReadyProducts = <ProductModel>[].obs;
+  final _karatOutProducts = <ProductModel>[].obs;
+  final _karatAllProducts = <ProductModel>[].obs;
+
+  final _karatReadyState = CurrentAppState.INITIAL.obs;
+  final _karatOutState = CurrentAppState.INITIAL.obs;
+  final _karatAllState = CurrentAppState.INITIAL.obs;
+
+  int _karatReadyPage = 1;
+  int _karatOutPage = 1;
+  int _karatAllPage = 1;
+
+  bool _karatReadyHasMore = true;
+  bool _karatOutHasMore = true;
+  bool _karatAllHasMore = true;
+
+  List<ProductModel> get karatReadyProducts => _karatReadyProducts;
+  List<ProductModel> get karatOutProducts => _karatOutProducts;
+  List<ProductModel> get karatAllProducts => _karatAllProducts;
+
+  CurrentAppState get karatReadyState => _karatReadyState.value;
+  CurrentAppState get karatOutState => _karatOutState.value;
+  CurrentAppState get karatAllState => _karatAllState.value;
+
+  bool get karatReadyHasMore => _karatReadyHasMore;
+  bool get karatOutHasMore => _karatOutHasMore;
+  bool get karatAllHasMore => _karatAllHasMore;
 
   final _categoryProducts = <ProductModel>[].obs;
   List<ProductModel> get categoryProducts => _categoryProducts;
@@ -84,17 +111,73 @@ class SearchProductController extends GetxController {
   final _categoryState = CurrentAppState.INITIAL.obs;
   CurrentAppState get categoryState => _categoryState.value;
 
+  final _categoryReadyProducts = <ProductModel>[].obs;
+  final _categoryOutProducts = <ProductModel>[].obs;
+  final _categoryAllProducts = <ProductModel>[].obs;
+
+  final _categoryReadyState = CurrentAppState.INITIAL.obs;
+  final _categoryOutState = CurrentAppState.INITIAL.obs;
+  final _categoryAllState = CurrentAppState.INITIAL.obs;
+
+  bool _categoryReadyHasMore = true;
+  bool _categoryOutHasMore = true;
+  bool _categoryAllHasMore = true;
+
+  List<ProductModel> get categoryReadyProducts => _categoryReadyProducts;
+  List<ProductModel> get categoryOutProducts => _categoryOutProducts;
+  List<ProductModel> get categoryAllProducts => _categoryAllProducts;
+
+  CurrentAppState get categoryReadyState => _categoryReadyState.value;
+  CurrentAppState get categoryOutState => _categoryOutState.value;
+  CurrentAppState get categoryAllState => _categoryAllState.value;
+
+  bool get categoryReadyHasMore => _categoryReadyHasMore;
+  bool get categoryOutHasMore => _categoryOutHasMore;
+  bool get categoryAllHasMore => _categoryAllHasMore;
+
   final _filteredProducts = <ProductModel>[].obs;
   List<ProductModel> get filteredProducts => _filteredProducts;
 
   final _filteredState = CurrentAppState.INITIAL.obs;
   CurrentAppState get filteredState => _filteredState.value;
 
-  int _filteredPage = 1;
   bool _filteredHasMore = true;
   bool get filteredHasMore => _filteredHasMore;
-  String? _currentFilterCategoryId;
-  String? _currentFilterKarat;
+
+  final _filteredReadyProducts = <ProductModel>[].obs;
+  final _filteredOutProducts = <ProductModel>[].obs;
+  final _filteredAllProducts = <ProductModel>[].obs;
+
+  final _filteredReadyState = CurrentAppState.INITIAL.obs;
+  final _filteredOutState = CurrentAppState.INITIAL.obs;
+  final _filteredAllState = CurrentAppState.INITIAL.obs;
+
+  int _filteredReadyPage = 1;
+  int _filteredOutPage = 1;
+  int _filteredAllPage = 1;
+
+  bool _filteredReadyHasMore = true;
+  bool _filteredOutHasMore = true;
+  bool _filteredAllHasMore = true;
+
+  String? _currentFilterCategoryIdForReady;
+  String? _currentFilterKaratForReady;
+  String? _currentFilterCategoryIdForOut;
+  String? _currentFilterKaratForOut;
+  String? _currentFilterCategoryIdForAll;
+  String? _currentFilterKaratForAll;
+
+  List<ProductModel> get filteredReadyProducts => _filteredReadyProducts;
+  List<ProductModel> get filteredOutProducts => _filteredOutProducts;
+  List<ProductModel> get filteredAllProducts => _filteredAllProducts;
+
+  CurrentAppState get filteredReadyState => _filteredReadyState.value;
+  CurrentAppState get filteredOutState => _filteredOutState.value;
+  CurrentAppState get filteredAllState => _filteredAllState.value;
+
+  bool get filteredReadyHasMore => _filteredReadyHasMore;
+  bool get filteredOutHasMore => _filteredOutHasMore;
+  bool get filteredAllHasMore => _filteredAllHasMore;
 
   List<String> get selectedKarats => filterState.selectedKaratsValue;
   String? get selectedCategoryId => filterState.selectedCategoryIdValue;
@@ -540,31 +623,61 @@ class SearchProductController extends GetxController {
     }
   }
 
+  Map<String, int>? _stockQueryParam(String? stockFilter) {
+    if (stockFilter == 'ready') return {"isStock": 1};
+    if (stockFilter == 'out') return {"isStock": 0};
+    return null;
+  }
+
   Future<void> loadProductsByKarats(
     List<String> karats, {
     bool isPagination = false,
+    String? stockFilter,
   }) async {
-    if (!_karatHasMore && isPagination) return;
-    if (_karatState.value == CurrentAppState.LOADING) return;
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
 
-    _karatState.value = CurrentAppState.LOADING;
+    final page = isReady ? _karatReadyPage : isOut ? _karatOutPage : _karatAllPage;
+    final hasMore = isReady ? _karatReadyHasMore : isOut ? _karatOutHasMore : _karatAllHasMore;
+    final state = isReady ? _karatReadyState : isOut ? _karatOutState : _karatAllState;
+
+    if (!hasMore && isPagination) return;
+    if (state.value == CurrentAppState.LOADING) return;
+
+    state.value = CurrentAppState.LOADING;
+
+    int currentPage = page;
+    bool currentHasMore = hasMore;
 
     if (!isPagination) {
-      _currentKarats = karats;
-      _karatPage = 1;
-      _karatHasMore = true;
-      _karatProducts.clear();
+      currentPage = 1;
+      currentHasMore = true;
+      if (isReady) {
+        _karatReadyPage = 1;
+        _karatReadyHasMore = true;
+        _karatReadyProducts.clear();
+      } else if (isOut) {
+        _karatOutPage = 1;
+        _karatOutHasMore = true;
+        _karatOutProducts.clear();
+      } else {
+        _karatAllPage = 1;
+        _karatAllHasMore = true;
+        _karatAllProducts.clear();
+      }
     }
 
     try {
+      final stockParam = _stockQueryParam(stockFilter);
       final karatFutures = karats.map((karat) async {
         try {
           final response = await httpClient.get(
             "/api/v1/products/search",
             queryParameters: {
               "search": _karatToSearchValue(karat),
-              "page": _karatPage,
+              "page": currentPage,
               "limit": _pageLimit,
+              if (stockParam != null) ...stockParam,
             },
           );
 
@@ -582,23 +695,39 @@ class SearchProductController extends GetxController {
         return <ProductModel>[];
       });
       final results = await Future.wait(karatFutures);
-      final allFetched = _dedupe(results.expand((list) => list).toList(), _karatProducts);
+      final existing = isReady
+          ? _karatReadyProducts
+          : isOut
+              ? _karatOutProducts
+              : _karatAllProducts;
+      final allFetched = _dedupe(results.expand((list) => list).toList(), existing);
 
       if (isPagination) {
-        _karatProducts.addAll(allFetched);
+        existing.addAll(allFetched);
       } else {
-        _karatProducts.value = allFetched;
+        existing.value = allFetched;
       }
 
       if (allFetched.length < _pageLimit * karats.length) {
-        _karatHasMore = false;
+        currentHasMore = false;
       } else {
-        _karatPage++;
+        currentPage++;
       }
 
-      _karatState.value = CurrentAppState.SUCCESS;
+      if (isReady) {
+        _karatReadyHasMore = currentHasMore;
+        _karatReadyPage = currentPage;
+      } else if (isOut) {
+        _karatOutHasMore = currentHasMore;
+        _karatOutPage = currentPage;
+      } else {
+        _karatAllHasMore = currentHasMore;
+        _karatAllPage = currentPage;
+      }
+
+      state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
-      _karatState.value = CurrentAppState.ERROR;
+      state.value = CurrentAppState.ERROR;
       Logger.error(
         "SearchProductController",
         "loadProductsByKarats error: $e\n$st",
@@ -606,16 +735,27 @@ class SearchProductController extends GetxController {
     }
   }
 
-  void loadMoreKaratProducts() {
-    if (!_karatHasMore || _karatState.value == CurrentAppState.LOADING) return;
-    loadProductsByKarats(_currentKarats, isPagination: true);
+  void loadMoreKaratProducts({String? stockFilter}) {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+    final hasMore = isReady ? _karatReadyHasMore : isOut ? _karatOutHasMore : _karatAllHasMore;
+    final state = isReady ? _karatReadyState : isOut ? _karatOutState : _karatAllState;
+    if (!hasMore || state.value == CurrentAppState.LOADING) return;
+    loadProductsByKarats(_currentKarats, isPagination: true, stockFilter: stockFilter);
   }
 
-  Future<void> loadProductsByCategory(String categoryId) async {
-    _categoryState.value = CurrentAppState.LOADING;
-    _categoryProducts.clear();
+  Future<void> loadProductsByCategory(String categoryId, {String? stockFilter}) async {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+
+    final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
+    final existing = isReady ? _categoryReadyProducts : isOut ? _categoryOutProducts : _categoryAllProducts;
+
+    state.value = CurrentAppState.LOADING;
+    existing.clear();
 
     try {
+      final stockParam = _stockQueryParam(stockFilter);
       final response = await httpClient.get(
         "/api/v1/products/get-all",
         queryParameters: {
@@ -623,20 +763,20 @@ class SearchProductController extends GetxController {
           "page": 1,
           "limit": _pageLimit,
           "showReverse": true,
+          if (stockParam != null) ...stockParam,
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
-        _categoryProducts.value =
-            raw.map((e) => ProductModel.fromJson(e)).toList();
-        _categoryState.value = CurrentAppState.SUCCESS;
+        existing.value = raw.map((e) => ProductModel.fromJson(e)).toList();
+        state.value = CurrentAppState.SUCCESS;
       } else {
-        _categoryState.value = CurrentAppState.ERROR;
+        state.value = CurrentAppState.ERROR;
       }
     } catch (e, st) {
-      _categoryState.value = CurrentAppState.ERROR;
+      state.value = CurrentAppState.ERROR;
       Logger.error(
         "SearchProductController",
         "loadProductsByCategory error: $e\n$st",
@@ -649,11 +789,18 @@ class SearchProductController extends GetxController {
     _categoryState.value = CurrentAppState.INITIAL;
   }
 
-  Future<void> loadProductsByMultipleCategories(List<String> categoryIds) async {
-    _categoryState.value = CurrentAppState.LOADING;
-    _categoryProducts.clear();
+  Future<void> loadProductsByMultipleCategories(List<String> categoryIds, {String? stockFilter}) async {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+
+    final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
+    final existing = isReady ? _categoryReadyProducts : isOut ? _categoryOutProducts : _categoryAllProducts;
+
+    state.value = CurrentAppState.LOADING;
+    existing.clear();
 
     try {
+      final stockParam = _stockQueryParam(stockFilter);
       final futures = categoryIds.map((catId) async {
         try {
           final response = await httpClient.get(
@@ -663,6 +810,7 @@ class SearchProductController extends GetxController {
               "page": 1,
               "limit": _pageLimit,
               "showReverse": true,
+              if (stockParam != null) ...stockParam,
             },
           );
 
@@ -692,10 +840,10 @@ class SearchProductController extends GetxController {
         }
       }
 
-      _categoryProducts.value = allProducts;
-      _categoryState.value = CurrentAppState.SUCCESS;
+      existing.value = allProducts;
+      state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
-      _categoryState.value = CurrentAppState.ERROR;
+      state.value = CurrentAppState.ERROR;
       Logger.error(
         "SearchProductController",
         "loadProductsByMultipleCategories error: $e\n$st",
@@ -703,43 +851,84 @@ class SearchProductController extends GetxController {
     }
   }
 
-  void loadMoreFilteredProducts() {
-    if (!_filteredHasMore || _filteredState.value == CurrentAppState.LOADING) {
-      return;
-    }
-    loadByCategoryWithKaratFilter(
-      _currentFilterCategoryId!,
-      _currentFilterKarat!,
-      isPagination: true,
-    );
+  void loadMoreFilteredProducts({String? stockFilter}) {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+    final hasMore = isReady ? _filteredReadyHasMore : isOut ? _filteredOutHasMore : _filteredAllHasMore;
+    final state = isReady ? _filteredReadyState : isOut ? _filteredOutState : _filteredAllState;
+    final catId = isReady
+        ? _currentFilterCategoryIdForReady
+        : isOut
+            ? _currentFilterCategoryIdForOut
+            : _currentFilterCategoryIdForAll;
+    final karat = isReady
+        ? _currentFilterKaratForReady
+        : isOut
+            ? _currentFilterKaratForOut
+            : _currentFilterKaratForAll;
+    if (!hasMore || state.value == CurrentAppState.LOADING) return;
+    loadByCategoryWithKaratFilter(catId!, karat!, isPagination: true, stockFilter: stockFilter);
   }
 
   Future<void> loadByCategoryWithKaratFilter(
     String categoryId,
     String targetKarat, {
     bool isPagination = false,
+    String? stockFilter,
   }) async {
-    if (!_filteredHasMore && isPagination) return;
-    if (_filteredState.value == CurrentAppState.LOADING) return;
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
 
-    _filteredState.value = CurrentAppState.LOADING;
+    final state = isReady ? _filteredReadyState : isOut ? _filteredOutState : _filteredAllState;
+    final existing = isReady ? _filteredReadyProducts : isOut ? _filteredOutProducts : _filteredAllProducts;
+    final hasMore = isReady ? _filteredReadyHasMore : isOut ? _filteredOutHasMore : _filteredAllHasMore;
+
+    int currentPage = isReady
+        ? _filteredReadyPage
+        : isOut
+            ? _filteredOutPage
+            : _filteredAllPage;
+    bool currentHasMore = hasMore;
+
+    if (!hasMore && isPagination) return;
+    if (state.value == CurrentAppState.LOADING) return;
+
+    state.value = CurrentAppState.LOADING;
 
     if (!isPagination) {
-      _currentFilterCategoryId = categoryId;
-      _currentFilterKarat = targetKarat;
-      _filteredPage = 1;
-      _filteredHasMore = true;
-      _filteredProducts.clear();
+      currentPage = 1;
+      currentHasMore = true;
+      if (isReady) {
+        _currentFilterCategoryIdForReady = categoryId;
+        _currentFilterKaratForReady = targetKarat;
+        _filteredReadyPage = 1;
+        _filteredReadyHasMore = true;
+        _filteredReadyProducts.clear();
+      } else if (isOut) {
+        _currentFilterCategoryIdForOut = categoryId;
+        _currentFilterKaratForOut = targetKarat;
+        _filteredOutPage = 1;
+        _filteredOutHasMore = true;
+        _filteredOutProducts.clear();
+      } else {
+        _currentFilterCategoryIdForAll = categoryId;
+        _currentFilterKaratForAll = targetKarat;
+        _filteredAllPage = 1;
+        _filteredAllHasMore = true;
+        _filteredAllProducts.clear();
+      }
     }
 
     try {
+      final stockParam = _stockQueryParam(stockFilter);
       final response = await httpClient.get(
         "/api/v1/products/get-all",
         queryParameters: {
           "categoryId": categoryId,
-          "page": _filteredPage,
+          "page": currentPage,
           "limit": _pageLimit,
           "showReverse": true,
+          if (stockParam != null) ...stockParam,
         },
       );
 
@@ -749,23 +938,34 @@ class SearchProductController extends GetxController {
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
         if (isPagination) {
-          _filteredProducts.addAll(_dedupe(allFetched, _filteredProducts));
+          existing.addAll(_dedupe(allFetched, existing));
         } else {
-          _filteredProducts.value = allFetched;
+          existing.value = allFetched;
         }
 
         if (allFetched.length < _pageLimit) {
-          _filteredHasMore = false;
+          currentHasMore = false;
         } else {
-          _filteredPage++;
+          currentPage++;
         }
 
-        _filteredState.value = CurrentAppState.SUCCESS;
+        if (isReady) {
+          _filteredReadyHasMore = currentHasMore;
+          _filteredReadyPage = currentPage;
+        } else if (isOut) {
+          _filteredOutHasMore = currentHasMore;
+          _filteredOutPage = currentPage;
+        } else {
+          _filteredAllHasMore = currentHasMore;
+          _filteredAllPage = currentPage;
+        }
+
+        state.value = CurrentAppState.SUCCESS;
       } else {
-        _filteredState.value = CurrentAppState.ERROR;
+        state.value = CurrentAppState.ERROR;
       }
     } catch (e, st) {
-      _filteredState.value = CurrentAppState.ERROR;
+      state.value = CurrentAppState.ERROR;
       Logger.error(
         "SearchProductController",
         "loadByCategoryWithKaratFilter error: $e\n$st",
@@ -776,10 +976,16 @@ class SearchProductController extends GetxController {
   void clearFilteredProducts() {
     _filteredProducts.clear();
     _filteredState.value = CurrentAppState.INITIAL;
-    _filteredPage = 1;
     _filteredHasMore = true;
-    _currentFilterCategoryId = null;
-    _currentFilterKarat = null;
+    _filteredReadyProducts.clear();
+    _filteredReadyState.value = CurrentAppState.INITIAL;
+    _filteredReadyHasMore = true;
+    _filteredOutProducts.clear();
+    _filteredOutState.value = CurrentAppState.INITIAL;
+    _filteredOutHasMore = true;
+    _filteredAllProducts.clear();
+    _filteredAllState.value = CurrentAppState.INITIAL;
+    _filteredAllHasMore = true;
   }
 
   void toggleKaratFilter(String karat) {

@@ -415,28 +415,33 @@ class _ProductImage extends StatelessWidget {
     final zoomIconSize = (width * 0.07).clamp(16.0, 22.0);
     final zoomPad = (width * 0.025).clamp(6.0, 10.0);
 
+    final imageProvider = imageUrl != null ? CachedNetworkImageProvider(imageUrl!) : null;
+
     return Stack(
       children: [
-        if (imageUrl != null)
+        if (imageProvider != null)
           ClipRect(
             child: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
               child: ColoredBox(
                 color: AppColors.cardBgLight,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl!,
+                child: Image(
+                  image: imageProvider,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
-                  placeholder: (context, url) => const DecoratedBox(
-                    decoration: BoxDecoration(color: AppColors.cardBgLight),
-                  ),
-                  errorWidget: (context, url, error) => const SizedBox.shrink(),
+                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded || frame != null) return child;
+                    return const DecoratedBox(
+                      decoration: BoxDecoration(color: AppColors.cardBgLight),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
                 ),
               ),
             ),
           ),
-        if (imageUrl != null)
+        if (imageProvider != null)
           Positioned.fill(
             child: AnimatedScale(
               scale: isHovered ? 1.05 : 1.0,
@@ -445,19 +450,21 @@ class _ProductImage extends StatelessWidget {
               child: Semantics(
                 image: true,
                 label: '$productName image',
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl!,
+                child: Image(
+                  image: imageProvider,
                   fit: BoxFit.contain,
                   width: double.infinity,
-                  fadeInDuration: const Duration(milliseconds: 200),
-                  placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: AppColors.warmShimmerBase,
-                          highlightColor: AppColors.shimmerHighlight,
-                    child: const DecoratedBox(
-                      decoration: BoxDecoration(color: Colors.white),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => const RatneshFallback.m(),
+                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded || frame != null) return child;
+                    return Shimmer.fromColors(
+                      baseColor: AppColors.warmShimmerBase,
+                      highlightColor: AppColors.shimmerHighlight,
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.white),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) => const RatneshFallback.m(),
                 ),
               ),
             ),

@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page
 import 'package:ratnesh_gold_app/presentation/pages/product/widgets/product_list_tile.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProductListingPage extends StatefulWidget {
   final String? karat;
@@ -42,7 +43,6 @@ class ProductListingPage extends StatefulWidget {
 
 class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
-  final ScrollController _scrollController = ScrollController();
 
   String _stockFilter = 'ready';
   double _weightMin = 0;
@@ -51,10 +51,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double _priceMax = 5000000;
   List<String> _selectedSizes = [];
 
-  // ── Selection state 
+  // ── Selection state
   final Set<String> _selectedProductIds = {};
   bool get _isSelectMode => _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
+
+  bool _isLoadingMore = false;
+  static const int _shimmerLoadMoreCount = 4;
 
   late String _selectedKarat;
   List<String> _filteredCategoryIds = [];
@@ -80,16 +83,87 @@ class _ProductListingPageState extends State<ProductListingPage> {
   bool get _hasKarat => widget.karat != null;
   bool get _isCategoryOnly => _isCategoryFilter && !_hasKarat;
 
+  CurrentAppState get _currentStockState {
+    switch (_stockFilter) {
+      case 'ready':
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryReadyState;
+        if (_isCategoryFilter) return _controller.filteredReadyState;
+        return _controller.karatReadyState;
+      case 'out':
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryOutState;
+        if (_isCategoryFilter) return _controller.filteredOutState;
+        return _controller.karatOutState;
+      default:
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryAllState;
+        if (_isCategoryFilter) return _controller.filteredAllState;
+        return _controller.karatAllState;
+    }
+  }
+
+  bool get _hasMore {
+    switch (_stockFilter) {
+      case 'ready':
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryReadyHasMore;
+        if (_isCategoryFilter) return _controller.filteredReadyHasMore;
+        return _controller.karatReadyHasMore;
+      case 'out':
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryOutHasMore;
+        if (_isCategoryFilter) return _controller.filteredOutHasMore;
+        return _controller.karatOutHasMore;
+      default:
+        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryAllHasMore;
+        if (_isCategoryFilter) return _controller.filteredAllHasMore;
+        return _controller.karatAllHasMore;
+    }
+  }
+
+  void _loadMore() {
+    if (_isCategoryOnly || _isLoadingMore) return;
+    setState(() => _isLoadingMore = true);
+    final stockFilter = _stockFilter;
+    if (_isCategoryFilter) {
+      _controller.loadMoreFilteredProducts(stockFilter: stockFilter);
+    } else {
+      _controller.loadMoreKaratProducts(stockFilter: stockFilter);
+    }
+  }
+
   List<ProductModel> get _displayedProducts {
     final List<ProductModel> base;
-    if (_isMultiCategory) {
-      base = _controller.categoryProducts;
-    } else if (_isCategoryOnly) {
-      base = _controller.categoryProducts;
-    } else if (_isCategoryFilter) {
-      base = _controller.filteredProducts;
-    } else {
-      base = _controller.karatProducts;
+    switch (_stockFilter) {
+      case 'ready':
+        if (_isMultiCategory) {
+          base = _controller.categoryReadyProducts;
+        } else if (_isCategoryOnly) {
+          base = _controller.categoryReadyProducts;
+        } else if (_isCategoryFilter) {
+          base = _controller.filteredReadyProducts;
+        } else {
+          base = _controller.karatReadyProducts;
+        }
+        break;
+      case 'out':
+        if (_isMultiCategory) {
+          base = _controller.categoryOutProducts;
+        } else if (_isCategoryOnly) {
+          base = _controller.categoryOutProducts;
+        } else if (_isCategoryFilter) {
+          base = _controller.filteredOutProducts;
+        } else {
+          base = _controller.karatOutProducts;
+        }
+        break;
+      default:
+        if (_isMultiCategory) {
+          base = _controller.categoryAllProducts;
+        } else if (_isCategoryOnly) {
+          base = _controller.categoryAllProducts;
+        } else if (_isCategoryFilter) {
+          base = _controller.filteredAllProducts;
+        } else {
+          base = _controller.karatAllProducts;
+        }
+        break;
     }
     if (!_isMultiCategory) return base;
     var result = base;
@@ -154,22 +228,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
     if (_isMultiCategory) {
       _filteredCategoryIds = List<String>.from(widget.categoryIds!);
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!);
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready');
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out');
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all');
     } else if (_isCategoryFilter && _hasKarat) {
-      _controller.loadByCategoryWithKaratFilter(
-        widget.categoryId!,
-        widget.karat!,
-      );
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready');
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out');
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all');
     } else if (_isCategoryFilter) {
-      _controller.loadProductsByCategory(widget.categoryId!);
+      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready');
+      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out');
+      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all');
     } else {
       final karatsToLoad =
           widget.karats ??
           (widget.karat != null ? [widget.karat!] : <String>[]);
-      _controller.loadProductsByKarats(karatsToLoad);
+      _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready');
+      _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out');
+      _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all');
     }
 
-    _scrollController.addListener(_onScroll);
     ever(_controller.sortByObs, (_) {
       setState(() {});
     });
@@ -177,26 +255,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
     final tag = _isCategoryFilter
         ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     Get.delete<SearchProductController>(tag: tag);
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 300) {
-      if (_isCategoryOnly) {
-        // Category-only mode doesn't support pagination yet
-      } else if (_isCategoryFilter) {
-        _controller.loadMoreFilteredProducts();
-      } else {
-        _controller.loadMoreKaratProducts();
-      }
-    }
   }
 
   @override
@@ -270,20 +333,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
           Expanded(
             child: Obx(() {
               _controller.sortByObs.value;
-              final state = _isMultiCategory
-                  ? _controller.categoryState
-                  : _isCategoryOnly
-                  ? _controller.categoryState
-                  : _isCategoryFilter
-                  ? _controller.filteredState
-                  : _controller.karatState;
-              final hasMore = _isMultiCategory
-                  ? false
-                  : _isCategoryOnly
-                  ? false
-                  : _isCategoryFilter
-                  ? _controller.filteredHasMore
-                  : _controller.karatHasMore;
+              final state = _currentStockState;
+              final hasMore = _hasMore;
+
+              if (_isLoadingMore && (state != CurrentAppState.LOADING || !hasMore)) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) setState(() => _isLoadingMore = false);
+                });
+              }
 
               final filteredProducts = _applyClientSideFilters(_displayedProducts);
               final products = _controller.sortProducts(
@@ -318,25 +375,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       ElevatedButton(
                         onPressed: () {
                           if (_isMultiCategory) {
-                            _controller.loadProductsByMultipleCategories(
-                              widget.categoryIds!,
-                            );
+                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready');
+                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out');
+                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all');
                           } else if (_isCategoryOnly) {
-                            _controller.loadProductsByCategory(
-                              widget.categoryId!,
-                            );
+                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready');
+                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out');
+                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all');
                           } else if (_isCategoryFilter) {
-                            _controller.loadByCategoryWithKaratFilter(
-                              widget.categoryId!,
-                              widget.karat!,
-                            );
+                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready');
+                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out');
+                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all');
                           } else {
                             final karatsToLoad =
                                 widget.karats ??
                                 (widget.karat != null
                                     ? [widget.karat!]
                                     : <String>[]);
-                            _controller.loadProductsByKarats(karatsToLoad);
+                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready');
+                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out');
+                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all');
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -378,22 +436,42 @@ class _ProductListingPageState extends State<ProductListingPage> {
               }
 
               if (layoutType == LayoutType.list) {
+                final shimmerCount = _isLoadingMore ? _shimmerLoadMoreCount : 0;
                 return ListView.builder(
-                  controller: _scrollController,
                   padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
-                  itemCount: products.length + (hasMore ? 1 : 0),
+                  itemCount: products.length + (hasMore && !_isLoadingMore ? 1 : 0) + shimmerCount,
                   itemBuilder: (_, index) {
-                    if (index >= products.length) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
+                    if (_isLoadingMore && index >= products.length) {
+                      return _shimmerListTile(context);
+                    }
+                    if (hasMore && !_isLoadingMore && index == products.length) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.responsiveWidth(16),
+                          vertical: context.responsiveWidth(8),
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _loadMore,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: context.colorPalette.gold,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                vertical: context.responsiveWidth(12),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                              ),
+                            ),
+                            child: const Text('Load More'),
+                          ),
                         ),
                       );
                     }
-
                     final product = products[index];
                     return ProductListTile(
+                      key: ValueKey(product.id),
                       product: product,
                       isSelected: _selectedProductIds.contains(product.id),
                       onTap: _isSelectMode
@@ -426,109 +504,211 @@ class _ProductListingPageState extends State<ProductListingPage> {
               }
 
               if (layoutType == LayoutType.fullScreen) {
-                return GridView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: products.length + (hasMore ? 1 : 0),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                        ? 0.7
-                        : MediaQuery.of(context).size.width >= 600
-                            ? 0.68
-                            : 0.65,
-                  ),
-                  itemBuilder: (_, index) {
-                    if (index >= products.length) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final product = products[index];
-                    return ProductCard(
-                      product: product,
-                      isSelected: _selectedProductIds.contains(product.id),
-                      onTap: _isSelectMode
-                          ? () => _toggleSelection(product.id)
-                          : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      ProductDetailsPage(
-                                        product: product,
-                                        products: products,
-                                        initialIndex: index,
-                                        controller: _controller,
-                                        listType: _isCategoryOnly
-                                            ? 'category'
-                                            : _isCategoryFilter
-                                                ? 'filtered'
-                                                : 'karat',
-                                      ),
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                              ? 0.7
+                              : MediaQuery.of(context).size.width >= 600
+                                  ? 0.68
+                                  : 0.65,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) {
+                            final product = products[index];
+                            return ProductCard(
+                              key: ValueKey(product.id),
+                              product: product,
+                              isSelected: _selectedProductIds.contains(product.id),
+                              onTap: _isSelectMode
+                                  ? () => _toggleSelection(product.id)
+                                  : () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              ProductDetailsPage(
+                                                product: product,
+                                                products: products,
+                                                initialIndex: index,
+                                                controller: _controller,
+                                                listType: _isCategoryOnly
+                                                    ? 'category'
+                                                    : _isCategoryFilter
+                                                        ? 'filtered'
+                                                        : 'karat',
+                                              ),
+                                        ),
+                                      );
+                                    },
+                              onLongPress: _isAdmin
+                                  ? () => _toggleSelection(product.id)
+                                  : null,
+                            );
+                          },
+                          childCount: products.length,
+                        ),
+                      ),
+                    ),
+                    if (_isLoadingMore && hasMore)
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverGrid(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 1,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                                ? 0.7
+                                : MediaQuery.of(context).size.width >= 600
+                                    ? 0.68
+                                    : 0.65,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (_, index) => _shimmerCard(context),
+                            childCount: 2,
+                          ),
+                        ),
+                      ),
+                    if (hasMore && !_isLoadingMore)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.responsiveWidth(16),
+                            vertical: context.responsiveWidth(8),
+                          ),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _loadMore,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: context.colorPalette.gold,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.responsiveWidth(12),
                                 ),
-                              );
-                            },
-                      onLongPress: _isAdmin
-                          ? () => _toggleSelection(product.id)
-                          : null,
-                    );
-                  },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                                ),
+                              ),
+                              child: const Text('Load More'),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 );
               }
 
-              return GridView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(16),
-                itemCount: products.length + (hasMore ? 1 : 0),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width >= 1000
-                      ? 3
-                      : context.gridColumns(phone: 2, tablet: 3),
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                      ? 0.62
-                      : MediaQuery.of(context).size.width >= 600
-                          ? 0.55
-                          : 0.488,
-                ),
-                itemBuilder: (_, index) {
-                  if (index >= products.length) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final product = products[index];
-                  return ProductCard(
-                    product: product,
-                    isSelected: _selectedProductIds.contains(product.id),
-                    onTap: _isSelectMode
-                        ? () => _toggleSelection(product.id)
-                        : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ProductDetailsPage(
-                                      product: product,
-                                      products: products,
-                                      initialIndex: index,
-                                      controller: _controller,
-                                      listType: _isCategoryOnly
-                                          ? 'category'
-                                          : _isCategoryFilter
-                                              ? 'filtered'
-                                              : 'karat',
-                                    ),
+              return CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: MediaQuery.of(context).size.width >= 1000
+                            ? 3
+                            : context.gridColumns(phone: 2, tablet: 3),
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                            ? 0.62
+                            : MediaQuery.of(context).size.width >= 600
+                                ? 0.55
+                                : 0.488,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (_, index) {
+                          final product = products[index];
+                          return ProductCard(
+                            key: ValueKey(product.id),
+                            product: product,
+                            isSelected: _selectedProductIds.contains(product.id),
+                            onTap: _isSelectMode
+                                ? () => _toggleSelection(product.id)
+                                : () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ProductDetailsPage(
+                                              product: product,
+                                              products: products,
+                                              initialIndex: index,
+                                              controller: _controller,
+                                              listType: _isCategoryOnly
+                                                  ? 'category'
+                                                  : _isCategoryFilter
+                                                      ? 'filtered'
+                                                      : 'karat',
+                                            ),
+                                      ),
+                                    );
+                                  },
+                            onLongPress: _isAdmin
+                                ? () => _toggleSelection(product.id)
+                                : null,
+                          );
+                        },
+                        childCount: products.length,
+                      ),
+                    ),
+                  ),
+                  if (_isLoadingMore && hasMore)
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: MediaQuery.of(context).size.width >= 1000
+                              ? 3
+                              : context.gridColumns(phone: 2, tablet: 3),
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: MediaQuery.of(context).size.width >= 1000
+                              ? 0.62
+                              : MediaQuery.of(context).size.width >= 600
+                                  ? 0.55
+                                  : 0.488,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) => _shimmerCard(context),
+                          childCount: _shimmerLoadMoreCount,
+                        ),
+                      ),
+                    ),
+                  if (hasMore && !_isLoadingMore)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.responsiveWidth(16),
+                          vertical: context.responsiveWidth(8),
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _loadMore,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: context.colorPalette.gold,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                vertical: context.responsiveWidth(12),
                               ),
-                            );
-                          },
-                    onLongPress: _isAdmin
-                        ? () => _toggleSelection(product.id)
-                        : null,
-                  );
-                },
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                              ),
+                            ),
+                            child: const Text('Load More'),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               );
             }),
           ),
@@ -865,12 +1045,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
     var result = products;
-
-    if (_stockFilter == 'ready') {
-      result = result.where((p) => p.rawData?['IsStock'] == 1).toList();
-    } else if (_stockFilter == 'out') {
-      result = result.where((p) => p.rawData?['IsStock'] == 0).toList();
-    }
 
     result = result.where((p) => !p.isOld22kReadyStock).toList();
 
@@ -1504,6 +1678,117 @@ class _ProductListingPageState extends State<ProductListingPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shimmerCard(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: context.colorPalette.shimmerBaseColor,
+      highlightColor: context.colorPalette.shimmerHighLightColor,
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colorPalette.shimmerBaseColor,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.colorPalette.shimmerHighLightColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.all(context.getResponsiveSize(2)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: context.getScreenHeight(1),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.shimmerHighLightColor,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    SizedBox(height: context.getScreenHeight(0.5)),
+                    Container(
+                      height: context.getScreenHeight(1),
+                      width: context.getResponsiveSize(20),
+                      decoration: BoxDecoration(
+                        color: context.colorPalette.shimmerHighLightColor,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _shimmerListTile(BuildContext context) {
+    return Shimmer.fromColors(
+      baseColor: context.colorPalette.shimmerBaseColor,
+      highlightColor: context.colorPalette.shimmerHighLightColor,
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(16),
+          vertical: context.responsiveWidth(4),
+        ),
+        padding: EdgeInsets.all(context.responsiveWidth(12)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.shimmerBaseColor,
+          borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: context.responsiveWidth(60),
+              height: context.responsiveWidth(60),
+              decoration: BoxDecoration(
+                color: context.colorPalette.shimmerHighLightColor,
+                borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+              ),
+            ),
+            SizedBox(width: context.responsiveWidth(12)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: context.getScreenHeight(1.2),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.shimmerHighLightColor,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  SizedBox(height: context.getScreenHeight(0.8)),
+                  Container(
+                    height: context.getScreenHeight(1),
+                    width: context.responsiveWidth(80),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.shimmerHighLightColor,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
