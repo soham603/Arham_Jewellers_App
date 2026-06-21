@@ -811,22 +811,32 @@ class _Level3Sheet extends StatelessWidget {
                             padding: EdgeInsets.all(
                               context.responsiveWidth(6, tabletVal: 10),
                             ),
-                            child: Text(
-                              cat.name
-                                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                                  .replaceAll(
-                                    RegExp(r'collection', caseSensitive: false),
-                                    '',
-                                  )
-                                  .trim(),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: context.responsiveFont(11),
-                                fontWeight: FontWeight.w600,
-                                color: context.colorPalette.goldDeep,
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim(),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: context.responsiveFont(9),
+                                      fontWeight: FontWeight.w600,
+                                      color: context.colorPalette.goldDeep,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  ' (${cat.count})',
+                                  style: TextStyle(
+                                    fontSize: context.responsiveFont(9),
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.goldDeep,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -880,7 +890,6 @@ class _CategoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              flex: 7,
               child: Stack(
                 children: [
                   ClipRRect(
@@ -920,29 +929,19 @@ class _CategoryCard extends StatelessWidget {
                 ],
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsiveWidth(10, tabletVal: 14),
-                  vertical: context.responsiveWidth(2, tabletVal: 6),
-                ),
-                child: Text(
-                  category.name
-                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(
-                        RegExp(r'collection', caseSensitive: false),
-                        '',
-                      )
-                      .trim(),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: context.responsiveFont(11),
-                    fontWeight: FontWeight.w600,
-                    color: context.colorPalette.goldDeep,
-                  ),
+            Padding(
+              padding: EdgeInsets.all(
+                context.responsiveWidth(6, tabletVal: 10),
+              ),
+              child: Text(
+                '${category.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} (${category.count})',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: context.responsiveFont(11),
+                  fontWeight: FontWeight.w600,
+                  color: context.colorPalette.goldDeep,
                 ),
               ),
             ),

@@ -7,7 +7,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserControl
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminUserManagementController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeController.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
@@ -23,6 +22,7 @@ import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 import 'package:ratnesh_gold_app/app/app.dart';
 
 import 'ancillary_selection_screen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/search/product_search_page.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
@@ -280,10 +280,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   icon: Icons.production_quantity_limits_rounded,
                   title: "Products",
                   subtitle: "Browse & edit products",
-                  onTap: () {
-                    Get.find<NavigationController>().switchTab(1, isAdmin: true);
-                    Get.back();
-                  },
+                  onTap: () => Get.to(() => const ProductSearchPage()),
                 ),
                 _adminTile(
                   context,
@@ -352,10 +349,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         _ManagementItem(Icons.category_rounded, "Categories",
             "Manage categories", () => Get.to(() => CategoryManagerScreen())),
         _ManagementItem(Icons.production_quantity_limits_rounded, "Products",
-            "Browse & edit products", () {
-          Get.find<NavigationController>().switchTab(1, isAdmin: true);
-          Get.back();
-        }),
+            "Browse & edit products", () => Get.to(() => const ProductSearchPage())),
         _ManagementItem(Icons.view_carousel_rounded, "Carousel",
             "Manage banners", () => Get.to(() => CarouselManagerScreen())),
         _ManagementItem(Icons.text_snippet_rounded, "Ancillary Data",

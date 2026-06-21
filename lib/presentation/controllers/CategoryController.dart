@@ -42,10 +42,12 @@ class CategoryController extends GetxController {
   final _k18Categories = <CategoryModel>[].obs;
   final _k20Categories = <CategoryModel>[].obs;
   final _k22Categories = <CategoryModel>[].obs;
+  final _k0Categories = <CategoryModel>[].obs;
 
   List<CategoryModel> get k18Categories => _k18Categories;
   List<CategoryModel> get k20Categories => _k20Categories;
   List<CategoryModel> get k22Categories => _k22Categories;
+  List<CategoryModel> get k0Categories => _k0Categories;
 
   final _k18State = CurrentAppState.INITIAL.obs;
   final _k20State = CurrentAppState.INITIAL.obs;
@@ -68,6 +70,15 @@ class CategoryController extends GetxController {
 
   final _level3KaratMap = <String, String>{}.obs;
   String? getLevel3Karat(String level3Id) => _level3KaratMap[level3Id];
+
+  String? getParentLevel2Id(String level3Id) {
+    for (final entry in _level3Cache.entries) {
+      if (entry.value.any((c) => c.id == level3Id)) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
 
   // ── Expansion state 
   final _expandedCategoryId = RxnString();
@@ -155,6 +166,7 @@ class CategoryController extends GetxController {
     _k20State.value = CurrentAppState.LOADING;
     _k22State.value = CurrentAppState.LOADING;
 
+    _k0Categories.clear();
     _k18Categories.clear();
     _k20Categories.clear();
     _k22Categories.clear();
@@ -179,6 +191,22 @@ class CategoryController extends GetxController {
 
       for (final item in results) {
         final karatCat = CategoryModel.fromJson(item);
+        final nameLower = karatCat.name.toLowerCase();
+
+        if (nameLower == '0k') {
+          final children = karatCat.children;
+          if (children != null) {
+            for (final level2 in children) {
+              _k0Categories.add(level2);
+              final level3Children = level2.children;
+              if (level3Children != null && level3Children.isNotEmpty) {
+                _level3Cache[level2.id] = level3Children;
+              }
+            }
+          }
+          continue;
+        }
+
         final karat = _karatNameMap[karatCat.name];
         if (karat == null) continue;
 

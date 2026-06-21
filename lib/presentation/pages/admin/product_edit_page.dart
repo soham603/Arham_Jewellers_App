@@ -41,6 +41,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   List<CategoryModel> get _level2Categories {
     switch (_selectedKarat) {
+      case '0K':
+        return _catCtrl.k0Categories;
       case '18K':
         return _catCtrl.k18Categories;
       case '20K':
@@ -59,6 +61,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   List<String> get _availableKarats {
     final karats = <String>{};
+    if (_catCtrl.k0Categories.isNotEmpty) karats.add('0K');
     if (_catCtrl.k18Categories.isNotEmpty) karats.add('18K');
     if (_catCtrl.k20Categories.isNotEmpty) karats.add('20K');
     if (_catCtrl.k22Categories.isNotEmpty) karats.add('22K');
@@ -86,7 +89,15 @@ class _ProductEditPageState extends State<ProductEditPage> {
     if (productCategory == null) return;
 
     _selectedCategoryId = productCategory.id;
-    _selectedLevel2Id = productCategory.parentId;
+
+    // Find parent level2 from the cached tree instead of relying on productCategory.parentId
+    _selectedLevel2Id = _catCtrl.getParentLevel2Id(productCategory.id);
+
+    // Determine karat from the category hierarchy
+    final karatFromCategory = _catCtrl.getLevel3Karat(productCategory.id);
+    if (karatFromCategory != null) {
+      _selectedKarat = karatFromCategory.toUpperCase();
+    }
   }
 
   @override
@@ -335,8 +346,10 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ? null
                   : (v) => setState(() => _selectedCategoryId = v),
               validator: (v) {
-                if (_selectedCategoryId == null && _level3Categories.isNotEmpty) {
-                  return 'Required';
+                if (_selectedCategoryId == null) {
+                  return _level3Categories.isEmpty
+                      ? 'No styles available for this collection'
+                      : 'Required';
                 }
                 return null;
               },

@@ -34,6 +34,8 @@ class CategoryModel {
 
   final dynamic images;
 
+  final int count;
+
   CategoryModel({
     required this.id,
     required this.name,
@@ -54,6 +56,7 @@ class CategoryModel {
     this.children,
     this.level,
     this.images,
+    this.count = 0,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
@@ -102,6 +105,8 @@ class CategoryModel {
       level: json['level'],
 
       images: json['images'],
+
+      count: json['count'] ?? 0,
     );
   }
 
@@ -141,6 +146,8 @@ class CategoryModel {
       "level": level,
 
       "images": images,
+
+      "count": count,
     };
   }
 }
