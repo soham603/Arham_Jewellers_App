@@ -189,21 +189,25 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     return Container(
       padding: isTransparentOuter
           ? EdgeInsets.zero
-          : EdgeInsets.fromLTRB(hPad, vPad * 0.8, hPad * 0.5, vPad * 0.8),
+          : EdgeInsets.fromLTRB(hPad * 0.3, vPad * 0.8, hPad * 0.5, vPad * 0.8),
       decoration: BoxDecoration(
         color: widget.outerBackgroundColor ?? Colors.white,
       ),
       child: Row(
         children: [
           if (widget.onBack != null)
-            GestureDetector(
-              onTap: widget.onBack,
-              child: Padding(
-                padding: EdgeInsets.only(right: spacing * 0.8),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: iconSize,
-                  color: _goldDark,
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: widget.onBack,
+                borderRadius: BorderRadius.circular(24),
+                child: Padding(
+                  padding: EdgeInsets.all(spacing * 1),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: iconSize,
+                    color: _goldDark,
+                  ),
                 ),
               ),
             ),

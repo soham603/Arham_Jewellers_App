@@ -196,6 +196,10 @@ class _SearchPageState extends State<SearchPage> {
               autofocus: false,
               showScanner: true,
               onBack: () {
+                if (_focusNode.hasFocus) {
+                  _focusNode.unfocus();
+                  return;
+                }
                 if (_textController.text.isNotEmpty ||
                     controller.isSearching ||
                     controller.hasActiveFilters) {
@@ -205,11 +209,7 @@ class _SearchPageState extends State<SearchPage> {
                   controller.loadInitialProducts();
                   setState(() {});
                 } else {
-                  if (Get.previousRoute.isNotEmpty) {
-                    Get.back();
-                  } else {
-                    Get.find<NavigationController>().switchTab(0);
-                  }
+                  Get.find<NavigationController>().switchTab(0);
                 }
               },
               onChanged: (v) {
