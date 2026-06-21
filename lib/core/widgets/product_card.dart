@@ -298,7 +298,7 @@ class _ProductCardState extends State<ProductCard>
                         if (widget.isSelected)
                           Positioned(
                             top: 6 * sf,
-                            right: 36 * sf,
+                            right: Get.find<AuthController>().isAdmin ? 6 * sf : 36 * sf,
                             child: Container(
                               padding: EdgeInsets.all(4 * sf),
                               decoration: BoxDecoration(

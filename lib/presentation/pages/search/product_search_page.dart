@@ -2,7 +2,7 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
-import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/widgets/product_list_tile.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/product_search_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/product_edit_page.dart';
@@ -133,25 +133,20 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               return CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: EdgeInsets.all(context.getResponsiveSize(3)),
-                    sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
-                        mainAxisSpacing: context.getResponsiveSize(2),
-                        crossAxisSpacing: context.getResponsiveSize(2),
-                        childAspectRatio: 0.488,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (_, index) {
-                          final product = products[index];
-                          return ProductCard(
-                            key: ValueKey(product.id),
-                            product: product,
-                            onTap: () => Get.to(() => ProductEditPage(product: product)),
-                          );
-                        },
-                        childCount: products.length,
-                      ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.getResponsiveSize(2),
+                    ),
+                    sliver: SliverList.separated(
+                      itemCount: products.length,
+                      itemBuilder: (_, index) {
+                        final product = products[index];
+                        return ProductListTile(
+                          key: ValueKey(product.id),
+                          product: product,
+                          onTap: () => Get.to(() => ProductEditPage(product: product)),
+                        );
+                      },
+                      separatorBuilder: (_, __) => SizedBox(height: context.getResponsiveSize(1)),
                     ),
                   ),
                   if (controller.hasMore)
