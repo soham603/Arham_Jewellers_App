@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
 
@@ -101,11 +100,6 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
 
                 if (success) {
                   Get.back();
-                } else {
-                  ToastUtils.showError(
-                    
-                    "Failed to save ${widget.category}",
-                  );
                 }
               },
               child: Text(

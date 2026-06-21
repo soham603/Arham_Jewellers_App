@@ -181,7 +181,7 @@ class CategoryManagerController extends GetxController {
   }
 
   // ── Create 
-  Future<String?> createCategory({
+  Future<(String? error, String? successMessage)> createCategory({
     required String name,
     required String boxName,
     String? description,
@@ -209,15 +209,15 @@ class CategoryManagerController extends GetxController {
         "CategoryManagerController",
         "Category created: ${created.name}",
       );
-      return null;
+      return (null, response['message']?.toString());
     } catch (e) {
       Logger.error("CategoryManagerController", "create error: $e");
-      return DioErrorHelper.getMessage(e);
+      return (DioErrorHelper.getMessage(e), null);
     }
   }
 
   // ── Edit 
-  Future<String?> editCategory({
+  Future<(String? error, String? successMessage)> editCategory({
     required String id,
     String? name,
     File? imageFile,
@@ -244,21 +244,21 @@ class CategoryManagerController extends GetxController {
       if (idx != -1) _allCategories[idx] = updated;
       _pickedImage.value = null;
       Logger.info("CategoryManagerController", "Category $id updated");
-      return null;
+      return (null, response['message']?.toString());
     } catch (e) {
       Logger.error("CategoryManagerController", "edit error: $e");
-      return DioErrorHelper.getMessage(e);
+      return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';
     }
   }
 
   // ── Delete 
-  Future<String?> deleteCategory(String id) async {
+  Future<(String? error, String? successMessage)> deleteCategory(String id) async {
     _actionLoadingId.value = id;
 
     try {
-      await _categoryRepo.deleteCategory(id: id);
+      final response = await _categoryRepo.deleteCategory(id: id);
 
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) {
@@ -277,17 +277,17 @@ class CategoryManagerController extends GetxController {
         );
       }
       Logger.info("CategoryManagerController", "Category $id deleted");
-      return null;
+      return (null, response['message']?.toString());
     } catch (e) {
       Logger.error("CategoryManagerController", "delete error: $e");
-      return DioErrorHelper.getMessage(e);
+      return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';
     }
   }
 
   // ── Restore 
-  Future<String?> restoreCategory(String id) async {
+  Future<(String? error, String? successMessage)> restoreCategory(String id) async {
     _actionLoadingId.value = id;
 
     try {
@@ -297,10 +297,10 @@ class CategoryManagerController extends GetxController {
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
       Logger.info("CategoryManagerController", "Category $id restored");
-      return null;
+      return (null, response['message']?.toString());
     } catch (e) {
       Logger.error("CategoryManagerController", "restore error: $e");
-      return DioErrorHelper.getMessage(e);
+      return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';
     }

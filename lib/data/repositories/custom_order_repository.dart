@@ -23,11 +23,12 @@ class CustomOrderRepository extends BaseRepository {
     return response.data;
   }
 
-  Future<void> deleteCustomOrder({
+  Future<Map<String, dynamic>> deleteCustomOrder({
     required String orderId,
   }) async {
-    await dio.delete(
+    final response = await dio.delete(
       ApiUrlConstants.customOrderDelete(orderId),
     );
+    return response.data as Map<String, dynamic>;
   }
 }

@@ -282,6 +282,8 @@ class _LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
               child: Text(
                 errorMsg,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: context.getResponsiveSize(3),
                   color: Colors.red,

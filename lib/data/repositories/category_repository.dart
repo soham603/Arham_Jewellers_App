@@ -59,11 +59,12 @@ class CategoryRepository extends BaseRepository {
     return response.data as Map<String, dynamic>;
   }
 
-  Future<void> deleteCategory({required String id}) async {
-    await dio.delete(
+  Future<Map<String, dynamic>> deleteCategory({required String id}) async {
+    final response = await dio.delete(
       ApiUrlConstants.categoryDelete(id),
       options: Options(extra: {'requiresAuth': true}),
     );
+    return response.data as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> restoreCategory({required String id}) async {

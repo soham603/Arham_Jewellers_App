@@ -185,7 +185,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final success = await _adminCtrl.updateProduct(
+    final (error, successMsg) = await _adminCtrl.updateProduct(
       id: widget.product.id,
       name: _nameCtrl.text.trim(),
       karat: _selectedKarat,
@@ -194,11 +194,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
       rawDataPatch: _rawDataPatch,
     );
 
-    if (success && mounted) {
-      ToastUtils.showSuccess('Product updated');
+    if (error == null && mounted) {
+      ToastUtils.showSuccess(successMsg ?? 'Product updated');
       Navigator.of(context).pop(true);
     } else if (mounted) {
-      ToastUtils.showError('Something went wrong');
+      ToastUtils.showError(error ?? 'Something went wrong');
     }
   }
 

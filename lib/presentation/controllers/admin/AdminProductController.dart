@@ -7,7 +7,6 @@ import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
@@ -96,8 +95,8 @@ class AdminProductController extends GetxController {
   }
 
   /// Updates a product via PATCH multipart form-data.
-  /// Returns true on success, false on failure.
-  Future<bool> updateProduct({
+  /// Returns (errorMessage, successMessage) tuple. null error = success.
+  Future<(String? error, String? successMessage)> updateProduct({
     required String id,
     String? name,
     String? karat,
@@ -125,17 +124,21 @@ class AdminProductController extends GetxController {
 
       final formData = FormData.fromMap(data);
 
-      await _productRepo.updateProduct(
+      final response = await _productRepo.updateProduct(
         id: id,
         data: formData,
       );
 
       _pickedImage.value = null;
       Logger.info("AdminProductController", "Product $id updated");
-      return true;
+      return (null, response['message']?.toString());
     } catch (e) {
       Logger.error("AdminProductController", "updateProduct error: $e");
-      return false;
+      String errorMsg = 'Something went wrong';
+      if (e is DioException) {
+        errorMsg = e.response?.data?['message']?.toString() ?? e.message ?? errorMsg;
+      }
+      return (errorMsg, null);
     } finally {
       _saving.value = false;
     }

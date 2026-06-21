@@ -882,7 +882,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
 
-    final String? error = isEditing
+    final (error, successMsg) = isEditing
         ? await widget.ctrl.editCategory(
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
@@ -899,7 +899,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
           );
 
     if (error == null && mounted) {
-      ToastUtils.showSuccess(isEditing ? 'Updated' : 'Created');
+      ToastUtils.showSuccess(successMsg ?? (isEditing ? 'Updated' : 'Created'));
       Navigator.of(context).pop();
     } else if (mounted) {
       ToastUtils.showError(error ?? 'Something went wrong');
@@ -1144,9 +1144,9 @@ void _confirmDelete(BuildContext context, CategoryManagerController ctrl, Catego
         Obx(() => TextButton(
           onPressed: ctrl.actionLoadingId == cat.id ? null : () async {
             Navigator.pop(context);
-            final error = await ctrl.deleteCategory(cat.id);
+            final (error, successMsg) = await ctrl.deleteCategory(cat.id);
             if (error == null) {
-              ToastUtils.showSuccess('"${cat.name}" deleted');
+              ToastUtils.showSuccess(successMsg ?? '"${cat.name}" deleted');
             } else {
               ToastUtils.showError(error);
             }
@@ -1171,11 +1171,11 @@ void _confirmRestore(BuildContext context, CategoryManagerController ctrl, Categ
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor))),
         TextButton(
-          onPressed: () async {
+          onPressed: ctrl.actionLoadingId == cat.id ? null : () async {
             Navigator.pop(context);
-            final error = await ctrl.restoreCategory(cat.id);
+            final (error, successMsg) = await ctrl.restoreCategory(cat.id);
             if (error == null) {
-              ToastUtils.showSuccess('"${cat.name}" restored');
+              ToastUtils.showSuccess(successMsg ?? '"${cat.name}" restored');
             } else {
               ToastUtils.showError(error);
             }

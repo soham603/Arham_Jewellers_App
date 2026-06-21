@@ -89,6 +89,8 @@ class CustomOrderController extends GetxController {
         _createdOrderId.value = data['orderId']?.toString() ?? '';
         _createState.value = CurrentAppState.SUCCESS;
 
+        ToastUtils.showSuccess(responseData['message']?.toString() ?? 'Custom order created');
+
         Logger.info("CustomOrderController",
             "Custom order created: ${_createdOrderId.value}");
 
@@ -207,9 +209,9 @@ class CustomOrderController extends GetxController {
     try {
       _isDeleting.value = true;
 
-      await _customOrderRepo.deleteCustomOrder(orderId: orderId);
+      final response = await _customOrderRepo.deleteCustomOrder(orderId: orderId);
 
-      ToastUtils.showSuccess("Custom order deleted successfully");
+      ToastUtils.showSuccess(response['message']?.toString() ?? 'Custom order deleted');
 
       Logger.info("CustomOrderController", "Custom order deleted: $orderId");
       return true;
