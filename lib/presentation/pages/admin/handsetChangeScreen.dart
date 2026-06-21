@@ -70,7 +70,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(3),
-                  vertical: context.getScreenHeight(0.5),
+                  vertical: context.heightPercent(0.5),
                 ),
                 decoration: BoxDecoration(
                   color: _filterColor(controller.activeFilter).withValues(alpha: 0.12),
@@ -94,7 +94,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
           Padding(
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
               context.getResponsiveSize(4),
               0,
             ),
@@ -109,7 +109,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
               outerBackgroundColor: Colors.transparent,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           _filterBar(context),
           Expanded(
             child: Obx(() {
@@ -135,13 +135,13 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                   controller: _scroll,
                   padding: EdgeInsets.fromLTRB(
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(1.5),
+                    context.heightPercent(1.5),
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(3),
+                    context.heightPercent(3),
                   ),
                   itemCount: list.length + 1,
                   separatorBuilder: (_, _) =>
-                      SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.heightPercent(1.5)),
                   itemBuilder: (context, index) {
                     if (index == list.length) return _listFooter(context);
                     return _RequestCard(
@@ -165,9 +165,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
       () => Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(0.5),
+          context.heightPercent(0.5),
           context.getResponsiveSize(4),
-          context.getScreenHeight(1),
+          context.heightPercent(1),
         ),
         child: Row(
           children: _filters.map((f) {
@@ -182,7 +182,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                     horizontal: context.getResponsiveSize(1),
                   ),
                   padding: EdgeInsets.symmetric(
-                    vertical: context.getScreenHeight(0.8),
+                    vertical: context.heightPercent(0.8),
                   ),
                   decoration: BoxDecoration(
                     color: isActive ? color : color.withValues(alpha: 0.08),
@@ -213,7 +213,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
       if (controller.state == CurrentAppState.LOADING &&
           controller.requests.isNotEmpty) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
           child: Center(
             child: SizedBox(
               width: context.getResponsiveSize(6),
@@ -228,7 +228,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
       }
       if (!controller.hasMore) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
           child: Center(
             child: Text(
               'All requests loaded',
@@ -250,14 +250,14 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 5,
       separatorBuilder: (_, _) =>
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
       itemBuilder: (_, _) => _shimmerCard(context),
     );
   }
 
   Widget _shimmerCard(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(14),
+      height: context.heightPercent(14),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(16),
@@ -282,16 +282,16 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
                 children: [
                   Container(
                     width: context.getResponsiveSize(35),
-                    height: context.getScreenHeight(1.5),
+                    height: context.heightPercent(1.5),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.6)),
+                  SizedBox(height: context.heightPercent(0.6)),
                   Container(
                     width: context.getResponsiveSize(25),
-                    height: context.getScreenHeight(1.2),
+                    height: context.heightPercent(1.2),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
@@ -317,7 +317,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
             size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
@@ -326,7 +326,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
               color: context.colorPalette.textColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             controller.error,
             textAlign: TextAlign.center,
@@ -335,7 +335,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
               color: context.colorPalette.subTitleColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           ElevatedButton(
             onPressed: controller.refresh,
             style: ElevatedButton.styleFrom(
@@ -361,7 +361,7 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
             size: context.getResponsiveSize(16),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             controller.searchQuery.isNotEmpty
                 ? 'No ${controller.activeFilter.toLowerCase()} requests found'
@@ -484,7 +484,7 @@ class _RequestCardState extends State<_RequestCard> {
                             color: context.colorPalette.textColor,
                           ),
                         ),
-                        SizedBox(height: context.getScreenHeight(0.3)),
+                        SizedBox(height: context.heightPercent(0.3)),
                         Text(
                           userPhone,
                           style: TextStyle(
@@ -501,7 +501,7 @@ class _RequestCardState extends State<_RequestCard> {
                       Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(2.5),
-                          vertical: context.getScreenHeight(0.4),
+                          vertical: context.heightPercent(0.4),
                         ),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.12),
@@ -517,7 +517,7 @@ class _RequestCardState extends State<_RequestCard> {
                           ),
                         ),
                       ),
-                      SizedBox(height: context.getScreenHeight(0.5)),
+                      SizedBox(height: context.heightPercent(0.5)),
                       Icon(
                         _expanded
                             ? Icons.keyboard_arrow_up_rounded
@@ -570,7 +570,7 @@ class _RequestCardState extends State<_RequestCard> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.3)),
+                                SizedBox(height: context.heightPercent(0.3)),
                                 Text(
                                   req.oldDeviceName ?? '—',
                                   style: TextStyle(
@@ -579,7 +579,7 @@ class _RequestCardState extends State<_RequestCard> {
                                     color: context.colorPalette.textColor,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.2)),
+                                SizedBox(height: context.heightPercent(0.2)),
                                 Text(
                                   req.oldDeviceId ?? '—',
                                   style: TextStyle(
@@ -614,7 +614,7 @@ class _RequestCardState extends State<_RequestCard> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.3)),
+                                SizedBox(height: context.heightPercent(0.3)),
                                 Text(
                                   req.newDeviceName,
                                   style: TextStyle(
@@ -624,7 +624,7 @@ class _RequestCardState extends State<_RequestCard> {
                                   ),
                                   textAlign: TextAlign.end,
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.2)),
+                                SizedBox(height: context.heightPercent(0.2)),
                                 Text(
                                   req.newDeviceId,
                                   style: TextStyle(
@@ -646,7 +646,7 @@ class _RequestCardState extends State<_RequestCard> {
                       'Device',
                       req.newDeviceName,
                     ),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     _infoRow(
                       context,
                       Icons.disc_full_rounded,
@@ -654,7 +654,7 @@ class _RequestCardState extends State<_RequestCard> {
                       req.newDeviceId,
                     ),
                   ],
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   _infoRow(
                     context,
                     Icons.access_time_rounded,
@@ -665,7 +665,7 @@ class _RequestCardState extends State<_RequestCard> {
 
                   if (req.rejectionReason != null &&
                       req.rejectionReason!.isNotEmpty) ...[
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.heightPercent(1)),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -694,7 +694,7 @@ class _RequestCardState extends State<_RequestCard> {
                                     color: context.colorPalette.subTitleColor,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.3)),
+                                SizedBox(height: context.heightPercent(0.3)),
                                 Text(
                                   req.rejectionReason!,
                                   style: TextStyle(
@@ -712,7 +712,7 @@ class _RequestCardState extends State<_RequestCard> {
                   ],
 
                   if (req.status == 'PENDING') ...[
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
                     Obx(() {
                       final isLoading =
                           widget.controller.actionState ==
@@ -891,7 +891,7 @@ class _RequestCardState extends State<_RequestCard> {
                 color: context.colorPalette.textColor,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
             TextField(
               controller: reasonController,
               maxLines: 3,
@@ -1018,7 +1018,7 @@ class _RequestCardState extends State<_RequestCard> {
     return GestureDetector(
       onTap: isLoading ? null : onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.2)),
+        padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.2)),
         decoration: BoxDecoration(
           color: outlined ? Colors.transparent : color,
           borderRadius: BorderRadius.circular(10),

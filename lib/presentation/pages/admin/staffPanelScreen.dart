@@ -52,7 +52,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(4),
-        vertical: context.getScreenHeight(1),
+        vertical: context.heightPercent(1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,11 +111,11 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                               fontSize: context.getResponsiveSize(5.3),
                             ),
                           ),
-                          SizedBox(height: context.getScreenHeight(0.5)),
+                          SizedBox(height: context.heightPercent(0.5)),
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(3),
-                              vertical: context.getScreenHeight(0.4),
+                              vertical: context.heightPercent(0.4),
                             ),
                             decoration: BoxDecoration(
                               color: const Color(0xFF0D9488).withValues(alpha: 0.3),
@@ -136,10 +136,10 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                   ],
                 ),
                 if (authController.user != null) ...[
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
                   if (authController.user!.email.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                      padding: EdgeInsets.only(bottom: context.heightPercent(0.5)),
                       child: Row(
                         children: [
                           Icon(
@@ -164,7 +164,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                     ),
                   if (authController.user!.phoneNumber.isNotEmpty)
                     Padding(
-                      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                      padding: EdgeInsets.only(bottom: context.heightPercent(0.5)),
                       child: Row(
                         children: [
                           Icon(
@@ -188,12 +188,12 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                       ),
                     ),
                 ],
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(4),
-                    vertical: context.getScreenHeight(1.2),
+                    vertical: context.heightPercent(1.2),
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.08),
@@ -223,14 +223,14 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(3)),
+          SizedBox(height: context.heightPercent(3)),
 
           
           // QUICK STATS ROW
           
           Obx(() => _buildStatsRow(context)),
 
-          SizedBox(height: context.getScreenHeight(3)),
+          SizedBox(height: context.heightPercent(3)),
 
           
           // STAFF MENU GRID / LIST
@@ -265,7 +265,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
             ],
           ),
 
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
 
           if (_isGridView)
             GridView.count(
@@ -273,7 +273,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
               physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: 2,
               crossAxisSpacing: context.getResponsiveSize(3),
-              mainAxisSpacing: context.getScreenHeight(1.5),
+              mainAxisSpacing: context.heightPercent(1.5),
               childAspectRatio: 0.9,
               children: [
                 _staffTile(
@@ -329,7 +329,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _managementItems.length,
               separatorBuilder: (_, __) =>
-                  SizedBox(height: context.getScreenHeight(1.2)),
+                  SizedBox(height: context.heightPercent(1.2)),
               itemBuilder: (context, index) {
                 final item = _managementItems[index];
                 return _staffListTile(
@@ -342,7 +342,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
               },
             ),
 
-          SizedBox(height: context.getScreenHeight(3)),
+          SizedBox(height: context.heightPercent(3)),
         ],
       ),
     );
@@ -406,7 +406,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
 
         return Wrap(
           spacing: spacing,
-          runSpacing: context.getScreenHeight(1),
+          runSpacing: context.heightPercent(1),
           children: stats
               .map((s) => SizedBox(
                     width: itemWidth,
@@ -430,7 +430,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1.5),
+          vertical: context.heightPercent(1.5),
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -474,7 +474,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                       fontSize: context.getResponsiveSize(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text(
                     subtitle,
                     maxLines: 1,
@@ -537,7 +537,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                 size: context.getResponsiveSize(7),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
             Text(
               title,
               textAlign: TextAlign.center,
@@ -549,7 +549,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                 fontSize: context.getResponsiveSize(3.8),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(0.4)),
+            SizedBox(height: context.heightPercent(0.4)),
             Text(
               subtitle,
               textAlign: TextAlign.center,

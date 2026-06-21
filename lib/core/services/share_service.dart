@@ -20,34 +20,6 @@ class ShareService {
     receiveTimeout: const Duration(seconds: 15),
   ));
 
-  static String buildFilterInfo({
-    required List<String> selectedKarats,
-    required List<String> selectedCategoryNames,
-    required bool showAllStock,
-    required double weightMin,
-    required double weightMax,
-  }) {
-    final parts = <String>[];
-
-    if (selectedKarats.isNotEmpty) {
-      parts.add(selectedKarats.join(', '));
-    }
-
-    if (selectedCategoryNames.isNotEmpty) {
-      parts.add(selectedCategoryNames.join(', '));
-    }
-
-    if (showAllStock) {
-      parts.add('All Stock');
-    }
-
-    if (weightMin > 0 || weightMax < 500) {
-      parts.add('${weightMin.round()}g – ${weightMax.round()}g');
-    }
-
-    return parts.isEmpty ? 'All Products' : parts.join(' | ');
-  }
-
   static Future<Uint8List> _loadLogoBytes(String path) async {
     final data = await rootBundle.load(path);
     return data.buffer.asUint8List();
@@ -314,97 +286,6 @@ class ShareService {
     }
 
     return allProducts;
-  }
-
-  static Future<File> shareCartEnquiryPdf({
-    required List<ProductModel> products,
-    required List<int> quantities,
-  }) async {
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
-    final imageFutures = products.map((p) async {
-      final url = p.displayImageUrl;
-      if (url == null || url.isEmpty) return null;
-      return _downloadAndCompressImage(
-        url,
-        maxLongestEdge: 200,
-        quality: 80,
-      );
-    }).toList();
-    final imageBytesList = await Future.wait(imageFutures);
-
-    final rows = <Map<String, dynamic>>[];
-    for (var i = 0; i < products.length; i++) {
-      final p = products[i];
-      rows.add({
-        'index': i + 1,
-        'name': p.name,
-        'category': p.category?.name ?? '-',
-        'karat': p.touch ?? p.karat ?? '-',
-        'netWt': p.karigarNetWt,
-        'qty': quantities[i],
-      });
-    }
-
-    final pdfBytes = await compute(_buildCartEnquiryPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'rows': rows,
-      'imageBytesList': imageBytesList,
-    });
-
-    final tempDir = await getApplicationDocumentsDirectory();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final fileName = 'Cart_Enquiry_$timestamp.pdf';
-    final file = File('${tempDir.path}/$fileName');
-    await file.writeAsBytes(pdfBytes);
-
-    return file;
-  }
-
-  static Future<File> shareOrderDetailsPdf({
-    required String orderId,
-    int? orderToken,
-    required String status,
-    required DateTime createdAt,
-    required List<Map<String, dynamic>> items,
-    double? totalAmount,
-  }) async {
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
-    final imageFutures = items.map((item) async {
-      final url = item['imageUrl'] as String?;
-      if (url == null || url.isEmpty) return null;
-      return _downloadAndCompressImage(
-        url,
-        maxLongestEdge: 200,
-        quality: 80,
-      );
-    }).toList();
-    final imageBytesList = await Future.wait(imageFutures);
-
-    final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'orderId': orderId,
-      'orderToken': orderToken,
-      'status': status,
-      'createdAt': createdAt.toIso8601String(),
-      'items': items,
-      'totalAmount': totalAmount,
-      'imageBytesList': imageBytesList,
-    });
-
-    final tempDir = await getApplicationDocumentsDirectory();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final displayId = orderToken != null ? '$orderToken' : orderId.substring(0, 8).toUpperCase();
-    final fileName = 'Order_${displayId}_$timestamp.pdf';
-    final file = File('${tempDir.path}/$fileName');
-    await file.writeAsBytes(pdfBytes);
-
-    return file;
   }
 
   static const MethodChannel _channel = MethodChannel('com.arhamjewellers/file_saver');
@@ -690,38 +571,6 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
   }
 
   return await pdf.save();
-}
-
-pw.Widget _infoChipCompact(String label, String value, pw.Font regularFont, pw.Font boldFont, {double fontSize = 8}) {
-  return pw.Container(
-    padding: pw.EdgeInsets.symmetric(horizontal: fontSize * 0.5, vertical: fontSize * 0.25),
-    decoration: pw.BoxDecoration(
-      color: PdfColor.fromHex('#F1EEE9'),
-      borderRadius: pw.BorderRadius.circular(2),
-    ),
-    child: pw.RichText(
-      text: pw.TextSpan(
-        children: [
-          pw.TextSpan(
-            text: '$label: ',
-            style: pw.TextStyle(
-              font: regularFont,
-              fontSize: fontSize,
-              color: PdfColor.fromHex('#7E756C'),
-            ),
-          ),
-          pw.TextSpan(
-            text: value,
-            style: pw.TextStyle(
-              font: boldFont,
-              fontSize: fontSize,
-              color: PdfColor.fromHex('#2D2118'),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) async {

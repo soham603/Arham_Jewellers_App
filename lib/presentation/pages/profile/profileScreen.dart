@@ -13,7 +13,6 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/staffPanelScreen.dart'
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/userOrderDetailScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/chat/chat_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/wishlist/wishlist_page.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -85,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         backgroundColor: AppColors.pageBg,
         toolbarHeight: MediaQuery.of(context).size.width >= 600
-            ? context.getScreenHeight(8)
+            ? context.heightPercent(8)
             : null,
         // 🔥 The Nuclear Option to permanently remove the back arrow:
         automaticallyImplyLeading: false,
@@ -237,7 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(4),
-                  vertical: context.getScreenHeight(1),
+                  vertical: context.heightPercent(1),
                 ),
 
                 child: Column(
@@ -309,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
 
                                     SizedBox(
-                                      height: context.getScreenHeight(0.5),
+                                      height: context.heightPercent(0.5),
                                     ),
 
                                     Text(
@@ -325,13 +324,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.heightPercent(2)),
 
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(4),
-                              vertical: context.getScreenHeight(1.2),
+                              vertical: context.heightPercent(1.2),
                             ),
 
                             decoration: BoxDecoration(
@@ -364,12 +363,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
 
                           if (authController.user?.isRetailer == true) ...[
-                            SizedBox(height: context.getScreenHeight(1)),
+                            SizedBox(height: context.heightPercent(1)),
                             Container(
                               width: double.infinity,
                               padding: EdgeInsets.symmetric(
                                 horizontal: context.getResponsiveSize(4),
-                                vertical: context.getScreenHeight(1.2),
+                                vertical: context.heightPercent(1.2),
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFD4AF37).withValues(alpha: 0.15),
@@ -400,15 +399,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Divider(color: Colors.grey.shade300),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     _wishlistLink(context),
 
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.heightPercent(1)),
 
                     // MY ORDERS CARD
                     GestureDetector(
@@ -416,7 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(4),
-                          vertical: context.getScreenHeight(1.5),
+                          vertical: context.heightPercent(1.5),
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -456,7 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       color: AppColors.textDark,
                                     ),
                                   ),
-                                  SizedBox(height: context.getScreenHeight(0.3)),
+                                  SizedBox(height: context.heightPercent(0.3)),
                                   Obx(
                                     () => Text(
                                       '${orderController.totalOrders} order${orderController.totalOrders != 1 ? 's' : ''}',
@@ -479,20 +478,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Divider(color: Colors.grey.shade300),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     // USER DETAILS CARD
                     _buildUserDetailsCard(context),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Divider(color: Colors.grey.shade300),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Text(
                       "Help & Info",
@@ -503,7 +502,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     _ancillaryLink(
                       context,
@@ -551,88 +550,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _chatButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Get.to(() => const ChatScreen()),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1.5),
-        ),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF1E1E1E), Color(0xFF2E2E2E)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGold.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                color: AppColors.primaryGold,
-                size: context.getResponsiveSize(5),
-              ),
-            ),
-            SizedBox(width: context.getResponsiveSize(3)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'AI Shopping Assistant',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: context.getResponsiveSize(4.2),
-                    ),
-                  ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
-                  Text(
-                    'Browse jewellery, check rates, track orders',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
-                      fontSize: context.getResponsiveSize(3),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.white.withValues(alpha: 0.5),
-              size: context.getResponsiveSize(5),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _wishlistLink(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(1)),
       child: GestureDetector(
         onTap: () => Get.to(() => const WishlistPage()),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1.5),
+            vertical: context.heightPercent(1.5),
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -672,7 +598,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: AppColors.textDark,
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(0.3)),
+                    SizedBox(height: context.heightPercent(0.3)),
                     Obx(
                       () => Text(
                         '${wishlistController.totalItems} item${wishlistController.totalItems != 1 ? 's' : ''}',
@@ -802,7 +728,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.getScreenHeight(0.3),
+                    vertical: context.heightPercent(0.3),
                   ),
                   decoration: BoxDecoration(
                     color: user.accountStatus!.toLowerCase() == 'active'
@@ -823,9 +749,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           ...details.map((detail) => Padding(
-                padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+                padding: EdgeInsets.only(bottom: context.heightPercent(1.2)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -846,7 +772,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fontSize: context.getResponsiveSize(2.8),
                             ),
                           ),
-                          SizedBox(height: context.getScreenHeight(0.2)),
+                          SizedBox(height: context.heightPercent(0.2)),
                           Text(
                             detail.value,
                             style: TextStyle(
@@ -873,13 +799,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String pageKey,
   }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(1)),
       child: GestureDetector(
         onTap: () => Get.to(() => const AncillaryPageScreen(), arguments: pageKey),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1.5),
+            vertical: context.heightPercent(1.5),
           ),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -962,7 +888,7 @@ class _OrderCard extends StatelessWidget {
                       fontSize: context.getResponsiveSize(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.4)),
+                  SizedBox(height: context.heightPercent(0.4)),
                   Text(
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
@@ -976,7 +902,7 @@ class _OrderCard extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(2.5),
-                vertical: context.getScreenHeight(0.3),
+                vertical: context.heightPercent(0.3),
               ),
               decoration: BoxDecoration(
                 color: statusInfo.bgColor,

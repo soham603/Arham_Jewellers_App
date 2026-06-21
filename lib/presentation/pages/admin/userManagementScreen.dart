@@ -105,13 +105,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   controller: _scroll,
                   padding: EdgeInsets.fromLTRB(
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(1.5),
+                    context.heightPercent(1.5),
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(3),
+                    context.heightPercent(3),
                   ),
                   itemCount: list.length + 1,
                   separatorBuilder: (_, _) =>
-                      SizedBox(height: context.getScreenHeight(1.2)),
+                      SizedBox(height: context.heightPercent(1.2)),
                   itemBuilder: (context, index) {
                     if (index == list.length) return _listFooter(context);
                     return _UserCard(
@@ -134,9 +134,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return Padding(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(1),
+        context.heightPercent(1),
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.5),
+        context.heightPercent(0.5),
       ),
       child: Column(
         children: [
@@ -188,7 +188,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               ],
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Obx(
             () => Align(
               alignment: Alignment.centerRight,
@@ -235,9 +235,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       () => Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(0.5),
+          context.heightPercent(0.5),
           context.getResponsiveSize(4),
-          context.getScreenHeight(1),
+          context.heightPercent(1),
         ),
         child: Row(
           children: _roleFilters.map((f) {
@@ -252,7 +252,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                     horizontal: 4,
                   ),
                   padding: EdgeInsets.symmetric(
-                    vertical: context.getScreenHeight(0.8),
+                    vertical: context.heightPercent(0.8),
                   ),
                   decoration: BoxDecoration(
                     color: isActive ? color : color.withValues(alpha: 0.08),
@@ -298,7 +298,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
       if (!controller.hasMore && !isLoading) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
           child: Center(
             child: Text(
               'All users loaded',
@@ -313,7 +313,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
       return Padding(
         padding: EdgeInsets.symmetric(
-          vertical: context.getScreenHeight(1.5),
+          vertical: context.heightPercent(1.5),
           horizontal: context.getResponsiveSize(12),
         ),
         child: ElevatedButton(
@@ -321,7 +321,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: context.colorPalette.primaryColor,
             disabledBackgroundColor: context.colorPalette.primaryColor.withValues(alpha: 0.6),
-            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.2)),
+            padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.2)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -355,14 +355,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 5,
       separatorBuilder: (_, _) =>
-          SizedBox(height: context.getScreenHeight(1.2)),
+          SizedBox(height: context.heightPercent(1.2)),
       itemBuilder: (_, _) => _shimmerCard(context),
     );
   }
 
   Widget _shimmerCard(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(10),
+      height: context.heightPercent(10),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(16),
@@ -384,16 +384,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             children: [
               Container(
                 width: context.getResponsiveSize(35),
-                height: context.getScreenHeight(1.5),
+                height: context.heightPercent(1.5),
                 decoration: BoxDecoration(
                   color: context.colorPalette.shimmerHighLightColor,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.6)),
+              SizedBox(height: context.heightPercent(0.6)),
               Container(
                 width: context.getResponsiveSize(25),
-                height: context.getScreenHeight(1.2),
+                height: context.heightPercent(1.2),
                 decoration: BoxDecoration(
                   color: context.colorPalette.shimmerHighLightColor,
                   borderRadius: BorderRadius.circular(4),
@@ -417,7 +417,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
@@ -426,7 +426,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               color: context.colorPalette.textColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             controller.error,
             textAlign: TextAlign.center,
@@ -435,7 +435,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               color: context.colorPalette.subTitleColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           ElevatedButton(
             onPressed: controller.refresh,
             style: ElevatedButton.styleFrom(
@@ -461,7 +461,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
             size: context.getResponsiveSize(16),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             controller.searchQuery.isNotEmpty
                 ? 'No users found'
@@ -569,7 +569,7 @@ class _UserCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text(
                     user.phoneNumber,
                     style: TextStyle(
@@ -579,7 +579,7 @@ class _UserCard extends StatelessWidget {
                   ),
                   if (user.companyName != null &&
                       user.companyName!.isNotEmpty) ...[
-                    SizedBox(height: context.getScreenHeight(0.2)),
+                    SizedBox(height: context.heightPercent(0.2)),
                     Text(
                       user.companyName!,
                       maxLines: 1,
@@ -591,11 +591,11 @@ class _UserCard extends StatelessWidget {
                     ),
                   ],
                    if (user.role.toUpperCase() != 'STAFF' && user.role.toUpperCase() != 'SUPERADMIN' && user.role.toUpperCase() != 'ADMIN') ...[
-                    SizedBox(height: context.getScreenHeight(0.4)),
+                    SizedBox(height: context.heightPercent(0.4)),
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(2),
-                        vertical: context.getScreenHeight(0.2),
+                        vertical: context.heightPercent(0.2),
                       ),
                       decoration: BoxDecoration(
                         color: (user.isRetailer == true
@@ -617,11 +617,11 @@ class _UserCard extends StatelessWidget {
                     ),
                   ],
                   if ((user.role.toUpperCase() == 'STAFF' || user.role.toUpperCase() == 'SUPERADMIN' || user.role.toUpperCase() == 'ADMIN') && user.isRetailer != true) ...[
-                    SizedBox(height: context.getScreenHeight(0.3)),
+                    SizedBox(height: context.heightPercent(0.3)),
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(2),
-                        vertical: context.getScreenHeight(0.2),
+                        vertical: context.heightPercent(0.2),
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryGold.withValues(alpha: 0.12),
@@ -638,11 +638,11 @@ class _UserCard extends StatelessWidget {
                     ),
                   ],
                   if (user.forgotPasswordStatus == 'PENDING') ...[
-                    SizedBox(height: context.getScreenHeight(0.3)),
+                    SizedBox(height: context.heightPercent(0.3)),
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(2),
-                        vertical: context.getScreenHeight(0.2),
+                        vertical: context.heightPercent(0.2),
                       ),
                       decoration: BoxDecoration(
                         color: Colors.orange.withValues(alpha: 0.12),
@@ -667,7 +667,7 @@ class _UserCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.getScreenHeight(0.4),
+                    vertical: context.heightPercent(0.4),
                   ),
                   decoration: BoxDecoration(
                     color: (isActive ? Colors.green : Colors.red)
@@ -684,7 +684,7 @@ class _UserCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.5)),
+                SizedBox(height: context.heightPercent(0.5)),
                 Icon(
                   Icons.chevron_right_rounded,
                   color: context.colorPalette.subTitleColor,
@@ -779,11 +779,11 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     context.getResponsiveSize(5),
                     0,
                     context.getResponsiveSize(5),
-                    context.getScreenHeight(3),
+                    context.heightPercent(3),
                   ),
                   children: [
                     _header(context, user, isActive),
-                    SizedBox(height: context.getScreenHeight(2.5)),
+                    SizedBox(height: context.heightPercent(2.5)),
                     _sectionTitle(context, 'Profile Information'),
                     _detailCard(
                       context,
@@ -807,7 +807,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                         ],
                       ],
                     ),
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     _sectionTitle(context, 'Account Details'),
                     _detailCard(
                       context,
@@ -855,7 +855,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                         ],
                       ],
                     ),
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     _sectionTitle(context, 'Device Information'),
                     _detailCard(
                       context,
@@ -878,7 +878,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                         ],
                       ],
                     ),
-                    SizedBox(height: context.getScreenHeight(2.5)),
+                    SizedBox(height: context.heightPercent(2.5)),
                     _sectionTitle(context, 'Actions'),
                     _actionCard(context, isActive),
                   ],
@@ -893,12 +893,12 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
   Widget _handleBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+      padding: EdgeInsets.only(top: context.heightPercent(1)),
       child: Column(
         children: [
           Container(
             width: context.getResponsiveSize(10),
-            height: context.getScreenHeight(0.5),
+            height: context.heightPercent(0.5),
             decoration: BoxDecoration(
               color: context.colorPalette.subTitleColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(100),
@@ -913,7 +913,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     return Column(
       children: [
         _handleBar(context),
-        SizedBox(height: context.getScreenHeight(2)),
+        SizedBox(height: context.heightPercent(2)),
         Container(
           width: context.getResponsiveSize(18),
           height: context.getResponsiveSize(18),
@@ -934,7 +934,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             ),
           ),
         ),
-        SizedBox(height: context.getScreenHeight(1)),
+        SizedBox(height: context.heightPercent(1)),
         Text(
           user.name,
           style: TextStyle(
@@ -943,7 +943,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             color: AppColors.textDark,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(0.3)),
+        SizedBox(height: context.heightPercent(0.3)),
         Text(
           user.email,
           style: TextStyle(
@@ -951,7 +951,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             color: context.colorPalette.subTitleColor,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(1)),
+        SizedBox(height: context.heightPercent(1)),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -984,7 +984,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(2.5),
-        vertical: context.getScreenHeight(0.4),
+        vertical: context.heightPercent(0.4),
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
@@ -1004,7 +1004,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
   Widget _sectionTitle(BuildContext context, String title) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(1)),
       child: Text(
         title,
         style: TextStyle(
@@ -1021,7 +1021,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(4),
-        vertical: context.getScreenHeight(1.5),
+        vertical: context.heightPercent(1.5),
       ),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
@@ -1046,7 +1046,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     int maxLines = 1,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.5)),
+      padding: EdgeInsets.symmetric(vertical: context.heightPercent(0.5)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1108,7 +1108,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(4),
-        vertical: context.getScreenHeight(1.5),
+        vertical: context.heightPercent(1.5),
       ),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
@@ -1202,7 +1202,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     required ValueChanged<bool> onChanged,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
+      padding: EdgeInsets.symmetric(vertical: context.heightPercent(0.8)),
       child: Row(
         children: [
           Container(
@@ -1280,7 +1280,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
         onTap: isLoading ? null : onTap,
         borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.8)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(0.8)),
           child: Row(
             children: [
               Container(
@@ -1530,7 +1530,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.5)),
+                SizedBox(height: context.heightPercent(0.5)),
                 Text(
                   'Phone: ${widget.user.phoneNumber}',
                   style: TextStyle(
@@ -1539,7 +1539,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
                 Text(
                   'Enter your password to confirm this action',
                   style: TextStyle(
@@ -1547,7 +1547,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     color: context.colorPalette.subTitleColor,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.8)),
+                SizedBox(height: context.heightPercent(0.8)),
                 TextField(
                   controller: passwordController,
                   obscureText: obscurePassword,
@@ -1583,7 +1583,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     fillColor: context.colorPalette.boxColor,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: context.getResponsiveSize(3),
-                      vertical: context.getScreenHeight(1.2),
+                      vertical: context.heightPercent(1.2),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1739,13 +1739,13 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               context.getResponsiveSize(2),
               0,
               context.getResponsiveSize(3),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
             ),
             titlePadding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(5),
               context.getResponsiveSize(4),
               context.getResponsiveSize(5),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
             ),
             title: Row(
               children: [
@@ -1783,7 +1783,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 TextField(
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
@@ -1820,7 +1820,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     fillColor: context.colorPalette.boxColor,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: context.getResponsiveSize(3),
-                      vertical: context.getScreenHeight(1.2),
+                      vertical: context.heightPercent(1.2),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1843,7 +1843,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                 ),
                 if (apiError != null) ...[
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   Text(
                     apiError!,
                     style: TextStyle(
@@ -1853,7 +1853,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     ),
                   ),
                 ],
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
             ),
             actions: [
@@ -1863,7 +1863,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(3),
-                    vertical: context.getScreenHeight(0.6),
+                    vertical: context.heightPercent(0.6),
                   ),
                 ),
                 child: Text(
@@ -1902,7 +1902,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     visualDensity: VisualDensity.compact,
                     padding: EdgeInsets.symmetric(
                       horizontal: context.getResponsiveSize(3),
-                      vertical: context.getScreenHeight(0.6),
+                      vertical: context.heightPercent(0.6),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

@@ -97,7 +97,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1.5),
+            vertical: context.heightPercent(1.5),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,12 +114,12 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ],
               ),
 
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
 
               // ── Customer Details ──
               if (order.partyName != null || order.contactNumber != null || order.user.name.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Customer Details'),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 _buildInfoCard(
                   context,
                   children: [
@@ -142,13 +142,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       _buildInfoRow(context, 'User Phone', order.user.phoneNumber),
                   ],
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
 
               // ── Item Details ──
               if (order.itemName != null || order.orderItems.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Item Details'),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 _buildInfoCard(
                   context,
                   children: [
@@ -209,13 +209,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     ],
                   ],
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
 
               // ── Reference Images ──
               if (order.referenceImages.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Reference Images'),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 SizedBox(
                   height: context.getResponsiveSize(25),
                   child: ListView.separated(
@@ -247,13 +247,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     },
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
 
               // ── Admin Message ──
               if (order.adminMessage != null && order.adminMessage!.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Admin Message'),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -273,14 +273,14 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     style: TextStyle(fontSize: context.getResponsiveSize(3.5), color: AppColors.textMuted, height: 1.5),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
 
               // ── Assigned Craftsman ──
               if (isAssigned || order.status.toUpperCase() == 'COMPLETED') ...[
                 if (order.assignedKarigarName != null && order.assignedKarigarName!.isNotEmpty) ...[
                   _buildSectionTitle(context, 'Assigned Craftsman'),
-                  SizedBox(height: context.getScreenHeight(1)),
+                  SizedBox(height: context.heightPercent(1)),
                   _buildInfoCard(
                     context,
                     children: [
@@ -303,7 +303,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ],
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                 ],
               ],
 
@@ -311,7 +311,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               if (isPending) ...[
                 SizedBox(
                   width: double.infinity,
-                  height: context.getScreenHeight(5.5),
+                  height: context.heightPercent(5.5),
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFDC2626)),
@@ -324,10 +324,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     ),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 SizedBox(
                   width: double.infinity,
-                  height: context.getScreenHeight(5.5),
+                  height: context.heightPercent(5.5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -348,7 +348,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               if (isAssigned) ...[
                 SizedBox(
                   width: double.infinity,
-                  height: context.getScreenHeight(5.5),
+                  height: context.heightPercent(5.5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -367,10 +367,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               ],
 
               // ── WhatsApp Button ──
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               _buildWhatsAppButton(context, order),
 
-              SizedBox(height: context.getScreenHeight(3)),
+              SizedBox(height: context.heightPercent(3)),
             ],
           ),
         ),
@@ -399,10 +399,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Approve & Assign Karigar", style: TextStyle(fontSize: context.getResponsiveSize(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Text("Select Craftsman", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     Obx(() {
                       final craftsmen = _craftsmanController.craftsmen;
                       return Container(
@@ -427,9 +427,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       );
                     }),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     Text("Staff Name", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     TextField(
                       controller: staffNameCtrl,
                       style: TextStyle(fontSize: context.getResponsiveSize(3.3)),
@@ -443,9 +443,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     Text("Notes", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     TextField(
                       controller: notesCtrl,
                       maxLines: 2,
@@ -460,10 +460,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.heightPercent(3)),
                     SizedBox(
                       width: double.infinity,
-                      height: context.getScreenHeight(5.5),
+                      height: context.heightPercent(5.5),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGold,
@@ -514,11 +514,11 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 decoration: const BoxDecoration(color: Color(0xFFFEE2E2), shape: BoxShape.circle),
                 child: Icon(Icons.close_rounded, color: const Color(0xFFDC2626), size: context.getResponsiveSize(7)),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Text("Reject Order", style: TextStyle(fontSize: context.getResponsiveSize(5.5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
-              SizedBox(height: context.getScreenHeight(1)),
+              SizedBox(height: context.heightPercent(1)),
               Text("Provide a reason for rejection", style: TextStyle(fontSize: context.getResponsiveSize(3.5), color: AppColors.textMuted)),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               TextField(
                 controller: reasonCtrl,
                 maxLines: 3,
@@ -530,12 +530,12 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(3)),
+              SizedBox(height: context.heightPercent(3)),
               Row(
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: context.getScreenHeight(5),
+                      height: context.heightPercent(5),
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.grey.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                         onPressed: () => Get.back(),
@@ -546,7 +546,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   SizedBox(width: context.getResponsiveSize(3)),
                   Expanded(
                     child: SizedBox(
-                      height: context.getScreenHeight(5),
+                      height: context.heightPercent(5),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC2626), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
                         onPressed: () async {
@@ -591,10 +591,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Mark as Completed", style: TextStyle(fontSize: context.getResponsiveSize(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
 
                     Text("Delivery Date", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     GestureDetector(
                       onTap: () async {
                         final date = await showDatePicker(
@@ -625,9 +625,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     Text("Completion Notes", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     TextField(
                       controller: notesCtrl,
                       maxLines: 2,
@@ -640,10 +640,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(3)),
+                    SizedBox(height: context.heightPercent(3)),
                     SizedBox(
                       width: double.infinity,
-                      height: context.getScreenHeight(5.5),
+                      height: context.heightPercent(5.5),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2D9D59),
@@ -727,7 +727,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
       },
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
+        padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
         decoration: BoxDecoration(
           color: const Color(0xFFE9F9EE),
           borderRadius: BorderRadius.circular(18),

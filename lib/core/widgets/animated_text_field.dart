@@ -106,7 +106,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
 
     return Padding(
       padding: EdgeInsets.only(
-        bottom: widget.paddingBottom ?? context.getScreenHeight(1.5),
+        bottom: widget.paddingBottom ?? context.heightPercent(1.5),
       ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -147,7 +147,7 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
             suffixIcon: dynamicSuffixIcon,
             contentPadding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(3.5).clamp(14.0, 20.0),
-              vertical: context.getScreenHeight(1.5).clamp(10.0, 16.0),
+              vertical: context.heightPercent(1.5).clamp(10.0, 16.0),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(

@@ -40,7 +40,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               ),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           Text(
             'Products per Page',
             style: TextStyle(
@@ -49,7 +49,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               color: context.colorPalette.textColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             'Select how many products to show on each page',
             style: TextStyle(
@@ -57,10 +57,10 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               color: context.colorPalette.subTitleColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           _buildOption(context, 1, '1 product per page', 'Full-size images'),
           _buildOption(context, 4, '4 products per page', 'Grid layout'),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -71,7 +71,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 padding: EdgeInsets.symmetric(
-                  vertical: context.getScreenHeight(1.2),
+                  vertical: context.heightPercent(1.2),
                 ),
               ),
               child: Text(
@@ -84,7 +84,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
               ),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
         ],
       ),
     );
@@ -95,7 +95,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
     return GestureDetector(
       onTap: () => setState(() => _selectedValue = value),
       child: Container(
-        margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+        margin: EdgeInsets.only(bottom: context.heightPercent(0.8)),
         padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
         decoration: BoxDecoration(
           color: isSelected
@@ -149,7 +149,7 @@ class _ShareProductsPerPageSheetState extends State<ShareProductsPerPageSheet> {
                           : context.colorPalette.textColor,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.2)),
+                  SizedBox(height: context.heightPercent(0.2)),
                   Text(
                     subtitle,
                     style: TextStyle(

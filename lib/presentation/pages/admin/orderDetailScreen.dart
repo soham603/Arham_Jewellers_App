@@ -66,15 +66,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildOrderHeader(context, order),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   _buildOrderItems(context, order),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   _buildTotalAmount(context, order),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   _buildUserDetails(context, order),
                   if (order.adminMessage != null &&
                       order.adminMessage!.isNotEmpty) ...[
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                     _buildAdminMessage(context, order),
                   ],
                 ],
@@ -85,9 +85,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Container(
               padding: EdgeInsets.fromLTRB(
                 context.getResponsiveSize(4),
-                context.getScreenHeight(1.5),
+                context.heightPercent(1.5),
                 context.getResponsiveSize(4),
-                context.getScreenHeight(2),
+                context.heightPercent(2),
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -103,7 +103,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 children: [
                   if (order.status == "PENDING") _buildActionButtons(context, order),
                   if (order.status == "APPROVED") _buildCompleteButton(context, order),
-                  SizedBox(height: context.getScreenHeight(1.2)),
+                  SizedBox(height: context.heightPercent(1.2)),
                   _buildWhatsAppButton(context, order),
                 ],
               ),
@@ -146,7 +146,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.getScreenHeight(0.3),
+                    vertical: context.heightPercent(0.3),
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF3E0),
@@ -167,11 +167,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
           Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(2.5),
-              vertical: context.getScreenHeight(0.3),
+              vertical: context.heightPercent(0.3),
             ),
             decoration: BoxDecoration(
               color: _orderStatusColor(order.status).withValues(alpha: 0.12),
@@ -186,14 +186,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           _infoRow(
             context,
             icon: Icons.access_time_rounded,
             label: "Created",
             value: DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
           ),
-          SizedBox(height: context.getScreenHeight(0.8)),
+          SizedBox(height: context.heightPercent(0.8)),
           _infoRow(
             context,
             icon: Icons.update_rounded,
@@ -230,13 +230,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               fontSize: context.getResponsiveSize(4.4),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           ...List.generate(order.orderItems.length, (index) {
             final item = order.orderItems[index];
             final imageUrl = item.product.imageUrl;
 
             return Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1.2)),
               child: Container(
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
@@ -290,7 +290,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: context.getResponsiveSize(1.5),
-                                    vertical: context.getScreenHeight(0.2),
+                                    vertical: context.heightPercent(0.2),
                                   ),
                                   decoration: BoxDecoration(
                                     color: Colors.red.withValues(alpha: 0.1),
@@ -307,10 +307,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 ),
                             ],
                           ),
-                          SizedBox(height: context.getScreenHeight(0.5)),
+                          SizedBox(height: context.heightPercent(0.5)),
                           Wrap(
                             spacing: context.getResponsiveSize(2),
-                            runSpacing: context.getScreenHeight(0.6),
+                            runSpacing: context.heightPercent(0.6),
                             children: [
                               _itemDetailChip(
                                 context,
@@ -373,7 +373,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(2),
-        vertical: context.getScreenHeight(0.2),
+        vertical: context.heightPercent(0.2),
       ),
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: 0.1),
@@ -473,14 +473,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               fontSize: context.getResponsiveSize(4.4),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           _detailRow(
             context,
             icon: Icons.person_rounded,
             label: "Name",
             value: user.name,
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
           _detailRow(
             context,
             icon: Icons.phone_rounded,
@@ -488,7 +488,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             value: user.phoneNumber,
           ),
           if (user.companyName.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             _detailRow(
               context,
               icon: Icons.business_rounded,
@@ -497,7 +497,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ],
           if (user.city.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             _detailRow(
               context,
               icon: Icons.location_city_rounded,
@@ -612,7 +612,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -666,7 +666,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               backgroundColor: Colors.green,
               disabledBackgroundColor: Colors.green.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
-                vertical: context.getScreenHeight(1.5),
+                vertical: context.heightPercent(1.5),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -702,7 +702,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               backgroundColor: Colors.red,
               disabledBackgroundColor: Colors.red.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
-                vertical: context.getScreenHeight(1.5),
+                vertical: context.heightPercent(1.5),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -734,7 +734,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           backgroundColor: const Color(0xFF2D9D59),
           disabledBackgroundColor: const Color(0xFF2D9D59).withValues(alpha: 0.5),
           padding: EdgeInsets.symmetric(
-            vertical: context.getScreenHeight(1.5),
+            vertical: context.heightPercent(1.5),
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
@@ -786,7 +786,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   Text(
                     "Order #${order.id.substring(0, 8)}",
                     style: TextStyle(
@@ -794,7 +794,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       fontSize: context.getResponsiveSize(3.4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   Text(
                     "Delivery Date",
                     style: TextStyle(
@@ -803,7 +803,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       color: AppColors.textMuted,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   GestureDetector(
                     onTap: () async {
                       final date = await showDatePicker(
@@ -854,7 +854,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   Text(
                     "Completion Notes",
                     style: TextStyle(
@@ -863,7 +863,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       color: AppColors.textMuted,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   TextField(
                     controller: notesController,
                     maxLines: 3,
@@ -893,7 +893,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   Row(
                     children: [
                       Expanded(
@@ -927,7 +927,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             elevation: 0,
                             backgroundColor: const Color(0xFF2D9D59),
                             padding: EdgeInsets.symmetric(
-                              vertical: context.getScreenHeight(1.2),
+                              vertical: context.heightPercent(1.2),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
@@ -965,7 +965,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          vertical: context.getScreenHeight(1.5),
+          vertical: context.heightPercent(1.5),
         ),
         decoration: BoxDecoration(
           color: const Color(0xFFE9F9EE),
@@ -1010,7 +1010,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.8)),
+              SizedBox(height: context.heightPercent(0.8)),
               Text(
                 "Order #${order.id.substring(0, 8)}",
                 style: TextStyle(
@@ -1018,7 +1018,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   fontSize: context.getResponsiveSize(3.4),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               TextField(
                 controller: reasonController,
                 maxLines: 3,
@@ -1048,7 +1048,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Row(
                 children: [
                   Expanded(
@@ -1086,7 +1086,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         elevation: 0,
                         backgroundColor: Colors.red,
                         padding: EdgeInsets.symmetric(
-                          vertical: context.getScreenHeight(1.2),
+                          vertical: context.heightPercent(1.2),
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),

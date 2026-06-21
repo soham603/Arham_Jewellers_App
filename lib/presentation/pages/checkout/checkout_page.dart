@@ -67,7 +67,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1),
+            vertical: context.heightPercent(1),
           ),
 
           child: Obx(() {
@@ -80,7 +80,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
 
                 Text(
                   "Booking Summary",
@@ -91,7 +91,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
 
-                SizedBox(height: context.getScreenHeight(0.3)),
+                SizedBox(height: context.heightPercent(0.3)),
 
                 Text(
                    "$totalItems item${totalItems != 1 ? 's' : ''} in your booking",
@@ -101,7 +101,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
                 ),
 
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
 
                 ...List.generate(items.length, (index) {
                   final item = items[index];
@@ -112,7 +112,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                   return Container(
                     margin: EdgeInsets.only(
-                      bottom: context.getScreenHeight(0.8),
+                      bottom: context.heightPercent(0.8),
                     ),
                     padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
                     decoration: BoxDecoration(
@@ -182,7 +182,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   height: 1.2,
                                 ),
                               ),
-                              SizedBox(height: context.getScreenHeight(0.2)),
+                              SizedBox(height: context.heightPercent(0.2)),
                               if (item.product.touch != null)
                                 Text(
                                   item.product.touch!,
@@ -215,7 +215,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                              SizedBox(height: context.getScreenHeight(0.4)),
+                              SizedBox(height: context.heightPercent(0.4)),
                               Text(
                                 'Qty: ${item.quantity}',
                                 style: TextStyle(
@@ -269,7 +269,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           "Subtotal",
                           "₹${subtotal.toStringAsFixed(0)}",
                         ),
-                        SizedBox(height: context.getScreenHeight(0.5)),
+                        SizedBox(height: context.heightPercent(0.5)),
                         _summaryRow(
                           context,
                           "GST (3%)",
@@ -277,7 +277,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(
-                            vertical: context.getScreenHeight(0.6),
+                            vertical: context.heightPercent(0.6),
                           ),
                           child: Container(
                             height: 1,
@@ -293,7 +293,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                   ),
 
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
             );
           }),
@@ -303,16 +303,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
         bottomNavigationBar: Container(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
-            context.getScreenHeight(0.8),
+            context.heightPercent(0.8),
             context.getResponsiveSize(4),
-            context.getScreenHeight(0.8),
+            context.heightPercent(0.8),
           ),
 
           decoration: const BoxDecoration(color: Colors.white),
 
           child: SizedBox(
             width: double.infinity,
-            height: context.getScreenHeight(5),
+            height: context.heightPercent(5),
 
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -364,7 +364,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.heightPercent(2)),
 
                           Text(
                             "Place Booking?",
@@ -377,7 +377,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ),
 
-                          SizedBox(height: context.getScreenHeight(1)),
+                          SizedBox(height: context.heightPercent(1)),
 
                           Text(
                             "Once submitted, our team will contact you shortly.",
@@ -390,13 +390,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ),
 
-                          SizedBox(height: context.getScreenHeight(3)),
+                          SizedBox(height: context.heightPercent(3)),
 
                           Row(
                             children: [
                               Expanded(
                                 child: SizedBox(
-                                  height: context.getScreenHeight(5),
+                                  height: context.heightPercent(5),
 
                                   child: OutlinedButton(
                                     style: OutlinedButton.styleFrom(
@@ -429,7 +429,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                               Expanded(
                                 child: SizedBox(
-                                  height: context.getScreenHeight(5),
+                                  height: context.heightPercent(5),
 
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(

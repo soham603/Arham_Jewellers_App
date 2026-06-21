@@ -97,14 +97,14 @@ class _LoginPageState extends State<LoginPage> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(5),
-                        vertical: context.getScreenHeight(2),
+                        vertical: context.heightPercent(2),
                       ),
                       child: Column(
                         children: [
                           // 1. Logo & Header
                           _buildTopSection(context, hasKeyboard: hasKeyboard),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.heightPercent(2)),
 
                           // 2. Form
                           Expanded(
@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          SizedBox(height: context.getScreenHeight(2)),
+                          SizedBox(height: context.heightPercent(2)),
 
                           // 3. Bottom Links & Terms
                           _buildBottomSection(context),
@@ -138,8 +138,8 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         SizedBox(
           height: hasKeyboard
-              ? context.getScreenHeight(1.5)
-              : context.getScreenHeight(5),
+              ? context.heightPercent(1.5)
+              : context.heightPercent(5),
         ),
         Center(
           child: LogoWidget(
@@ -157,17 +157,17 @@ class _LoginPageState extends State<LoginPage> {
             subtitleColor: context.colorPalette.goldDark,
             nameLetterSpacing: 2.5,
             iconNameSpacing: hasKeyboard
-                ? context.getScreenHeight(0.4)
-                : context.getScreenHeight(1.5),
+                ? context.heightPercent(0.4)
+                : context.heightPercent(1.5),
             nameSubtitleSpacing: hasKeyboard
-                ? context.getScreenHeight(0.15)
-                : context.getScreenHeight(0.4),
+                ? context.heightPercent(0.15)
+                : context.heightPercent(0.4),
           ),
         ),
         SizedBox(
           height: hasKeyboard
-              ? context.getScreenHeight(0.5)
-              : context.getScreenHeight(2),
+              ? context.heightPercent(0.5)
+              : context.heightPercent(2),
         ),
       ],
     );
@@ -196,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(0.3)),
+          SizedBox(height: context.heightPercent(0.3)),
 
           Text(
             isAdminLogin
@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
 
           AnimatedTextField(
             controller: phoneController,
@@ -250,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
             controller: passwordController,
             hintText: 'Enter Password',
             obscureText: _obscurePassword,
-            paddingBottom: context.getScreenHeight(0.5),
+            paddingBottom: context.heightPercent(0.5),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword
@@ -279,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                 : authController.userLoginErrorMsg;
             if (errorMsg.isEmpty) return const SizedBox.shrink();
             return Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(0.5)),
               child: Text(
                 errorMsg,
                 maxLines: 1,
@@ -293,7 +293,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           }),
 
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
 
           Align(
             alignment: Alignment.centerRight,
@@ -310,7 +310,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
 
           Obx(() {
             final isLoading = isAdminLogin
@@ -319,7 +319,7 @@ class _LoginPageState extends State<LoginPage> {
 
             return SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6),
+              height: context.heightPercent(6),
               child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -405,7 +405,7 @@ class _LoginPageState extends State<LoginPage> {
             );
           }),
 
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
 
           // ── Create Account Section ──
           Row(
@@ -432,7 +432,7 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
 
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
 
           // 🔥 Removed underline and added space before the question mark
           Center(
@@ -476,7 +476,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(3),
-                vertical: context.getScreenHeight(0.5),
+                vertical: context.heightPercent(0.5),
               ),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
@@ -495,7 +495,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        SizedBox(height: context.getScreenHeight(1)),
+        SizedBox(height: context.heightPercent(1)),
         Center(
           child: Text.rich(
             TextSpan(
@@ -529,7 +529,7 @@ class _LoginPageState extends State<LoginPage> {
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(1)),
+        SizedBox(height: context.heightPercent(1)),
       ],
     );
   }

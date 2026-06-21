@@ -79,7 +79,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(5),
-            vertical: context.getScreenHeight(1),
+            vertical: context.heightPercent(1),
           ),
           child: Center(
             child: ConstrainedBox(
@@ -87,7 +87,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: context.getScreenHeight(0.2)),
+                    SizedBox(height: context.heightPercent(0.2)),
 
                     // ── Logo ──
                     Center(
@@ -99,12 +99,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         nameColor: context.colorPalette.goldDeep,
                         subtitleColor: context.colorPalette.goldDark,
                         nameLetterSpacing: 2.0,
-                        iconNameSpacing: context.getScreenHeight(0.8),
-                        nameSubtitleSpacing: context.getScreenHeight(0.2),
+                        iconNameSpacing: context.heightPercent(0.8),
+                        nameSubtitleSpacing: context.heightPercent(0.2),
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(5)),
+                    SizedBox(height: context.heightPercent(5)),
 
                     // ── Title ──
                     Text(
@@ -116,7 +116,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.heightPercent(1)),
 
                     // ── Subtitle ──
                     Text(
@@ -128,7 +128,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(4)),
+                    SizedBox(height: context.heightPercent(4)),
 
                     // ── Phone Input ──
                     Align(
@@ -143,7 +143,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
 
                     AnimatedTextField(
                       controller: phoneController,
@@ -181,7 +181,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       },
                     ),
 
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
 
                     // ── Send Reset Link Button ──
                     Obx(() {
@@ -190,7 +190,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                       return SizedBox(
                         width: double.infinity,
-                        height: context.getScreenHeight(6),
+                        height: context.heightPercent(6),
                         child: ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -248,7 +248,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       );
                     }),
 
-                    SizedBox(height: context.getScreenHeight(2.5)),
+                    SizedBox(height: context.heightPercent(2.5)),
 
                     // ── OR Divider ──
                     Row(
@@ -295,12 +295,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ],
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2.5)),
+                    SizedBox(height: context.heightPercent(2.5)),
 
                     // ── Back to Sign In ──
                     SizedBox(
                       width: double.infinity,
-                      height: context.getScreenHeight(6),
+                      height: context.heightPercent(6),
                       child: OutlinedButton(
                         style: ButtonStyle(
                           side: WidgetStateProperty.all(
@@ -327,7 +327,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(6)),
+                    SizedBox(height: context.heightPercent(6)),
 
                     // ── Support Section ──
                     Center(
@@ -353,7 +353,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                     ),
 
-                    SizedBox(height: context.getScreenHeight(2)),
+                    SizedBox(height: context.heightPercent(2)),
                   ],
                 ),
               ),

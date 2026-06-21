@@ -31,6 +31,14 @@ class NotificationController extends GetxController {
   final Rx<CurrentAppState> state = CurrentAppState.INITIAL.obs;
   final RxString errorMessage = ''.obs;
   final RxString loadMoreError = ''.obs;
+  final RxInt filterIndex = 0.obs;
+
+  RxList<NotificationModel> get filteredNotifications {
+    if (filterIndex.value == 1) {
+      return notifications.where((n) => !n.isRead).toList().obs;
+    }
+    return notifications;
+  }
 
   final RxBool _hasMore = true.obs;
   bool get hasMore => _hasMore.value;
@@ -105,8 +113,10 @@ class NotificationController extends GetxController {
 
       if (generation != _fetchGeneration) return;
 
-      final List<dynamic> items =
-          responseData['data'] ?? responseData['notifications'] ?? [];
+      final nestedData = responseData['data'];
+      final List<dynamic> items = nestedData is Map
+          ? (nestedData['notifications'] ?? nestedData['data'] ?? [])
+          : (responseData['notifications'] ?? []);
       final fetched = items
           .map((json) => NotificationModel.fromJson(json))
           .toList();
@@ -255,6 +265,12 @@ class NotificationController extends GetxController {
 
   void clearAll() {
     notifications.clear();
+    _updateUnreadCount();
+    _saveNotifications();
+  }
+
+  void deleteNotification(String id) {
+    notifications.removeWhere((n) => n.id == id);
     _updateUnreadCount();
     _saveNotifications();
   }

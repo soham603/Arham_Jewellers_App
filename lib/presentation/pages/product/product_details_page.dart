@@ -324,15 +324,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                   padding: EdgeInsets.fromLTRB(
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(1.5),
+                    context.heightPercent(1.5),
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(1.5),
+                    context.heightPercent(1.5),
                   ),
                   child: Row(
                     children: [
                       Expanded(
                         child: SizedBox(
-                          height: context.getScreenHeight(6.2),
+                          height: context.heightPercent(6.2),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: isInCart ? 0 : 2,
@@ -374,7 +374,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       SizedBox(width: context.getResponsiveSize(3)),
                       Expanded(
                         child: SizedBox(
-                          height: context.getScreenHeight(6.2),
+                          height: context.heightPercent(6.2),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               elevation: 6,
@@ -468,7 +468,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           children: [
             // --- 1. Image Section (scrolls with content) ---
             SizedBox(
-              height: context.getScreenHeight(65),
+              height: context.heightPercent(65),
               width: double.infinity,
               child: Stack(
                 children: [
@@ -507,7 +507,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   // Top Left: Back Button
                   Positioned(
-                    top: context.getScreenHeight(2),
+                    top: context.heightPercent(2),
                     left: context.getResponsiveSize(4),
                     child: GestureDetector(
                       onTap: () => Get.back(),
@@ -535,7 +535,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // Top Right: Wishlist Heart
                   if (!Get.find<AuthController>().isAdmin)
                     Positioned(
-                      top: context.getScreenHeight(2),
+                      top: context.heightPercent(2),
                       right: context.getResponsiveSize(4),
                       child: Obx(() {
                         final isWishlisted = WishlistController.instance.isWishlisted(product.id);
@@ -593,7 +593,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   // Bottom Right: Zoom Icon
                   if (product.imageUrl != null)
                     Positioned(
-                      bottom: context.getScreenHeight(4),
+                      bottom: context.heightPercent(4),
                       right: context.getResponsiveSize(4),
                       child: GestureDetector(
                         onTap: () => showImageZoomDialog(
@@ -633,9 +633,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ),
               padding: EdgeInsets.fromLTRB(
                 context.getResponsiveSize(5),
-                context.getScreenHeight(3),
+                context.heightPercent(3),
                 context.getResponsiveSize(5),
-                context.getScreenHeight(3),
+                context.heightPercent(3),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -664,7 +664,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 letterSpacing: 0.5,
                               ),
                             ),
-                            SizedBox(height: context.getScreenHeight(0.3)),
+                            SizedBox(height: context.heightPercent(0.3)),
                             Text(
                               "Tag: ${product.tagNo ?? rawData['Barcode'] ?? '-'}",
                               style: TextStyle(
@@ -673,11 +673,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            SizedBox(height: context.getScreenHeight(0.6)),
+                            SizedBox(height: context.heightPercent(0.6)),
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: context.getResponsiveSize(3),
-                                vertical: context.getScreenHeight(0.4),
+                                vertical: context.heightPercent(0.4),
                               ),
                               decoration: BoxDecoration(
                                 color: stockColor.withValues(alpha: 0.1),
@@ -706,7 +706,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: context.getResponsiveSize(4),
-                            vertical: context.getScreenHeight(0.8),
+                            vertical: context.heightPercent(0.8),
                           ),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -748,7 +748,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ],
                   ),
 
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
 
                   // Specifications Header & Customize Button
                   Row(
@@ -792,7 +792,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                           padding: EdgeInsets.symmetric(
                             horizontal: context.getResponsiveSize(4),
-                            vertical: context.getScreenHeight(0.8),
+                            vertical: context.heightPercent(0.8),
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
@@ -802,7 +802,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ],
                   ),
 
-                  SizedBox(height: context.getScreenHeight(1)),
+                  SizedBox(height: context.heightPercent(1)),
 
                   // 2x2 Specifications Grid
                   if (grossWeight != null || netWeight != null) ...[
@@ -830,7 +830,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                       ],
                     ),
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.heightPercent(1)),
                     Row(
                       children: [
                         if (netWeight != null)
@@ -880,7 +880,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ],
 
-                  SizedBox(height: context.getScreenHeight(1)),
+                  SizedBox(height: context.heightPercent(1)),
 
                   // Size (Full Width)
                   if (size != null && size.isNotEmpty) ...[
@@ -893,7 +893,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         size,
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(1)),
+                    SizedBox(height: context.heightPercent(1)),
                   ],
 
                   // 5th Specification (Full Width Collection Name)
@@ -907,7 +907,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
 
                   // Description Header
                   Text(
@@ -919,7 +919,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                  SizedBox(height: context.getScreenHeight(0.5)),
+                  SizedBox(height: context.heightPercent(0.5)),
 
                   // Dynamic Description Text
                   Text(
@@ -931,12 +931,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
 
                   // Trust Badges Box
                   Container(
                     padding: EdgeInsets.symmetric(
-                      vertical: context.getScreenHeight(1.2),
+                      vertical: context.heightPercent(1.2),
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF9F6F0),
@@ -971,7 +971,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(10)),
+                  SizedBox(height: context.heightPercent(10)),
                 ],
               ),
             ),
@@ -990,7 +990,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(3),
-        vertical: context.getScreenHeight(1),
+        vertical: context.heightPercent(1),
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1029,7 +1029,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     letterSpacing: 0.5,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.3)),
+                SizedBox(height: context.heightPercent(0.3)),
                 Text(
                   value,
                   style: TextStyle(

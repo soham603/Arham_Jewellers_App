@@ -110,44 +110,5 @@ class CategoryModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
 
-      "name": name,
-
-      "nameSlug": nameSlug,
-
-      "description": description,
-
-      "imageUrl": imageUrl,
-
-      "imagePublicId": imagePublicId,
-
-      "boxName": boxName,
-
-      "isDeleted": isDeleted,
-
-      "createdAt": createdAt?.toIso8601String(),
-
-      "updatedAt": updatedAt?.toIso8601String(),
-
-      "createdBy": createdBy,
-
-      "updatedBy": updatedBy,
-
-      // NEW
-      "parentId": parentId,
-
-      "parent": parent?.toJson(),
-
-      "children": children?.map((e) => e.toJson()).toList(),
-
-      "level": level,
-
-      "images": images,
-
-      "count": count,
-    };
-  }
 }

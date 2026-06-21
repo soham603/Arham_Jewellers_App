@@ -513,46 +513,6 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.maxWidth,
-    required this.fontSize,
-    required this.hPad,
-    required this.vPad,
-  });
-
-  final String label;
-  final double maxWidth;
-  final double fontSize;
-  final double hPad;
-  final double vPad;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
-        decoration: BoxDecoration(
-          color: AppColors.categoryChipBg,
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: fontSize,
-            color: AppColors.primaryGold,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _WeightInfo extends StatelessWidget {
   const _WeightInfo({
     required this.fineWeight,

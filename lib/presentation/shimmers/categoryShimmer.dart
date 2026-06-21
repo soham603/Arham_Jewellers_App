@@ -9,7 +9,7 @@ class CategoryShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: context.getScreenHeight(12),
+      height: context.heightPercent(12),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: 6,
@@ -22,7 +22,7 @@ class CategoryShimmer extends StatelessWidget {
             child: Container(
               width: context.getResponsiveSize(18),
               padding: EdgeInsets.symmetric(
-                vertical: context.getScreenHeight(0.8),
+                vertical: context.heightPercent(0.8),
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -32,16 +32,16 @@ class CategoryShimmer extends StatelessWidget {
                 children: [
                   Container(
                     width: context.getResponsiveSize(11),
-                    height: context.getScreenHeight(5),
+                    height: context.heightPercent(5),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.6)),
+                  SizedBox(height: context.heightPercent(0.6)),
                   Container(
                     width: context.getResponsiveSize(10),
-                    height: context.getScreenHeight(1.2),
+                    height: context.heightPercent(1.2),
                     color: Colors.white,
                   ),
                 ],

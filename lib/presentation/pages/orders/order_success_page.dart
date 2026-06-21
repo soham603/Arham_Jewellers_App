@@ -99,12 +99,12 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
 
                     return Column(
                       children: [
-                        SizedBox(height: context.getScreenHeight(4)),
+                        SizedBox(height: context.heightPercent(4)),
 
                         // ── Hero: Animated success icon with gradient bg ──
                         _AnimatedHero(controller: _heroController),
 
-                        SizedBox(height: context.getScreenHeight(2.5)),
+                        SizedBox(height: context.heightPercent(2.5)),
 
                         Text(
                           'Booking Confirmed!',
@@ -117,7 +117,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                           textAlign: TextAlign.center,
                         ),
 
-                        SizedBox(height: context.getScreenHeight(1)),
+                        SizedBox(height: context.heightPercent(1)),
 
                         Text(
                           message.isNotEmpty
@@ -131,7 +131,7 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                           textAlign: TextAlign.center,
                         ),
 
-                        SizedBox(height: context.getScreenHeight(3)),
+                        SizedBox(height: context.heightPercent(3)),
 
                         // ── Content: Slide-up animated sections ──
                         FadeTransition(
@@ -153,24 +153,24 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                                   createdAt:
                                       orderController.lastOrderCreatedAt,
                                 ),
-                                SizedBox(height: context.getScreenHeight(2.5)),
+                                SizedBox(height: context.heightPercent(2.5)),
                                 _NextStepsCard(),
-                                SizedBox(height: context.getScreenHeight(2.5)),
+                                SizedBox(height: context.heightPercent(2.5)),
                                 _ContactAdminCard(orderId: orderId),
-                                SizedBox(height: context.getScreenHeight(3)),
+                                SizedBox(height: context.heightPercent(3)),
                                 _PrimaryButton(
                                   label: 'View My Orders',
                                   onPressed: () =>
                                       Get.offAllNamed(AppRoutes.myOrders),
                                 ),
                                 SizedBox(
-                                    height: context.getScreenHeight(1.5)),
+                                    height: context.heightPercent(1.5)),
                                 _SecondaryButton(
                                   label: 'Continue Shopping',
                                   onPressed: () =>
                                       Get.offAllNamed(AppRoutes.home),
                                 ),
-                                SizedBox(height: context.getScreenHeight(2)),
+                                SizedBox(height: context.heightPercent(2)),
                               ],
                             ),
                           ),
@@ -311,7 +311,7 @@ class _OrderDetailCard extends StatelessWidget {
                         color: AppColors.textDark,
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(0.5)),
+                    SizedBox(height: context.heightPercent(0.5)),
                     Text(
                       'Your booking has been received',
                       style: TextStyle(
@@ -326,9 +326,9 @@ class _OrderDetailCard extends StatelessWidget {
           ),
 
           if (orderId.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
             _Divider(),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
 
             _infoRow(
               context,
@@ -337,7 +337,7 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ],
 
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
 
           _infoRow(
             context,
@@ -349,7 +349,7 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
 
           _infoRow(
             context,
@@ -358,9 +358,9 @@ class _OrderDetailCard extends StatelessWidget {
           ),
 
           if (itemNames.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
             _Divider(),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
 
             for (int i = 0; i < itemNames.length; i++) ...[
               Row(
@@ -387,12 +387,12 @@ class _OrderDetailCard extends StatelessWidget {
                 ],
               ),
               if (i < itemNames.length - 1)
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
             ],
 
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             _Divider(),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
 
             Row(
               children: [
@@ -417,9 +417,9 @@ class _OrderDetailCard extends StatelessWidget {
             ),
           ],
 
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           _Divider(),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
 
           _infoRow(
             context,
@@ -676,7 +676,7 @@ class _NextStepsCard extends StatelessWidget {
               color: AppColors.textDark,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2.5)),
+          SizedBox(height: context.heightPercent(2.5)),
           ...steps.asMap().entries.map((entry) {
             final idx = entry.key;
             final (icon, title, subtitle) = entry.value;
@@ -725,9 +725,9 @@ class _NextStepsCard extends StatelessWidget {
                         if (!isLast)
                           Container(
                             width: 1.5,
-                            height: context.getScreenHeight(3.5),
+                            height: context.heightPercent(3.5),
                             margin: EdgeInsets.symmetric(
-                                vertical: context.getScreenHeight(0.6)),
+                                vertical: context.heightPercent(0.6)),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
@@ -746,7 +746,7 @@ class _NextStepsCard extends StatelessWidget {
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.only(
-                            top: context.getScreenHeight(0.3)),
+                            top: context.heightPercent(0.3)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -759,7 +759,7 @@ class _NextStepsCard extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                                height: context.getScreenHeight(0.5)),
+                                height: context.heightPercent(0.5)),
                             Text(
                               subtitle,
                               style: TextStyle(
@@ -850,7 +850,7 @@ class _ContactAdminCard extends StatelessWidget {
                         color: AppColors.textDark,
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(0.4)),
+                    SizedBox(height: context.heightPercent(0.4)),
                     Text(
                       'Have questions about your order?',
                       style: TextStyle(
@@ -864,7 +864,7 @@ class _ContactAdminCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(2.5)),
+          SizedBox(height: context.heightPercent(2.5)),
           Row(
             children: [
               Expanded(
@@ -933,7 +933,7 @@ class _ContactButton extends StatelessWidget {
             ),
           ),
           padding: EdgeInsets.symmetric(
-            vertical: context.getScreenHeight(1.6),
+            vertical: context.heightPercent(1.6),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -968,7 +968,7 @@ class _PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: context.getScreenHeight(6.5),
+      height: context.heightPercent(6.5),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -1023,7 +1023,7 @@ class _SecondaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: context.getScreenHeight(6.5),
+      height: context.heightPercent(6.5),
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
           side: BorderSide(

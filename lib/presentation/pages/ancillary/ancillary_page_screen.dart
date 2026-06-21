@@ -87,7 +87,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                     size: context.getResponsiveSize(14),
                     color: Colors.red.shade300,
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   Text(
                     controller.error.isNotEmpty
                         ? controller.error
@@ -98,7 +98,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                       color: Colors.red.shade400,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   ElevatedButton(
                     onPressed: () => controller.fetchPage(pageKey),
                     style: ElevatedButton.styleFrom(
@@ -128,7 +128,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
                   size: context.getResponsiveSize(14),
                   color: AppColors.textMuted.withValues(alpha: 0.4),
                 ),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 Text(
                   'No content available',
                   style: TextStyle(
@@ -144,7 +144,7 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(2),
+            vertical: context.heightPercent(2),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

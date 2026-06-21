@@ -14,10 +14,5 @@ class AncillaryPageModel {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'content': content,
-    };
-  }
+
 }

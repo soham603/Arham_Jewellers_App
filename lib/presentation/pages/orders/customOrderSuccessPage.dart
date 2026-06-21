@@ -29,7 +29,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                     size: context.getResponsiveSize(14),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(3)),
+                SizedBox(height: context.heightPercent(3)),
                 Text(
                   'Order Submitted!',
                   style: TextStyle(
@@ -38,7 +38,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                     color: AppColors.textDark,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   'Your custom order has been placed successfully. Our team will review and contact you shortly.',
                   style: TextStyle(
@@ -48,10 +48,10 @@ class CustomOrderSuccessPage extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: context.getScreenHeight(5)),
+                SizedBox(height: context.heightPercent(5)),
                 SizedBox(
                   width: double.infinity,
-                  height: context.getScreenHeight(6),
+                  height: context.heightPercent(6),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -71,7 +71,7 @@ class CustomOrderSuccessPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
                 TextButton(
                   onPressed: () => Get.offAllNamed('/my-orders'),
                   child: Text(

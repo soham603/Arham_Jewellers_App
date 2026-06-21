@@ -329,7 +329,7 @@ class _RegisterPageState extends State<RegisterPage> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
-              height: context.getScreenHeight(70),
+              height: context.heightPercent(70),
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
@@ -420,11 +420,11 @@ class _RegisterPageState extends State<RegisterPage> {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(1.5)),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          height: context.getScreenHeight(5.5).clamp(46.0, 60.0),
+          height: context.heightPercent(5.5).clamp(46.0, 60.0),
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
@@ -494,10 +494,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(
                         context.getResponsiveSize(4.5),
-                        context.getScreenHeight(1),
+                        context.heightPercent(1),
                         context.getResponsiveSize(4.5),
                         MediaQuery.of(context).viewInsets.bottom +
-                            context.getScreenHeight(2),
+                            context.heightPercent(2),
                       ),
                       child: Form(
                         key: _formKey,
@@ -507,7 +507,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(height: context.getScreenHeight(2)),
+                                SizedBox(height: context.heightPercent(2)),
 
                                 // ── Header ──
                                 Text(
@@ -518,7 +518,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     color: AppColors.textDark,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(0.5)),
+                                SizedBox(height: context.heightPercent(0.5)),
                                 Text(
                                   'Create an account to continue',
                                   style: TextStyle(
@@ -526,7 +526,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     color: AppColors.textMuted,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(2.5)),
+                                SizedBox(height: context.heightPercent(2.5)),
 
                                 AnimatedTextField(
                                   controller: emailController,
@@ -546,7 +546,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   final errorMsg = authController.userRegisterErrorMsg;
                                   if (errorMsg.isEmpty) return const SizedBox.shrink();
                                   return Padding(
-                                    padding: EdgeInsets.only(bottom: context.getScreenHeight(0.5)),
+                                    padding: EdgeInsets.only(bottom: context.heightPercent(0.5)),
                                     child: Text(
                                       errorMsg,
                                       style: TextStyle(
@@ -673,7 +673,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       _validateRequired('Company Name', v),
                                 ),
 
-                                SizedBox(height: context.getScreenHeight(2)),
+                                SizedBox(height: context.heightPercent(2)),
 
                                 Text(
                                   'Staff Details (Optional)',
@@ -683,7 +683,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     color: AppColors.textDark,
                                   ),
                                 ),
-                                SizedBox(height: context.getScreenHeight(1)),
+                                SizedBox(height: context.heightPercent(1)),
 
                                 AnimatedTextField(
                                   controller: staffNameController,
@@ -697,7 +697,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   maxLength: 10,
                                 ),
 
-                                SizedBox(height: context.getScreenHeight(1)),
+                                SizedBox(height: context.heightPercent(1)),
 
                                 Obx(() {
                                   final isLoading =
@@ -707,7 +707,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                   return SizedBox(
                                     width: double.infinity,
-                                    height: context.getScreenHeight(6),
+                                    height: context.heightPercent(6),
                                     child: ElevatedButton(
                                       style: ButtonStyle(
                                         backgroundColor:
@@ -769,7 +769,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }),
 
                                 const Spacer(),
-                                SizedBox(height: context.getScreenHeight(2)),
+                                SizedBox(height: context.heightPercent(2)),
 
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -800,7 +800,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ],
                                 ),
 
-                                SizedBox(height: context.getScreenHeight(2)),
+                                SizedBox(height: context.heightPercent(2)),
 
                                 Center(
                                   child: Text(

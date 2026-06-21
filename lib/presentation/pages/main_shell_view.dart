@@ -59,6 +59,9 @@ class MainShellView extends GetView<NavigationController> {
         final isAdmin = authController.isAdmin;
         final pages = isAdmin ? _adminPages : _regularPages;
         final navIndex = isAdmin ? index : (index >= 2 ? index + 1 : index);
+        final notificationCount = Get.isRegistered<NotificationController>()
+            ? Get.find<NotificationController>().unreadCount.value
+            : 0;
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -73,6 +76,7 @@ class MainShellView extends GetView<NavigationController> {
             currentIndex: navIndex,
             onTap: (i) => controller.switchTab(i, isAdmin: isAdmin),
             isAdmin: isAdmin,
+            notificationCount: notificationCount,
           ),
         );
       }),

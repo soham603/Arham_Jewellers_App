@@ -428,9 +428,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       bottomNavigationBar: Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(1.2),
+          context.heightPercent(1.2),
           context.getResponsiveSize(4),
-          context.getScreenHeight(1.2),
+          context.heightPercent(1.2),
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -452,10 +452,10 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 color: AppColors.textMuted,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
             SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6),
+              height: context.heightPercent(6),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 6,
@@ -517,7 +517,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1),
+            vertical: context.heightPercent(1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -538,7 +538,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 ),
               ),
 
-              SizedBox(height: context.getScreenHeight(0.5)),
+              SizedBox(height: context.heightPercent(0.5)),
 
               // 2. PRODUCT SPECIFICATIONS
               _buildSectionHeader("Product Specifications"),
@@ -668,7 +668,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 ),
               ),
 
-              SizedBox(height: context.getScreenHeight(0.5)),
+              SizedBox(height: context.heightPercent(0.5)),
 
               // 3. CUSTOMIZATION OPTIONS
               _buildSectionHeader("Customization Options"),
@@ -797,8 +797,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 ),
               ),
 
-              SizedBox(height: context.getScreenHeight(0.5)),
-              SizedBox(height: context.getScreenHeight(3)),
+              SizedBox(height: context.heightPercent(0.5)),
+              SizedBox(height: context.heightPercent(3)),
             ],
           ),
         ),

@@ -53,18 +53,18 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildOrderHeader(context, order),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             _buildOrderItems(context, order),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             _buildTotalAmount(context, order),
             if (order.adminMessage != null &&
                 order.adminMessage!.isNotEmpty) ...[
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               _buildAdminMessage(context, order),
             ],
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             _buildActionButtons(context, order),
-            SizedBox(height: context.getScreenHeight(4)),
+            SizedBox(height: context.heightPercent(4)),
           ],
         ),
       ),
@@ -101,7 +101,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.3),
+                  vertical: context.heightPercent(0.3),
                 ),
                 decoration: BoxDecoration(
                   color: statusInfo.bgColor,
@@ -118,14 +118,14 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           _infoRow(
             context,
             icon: Icons.access_time_rounded,
             label: "Created",
             value: DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
           ),
-          SizedBox(height: context.getScreenHeight(0.8)),
+          SizedBox(height: context.heightPercent(0.8)),
           _infoRow(
             context,
             icon: Icons.update_rounded,
@@ -164,13 +164,13 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               fontSize: context.getResponsiveSize(4.4),
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           ...List.generate(order.items.length, (index) {
             final item = order.items[index];
             final imageUrl = item.product.imageUrl;
 
             return Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1.2)),
               child: Container(
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
@@ -224,7 +224,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: context.getResponsiveSize(1.5),
-                                    vertical: context.getScreenHeight(0.2),
+                                    vertical: context.heightPercent(0.2),
                                   ),
                                   decoration: BoxDecoration(
                                     color: Colors.red.withValues(alpha: 0.1),
@@ -241,11 +241,11 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(height: context.getScreenHeight(0.5)),
+                          SizedBox(height: context.heightPercent(0.5)),
                           if (item.product.karigarNetWt != null)
                             Padding(
                               padding: EdgeInsets.only(
-                                bottom: context.getScreenHeight(0.3),
+                                bottom: context.heightPercent(0.3),
                               ),
                               child: Text(
                                 'Net Wt: ${item.product.karigarNetWt!.toStringAsFixed(2)}g',
@@ -258,7 +258,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                           if (item.product.size1 != null)
                             Padding(
                               padding: EdgeInsets.only(
-                                bottom: context.getScreenHeight(0.3),
+                                bottom: context.heightPercent(0.3),
                               ),
                               child: Text(
                                 'Size: ${item.product.size1}',
@@ -270,7 +270,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             ),
                           Padding(
                             padding: EdgeInsets.only(
-                              bottom: context.getScreenHeight(0.3),
+                              bottom: context.heightPercent(0.3),
                             ),
                             child: Text(
                               'Qty: ${item.quantity}',
@@ -324,7 +324,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
 
           if (order.itemName != null)
             _customDetailRow(context, "Item", order.itemName!),
@@ -352,7 +352,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               DateFormat("dd MMM yyyy").format(order.deliveryDate!.toLocal()),
             ),
           if (order.referenceImages.isNotEmpty) ...[
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
             Text(
               "Reference Images",
               style: TextStyle(
@@ -361,7 +361,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             SizedBox(
               height: context.getResponsiveSize(20),
               child: ListView.separated(
@@ -391,7 +391,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
   Widget _customDetailRow(BuildContext context, String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(0.8)),
       child: Row(
         children: [
           SizedBox(
@@ -428,7 +428,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
     if (price == null) return const SizedBox.shrink();
     return Padding(
-      padding: EdgeInsets.only(bottom: context.getScreenHeight(0.3)),
+      padding: EdgeInsets.only(bottom: context.heightPercent(0.3)),
       child: Text(
         'Price: ${_formatPrice(price)}',
         style: TextStyle(
@@ -535,7 +535,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -569,7 +569,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       children: [
         Expanded(
           child: SizedBox(
-            height: context.getScreenHeight(5),
+            height: context.heightPercent(5),
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.primaryGold),
@@ -592,7 +592,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         SizedBox(width: context.getResponsiveSize(3)),
         Expanded(
           child: SizedBox(
-            height: context.getScreenHeight(5),
+            height: context.heightPercent(5),
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 elevation: 0,
@@ -694,7 +694,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                     color: AppColors.primaryGold,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   message,
                   style: TextStyle(

@@ -46,7 +46,7 @@ class AncillarySelectionScreen extends StatelessWidget {
           final category = categories[index];
           return Card(
             elevation: 0,
-            margin: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
+            margin: EdgeInsets.only(bottom: context.heightPercent(1.5)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(color: Colors.grey.shade200),
@@ -54,7 +54,7 @@ class AncillarySelectionScreen extends StatelessWidget {
             child: ListTile(
               contentPadding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(4),
-                vertical: context.getScreenHeight(0.5),
+                vertical: context.heightPercent(0.5),
               ),
               title: Text(
                 category.replaceAll('_', ' '),

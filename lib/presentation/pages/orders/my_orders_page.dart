@@ -87,19 +87,19 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           controller: _scrollController,
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
-            context.getScreenHeight(2),
+            context.heightPercent(2),
             context.getResponsiveSize(4),
-            context.getScreenHeight(2),
+            context.heightPercent(2),
           ),
           itemCount: orders.length +
               (_orderController.hasMoreOrders ? 1 : 0),
           separatorBuilder: (_, _) =>
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
           itemBuilder: (context, index) {
             if (index == orders.length) {
               return Padding(
                 padding: EdgeInsets.symmetric(
-                  vertical: context.getScreenHeight(2),
+                  vertical: context.heightPercent(2),
                 ),
                 child: const Center(
                   child: CircularProgressIndicator(
@@ -188,9 +188,9 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           Padding(
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
               context.getResponsiveSize(4),
-              context.getScreenHeight(0.5),
+              context.heightPercent(0.5),
             ),
             child: Row(
               children: List.generate(_tabs.length, (i) {
@@ -208,7 +208,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                         horizontal: 3,
                       ),
                       padding: EdgeInsets.symmetric(
-                        vertical: context.getScreenHeight(0.9),
+                        vertical: context.heightPercent(0.9),
                       ),
                       decoration: BoxDecoration(
                         color: isActive
@@ -296,7 +296,7 @@ class _OrderCard extends StatelessWidget {
                               color: AppColors.textDark,
                             ),
                           ),
-                          SizedBox(height: context.getScreenHeight(0.4)),
+                          SizedBox(height: context.heightPercent(0.4)),
                           Text(
                             _formatDate(order.createdAt),
                             style: TextStyle(
@@ -305,11 +305,11 @@ class _OrderCard extends StatelessWidget {
                             ),
                           ),
                           if (order.isCustomOrder) ...[
-                            SizedBox(height: context.getScreenHeight(0.6)),
+                            SizedBox(height: context.heightPercent(0.6)),
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: context.getResponsiveSize(2),
-                                vertical: context.getScreenHeight(0.3),
+                                vertical: context.heightPercent(0.3),
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFFF3E0),
@@ -349,9 +349,9 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
 
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   Container(height: 1, color: AppColors.divider),
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
 
                   // ── Product thumbnail + items list 
                   Row(
@@ -377,7 +377,7 @@ class _OrderCard extends StatelessWidget {
                               ...order.items.take(2).map(
                                     (item) => Padding(
                                       padding: EdgeInsets.only(
-                                        bottom: context.getScreenHeight(0.5),
+                                        bottom: context.heightPercent(0.5),
                                       ),
                                       child: Row(
                                         children: [
@@ -423,7 +423,7 @@ class _OrderCard extends StatelessWidget {
                   // ── Admin message if present 
                   if (order.adminMessage != null &&
                       order.adminMessage!.isNotEmpty) ...[
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -457,9 +457,9 @@ class _OrderCard extends StatelessWidget {
 
                   // ── Total amount if present ─
                   if (order.totalAmount != null) ...[
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
                     Container(height: 1, color: AppColors.divider),
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -526,13 +526,13 @@ class _OrdersShimmer extends StatelessWidget {
     return ListView.separated(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(2),
+        context.heightPercent(2),
         context.getResponsiveSize(4),
-        context.getScreenHeight(2),
+        context.heightPercent(2),
       ),
       itemCount: 4,
       separatorBuilder: (_, _) =>
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
       itemBuilder: (_, _) => const _ShimmerCard(),
     );
   }
@@ -568,25 +568,25 @@ class _ShimmerCard extends StatelessWidget {
                         children: [
                           _ShimmerBlock(
                             width: context.getResponsiveSize(30),
-                            height: context.getScreenHeight(2),
+                            height: context.heightPercent(2),
                           ),
-                          SizedBox(height: context.getScreenHeight(0.8)),
+                          SizedBox(height: context.heightPercent(0.8)),
                           _ShimmerBlock(
                             width: context.getResponsiveSize(20),
-                            height: context.getScreenHeight(1.5),
+                            height: context.heightPercent(1.5),
                           ),
                         ],
                       ),
                       _ShimmerBlock(
                         width: context.getResponsiveSize(22),
-                        height: context.getScreenHeight(3),
+                        height: context.heightPercent(3),
                         borderRadius: 20,
                       ),
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   _ShimmerBlock(height: 1),
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -601,31 +601,31 @@ class _ShimmerCard extends StatelessWidget {
                           children: [
                             _ShimmerBlock(
                               width: double.infinity,
-                              height: context.getScreenHeight(1.8),
+                              height: context.heightPercent(1.8),
                             ),
-                            SizedBox(height: context.getScreenHeight(1.2)),
+                            SizedBox(height: context.heightPercent(1.2)),
                             _ShimmerBlock(
                               width: context.getResponsiveSize(25),
-                              height: context.getScreenHeight(1.8),
+                              height: context.heightPercent(1.8),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
                   _ShimmerBlock(height: 1),
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _ShimmerBlock(
                         width: context.getResponsiveSize(20),
-                        height: context.getScreenHeight(2),
+                        height: context.heightPercent(2),
                       ),
                       _ShimmerBlock(
                         width: context.getResponsiveSize(20),
-                        height: context.getScreenHeight(2.2),
+                        height: context.heightPercent(2.2),
                       ),
                     ],
                   ),
@@ -690,7 +690,7 @@ class _EmptyOrdersView extends StatelessWidget {
                 size: context.getResponsiveSize(11),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
             Text(
               'No Orders Yet',
               style: TextStyle(
@@ -699,7 +699,7 @@ class _EmptyOrdersView extends StatelessWidget {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Text(
               'Your orders will appear here once you place them.',
               style: TextStyle(
@@ -709,10 +709,10 @@ class _EmptyOrdersView extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
             SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6.5),
+              height: context.heightPercent(6.5),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
@@ -767,7 +767,7 @@ class _ErrorView extends StatelessWidget {
                 color: AppColors.danger,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
             Text(
               'Failed to load orders',
               style: TextStyle(
@@ -776,7 +776,7 @@ class _ErrorView extends StatelessWidget {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Text(
               'Something went wrong. Please try again.',
               style: TextStyle(
@@ -786,10 +786,10 @@ class _ErrorView extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
             SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6.5),
+              height: context.heightPercent(6.5),
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,

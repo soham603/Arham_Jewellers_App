@@ -66,7 +66,7 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.getScreenHeight(4.5)),
+          preferredSize: Size.fromHeight(context.heightPercent(4.5)),
           child: TabBar(
             controller: _tabController,
             labelColor: context.colorPalette.primaryColor,
@@ -116,8 +116,8 @@ class _Level1Tab extends StatelessWidget {
         color: context.colorPalette.primaryColor,
         child: ListView.builder(
           padding: EdgeInsets.fromLTRB(
-            context.getResponsiveSize(4), context.getScreenHeight(1),
-            context.getResponsiveSize(4), context.getScreenHeight(8),
+            context.getResponsiveSize(4), context.heightPercent(1),
+            context.getResponsiveSize(4), context.heightPercent(8),
           ),
           itemCount: items.length,
           itemBuilder: (_, i) {
@@ -256,8 +256,8 @@ class _ParentPickerList extends StatelessWidget {
       color: context.colorPalette.primaryColor,
       child: ListView.builder(
         padding: EdgeInsets.fromLTRB(
-          context.getResponsiveSize(4), context.getScreenHeight(1),
-          context.getResponsiveSize(4), context.getScreenHeight(8),
+          context.getResponsiveSize(4), context.heightPercent(1),
+          context.getResponsiveSize(4), context.heightPercent(8),
         ),
         itemCount: parents.length,
         itemBuilder: (_, i) => _ParentTile(cat: parents[i], onTap: () => onSelect(parents[i])),
@@ -307,7 +307,7 @@ class _DrillDownList extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(1),
+            vertical: context.heightPercent(1),
           ),
           color: context.colorPalette.boxColor.withValues(alpha: 0.4),
           child: Row(
@@ -336,7 +336,7 @@ class _DrillDownList extends StatelessWidget {
                 GestureDetector(
                   onTap: onAddNew,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2.5), vertical: context.getScreenHeight(0.6)),
+                    padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2.5), vertical: context.heightPercent(0.6)),
                     decoration: BoxDecoration(color: context.colorPalette.primaryColor, borderRadius: BorderRadius.circular(8)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -361,8 +361,8 @@ class _DrillDownList extends StatelessWidget {
                   color: context.colorPalette.primaryColor,
                   child: ListView.builder(
                     padding: EdgeInsets.fromLTRB(
-                      context.getResponsiveSize(4), context.getScreenHeight(1),
-                      context.getResponsiveSize(4), context.getScreenHeight(8),
+                      context.getResponsiveSize(4), context.heightPercent(1),
+                      context.getResponsiveSize(4), context.heightPercent(8),
                     ),
                     itemCount: items.length,
                     itemBuilder: (_, i) {
@@ -402,7 +402,7 @@ class _GroupedL1Tile extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showL1GroupSheet(context, ctrl, cat),
       child: Container(
-        margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+        margin: EdgeInsets.only(bottom: context.heightPercent(0.8)),
         padding: EdgeInsets.all(context.getResponsiveSize(3)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
@@ -427,7 +427,7 @@ class _GroupedL1Tile extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: context.getScreenHeight(0.4)),
+              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: context.heightPercent(0.4)),
               decoration: BoxDecoration(
                 color: context.colorPalette.primaryColor.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
@@ -466,7 +466,7 @@ class _L1GroupSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(60),
+      height: context.heightPercent(60),
       decoration: BoxDecoration(
         color: context.colorPalette.backgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -474,15 +474,15 @@ class _L1GroupSheet extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(top: context.getScreenHeight(1)),
+            margin: EdgeInsets.only(top: context.heightPercent(1)),
             width: context.getResponsiveSize(10),
             height: 4,
             decoration: BoxDecoration(color: context.colorPalette.subTitleColor.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2)),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text('${cat.name} — ${parents.length} parents, ${l2Items.length} sub-categories',
             style: TextStyle(fontSize: context.getResponsiveSize(3.8), fontWeight: FontWeight.w700, color: context.colorPalette.textColor)),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Expanded(
             child: ListView.separated(
               padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
@@ -514,7 +514,7 @@ class _L1GroupSheet extends StatelessWidget {
               },
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
         ],
       ),
     );
@@ -531,7 +531,7 @@ class _ParentTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+        margin: EdgeInsets.only(bottom: context.heightPercent(0.8)),
         padding: EdgeInsets.all(context.getResponsiveSize(3)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
@@ -593,7 +593,7 @@ class _CategoryTile extends StatelessWidget {
     final levelColor = _levelColor(cat.level);
 
     return Container(
-      margin: EdgeInsets.only(bottom: context.getScreenHeight(0.8)),
+      margin: EdgeInsets.only(bottom: context.heightPercent(0.8)),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(12),
@@ -615,7 +615,7 @@ class _CategoryTile extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1)),
+                padding: EdgeInsets.symmetric(vertical: context.heightPercent(1)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -633,7 +633,7 @@ class _CategoryTile extends StatelessWidget {
                         ],
                       ],
                     ),
-                    SizedBox(height: context.getScreenHeight(0.3)),
+                    SizedBox(height: context.heightPercent(0.3)),
                     Text(
                       cat.name, maxLines: 2, overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -653,7 +653,7 @@ class _CategoryTile extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(right: context.getResponsiveSize(2), top: context.getScreenHeight(0.8), bottom: context.getScreenHeight(0.8)),
+              padding: EdgeInsets.only(right: context.getResponsiveSize(2), top: context.heightPercent(0.8), bottom: context.heightPercent(0.8)),
               child: Obx(() {
                 final isLoading = ctrl.actionLoadingId == cat.id;
                 if (isLoading) {
@@ -667,7 +667,7 @@ class _CategoryTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (onEdit != null) _CircleBtn(icon: Icons.edit_rounded, color: context.colorPalette.primaryColor, onTap: onEdit!),
-                    if (onEdit != null && onDelete != null) SizedBox(height: context.getScreenHeight(0.5)),
+                    if (onEdit != null && onDelete != null) SizedBox(height: context.heightPercent(0.5)),
                     if (onDelete != null) _CircleBtn(icon: Icons.delete_rounded, color: Colors.red, onTap: onDelete!),
                   ],
                 );
@@ -926,46 +926,46 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             child: ListView(
               controller: scrollCtrl,
               padding: EdgeInsets.fromLTRB(
-                context.getResponsiveSize(5), context.getScreenHeight(1.5),
-                context.getResponsiveSize(5), context.getScreenHeight(3),
+                context.getResponsiveSize(5), context.heightPercent(1.5),
+                context.getResponsiveSize(5), context.heightPercent(3),
               ),
               children: [
                 Center(child: Container(width: context.getResponsiveSize(10), height: 4,
                   decoration: BoxDecoration(color: context.colorPalette.boxColor, borderRadius: BorderRadius.circular(2)))),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
                 Text(
                   isEditing ? 'Edit Category' : 'New Level ${widget.level} Category',
                   style: TextStyle(fontSize: context.getResponsiveSize(5), fontWeight: FontWeight.w700, color: context.colorPalette.textColor),
                 ),
-                SizedBox(height: context.getScreenHeight(2.5)),
+                SizedBox(height: context.heightPercent(2.5)),
 
                 _label('Name'),
-                SizedBox(height: context.getScreenHeight(0.6)),
+                SizedBox(height: context.heightPercent(0.6)),
                 TextFormField(
                   controller: _nameCtrl,
                   style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
                   decoration: _inputDec(context, 'Enter name'),
                   validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
 
                 if (!isEditing) ...[
                   _label('Description (optional)'),
-                  SizedBox(height: context.getScreenHeight(0.6)),
+                  SizedBox(height: context.heightPercent(0.6)),
                   TextFormField(
                     controller: _descCtrl,
                     style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
                     maxLines: 3,
                     decoration: _inputDec(context, 'Brief description...'),
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                 ],
 
                 _label('Image (optional)'),
-                SizedBox(height: context.getScreenHeight(0.8)),
+                SizedBox(height: context.heightPercent(0.8)),
                 Center(
                   child: SizedBox(
-                    width: context.getScreenHeight(14),
+                    width: context.heightPercent(14),
                     child: AspectRatio(
                       aspectRatio: 1,
                       child: GestureDetector(
@@ -1059,10 +1059,10 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                     ),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(3)),
+                SizedBox(height: context.heightPercent(3)),
 
                 SizedBox(
-                  width: double.infinity, height: context.getScreenHeight(6),
+                  width: double.infinity, height: context.heightPercent(6),
                   child: ElevatedButton(
                     onPressed: _submitting ? null : _submit,
                     style: ElevatedButton.styleFrom(
@@ -1104,7 +1104,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
           Container(decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.black.withValues(alpha: 0.35))),
           Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(Icons.camera_alt_rounded, color: Colors.white, size: context.getResponsiveSize(6)),
-            SizedBox(height: context.getScreenHeight(0.3)),
+            SizedBox(height: context.heightPercent(0.3)),
             Text('Tap to change', style: TextStyle(color: Colors.white, fontSize: context.getResponsiveSize(3))),
           ])),
         ]),
@@ -1119,7 +1119,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
 InputDecoration _inputDec(BuildContext context, String hint) {
   return InputDecoration(
     isDense: true,
-    contentPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(3.5), vertical: context.getScreenHeight(1.3)),
+    contentPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(3.5), vertical: context.heightPercent(1.3)),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
     enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.boxColor)),
     focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: context.colorPalette.primaryColor)),

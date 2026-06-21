@@ -70,9 +70,9 @@ class _SharePageState extends State<SharePage> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.8),
+        context.heightPercent(0.8),
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.6),
+        context.heightPercent(0.6),
       ),
       child: Row(
         children: [
@@ -97,7 +97,7 @@ class _SharePageState extends State<SharePage> {
           duration: const Duration(milliseconds: 200),
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(2),
-            vertical: context.getScreenHeight(0.8),
+            vertical: context.heightPercent(0.8),
           ),
           decoration: BoxDecoration(
             color: isSelected
@@ -147,12 +147,12 @@ class _SharePageState extends State<SharePage> {
           child: Container(
             margin: EdgeInsets.only(
               left: context.getResponsiveSize(4),
-              top: context.getScreenHeight(1),
-              bottom: context.getScreenHeight(0.6),
+              top: context.heightPercent(1),
+              bottom: context.heightPercent(0.6),
             ),
             padding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(4),
-              vertical: context.getScreenHeight(1),
+              vertical: context.heightPercent(1),
             ),
             decoration: BoxDecoration(
               color: context.colorPalette.goldDark,
@@ -218,7 +218,7 @@ class _SharePageState extends State<SharePage> {
       onRefresh: () => categoryController.fetchCategoryTree(),
       color: context.colorPalette.gold,
       child: ListView.builder(
-        padding: EdgeInsets.fromLTRB(0, context.getScreenHeight(0.5), 0, NavBarSpacer.heightOf(context)),
+        padding: EdgeInsets.fromLTRB(0, context.heightPercent(0.5), 0, NavBarSpacer.heightOf(context)),
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final cat = categories[index];
@@ -233,7 +233,7 @@ class _SharePageState extends State<SharePage> {
               return Container(
                 margin: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(4),
-                  vertical: context.getScreenHeight(0.4),
+                  vertical: context.heightPercent(0.4),
                 ),
                 padding: EdgeInsets.all(context.getResponsiveSize(4)),
                 decoration: BoxDecoration(
@@ -256,7 +256,7 @@ class _SharePageState extends State<SharePage> {
                             ),
                           ),
                           if (selectedCount > 0) ...[
-                            SizedBox(height: context.getScreenHeight(0.3)),
+                            SizedBox(height: context.heightPercent(0.3)),
                             Text(
                               '$selectedCount style${selectedCount == 1 ? '' : 's'} selected',
                               style: TextStyle(
@@ -301,7 +301,7 @@ class _SharePageState extends State<SharePage> {
         Container(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
-            vertical: context.getScreenHeight(0.6),
+            vertical: context.heightPercent(0.6),
           ),
           child: Row(
             children: [
@@ -367,7 +367,7 @@ class _SharePageState extends State<SharePage> {
         // Level 3 items
         Expanded(
           child: ListView.builder(
-            padding: EdgeInsets.fromLTRB(0, context.getScreenHeight(0.3), 0, NavBarSpacer.heightOf(context)),
+            padding: EdgeInsets.fromLTRB(0, context.heightPercent(0.3), 0, NavBarSpacer.heightOf(context)),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final cat = categories[index];
@@ -378,7 +378,7 @@ class _SharePageState extends State<SharePage> {
                   child: Container(
                     margin: EdgeInsets.symmetric(
                       horizontal: context.getResponsiveSize(4),
-                      vertical: context.getScreenHeight(0.3),
+                      vertical: context.heightPercent(0.3),
                     ),
                     padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
                     decoration: BoxDecoration(
@@ -480,7 +480,7 @@ class _SharePageState extends State<SharePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: context.getResponsiveSize(12), color: context.colorPalette.subTitleColor),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             message,
             style: TextStyle(
@@ -661,7 +661,7 @@ class _SharePageState extends State<SharePage> {
                 ),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             Text(
               'Share ${controller.selectedCount} categor${controller.selectedCount == 1 ? 'y' : 'ies'}',
               style: TextStyle(
@@ -670,7 +670,7 @@ class _SharePageState extends State<SharePage> {
                 color: context.colorPalette.textColor,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(0.5)),
+            SizedBox(height: context.heightPercent(0.5)),
             Text(
               controller.selectedCategoriesInfo,
               style: TextStyle(
@@ -680,7 +680,7 @@ class _SharePageState extends State<SharePage> {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             _shareOptionTile(
               context,
               icon: Icons.image_outlined,
@@ -697,7 +697,7 @@ class _SharePageState extends State<SharePage> {
                       _shareAsImages(context);
                     },
             ),
-            SizedBox(height: context.getScreenHeight(1.2)),
+            SizedBox(height: context.heightPercent(1.2)),
             _shareOptionTile(
               context,
               icon: Icons.picture_as_pdf_outlined,
@@ -709,7 +709,7 @@ class _SharePageState extends State<SharePage> {
                 _showProductsPerPageDialog(context);
               },
             ),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
           ],
         ),
       ),
@@ -763,7 +763,7 @@ class _SharePageState extends State<SharePage> {
                       color: effectiveTextColor,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text(
                     subtitle,
                     style: TextStyle(
@@ -862,7 +862,7 @@ class _SharePageState extends State<SharePage> {
                     color: context.colorPalette.gold,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   message,
                   style: TextStyle(
@@ -872,7 +872,7 @@ class _SharePageState extends State<SharePage> {
                   ),
                 ),
                 if (onCancel != null) ...[
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();

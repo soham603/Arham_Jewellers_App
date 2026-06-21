@@ -75,7 +75,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                   size: context.getResponsiveSize(18),
                   color: Colors.red.shade300,
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   "Failed to load orders",
                   style: TextStyle(
@@ -104,7 +104,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                 },
               ),
 
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
 
               // STATUS FILTER DROPDOWN
               Row(
@@ -147,11 +147,11 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                 ],
               ),
 
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
 
               if (controller.orders.isEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: context.getScreenHeight(12)),
+                  padding: EdgeInsets.only(top: context.heightPercent(12)),
                   child: Column(
                     children: [
                       Container(
@@ -167,7 +167,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                           color: Colors.grey,
                         ),
                       ),
-                      SizedBox(height: context.getScreenHeight(2)),
+                      SizedBox(height: context.heightPercent(2)),
                       Text(
                         "No Orders Found",
                         style: TextStyle(
@@ -175,7 +175,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                           fontSize: context.getResponsiveSize(5),
                         ),
                       ),
-                      SizedBox(height: context.getScreenHeight(1)),
+                      SizedBox(height: context.heightPercent(1)),
                       Text(
                         "No orders found for entered query",
                         textAlign: TextAlign.center,
@@ -192,7 +192,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                 ...List.generate(controller.orders.length, (index) {
                   return Padding(
                     padding: EdgeInsets.only(
-                      bottom: context.getScreenHeight(1.5),
+                      bottom: context.heightPercent(1.5),
                     ),
                     child: _AdminOrderCard(
                       order: controller.orders[index],
@@ -208,8 +208,8 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
               else if (controller.hasMore)
                 Padding(
                   padding: EdgeInsets.only(
-                    top: context.getScreenHeight(1),
-                    bottom: context.getScreenHeight(4),
+                    top: context.heightPercent(1),
+                    bottom: context.heightPercent(4),
                   ),
                   child: ElevatedButton(
                     onPressed: () {
@@ -223,7 +223,7 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                       ),
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(9),
-                        vertical: context.getScreenHeight(1.5),
+                        vertical: context.heightPercent(1.5),
                       ),
                     ),
                     child: Text(
@@ -291,7 +291,7 @@ class _AdminOrderCard extends StatelessWidget {
                       fontSize: context.getResponsiveSize(4.4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.6)),
+                  SizedBox(height: context.heightPercent(0.6)),
                   Text(
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
                     style: TextStyle(
@@ -299,13 +299,13 @@ class _AdminOrderCard extends StatelessWidget {
                       fontSize: context.getResponsiveSize(3.4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(1)),
+                  SizedBox(height: context.heightPercent(1)),
                   Row(
                     children: [
                       Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(2.5),
-                          vertical: context.getScreenHeight(0.3),
+                          vertical: context.heightPercent(0.3),
                         ),
                         decoration: BoxDecoration(
                           color: _orderStatusColor(order.status).withValues(alpha: 0.12),
@@ -325,7 +325,7 @@ class _AdminOrderCard extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: context.getResponsiveSize(2),
-                            vertical: context.getScreenHeight(0.3),
+                            vertical: context.heightPercent(0.3),
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFFF3E0),

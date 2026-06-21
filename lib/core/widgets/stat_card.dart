@@ -70,7 +70,7 @@ class StatCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             data.label,
             maxLines: 1,

@@ -27,12 +27,14 @@ class AppBottomNav extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
     this.isAdmin = false,
+    this.notificationCount = 0,
     super.key,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
   final bool isAdmin;
+  final int notificationCount;
 
   static const Duration _animationDuration = Duration(milliseconds: 220);
   static const Curve _animationCurve = Curves.easeOutCubic;
@@ -152,6 +154,7 @@ class AppBottomNav extends StatelessWidget {
                       index: index,
                       totalCount: items.length,
                       isSelected: isSelected,
+                      badgeCount: index == 0 ? notificationCount : 0,
                       onTap: () {
                         if (isSelected) return;
 
@@ -200,6 +203,7 @@ class _NavItemTile extends StatelessWidget {
     required this.selectedLabelColor,
     required this.unselectedIconColor,
     required this.unselectedLabelColor,
+    this.badgeCount = 0,
   });
 
   final _NavItem item;
@@ -218,6 +222,7 @@ class _NavItemTile extends StatelessWidget {
   final Color selectedLabelColor;
   final Color unselectedIconColor;
   final Color unselectedLabelColor;
+  final int badgeCount;
 
   @override
   Widget build(BuildContext context) {
@@ -362,6 +367,32 @@ child: Padding(
                           ),
                         ),
                       ),
+                      if (badgeCount > 0)
+                        Positioned(
+                          top: isCenterItem ? 4 : 0,
+                          right: 0,
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE85D4F),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                            child: Text(
+                              badgeCount > 99 ? '99+' : '$badgeCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

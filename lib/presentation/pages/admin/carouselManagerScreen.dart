@@ -77,7 +77,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(4),
-                  vertical: context.getScreenHeight(0.8),
+                  vertical: context.heightPercent(0.8),
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.primaryColor,
@@ -198,7 +198,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           padding: EdgeInsets.all(context.getResponsiveSize(4)),
           itemCount: list.length,
           separatorBuilder: (_, _) =>
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
           itemBuilder: (context, index) =>
               _deletedCarouselCard(context, list[index]),
         ),
@@ -214,7 +214,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
   }) {
     return Container(
       key: key,
-      margin: EdgeInsets.only(bottom: context.getScreenHeight(1.5)),
+      margin: EdgeInsets.only(bottom: context.heightPercent(1.5)),
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
@@ -241,14 +241,14 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     CachedNetworkImage(
                       imageUrl: item.imageUrl,
                       width: double.infinity,
-                      height: context.getScreenHeight(20),
+                      height: context.heightPercent(20),
                       fit: BoxFit.cover,
                       placeholder: (_, _) => Container(
                         color: context.colorPalette.shimmerBaseColor,
-                        height: context.getScreenHeight(20),
+                        height: context.heightPercent(20),
                       ),
                       errorWidget: (_, _, _) => Container(
-                        height: context.getScreenHeight(20),
+                        height: context.heightPercent(20),
                         color: context.colorPalette.boxColor,
                         child: Icon(
                           Icons.image_not_supported,
@@ -281,12 +281,12 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               ),
               // Position badge
               Positioned(
-                top: context.getScreenHeight(1),
+                top: context.heightPercent(1),
                 left: context.getResponsiveSize(3),
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.getScreenHeight(0.4),
+                    vertical: context.heightPercent(0.4),
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.65),
@@ -304,12 +304,12 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               ),
               // Active badge
               Positioned(
-                top: context.getScreenHeight(1),
+                top: context.heightPercent(1),
                 right: context.getResponsiveSize(3),
                 child: Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.getScreenHeight(0.4),
+                    vertical: context.heightPercent(0.4),
                   ),
                   decoration: BoxDecoration(
                     color: item.isActive
@@ -329,7 +329,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               ),
               // Drag handle
               Positioned(
-                bottom: context.getScreenHeight(1),
+                bottom: context.heightPercent(1),
                 right: context.getResponsiveSize(3),
                 child: Container(
                   padding: EdgeInsets.all(context.getResponsiveSize(1.5)),
@@ -363,7 +363,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     ),
                   ),
                 if (item.description.isNotEmpty) ...[
-                  SizedBox(height: context.getScreenHeight(0.4)),
+                  SizedBox(height: context.heightPercent(0.4)),
                   Text(
                     item.description,
                     maxLines: 2,
@@ -374,7 +374,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     ),
                   ),
                 ],
-                SizedBox(height: context.getScreenHeight(1.2)),
+                SizedBox(height: context.heightPercent(1.2)),
 
                 // ── Action Row 
                 Row(
@@ -468,7 +468,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             child: CachedNetworkImage(
               imageUrl: item.imageUrl,
               width: context.getResponsiveSize(28),
-              height: context.getScreenHeight(12),
+              height: context.heightPercent(12),
               fit: BoxFit.cover,
               placeholder: (_, _) =>
                   Container(color: context.colorPalette.shimmerBaseColor),
@@ -494,7 +494,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(2),
-                          vertical: context.getScreenHeight(0.3),
+                          vertical: context.heightPercent(0.3),
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.1),
@@ -511,7 +511,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       ),
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(0.5)),
+                  SizedBox(height: context.heightPercent(0.5)),
                   Text(
                     item.title,
                     maxLines: 1,
@@ -522,7 +522,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                       color: context.colorPalette.textColor,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(1)),
+                  SizedBox(height: context.heightPercent(1)),
                   Row(
                     children: [
                       Expanded(
@@ -542,7 +542,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                vertical: context.getScreenHeight(0.8),
+                                vertical: context.heightPercent(0.8),
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.green,
@@ -593,7 +593,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         onTap: () => _showRestoreWithImageSheet(context, item),
                         child: Container(
                           padding: EdgeInsets.symmetric(
-                            vertical: context.getScreenHeight(0.8),
+                            vertical: context.heightPercent(0.8),
                             horizontal: context.getResponsiveSize(3),
                           ),
                           decoration: BoxDecoration(
@@ -714,9 +714,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         builder: (ctx, setInner) => Container(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(5),
-            context.getScreenHeight(2),
+            context.heightPercent(2),
             context.getResponsiveSize(5),
-            context.getScreenHeight(4),
+            context.heightPercent(4),
           ),
           decoration: BoxDecoration(
             color: context.colorPalette.backgroundColor,
@@ -736,7 +736,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Text(
                 'Restore with New Image',
                 style: TextStyle(
@@ -745,7 +745,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   color: AppColors.textDark,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.5)),
+              SizedBox(height: context.heightPercent(0.5)),
               Text(
                 'Optionally replace the image before restoring',
                 style: TextStyle(
@@ -753,7 +753,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   color: context.colorPalette.subTitleColor,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               GestureDetector(
                 onTap: () async {
                   final picked = await ImagePicker().pickImage(
@@ -769,7 +769,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   }
                 },
                 child: Container(
-                  height: context.getScreenHeight(18),
+                  height: context.heightPercent(18),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: context.colorPalette.boxColor,
@@ -793,7 +793,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                               size: context.getResponsiveSize(10),
                               color: context.colorPalette.subTitleColor,
                             ),
-                            SizedBox(height: context.getScreenHeight(0.8)),
+                            SizedBox(height: context.heightPercent(0.8)),
                             Text(
                               'Tap to select image (optional)',
                               style: TextStyle(
@@ -805,7 +805,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                         ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2.5)),
+              SizedBox(height: context.heightPercent(2.5)),
               Obx(
                 () => SizedBox(
                   width: double.infinity,
@@ -848,7 +848,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(
-                        vertical: context.getScreenHeight(1.8),
+                        vertical: context.heightPercent(1.8),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -961,7 +961,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(2.5),
-          vertical: context.getScreenHeight(0.6),
+          vertical: context.heightPercent(0.6),
         ),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
@@ -998,9 +998,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 3,
       separatorBuilder: (_, _) =>
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
       itemBuilder: (_, _) => Container(
-        height: context.getScreenHeight(28),
+        height: context.heightPercent(28),
         decoration: BoxDecoration(
           color: context.colorPalette.shimmerBaseColor,
           borderRadius: BorderRadius.circular(16),
@@ -1019,7 +1019,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
@@ -1028,7 +1028,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               color: context.colorPalette.textColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           ElevatedButton(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
@@ -1054,7 +1054,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             msg,
             textAlign: TextAlign.center,
@@ -1174,7 +1174,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   color: AppColors.textDark,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Row(
                 children: [
                   Expanded(
@@ -1251,7 +1251,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+        padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
         decoration: BoxDecoration(
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(14),
@@ -1259,7 +1259,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
         child: Column(
           children: [
             Icon(icon, size: context.getResponsiveSize(10), color: context.colorPalette.primaryColor),
-            SizedBox(height: context.getScreenHeight(0.8)),
+            SizedBox(height: context.heightPercent(0.8)),
             Text(
               label,
               style: TextStyle(
@@ -1342,7 +1342,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     size: context.getResponsiveSize(12),
                     color: context.colorPalette.primaryColor,
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   Text(
                     'Video selected',
                     style: TextStyle(
@@ -1351,7 +1351,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text(
                     'Tap to change',
                     style: TextStyle(
@@ -1399,7 +1399,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     size: context.getResponsiveSize(12),
                     color: context.colorPalette.primaryColor,
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   Text(
                     'Video (existing)',
                     style: TextStyle(
@@ -1408,7 +1408,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text(
                     'Tap to change',
                     style: TextStyle(
@@ -1439,7 +1439,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   color: Colors.white,
                   size: context.getResponsiveSize(8),
                 ),
-                SizedBox(height: context.getScreenHeight(0.5)),
+                SizedBox(height: context.heightPercent(0.5)),
                 Text(
                   'Tap to change',
                   style: TextStyle(
@@ -1462,7 +1462,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
           size: context.getResponsiveSize(12),
           color: context.colorPalette.subTitleColor,
         ),
-        SizedBox(height: context.getScreenHeight(0.8)),
+        SizedBox(height: context.heightPercent(0.8)),
         Text(
           'Tap to select image/video',
           style: TextStyle(
@@ -1471,7 +1471,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
           ),
         ),
         if (!isEdit) ...[
-          SizedBox(height: context.getScreenHeight(0.3)),
+          SizedBox(height: context.heightPercent(0.3)),
           Text(
             '* Required',
             style: TextStyle(
@@ -1495,9 +1495,9 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
       child: Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(5),
-          context.getScreenHeight(2),
+          context.heightPercent(2),
           context.getResponsiveSize(5),
-          context.getScreenHeight(4),
+          context.heightPercent(4),
         ),
         decoration: BoxDecoration(
           color: context.colorPalette.backgroundColor,
@@ -1519,7 +1519,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Text(
                 isEdit ? 'Edit Carousel' : 'New Carousel',
                 style: TextStyle(
@@ -1528,7 +1528,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   color: AppColors.textDark,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
 
               // ── Media Picker 
               AspectRatio(
@@ -1673,7 +1673,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   ),
                 ],
               ),
-              SizedBox(height: context.getScreenHeight(1)),
+              SizedBox(height: context.heightPercent(1)),
 
               // ── Title 
               _buildField(
@@ -1681,7 +1681,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 'Title (optional)',
                 _titleController,
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
 
               // ── Description 
               _buildField(
@@ -1690,7 +1690,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 _descriptionController,
                 maxLines: 3,
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
 
               // ── Link URL ─
               _buildField(
@@ -1699,7 +1699,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                 _linkController,
                 keyboardType: TextInputType.url,
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
 
               // ── Inline Error 
               Obx(
@@ -1708,10 +1708,10 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(3),
-                          vertical: context.getScreenHeight(1),
+                          vertical: context.heightPercent(1),
                         ),
                         margin: EdgeInsets.only(
-                          bottom: context.getScreenHeight(1.5),
+                          bottom: context.heightPercent(1.5),
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: 0.1),
@@ -1762,7 +1762,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   ),
                 ],
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
 
               // ── Submit ───
               SizedBox(
@@ -1806,7 +1806,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: context.colorPalette.primaryColor,
                     padding: EdgeInsets.symmetric(
-                      vertical: context.getScreenHeight(1.8),
+                      vertical: context.heightPercent(1.8),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1867,7 +1867,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1.4),
+          vertical: context.heightPercent(1.4),
         ),
       ),
     );

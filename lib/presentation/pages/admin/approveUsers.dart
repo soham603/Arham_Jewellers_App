@@ -71,7 +71,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(3),
-                  vertical: context.getScreenHeight(0.5),
+                  vertical: context.heightPercent(0.5),
                 ),
                 decoration: BoxDecoration(
                   color: _filterColor(
@@ -120,13 +120,13 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                   controller: _scroll,
                   padding: EdgeInsets.fromLTRB(
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(1.5),
+                    context.heightPercent(1.5),
                     context.getResponsiveSize(4),
-                    context.getScreenHeight(3),
+                    context.heightPercent(3),
                   ),
                   itemCount: list.length + 1,
                   separatorBuilder: (_, _) =>
-                      SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.heightPercent(1.5)),
                   itemBuilder: (context, index) {
                     if (index == list.length) return _listFooter(context);
                     return _RequestCard(
@@ -151,9 +151,9 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(1),
+        context.heightPercent(1),
         context.getResponsiveSize(4),
-        context.getScreenHeight(1),
+        context.heightPercent(1),
       ),
       child: Obx(() {
         // Show selected user chip if in USER mode and user selected
@@ -161,7 +161,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
           return Container(
             padding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(3),
-              vertical: context.getScreenHeight(0.8),
+              vertical: context.heightPercent(0.8),
             ),
             decoration: BoxDecoration(
               color: context.colorPalette.primaryColor.withValues(alpha: 0.1),
@@ -299,8 +299,8 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
       if (state == CurrentAppState.LOADING) {
         return Container(
-          margin: EdgeInsets.only(top: context.getScreenHeight(1)),
-          padding: EdgeInsets.all(context.getScreenHeight(1.5)),
+          margin: EdgeInsets.only(top: context.heightPercent(1)),
+          padding: EdgeInsets.all(context.heightPercent(1.5)),
           decoration: BoxDecoration(
             color: context.colorPalette.boxColor,
             borderRadius: BorderRadius.circular(12),
@@ -327,8 +327,8 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
       if (state == CurrentAppState.SUCCESS && results.isEmpty) {
         return Container(
-          margin: EdgeInsets.only(top: context.getScreenHeight(1)),
-          padding: EdgeInsets.all(context.getScreenHeight(2)),
+          margin: EdgeInsets.only(top: context.heightPercent(1)),
+          padding: EdgeInsets.all(context.heightPercent(2)),
           decoration: BoxDecoration(
             color: context.colorPalette.boxColor,
             borderRadius: BorderRadius.circular(12),
@@ -347,9 +347,9 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
       if (results.isNotEmpty) {
         return Container(
-          margin: EdgeInsets.only(top: context.getScreenHeight(1)),
+          margin: EdgeInsets.only(top: context.heightPercent(1)),
           constraints: BoxConstraints(
-            maxHeight: context.getScreenHeight(40),
+            maxHeight: context.heightPercent(40),
           ),
           decoration: BoxDecoration(
             color: context.colorPalette.boxColor,
@@ -364,7 +364,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
           ),
           child: ListView.separated(
             shrinkWrap: true,
-            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.5)),
+            padding: EdgeInsets.symmetric(vertical: context.heightPercent(0.5)),
             itemCount: results.length,
             separatorBuilder: (_, _) => Divider(
               height: 1,
@@ -398,9 +398,9 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       () => Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(0.5),
+          context.heightPercent(0.5),
           context.getResponsiveSize(4),
-          context.getScreenHeight(1),
+          context.heightPercent(1),
         ),
         child: Row(
           children: _filters.map((f) {
@@ -415,7 +415,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     horizontal: context.getResponsiveSize(1),
                   ),
                   padding: EdgeInsets.symmetric(
-                    vertical: context.getScreenHeight(0.8),
+                    vertical: context.heightPercent(0.8),
                   ),
                   decoration: BoxDecoration(
                     color: isActive ? color : color.withValues(alpha: 0.08),
@@ -505,13 +505,13 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             context.getResponsiveSize(2),
             0,
             context.getResponsiveSize(3),
-            context.getScreenHeight(1),
+            context.heightPercent(1),
           ),
           titlePadding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(5),
             context.getResponsiveSize(4),
             context.getResponsiveSize(5),
-            context.getScreenHeight(1),
+            context.heightPercent(1),
           ),
           title: Row(
             children: [
@@ -551,11 +551,11 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                   color: context.colorPalette.textColor,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.6)),
+              SizedBox(height: context.heightPercent(0.6)),
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.5),
+                  vertical: context.heightPercent(0.5),
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold.withValues(alpha: 0.06),
@@ -583,7 +583,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               ),
               if (req.approvedTill != null && req.status == 'APPROVED')
                 Padding(
-                  padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
+                  padding: EdgeInsets.only(top: context.heightPercent(0.5)),
                   child: Text(
                     'Current access until: ${DateFormat('dd MMM yyyy').format(req.approvedTill!.toLocal())}',
                     style: TextStyle(
@@ -601,7 +601,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(3),
-                  vertical: context.getScreenHeight(0.6),
+                  vertical: context.heightPercent(0.6),
                 ),
               ),
               child: Text(
@@ -631,7 +631,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(3),
-                    vertical: context.getScreenHeight(0.6),
+                    vertical: context.heightPercent(0.6),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -757,7 +757,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       if (controller.state == CurrentAppState.LOADING &&
           controller.requests.isNotEmpty) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
           child: Center(
             child: SizedBox(
               width: context.getResponsiveSize(6),
@@ -772,7 +772,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       }
       if (!controller.hasMore) {
         return Padding(
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
           child: Center(
             child: Text(
               'All requests loaded',
@@ -794,14 +794,14 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
       itemCount: 5,
       separatorBuilder: (_, _) =>
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
       itemBuilder: (_, _) => _shimmerCard(context),
     );
   }
 
   Widget _shimmerCard(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(14),
+      height: context.heightPercent(14),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(16),
@@ -826,16 +826,16 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 children: [
                   Container(
                     width: context.getResponsiveSize(35),
-                    height: context.getScreenHeight(1.5),
+                    height: context.heightPercent(1.5),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.6)),
+                  SizedBox(height: context.heightPercent(0.6)),
                   Container(
                     width: context.getResponsiveSize(25),
-                    height: context.getScreenHeight(1.2),
+                    height: context.heightPercent(1.2),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
@@ -861,7 +861,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             size: context.getResponsiveSize(14),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             'Failed to load',
             style: TextStyle(
@@ -870,7 +870,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               color: context.colorPalette.textColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             controller.error,
             textAlign: TextAlign.center,
@@ -879,7 +879,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
               color: context.colorPalette.subTitleColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           ElevatedButton(
             onPressed: controller.refresh,
             style: ElevatedButton.styleFrom(
@@ -905,7 +905,7 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
             size: context.getResponsiveSize(16),
             color: context.colorPalette.subTitleColor,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             controller.searchMode == SearchMode.PHONE && controller.searchQuery.isNotEmpty
                 ? 'No ${controller.activeFilter.toLowerCase()} requests for this phone number'
@@ -1063,7 +1063,7 @@ class _RequestCardState extends State<_RequestCard> {
                             color: context.colorPalette.textColor,
                           ),
                         ),
-                        SizedBox(height: context.getScreenHeight(0.3)),
+                        SizedBox(height: context.heightPercent(0.3)),
                         Text(
                           user?.phoneNumber ?? user?.email ?? '—',
                           style: TextStyle(
@@ -1094,7 +1094,7 @@ class _RequestCardState extends State<_RequestCard> {
                           Container(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(2.5),
-                              vertical: context.getScreenHeight(0.4),
+                              vertical: context.heightPercent(0.4),
                             ),
                             decoration: BoxDecoration(
                               color: statusColor.withValues(alpha: 0.12),
@@ -1112,7 +1112,7 @@ class _RequestCardState extends State<_RequestCard> {
                           ),
                         ],
                       ),
-                      SizedBox(height: context.getScreenHeight(0.5)),
+                      SizedBox(height: context.heightPercent(0.5)),
                       Icon(
                         _expanded
                             ? Icons.keyboard_arrow_up_rounded
@@ -1146,14 +1146,14 @@ class _RequestCardState extends State<_RequestCard> {
                     'Email',
                     user?.email ?? '—',
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   _infoRow(
                     context,
                     Icons.phone_rounded,
                     'Phone',
                     user?.phoneNumber ?? '—',
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   _infoRow(
                     context,
                     Icons.access_time_rounded,
@@ -1165,7 +1165,7 @@ class _RequestCardState extends State<_RequestCard> {
 
                   // Approved till (if applicable)
                   if (req.approvedTill != null) ...[
-                    SizedBox(height: context.getScreenHeight(0.8)),
+                    SizedBox(height: context.heightPercent(0.8)),
                     Container(
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
                       decoration: BoxDecoration(
@@ -1230,13 +1230,13 @@ class _RequestCardState extends State<_RequestCard> {
                     ),
                   ],
 
-                  SizedBox(height: context.getScreenHeight(1.5)),
+                  SizedBox(height: context.heightPercent(1.5)),
 
                   if (req.status == 'PENDING')
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(3),
-                        vertical: context.getScreenHeight(0.5),
+                        vertical: context.heightPercent(0.5),
                       ),
                       decoration: BoxDecoration(
                         color: _isRetailer
@@ -1295,13 +1295,13 @@ class _RequestCardState extends State<_RequestCard> {
                     ),
 
                   if (req.status == 'PENDING')
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
 
                   if (req.status == 'APPROVED') ...[
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(3),
-                        vertical: context.getScreenHeight(0.5),
+                        vertical: context.heightPercent(0.5),
                       ),
                       decoration: BoxDecoration(
                         color: _isRetailer
@@ -1356,7 +1356,7 @@ class _RequestCardState extends State<_RequestCard> {
                         ],
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(1.5)),
+                    SizedBox(height: context.heightPercent(1.5)),
                   ],
 
                   Obx(() {
@@ -1475,7 +1475,7 @@ class _RequestCardState extends State<_RequestCard> {
     return GestureDetector(
       onTap: isLoading ? null : onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.2)),
+        padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.2)),
         decoration: BoxDecoration(
           color: outlined ? Colors.transparent : color,
           borderRadius: BorderRadius.circular(10),
@@ -1573,7 +1573,7 @@ class _RequestCardState extends State<_RequestCard> {
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(3),
-                vertical: context.getScreenHeight(0.6),
+                vertical: context.heightPercent(0.6),
               ),
             ),
             child: Text(
@@ -1606,7 +1606,7 @@ class _RequestCardState extends State<_RequestCard> {
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(3),
-                vertical: context.getScreenHeight(0.6),
+                vertical: context.heightPercent(0.6),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -1659,13 +1659,13 @@ class _RequestCardState extends State<_RequestCard> {
               context.getResponsiveSize(2),
               0,
               context.getResponsiveSize(3),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
             ),
             titlePadding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(5),
               context.getResponsiveSize(4),
               context.getResponsiveSize(5),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
             ),
             title: Row(
               children: [
@@ -1703,7 +1703,7 @@ class _RequestCardState extends State<_RequestCard> {
                     color: context.colorPalette.textColor,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 TextField(
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
@@ -1738,7 +1738,7 @@ class _RequestCardState extends State<_RequestCard> {
                     fillColor: context.colorPalette.boxColor,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: context.getResponsiveSize(3),
-                      vertical: context.getScreenHeight(1.2),
+                      vertical: context.heightPercent(1.2),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -1760,7 +1760,7 @@ class _RequestCardState extends State<_RequestCard> {
                     ),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(2)),
+                SizedBox(height: context.heightPercent(2)),
               ],
             ),
             actions: [
@@ -1770,7 +1770,7 @@ class _RequestCardState extends State<_RequestCard> {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(3),
-                    vertical: context.getScreenHeight(0.6),
+                    vertical: context.heightPercent(0.6),
                   ),
                 ),
                 child: Text(
@@ -1805,7 +1805,7 @@ class _RequestCardState extends State<_RequestCard> {
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(3),
-                    vertical: context.getScreenHeight(0.6),
+                    vertical: context.heightPercent(0.6),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -1884,7 +1884,7 @@ class _SearchResultTile extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(2),
-                vertical: context.getScreenHeight(0.3),
+                vertical: context.heightPercent(0.3),
               ),
               decoration: BoxDecoration(
                 color: _getStatusColor(user.accountStatus).withValues(alpha: 0.1),

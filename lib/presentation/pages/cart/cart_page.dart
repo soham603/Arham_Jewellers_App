@@ -89,7 +89,7 @@ class _CartPageState extends State<CartPage> {
       body: Padding(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(1),
+          context.heightPercent(1),
           context.getResponsiveSize(4),
           NavBarSpacer.heightOf(context),
         ),
@@ -116,7 +116,7 @@ class _CartPageState extends State<CartPage> {
                           },
                           background: Container(
                             margin: EdgeInsets.only(
-                              bottom: context.getScreenHeight(0.8),
+                              bottom: context.heightPercent(0.8),
                             ),
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(5),
@@ -141,7 +141,7 @@ class _CartPageState extends State<CartPage> {
                             },
                             child: Container(
                               margin: EdgeInsets.only(
-                                bottom: context.getScreenHeight(0.8),
+                                bottom: context.heightPercent(0.8),
                               ),
                               padding: EdgeInsets.all(
                                 context.getResponsiveSize(2.5),
@@ -227,7 +227,7 @@ class _CartPageState extends State<CartPage> {
                                         if (item.product.touch != null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.2)),
+                                                  context.heightPercent(0.2)),
                                           Text(
                                             item.product.touch!,
                                             style: TextStyle(
@@ -241,7 +241,7 @@ class _CartPageState extends State<CartPage> {
                                             null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.2)),
+                                                  context.heightPercent(0.2)),
                                           Text(
                                             'Gross Wt: ${item.product.grossWeight}g',
                                             style: TextStyle(
@@ -255,7 +255,7 @@ class _CartPageState extends State<CartPage> {
                                                 null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.2)),
+                                                  context.heightPercent(0.2)),
                                           Text(
                                             'Net Wt: ${item.product.karigarNetWt}g',
                                             style: TextStyle(
@@ -268,7 +268,7 @@ class _CartPageState extends State<CartPage> {
                                         if (item.product.size != null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.2)),
+                                                  context.heightPercent(0.2)),
                                           Text(
                                             item.product.size!,
                                             style: TextStyle(
@@ -281,7 +281,7 @@ class _CartPageState extends State<CartPage> {
                                         if (_isRetailer && price != null) ...[
                                           SizedBox(
                                               height:
-                                                  context.getScreenHeight(0.5)),
+                                                  context.heightPercent(0.5)),
                                           Text(
                                             "₹${_formatPrice(price)}",
                                             style: TextStyle(
@@ -316,9 +316,9 @@ class _CartPageState extends State<CartPage> {
                           ),
                         );
                       }),
-                      SizedBox(height: context.getScreenHeight(0.5)),
+                      SizedBox(height: context.heightPercent(0.5)),
                       if (_isRetailer) _priceBreakdown(context),
-                      SizedBox(height: context.getScreenHeight(2)),
+                      SizedBox(height: context.heightPercent(2)),
                     ],
                   );
                 }),
@@ -343,7 +343,7 @@ class _CartPageState extends State<CartPage> {
   }) {
     return Container(
       width: context.getResponsiveSize(28),
-      height: context.getScreenHeight(3.8),
+      height: context.heightPercent(3.8),
       decoration: BoxDecoration(
         color: AppColors.warmBgLight,
         borderRadius: BorderRadius.circular(12),
@@ -422,7 +422,7 @@ class _CartPageState extends State<CartPage> {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Container(height: 1, color: AppColors.divider),
             _breakdownRow(
               context,
@@ -436,7 +436,7 @@ class _CartPageState extends State<CartPage> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(
-                vertical: context.getScreenHeight(1.5),
+                vertical: context.heightPercent(1.5),
               ),
               child: Container(height: 1, color: AppColors.divider),
             ),
@@ -460,7 +460,7 @@ class _CartPageState extends State<CartPage> {
         children: [
           Expanded(
             child: SizedBox(
-              height: context.getScreenHeight(5),
+              height: context.heightPercent(5),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: AppColors.primaryGold),
@@ -495,7 +495,7 @@ class _CartPageState extends State<CartPage> {
           SizedBox(width: context.getResponsiveSize(3)),
           Expanded(
             child: SizedBox(
-              height: context.getScreenHeight(5),
+              height: context.heightPercent(5),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
@@ -555,7 +555,7 @@ class _CartPageState extends State<CartPage> {
                     color: AppColors.primaryGold,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   'Generating enquiry PDF...',
                   style: TextStyle(
@@ -618,7 +618,7 @@ class _CartPageState extends State<CartPage> {
                 color: AppColors.primaryGold,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(2.2)),
+            SizedBox(height: context.heightPercent(2.2)),
             Text(
               "Your cart is empty",
               style: TextStyle(
@@ -627,7 +627,7 @@ class _CartPageState extends State<CartPage> {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Text(
               "Add items to your cart to continue to checkout.",
               textAlign: TextAlign.center,
@@ -637,10 +637,10 @@ class _CartPageState extends State<CartPage> {
                 height: 1.4,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
             SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6),
+              height: context.heightPercent(6),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
@@ -675,7 +675,7 @@ class _CartPageState extends State<CartPage> {
     bool bold = false,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(0.5)),
+      padding: EdgeInsets.symmetric(vertical: context.heightPercent(0.5)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

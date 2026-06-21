@@ -3,14 +3,6 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import 'logo_widget.dart';
 
-enum FallbackSize {
-  xs,
-  s,
-  m,
-  l,
-  xl,
-}
-
 class RatneshFallback extends StatelessWidget {
   final double logoSize;
   final double nameFontSize;

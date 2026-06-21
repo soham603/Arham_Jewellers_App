@@ -24,7 +24,7 @@ void showImageActionSheet(
           context.getResponsiveSize(4),
           0,
           context.getResponsiveSize(4),
-          context.getScreenHeight(1.5),
+          context.heightPercent(1.5),
         ),
         decoration: BoxDecoration(
           color: context.colorPalette.backgroundColor,
@@ -36,7 +36,7 @@ void showImageActionSheet(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: context.getScreenHeight(1.2)),
+            SizedBox(height: context.heightPercent(1.2)),
             Text(
               'Choose Action',
               style: TextStyle(
@@ -45,7 +45,7 @@ void showImageActionSheet(
                 color: context.colorPalette.textColor,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             // Edit option
             ListTile(
               contentPadding: EdgeInsets.symmetric(
@@ -185,7 +185,7 @@ void showImageActionSheet(
                 onRemove();
               },
             ),
-            SizedBox(height: context.getScreenHeight(0.5)),
+            SizedBox(height: context.heightPercent(0.5)),
           ],
         ),
       ),

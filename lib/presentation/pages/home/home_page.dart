@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
           children: [
                         const _TopBar(),
 
-                        SizedBox(height: context.getScreenHeight(1)),
+                        SizedBox(height: context.heightPercent(1)),
 
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
@@ -222,7 +222,7 @@ GestureDetector(
                           ),
                         ),
 
-                        SizedBox(height: context.getScreenHeight(2.2)),
+                        SizedBox(height: context.heightPercent(2.2)),
 
                         _CarouselSection(
                           controller: carouselController,
@@ -235,12 +235,12 @@ GestureDetector(
 
                         _CategoryQuickAccess(controller: categoryController),
 
-                        SizedBox(height: context.getScreenHeight(2)),
+                        SizedBox(height: context.heightPercent(2)),
 
                         Container(
                           width: double.infinity,
                           color: AppColors.deepEspresso,
-                          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(3)),
+                          padding: EdgeInsets.symmetric(vertical: context.heightPercent(3)),
                           child: Column(
                             children: [
                               const CollectionsDivider(
@@ -248,7 +248,7 @@ GestureDetector(
                                 label: 'Collections',
                               ),
 
-                              SizedBox(height: context.getScreenHeight(3)),
+                              SizedBox(height: context.heightPercent(3)),
 
                               _showCollectionShimmer
                                   ? Padding(
@@ -260,7 +260,7 @@ GestureDetector(
                                           children: [
                                             Expanded(
                                               child: Container(
-                                                height: context.getScreenWidth(44),
+                                                height: context.widthPercent(44),
                                                 decoration: BoxDecoration(
                                                   color: context.colorPalette.shimmerBaseColor,
                                                   borderRadius: BorderRadius.circular(12),
@@ -270,7 +270,7 @@ GestureDetector(
                                             SizedBox(width: context.getResponsiveSize(3)),
                                             Expanded(
                                               child: Container(
-                                                height: context.getScreenWidth(44),
+                                                height: context.widthPercent(44),
                                                 decoration: BoxDecoration(
                                                   color: context.colorPalette.shimmerBaseColor,
                                                   borderRadius: BorderRadius.circular(12),
@@ -402,7 +402,7 @@ GestureDetector(
                           ),
                         ),
 
-                        SizedBox(height: context.getScreenHeight(2.5)),
+                        SizedBox(height: context.heightPercent(2.5)),
 
                         Obx(() {
                           if (!categoryController.showProductSection) {
@@ -411,7 +411,7 @@ GestureDetector(
 
                           return Column(
                             children: [
-                              SizedBox(height: context.getScreenHeight(1)),
+                              SizedBox(height: context.heightPercent(1)),
                               _ProductSection(
                                 key: productSectionKey,
                                 category: categoryController.selectedLevel3!,
@@ -421,7 +421,7 @@ GestureDetector(
                           );
                         }),
 
-                        SizedBox(height: context.getScreenHeight(1)),
+                        SizedBox(height: context.heightPercent(1)),
 
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
@@ -437,13 +437,13 @@ GestureDetector(
                         Obx(() {
                           final state = carouselController.productState;
                           final products = carouselController.latestProducts;
-                          final cardWidth = context.getScreenWidth(42);
+                          final cardWidth = context.widthPercent(42);
                           final cardHeight = cardWidth * 4 / 3 + 80;
 
                           if (state == CurrentAppState.LOADING &&
                               products.isEmpty) {
                             return SizedBox(
-                              height: context.getScreenHeight(34),
+                              height: context.heightPercent(34),
                               child: ListView.separated(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.getResponsiveSize(4),
@@ -453,7 +453,7 @@ GestureDetector(
                                 separatorBuilder: (_, _) =>
                                     SizedBox(width: context.getResponsiveSize(3)),
                                 itemBuilder: (_, _) {
-                          final cardWidth = context.getScreenWidth(42);
+                          final cardWidth = context.widthPercent(42);
                                   return Shimmer.fromColors(
                                     baseColor:
                                         context.colorPalette.shimmerBaseColor,
@@ -462,7 +462,7 @@ GestureDetector(
                                         .shimmerHighLightColor,
                                     child: Container(
                                       width: cardWidth,
-                                      height: cardWidth * 0.8 + context.getScreenHeight(14) + 16,
+                                      height: cardWidth * 0.8 + context.heightPercent(14) + 16,
                                       decoration: BoxDecoration(
                                         color: context.colorPalette.cardBg,
                                         borderRadius: BorderRadius.circular(16),
@@ -491,7 +491,7 @@ GestureDetector(
                                             ),
                                           ),
                                           Container(
-                                            height: context.getScreenHeight(14),
+                                            height: context.heightPercent(14),
                                             padding: const EdgeInsets.all(8),
                                             child: Column(
                                               crossAxisAlignment:
@@ -578,7 +578,7 @@ GestureDetector(
                                 itemBuilder: (_, index) {
                                   if (index >= products.length) {
                                     return SizedBox(
-                                      width: context.getScreenWidth(42),
+                                      width: context.widthPercent(42),
                                       child: Center(
                                         child: CircularProgressIndicator(
                                           color: context.colorPalette.gold,
@@ -590,7 +590,7 @@ GestureDetector(
                                   final product = products[index];
 
                                   return SizedBox(
-                                    width: context.getScreenWidth(42),
+                                    width: context.widthPercent(42),
                                     child: ProductCard(
                                       product: product,
                                       onTap: () {
@@ -614,7 +614,7 @@ GestureDetector(
                           );
                         }),
 
-                        SizedBox(height: context.getScreenHeight(4)),
+                        SizedBox(height: context.heightPercent(4)),
 
                         const CustomiseOrderBanner(),
 
@@ -759,7 +759,7 @@ class _KaratSection extends StatelessWidget {
             )
           else
             SizedBox(
-              height: context.getScreenHeight(14.5),
+              height: context.heightPercent(14.5),
 
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -814,7 +814,7 @@ class _KaratSection extends StatelessWidget {
                           children: [
                             Container(
                               width: context.getResponsiveSize(12),
-                              height: context.getScreenHeight(6),
+                              height: context.heightPercent(6),
 
                               decoration: BoxDecoration(
                                 color: context.colorPalette.shimmerBaseColor,
@@ -933,7 +933,7 @@ class _Level3Panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.getScreenHeight(1.2), context.getResponsiveSize(4), context.getScreenHeight(0.5)),
+      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.heightPercent(1.2), context.getResponsiveSize(4), context.heightPercent(0.5)),
 
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
 
@@ -1094,7 +1094,7 @@ class _ProductSection extends StatelessWidget {
     final productController = SearchProductController.instance;
 
     return Container(
-      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), 0, context.getResponsiveSize(4), context.getScreenHeight(3.5)),
+      margin: EdgeInsets.fromLTRB(context.getResponsiveSize(4), 0, context.getResponsiveSize(4), context.heightPercent(3.5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1146,7 +1146,7 @@ class _ProductSection extends StatelessWidget {
 
             if (state == CurrentAppState.LOADING) {
               return SizedBox(
-                height: context.getScreenHeight(36),
+                height: context.heightPercent(36),
                 child: Center(
                   child: CircularProgressIndicator(
                     color: context.colorPalette.gold,
@@ -1157,7 +1157,7 @@ class _ProductSection extends StatelessWidget {
 
             if (state == CurrentAppState.ERROR || products.isEmpty) {
               return SizedBox(
-                height: context.getScreenHeight(16),
+                height: context.heightPercent(16),
                 child: Center(
                   child: Text(
                     'No products found',
@@ -1208,7 +1208,7 @@ class _TrendingPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: context.getScreenHeight(22),
+      height: context.heightPercent(22),
 
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1247,7 +1247,7 @@ class _TrendingPlaceholder extends StatelessWidget {
                       child: Icon(
                         Icons.diamond_outlined,
                         color: context.colorPalette.goldDark,
-                        size: context.getScreenHeight(4),
+                        size: context.heightPercent(4),
                       ),
                     ),
                   ),
@@ -1372,7 +1372,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.getScreenHeight(2.5), context.getResponsiveSize(4), context.getScreenHeight(1)),
+      padding: EdgeInsets.fromLTRB(context.getResponsiveSize(4), context.heightPercent(2.5), context.getResponsiveSize(4), context.heightPercent(1)),
 
       child: Row(
         children: [
@@ -1479,7 +1479,7 @@ class _IconBtn extends StatelessWidget {
               top: -2,
               child: Container(
                 padding: EdgeInsets.all(0),
-                constraints: BoxConstraints(minWidth: context.responsiveWidth(10, tabletVal: 13, largeTabletVal: 15), minHeight: context.responsiveWidth(10, tabletVal: 13, largeTabletVal: 15)),
+                constraints: BoxConstraints(minWidth: context.responsiveWidth(18, tabletVal: 22, largeTabletVal: 26), minHeight: context.responsiveWidth(18, tabletVal: 22, largeTabletVal: 26)),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   shape: BoxShape.circle,
@@ -1489,7 +1489,7 @@ class _IconBtn extends StatelessWidget {
                     badgeCount > 99 ? '99+' : '$badgeCount',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: context.responsiveFont(8, tabletMultiplier: 1.2, largeTabletMultiplier: 1.3),
+                      fontSize: context.responsiveFont(10, tabletMultiplier: 1.2, largeTabletMultiplier: 1.3),
                       fontWeight: FontWeight.w700,
                     ),
                     textAlign: TextAlign.center,
@@ -1515,7 +1515,7 @@ class _QuickStatsStrip extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: context.getScreenHeight(8),
+      height: context.heightPercent(8),
 
       child: ListView.separated(
         padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
@@ -1530,7 +1530,7 @@ class _QuickStatsStrip extends StatelessWidget {
           final item = items[i];
 
           return Container(
-            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.getScreenHeight(1)),
+            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4), vertical: context.heightPercent(1)),
 
             decoration: BoxDecoration(
               color: context.colorPalette.goldLight,
@@ -1748,7 +1748,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
       if (widget.controller.getCarouselState == CurrentAppState.ERROR) {
         return Container(
           margin: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
-          height: context.getScreenHeight(20),
+          height: context.heightPercent(20),
 
           decoration: BoxDecoration(
             color: Colors.red.withValues(alpha: 0.06),
@@ -2002,7 +2002,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
       if (unique.isEmpty) {
         return SizedBox(
-          height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(5),
+          height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.heightPercent(5),
           child: Shimmer.fromColors(
             baseColor: context.colorPalette.shimmerBaseColor,
             highlightColor: context.colorPalette.shimmerHighLightColor,
@@ -2025,7 +2025,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                     const SizedBox(height: 7),
                     Container(
                       width: context.responsiveWidth(60, tabletVal: 115, largeTabletVal: 90),
-                      height: context.getScreenHeight(3),
+                      height: context.heightPercent(3),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(4),
@@ -2040,7 +2040,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       }
 
       return SizedBox(
-        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.getScreenHeight(5),
+        height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.heightPercent(5),
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           scrollDirection: Axis.horizontal,
@@ -2139,7 +2139,7 @@ class CustomiseOrderBanner extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(0.5),
+          vertical: context.heightPercent(0.5),
         ),
         child: Material(
           color: Colors.transparent,
@@ -2177,7 +2177,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(2.5),
-                        vertical: context.getScreenHeight(0.4),
+                        vertical: context.heightPercent(0.4),
                       ),
                       decoration: BoxDecoration(
                         color: context.colorPalette.goldDeep,
@@ -2225,7 +2225,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(height: context.getScreenHeight(0.8)),
+                              SizedBox(height: context.heightPercent(0.8)),
 
                               FittedBox(
                                 fit: BoxFit.scaleDown,
@@ -2242,7 +2242,7 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(height: context.getScreenHeight(0.8)),
+                              SizedBox(height: context.heightPercent(0.8)),
 
                               Text(
                                 "Turn your unique inspirations into stunning gold masterpieces.",
@@ -2254,12 +2254,12 @@ class CustomiseOrderBanner extends StatelessWidget {
                                 ),
                               ),
 
-                              SizedBox(height: context.getScreenHeight(1.2)),
+                              SizedBox(height: context.heightPercent(1.2)),
 
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: context.getResponsiveSize(3),
-                                  vertical: context.getScreenHeight(0.6),
+                                  vertical: context.heightPercent(0.6),
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.white,

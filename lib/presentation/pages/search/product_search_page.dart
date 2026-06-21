@@ -80,7 +80,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
             },
           ),
           _buildKaratRow(context),
-          SizedBox(height: context.getScreenHeight(0.6)),
+          SizedBox(height: context.heightPercent(0.6)),
           Expanded(
             child: Obx(() {
               final products = controller.products;
@@ -212,7 +212,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.4),
+        context.heightPercent(0.4),
         context.getResponsiveSize(4),
         0,
       ),
@@ -244,7 +244,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(2),
-          vertical: context.getScreenHeight(0.8),
+          vertical: context.heightPercent(0.8),
         ),
         decoration: BoxDecoration(
           color: isSelected

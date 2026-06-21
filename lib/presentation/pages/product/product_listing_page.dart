@@ -727,9 +727,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.4),
+        context.heightPercent(0.4),
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.4),
+        context.heightPercent(0.4),
       ),
       child: Row(
         children: [
@@ -758,7 +758,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(2),
-          vertical: context.getScreenHeight(0.6),
+          vertical: context.heightPercent(0.6),
         ),
         decoration: BoxDecoration(
           color: isSelected
@@ -1547,7 +1547,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       color: context.colorPalette.textColor,
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.2)),
+                  SizedBox(height: context.heightPercent(0.2)),
                   Text(
                     subtitle,
                     style: TextStyle(
@@ -1649,7 +1649,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                     color: context.colorPalette.gold,
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(1.5)),
+                SizedBox(height: context.heightPercent(1.5)),
                 Text(
                   message,
                   style: TextStyle(
@@ -1659,7 +1659,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                 ),
                 if (onCancel != null) ...[
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -1713,16 +1713,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: context.getScreenHeight(1),
+                      height: context.heightPercent(1),
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: context.colorPalette.shimmerHighLightColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    SizedBox(height: context.getScreenHeight(0.5)),
+                    SizedBox(height: context.heightPercent(0.5)),
                     Container(
-                      height: context.getScreenHeight(1),
+                      height: context.heightPercent(1),
                       width: context.getResponsiveSize(20),
                       decoration: BoxDecoration(
                         color: context.colorPalette.shimmerHighLightColor,
@@ -1769,16 +1769,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: context.getScreenHeight(1.2),
+                    height: context.heightPercent(1.2),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
+                  SizedBox(height: context.heightPercent(0.8)),
                   Container(
-                    height: context.getScreenHeight(1),
+                    height: context.heightPercent(1),
                     width: context.responsiveWidth(80),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,

@@ -88,7 +88,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(5),
-            vertical: context.getScreenHeight(1),
+            vertical: context.heightPercent(1),
           ),
           child: Center(
             child: ConstrainedBox(
@@ -98,7 +98,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: context.getScreenHeight(0.2)),
+                      SizedBox(height: context.heightPercent(0.2)),
 
                       // ── Logo ──
                       Center(
@@ -110,12 +110,12 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                           nameColor: context.colorPalette.goldDeep,
                           subtitleColor: context.colorPalette.goldDark,
                           nameLetterSpacing: 2.0,
-                          iconNameSpacing: context.getScreenHeight(0.8),
-                          nameSubtitleSpacing: context.getScreenHeight(0.2),
+                          iconNameSpacing: context.heightPercent(0.8),
+                          nameSubtitleSpacing: context.heightPercent(0.2),
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(5)),
+                      SizedBox(height: context.heightPercent(5)),
 
                       // ── Title ──
                       Text(
@@ -127,7 +127,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(1)),
+                      SizedBox(height: context.heightPercent(1)),
 
                       // ── Subtitle ──
                       Text(
@@ -139,7 +139,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(4)),
+                      SizedBox(height: context.heightPercent(4)),
 
                       // ── Mobile Number Label ──
                       Text(
@@ -151,7 +151,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(0.8)),
+                      SizedBox(height: context.heightPercent(0.8)),
 
                       // ── Phone Input ──
                       AnimatedTextField(
@@ -190,7 +190,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         },
                       ),
 
-                      SizedBox(height: context.getScreenHeight(1)),
+                      SizedBox(height: context.heightPercent(1)),
 
                       // ── Password Label ──
                       Text(
@@ -202,7 +202,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(0.8)),
+                      SizedBox(height: context.heightPercent(0.8)),
 
                       // ── Password Input ──
                       AnimatedTextField(
@@ -234,12 +234,12 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         },
                       ),
 
-                      SizedBox(height: context.getScreenHeight(1.5)),
+                      SizedBox(height: context.heightPercent(1.5)),
 
                       // ── Verify & Change Handset Button ──
                       SizedBox(
                         width: double.infinity,
-                        height: context.getScreenHeight(6),
+                        height: context.heightPercent(6),
                         child: ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -343,7 +343,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(6)),
+                      SizedBox(height: context.heightPercent(6)),
 
                       // ── Support Section ──
                       Center(
@@ -369,7 +369,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         ),
                       ),
 
-                      SizedBox(height: context.getScreenHeight(2)),
+                      SizedBox(height: context.heightPercent(2)),
                     ],
                   ),
                 ),

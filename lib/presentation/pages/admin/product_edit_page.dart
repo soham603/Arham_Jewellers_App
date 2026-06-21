@@ -221,17 +221,17 @@ class _ProductEditPageState extends State<ProductEditPage> {
         child: ListView(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(5),
-            context.getScreenHeight(2),
+            context.heightPercent(2),
             context.getResponsiveSize(5),
-            context.getScreenHeight(3),
+            context.heightPercent(3),
           ),
           children: [
             // Image Section
             _label('Product Image'),
-            SizedBox(height: context.getScreenHeight(0.8)),
+            SizedBox(height: context.heightPercent(0.8)),
             Center(
               child: SizedBox(
-                width: context.getScreenHeight(18),
+                width: context.heightPercent(18),
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: GestureDetector(
@@ -254,11 +254,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 ),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(2.5)),
+            SizedBox(height: context.heightPercent(2.5)),
 
             // Name
             _label('Name'),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             TextFormField(
               controller: _nameCtrl,
               style: TextStyle(
@@ -268,11 +268,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
               decoration: _inputDec('Enter product name'),
               validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
 
             // Karat
             _label('Karat'),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             DropdownButtonFormField<String>(
               initialValue: _selectedKarat,
               decoration: _inputDec('Select karat'),
@@ -289,11 +289,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 }
               },
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
 
             // Collection (Level 2)
             _label('Collection'),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             DropdownButtonFormField<String>(
               initialValue: _selectedLevel2Id,
               decoration: _inputDec(
@@ -323,11 +323,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 return null;
               },
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
 
             // Style (Level 3)
             _label('Style'),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             DropdownButtonFormField<String>(
               initialValue: _selectedCategoryId,
               decoration: _inputDec(
@@ -354,7 +354,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 return null;
               },
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
 
             // Raw Data
             GestureDetector(
@@ -374,7 +374,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(4),
-                  vertical: context.getScreenHeight(1.2),
+                  vertical: context.heightPercent(1.2),
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
@@ -402,12 +402,12 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 ),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
 
             // Save Button
             Obx(() => SizedBox(
               width: double.infinity,
-              height: context.getScreenHeight(6.5),
+              height: context.heightPercent(6.5),
               child: ElevatedButton(
                 onPressed: _adminCtrl.saving ? null : _submit,
                 style: ElevatedButton.styleFrom(
@@ -475,7 +475,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
             size: context.getResponsiveSize(10),
             color: Colors.grey.shade400,
           ),
-          SizedBox(height: context.getScreenHeight(0.5)),
+          SizedBox(height: context.heightPercent(0.5)),
           Text(
             'Tap to add image',
             style: TextStyle(
@@ -507,7 +507,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       fillColor: Colors.white,
       contentPadding: EdgeInsets.symmetric(
         horizontal: context.getResponsiveSize(4),
-        vertical: context.getScreenHeight(1.2),
+        vertical: context.heightPercent(1.2),
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

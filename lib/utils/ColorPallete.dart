@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 
 class ColorPalette {
+  const ColorPalette();
+  
   Color get backgroundColor => const Color(0xFFFFFFFF);
 
   Color get primaryColor => const Color(0xFF8B6914);
 
   Color get boxColor => const Color(0xFFFAF6F0);
 
-  Color get buttonColor => const Color(0xff000000);
-
   Color get textColor => const Color(0xff000000);
-
-  Color get reverseTextColor => const Color(0xffFFFFFF);
-
-  Color get lightBackgroundColor => const Color(0xFF999999);
 
   Color get pageBackgroundColor => const Color(0xFFF6F6F6);
 
   Color get subTitleColor => const Color(0xFF767C8F);
 
-  Color get shimmerBaseColor => Colors.grey[300]!;
+  Color get shimmerBaseColor => const Color(0xFFE0E0E0);
 
-  Color get shimmerHighLightColor => Colors.grey[100]!;
+  Color get shimmerHighLightColor => const Color(0xFFF5F5F5);
 
   Color get gold => const Color(0xFFD4AF37);
 

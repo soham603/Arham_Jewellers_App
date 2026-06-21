@@ -276,7 +276,7 @@ class _SearchPageState extends State<SearchPage> {
               return Container(
                 padding: EdgeInsets.fromLTRB(
                   context.getResponsiveSize(4),
-                  context.getScreenHeight(0.4),
+                  context.heightPercent(0.4),
                   context.getResponsiveSize(4),
                   0,
                 ),
@@ -315,7 +315,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               );
             }),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             Expanded(
               child: Obx(() {
                 final isSearching = controller.isSearching;
@@ -348,9 +348,9 @@ class _SearchPageState extends State<SearchPage> {
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(
                             context.getResponsiveSize(4),
-                            context.getScreenHeight(0.4),
+                            context.heightPercent(0.4),
                             context.getResponsiveSize(4),
-                            context.getScreenHeight(0.8),
+                            context.heightPercent(0.8),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -433,7 +433,7 @@ class _SearchPageState extends State<SearchPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
-        context.getScreenHeight(0.4),
+        context.heightPercent(0.4),
         context.getResponsiveSize(4),
         0,
       ),
@@ -480,7 +480,7 @@ class _SearchPageState extends State<SearchPage> {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(2),
-          vertical: context.getScreenHeight(0.8),
+          vertical: context.heightPercent(0.8),
         ),
         decoration: BoxDecoration(
           color: isSelected
@@ -856,7 +856,7 @@ class _SearchPageState extends State<SearchPage> {
         if (unique.isEmpty &&
             categoryController.k18State == CurrentAppState.LOADING) {
           return Padding(
-            padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+            padding: EdgeInsets.only(top: context.heightPercent(1)),
             child: const CategoryShimmer(),
           );
         }
@@ -869,9 +869,9 @@ class _SearchPageState extends State<SearchPage> {
             Padding(
               padding: EdgeInsets.fromLTRB(
                 context.getResponsiveSize(4),
-                context.getScreenHeight(1.5),
+                context.heightPercent(1.5),
                 context.getResponsiveSize(4),
-                context.getScreenHeight(0.8),
+                context.heightPercent(0.8),
               ),
               child: Text(
                 'Browse Categories',
@@ -882,7 +882,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             ),
-            SizedBox(height: context.getScreenHeight(0.6)),
+            SizedBox(height: context.heightPercent(0.6)),
             SizedBox(
               height: context.responsiveWidth(100, tabletVal: 140, largeTabletVal: 185),
               child: ListView.separated(
@@ -950,7 +950,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: context.getScreenHeight(0.5)),
+              padding: EdgeInsets.only(top: context.heightPercent(0.5)),
               child: Divider(color: context.colorPalette.boxColor),
             ),
           ],
@@ -970,7 +970,7 @@ class _SearchPageState extends State<SearchPage> {
           return Padding(
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
-              context.getScreenHeight(1.5),
+              context.heightPercent(1.5),
               context.getResponsiveSize(4),
               0,
             ),
@@ -985,15 +985,15 @@ class _SearchPageState extends State<SearchPage> {
                     color: const Color(0xFF675F55),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.8)),
+                SizedBox(height: context.heightPercent(0.8)),
                 Wrap(
                   spacing: context.getResponsiveSize(2),
-                  runSpacing: context.getScreenHeight(0.6),
+                  runSpacing: context.heightPercent(0.6),
                   children: List.generate(
                     6,
                     (_) => Container(
                       width: context.getResponsiveSize(22),
-                      height: context.getScreenHeight(3.2),
+                      height: context.heightPercent(3.2),
                       decoration: BoxDecoration(
                         color: context.colorPalette.shimmerBaseColor,
                         borderRadius: BorderRadius.circular(14),
@@ -1011,7 +1011,7 @@ class _SearchPageState extends State<SearchPage> {
         return Padding(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
-            context.getScreenHeight(1.5),
+            context.heightPercent(1.5),
             context.getResponsiveSize(4),
             0,
           ),
@@ -1026,10 +1026,10 @@ class _SearchPageState extends State<SearchPage> {
                   color: const Color(0xFF675F55),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.8)),
+              SizedBox(height: context.heightPercent(0.8)),
               Wrap(
                 spacing: context.getResponsiveSize(2),
-                runSpacing: context.getScreenHeight(0.6),
+                runSpacing: context.heightPercent(0.6),
                 children: categories.map((cat) {
                   final cleanedName = cat.name
                       .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
@@ -1064,7 +1064,7 @@ class _SearchPageState extends State<SearchPage> {
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(3),
-                        vertical: context.getScreenHeight(0.6),
+                        vertical: context.heightPercent(0.6),
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF4F1EC),
@@ -1083,7 +1083,7 @@ class _SearchPageState extends State<SearchPage> {
                   );
                 }).toList(),
               ),
-              SizedBox(height: context.getScreenHeight(0.5)),
+              SizedBox(height: context.heightPercent(0.5)),
               Divider(color: context.colorPalette.boxColor),
             ],
           ),
@@ -1101,7 +1101,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(1.5),
+          context.heightPercent(1.5),
           context.getResponsiveSize(4),
           0,
         ),
@@ -1132,13 +1132,13 @@ class _SearchPageState extends State<SearchPage> {
                   ),
               ],
             ),
-            SizedBox(height: context.getScreenHeight(0.8)),
+            SizedBox(height: context.heightPercent(0.8)),
             Wrap(
               spacing: context.getResponsiveSize(2),
-              runSpacing: context.getScreenHeight(0.6),
+              runSpacing: context.heightPercent(0.6),
               children: visible.map((term) => _buildSearchChip(context, term)).toList(),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Divider(color: context.colorPalette.boxColor),
           ],
         ),
@@ -1165,8 +1165,8 @@ class _SearchPageState extends State<SearchPage> {
           padding: EdgeInsets.only(
             left: context.getResponsiveSize(2.5),
             right: context.getResponsiveSize(1),
-            top: context.getScreenHeight(0.45),
-            bottom: context.getScreenHeight(0.45),
+            top: context.heightPercent(0.45),
+            bottom: context.heightPercent(0.45),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -1315,7 +1315,7 @@ class _SearchPageState extends State<SearchPage> {
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(2),
-                          vertical: context.getScreenHeight(0.3),
+                          vertical: context.heightPercent(0.3),
                         ),
                         child: ClipRect(
                           child: Column(
@@ -1333,7 +1333,7 @@ class _SearchPageState extends State<SearchPage> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               if (karatName != null) ...[
-                                SizedBox(height: context.getScreenHeight(0.1)),
+                                SizedBox(height: context.heightPercent(0.1)),
                                 Text(
                                   '$karatName • ${_getKaratPurity(karatName)}',
                                   style: TextStyle(
@@ -1463,16 +1463,16 @@ class _SearchPageState extends State<SearchPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: context.getScreenHeight(1),
+                    height: context.heightPercent(1),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.5)),
+                  SizedBox(height: context.heightPercent(0.5)),
                   Container(
-                    height: context.getScreenHeight(1),
+                    height: context.heightPercent(1),
                     width: context.getResponsiveSize(20),
                     decoration: BoxDecoration(
                       color: context.colorPalette.shimmerHighLightColor,
@@ -1491,7 +1491,7 @@ class _SearchPageState extends State<SearchPage> {
   // ── Empty Widget 
   Widget _emptyWidget(BuildContext context, String message) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(6)),
+      padding: EdgeInsets.symmetric(vertical: context.heightPercent(6)),
       child: Column(
         children: [
           Icon(
@@ -1499,7 +1499,7 @@ class _SearchPageState extends State<SearchPage> {
             size: context.getResponsiveSize(12),
             color: const Color(0xFF8D847A),
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           Text(
             message,
             textAlign: TextAlign.center,

@@ -105,14 +105,14 @@ class _RawDataPageState extends State<RawDataPage> {
             color: Colors.white,
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
               context.getResponsiveSize(4),
-              context.getScreenHeight(1),
+              context.heightPercent(1),
             ),
             child: Column(
               children: [
                 Container(
-                  height: context.getScreenHeight(5),
+                  height: context.heightPercent(5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.grey.shade300),
@@ -128,7 +128,7 @@ class _RawDataPageState extends State<RawDataPage> {
                       isDense: true,
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
-                        vertical: context.getScreenHeight(1.2),
+                        vertical: context.heightPercent(1.2),
                       ),
                       hintText: 'Search fields...',
                       hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -154,7 +154,7 @@ class _RawDataPageState extends State<RawDataPage> {
                     onChanged: (v) => setState(() => _searchQuery = v),
                   ),
                 ),
-                SizedBox(height: context.getScreenHeight(0.8)),
+                SizedBox(height: context.heightPercent(0.8)),
                 Row(
                   children: [
                     GestureDetector(
@@ -165,7 +165,7 @@ class _RawDataPageState extends State<RawDataPage> {
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: context.getResponsiveSize(3),
-                          vertical: context.getScreenHeight(0.6),
+                          vertical: context.heightPercent(0.6),
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
@@ -208,16 +208,16 @@ class _RawDataPageState extends State<RawDataPage> {
             child: ListView.builder(
               padding: EdgeInsets.fromLTRB(
                 context.getResponsiveSize(4),
-                context.getScreenHeight(1),
+                context.heightPercent(1),
                 context.getResponsiveSize(4),
-                context.getScreenHeight(3),
+                context.heightPercent(3),
               ),
               itemCount: visible.length,
               itemBuilder: (context, index) {
                 final key = visible[index];
                 return Padding(
                   padding: EdgeInsets.only(
-                    bottom: context.getScreenHeight(1),
+                    bottom: context.heightPercent(1),
                   ),
                   child: TextFormField(
                     controller: _fieldCtrls[key],
@@ -236,7 +236,7 @@ class _RawDataPageState extends State<RawDataPage> {
                       fillColor: Colors.white,
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: context.getResponsiveSize(3.5),
-                        vertical: context.getScreenHeight(1.2),
+                        vertical: context.heightPercent(1.2),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),

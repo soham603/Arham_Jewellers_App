@@ -78,6 +78,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
               ),
             );
           }),
+          Obx(() {
+            if (_controller.notifications.isEmpty) return const SizedBox();
+            return IconButton(
+              onPressed: () => _showClearAllDialog(),
+              icon: Icon(
+                Icons.delete_sweep_rounded,
+                color: AppColors.danger,
+                size: context.getResponsiveSize(6),
+              ),
+            );
+          }),
           SizedBox(width: context.getResponsiveSize(2)),
         ],
       ),
@@ -85,10 +96,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
         child: Column(
           children: [
             Container(height: 3, color: AppColors.divider),
+            _FilterBar(controller: _controller),
             Expanded(
               child: Obx(() {
                 // Subscribe Obx to loadMoreError so list rebuilds when pagination fails
                 _controller.loadMoreError.value;
+                _controller.filterIndex.value;
                 switch (_controller.state.value) {
                   case CurrentAppState.INITIAL:
                   case CurrentAppState.LOADING:
@@ -110,8 +123,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       scrollController: _scrollController,
                     );
                   case CurrentAppState.SUCCESS:
-                    if (_controller.notifications.isEmpty) {
-                      return _EmptyState();
+                    if (_controller.filteredNotifications.isEmpty) {
+                      return _EmptyState(
+                        isFiltered: _controller.filterIndex.value == 1,
+                      );
                     }
                     return _NotificationList(
                       controller: _controller,
@@ -154,6 +169,122 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
     );
   }
+
+  void _showClearAllDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear All'),
+        content: const Text('Delete all notifications? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              _controller.clearAll();
+              Navigator.pop(context);
+            },
+            child: Text(
+              'Clear All',
+              style: TextStyle(color: AppColors.danger),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterBar extends StatelessWidget {
+  final NotificationController controller;
+
+  const _FilterBar({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      if (controller.notifications.isEmpty) return const SizedBox.shrink();
+      return Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(4),
+          vertical: context.heightPercent(1),
+        ),
+        child: Row(
+          children: [
+            _FilterChip(
+              label: 'All',
+              isSelected: controller.filterIndex.value == 0,
+              onTap: () => controller.filterIndex.value = 0,
+            ),
+            SizedBox(width: context.getResponsiveSize(2)),
+            _FilterChip(
+              label: 'Unread',
+              isSelected: controller.filterIndex.value == 1,
+              onTap: () => controller.filterIndex.value = 1,
+              count: controller.unreadCount.value,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final int? count;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+    this.count,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(4),
+          vertical: context.getResponsiveSize(2),
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryGold
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(context.getResponsiveSize(5)),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryGold
+                : AppColors.divider,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              count != null && count! > 0 ? '$label ($count)' : label,
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.textDark,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _LoadingShimmer extends StatelessWidget {
@@ -165,12 +296,12 @@ class _LoadingShimmer extends StatelessWidget {
       child: ListView.builder(
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1),
+          vertical: context.heightPercent(1),
         ),
         itemCount: 6,
         itemBuilder: (context, index) {
           return Container(
-            margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+            margin: EdgeInsets.only(bottom: context.heightPercent(1.2)),
             padding: EdgeInsets.all(context.getResponsiveSize(4)),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -201,7 +332,7 @@ class _LoadingShimmer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
                         ),
                       ),
-                      SizedBox(height: context.getScreenHeight(1)),
+                      SizedBox(height: context.heightPercent(1)),
                       Container(
                         width: double.infinity,
                         height: context.getResponsiveSize(3),
@@ -210,7 +341,7 @@ class _LoadingShimmer extends StatelessWidget {
                           borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
                         ),
                       ),
-                      SizedBox(height: context.getScreenHeight(0.8)),
+                      SizedBox(height: context.heightPercent(0.8)),
                       Container(
                         width: context.getResponsiveSize(20),
                         height: context.getResponsiveSize(2.5),
@@ -249,7 +380,7 @@ class _ErrorState extends StatelessWidget {
               size: context.getResponsiveSize(16),
               color: AppColors.textMuted.withValues(alpha: 0.5),
             ),
-            SizedBox(height: context.getScreenHeight(2)),
+            SizedBox(height: context.heightPercent(2)),
             Text(
               'Something went wrong',
               style: TextStyle(
@@ -258,7 +389,7 @@ class _ErrorState extends StatelessWidget {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1)),
+            SizedBox(height: context.heightPercent(1)),
             Text(
               'Failed to load notifications',
               style: TextStyle(
@@ -266,7 +397,7 @@ class _ErrorState extends StatelessWidget {
                 color: AppColors.textMuted,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
             GestureDetector(
               onTap: onRetry,
               child: Container(
@@ -296,6 +427,10 @@ class _ErrorState extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
+  final bool isFiltered;
+
+  const _EmptyState({this.isFiltered = false});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -303,22 +438,24 @@ class _EmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.notifications_none_rounded,
+            isFiltered ? Icons.mark_email_read_rounded : Icons.notifications_none_rounded,
             size: context.getResponsiveSize(20),
             color: AppColors.textMuted.withValues(alpha: 0.5),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           Text(
-            'No notifications yet',
+            isFiltered ? 'No unread notifications' : 'No notifications yet',
             style: TextStyle(
               fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
               color: AppColors.textDark,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(1)),
+          SizedBox(height: context.heightPercent(1)),
           Text(
-            'You\'ll receive notifications about\norders, offers, and updates',
+            isFiltered
+                ? 'All caught up! New notifications\nwill appear here.'
+                : 'You\'ll receive notifications about\norders, offers, and updates',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: context.getResponsiveSize(3.5),
@@ -351,6 +488,7 @@ class _NotificationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final items = controller.filteredNotifications;
     return RefreshIndicator(
       color: AppColors.primaryGold,
       onRefresh: () => controller.refreshNotifications(),
@@ -358,16 +496,16 @@ class _NotificationList extends StatelessWidget {
         controller: scrollController,
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(1),
+          vertical: context.heightPercent(1),
         ),
-        itemCount: controller.notifications.length + (controller.hasMore ? 1 : 0),
+        itemCount: items.length + (controller.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
-          if (index == controller.notifications.length) {
+          if (index == items.length) {
             if (controller.loadMoreError.value.isNotEmpty) {
               return GestureDetector(
                 onTap: () => controller.loadMore(),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+                  padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
                   child: Center(
                     child: Text(
                       'Tap to retry',
@@ -382,7 +520,7 @@ class _NotificationList extends StatelessWidget {
               );
             }
             return Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(2)),
+              padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
               child: Center(
                 child: SizedBox(
                   width: context.getResponsiveSize(5),
@@ -395,10 +533,56 @@ class _NotificationList extends StatelessWidget {
               ),
             );
           }
-          final notification = controller.notifications[index];
-          return _NotificationCard(
-            notification: notification,
-            onTap: () => _handleTap(notification),
+          final notification = items[index];
+          return Dismissible(
+            key: Key(notification.id),
+            direction: DismissDirection.endToStart,
+            confirmDismiss: (_) async {
+              return await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Notification'),
+                  content: const Text('Remove this notification?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: AppColors.textMuted),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: Text(
+                        'Delete',
+                        style: TextStyle(color: AppColors.danger),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+            onDismissed: (_) {
+              controller.deleteNotification(notification.id);
+            },
+            background: Container(
+              margin: EdgeInsets.only(bottom: context.heightPercent(1.2)),
+              padding: EdgeInsets.all(context.getResponsiveSize(4)),
+              decoration: BoxDecoration(
+                color: AppColors.danger,
+                borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
+              ),
+              alignment: Alignment.centerRight,
+              child: Icon(
+                Icons.delete_rounded,
+                color: Colors.white,
+                size: context.getResponsiveSize(6),
+              ),
+            ),
+            child: _NotificationCard(
+              notification: notification,
+              onTap: () => _handleTap(notification),
+            ),
           );
         },
       ),
@@ -406,7 +590,7 @@ class _NotificationList extends StatelessWidget {
   }
 }
 
-class _NotificationCard extends StatelessWidget {
+class _NotificationCard extends StatefulWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
 
@@ -416,19 +600,45 @@ class _NotificationCard extends StatelessWidget {
   });
 
   @override
+  State<_NotificationCard> createState() => _NotificationCardState();
+}
+
+class _NotificationCardState extends State<_NotificationCard> {
+  bool _expanded = false;
+
+  IconData _getNotificationIcon() {
+    final route = widget.notification.data?['route']?.toString();
+    if (route == null) return Icons.notifications_none_rounded;
+
+    switch (route) {
+      case 'userOrderDetail':
+      case 'adminOrderDetail':
+      case 'myOrders':
+        return Icons.receipt_long_rounded;
+      case 'goldRateDetail':
+      case 'gold_rate':
+        return Icons.trending_up_rounded;
+      default:
+        return Icons.notifications_none_rounded;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final timeAgo = _getTimeAgo(notification.timestamp);
+    final timeAgo = _getTimeAgo(widget.notification.timestamp);
+    final icon = _getNotificationIcon();
+    final hasLongBody = widget.notification.body.length > 60;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: context.getScreenHeight(1.2)),
+        margin: EdgeInsets.only(bottom: context.heightPercent(1.2)),
         padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
-          color: notification.isRead ? Colors.white : AppColors.primaryGold.withValues(alpha: 0.05),
+          color: widget.notification.isRead ? Colors.white : AppColors.primaryGold.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
           border: Border.all(
-            color: notification.isRead
+            color: widget.notification.isRead
                 ? AppColors.divider
                 : AppColors.primaryGold.withValues(alpha: 0.3),
           ),
@@ -440,15 +650,15 @@ class _NotificationCard extends StatelessWidget {
               width: context.getResponsiveSize(10),
               height: context.getResponsiveSize(10),
               decoration: BoxDecoration(
-                color: notification.isRead
+                color: widget.notification.isRead
                     ? AppColors.textMuted.withValues(alpha: 0.1)
                     : AppColors.primaryGold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
               ),
               child: Icon(
-                Icons.notifications_none_rounded,
+                icon,
                 size: context.getResponsiveSize(5),
-                color: notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
+                color: widget.notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
               ),
             ),
             SizedBox(width: context.getResponsiveSize(3)),
@@ -461,17 +671,17 @@ class _NotificationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          notification.title,
+                          widget.notification.title,
                           style: TextStyle(
                             fontSize: context.getResponsiveSize(3.8),
-                            fontWeight: notification.isRead ? FontWeight.w500 : FontWeight.w700,
+                            fontWeight: widget.notification.isRead ? FontWeight.w500 : FontWeight.w700,
                             color: AppColors.textDark,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (!notification.isRead)
+                      if (!widget.notification.isRead)
                         Container(
                           width: context.getResponsiveSize(2),
                           height: context.getResponsiveSize(2),
@@ -483,23 +693,41 @@ class _NotificationCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  SizedBox(height: context.getScreenHeight(0.5)),
+                  SizedBox(height: context.heightPercent(0.5)),
                   Text(
-                    notification.body,
+                    widget.notification.body,
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(3.3),
                       color: AppColors.textMuted,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: _expanded ? null : 2,
+                    overflow: _expanded ? null : TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: context.getScreenHeight(0.8)),
-                  Text(
-                    timeAgo,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(2.8),
-                      color: AppColors.textMuted.withValues(alpha: 0.7),
-                    ),
+                  SizedBox(height: context.heightPercent(0.8)),
+                  Row(
+                    children: [
+                      Text(
+                        timeAgo,
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.8),
+                          color: AppColors.textMuted.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      if (hasLongBody) ...[
+                        SizedBox(width: context.getResponsiveSize(2)),
+                        GestureDetector(
+                          onTap: () => setState(() => _expanded = !_expanded),
+                          child: Text(
+                            _expanded ? 'Show less' : 'Read more',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(2.8),
+                              color: AppColors.primaryGold,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

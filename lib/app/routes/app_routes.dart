@@ -12,7 +12,6 @@ abstract class AppRoutes {
   static const handsetRequests = '/handset-requests';
   static const share = '/share';
   static const ancillary = '/ancillary';
-  static const chat = '/chat';
   static const customOrderSuccess = '/custom-order-success';
   static const forgotPassword = '/forgot-password';
   static const wishlist = '/wishlist';

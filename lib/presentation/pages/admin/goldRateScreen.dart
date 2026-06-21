@@ -48,17 +48,17 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
-            context.getScreenHeight(1.5),
+            context.heightPercent(1.5),
             context.getResponsiveSize(4),
-            context.getScreenHeight(3),
+            context.heightPercent(3),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _currentRateCard(context),
-              SizedBox(height: context.getScreenHeight(2.5)),
+              SizedBox(height: context.heightPercent(2.5)),
               _setRateButton(context),
-              SizedBox(height: context.getScreenHeight(3)),
+              SizedBox(height: context.heightPercent(3)),
               Text(
                 'Rate History',
                 style: TextStyle(
@@ -67,7 +67,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   color: AppColors.textDark,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
               _historyList(context),
             ],
           ),
@@ -101,7 +101,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 size: context.getResponsiveSize(10),
                 color: Colors.red.shade300,
               ),
-              SizedBox(height: context.getScreenHeight(1)),
+              SizedBox(height: context.heightPercent(1)),
               Text(
                 controller.error.isNotEmpty ? controller.error : 'Failed to load rate',
                 textAlign: TextAlign.center,
@@ -110,7 +110,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   color: Colors.red.shade400,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(1.5)),
+              SizedBox(height: context.heightPercent(1.5)),
               ElevatedButton(
                 onPressed: controller.fetchCurrentRate,
                 style: ElevatedButton.styleFrom(
@@ -130,7 +130,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         width: double.infinity,
         padding: EdgeInsets.symmetric(
           horizontal: context.getResponsiveSize(4),
-          vertical: context.getScreenHeight(2),
+          vertical: context.heightPercent(2),
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
@@ -175,7 +175,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                       fontSize: context.getResponsiveSize(3.2),
                     ),
                   ),
-                  SizedBox(height: context.getScreenHeight(0.3)),
+                  SizedBox(height: context.heightPercent(0.3)),
                   Text.rich(
                     rate != null
                         ? TextSpan(children: [
@@ -215,7 +215,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.getScreenHeight(0.6),
+                  vertical: context.heightPercent(0.6),
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
@@ -254,7 +254,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         onTap: isLoading ? null : () => _showSetRateSheet(context),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.8)),
+          padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.8)),
           decoration: BoxDecoration(
             color: AppColors.primaryGold,
             borderRadius: BorderRadius.circular(16),
@@ -315,9 +315,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
         child: Container(
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(5),
-            context.getScreenHeight(2),
+            context.heightPercent(2),
             context.getResponsiveSize(5),
-            context.getScreenHeight(3),
+            context.heightPercent(3),
           ),
           decoration: BoxDecoration(
             color: context.colorPalette.backgroundColor,
@@ -330,14 +330,14 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
               Center(
                 child: Container(
                   width: context.getResponsiveSize(10),
-                  height: context.getScreenHeight(0.5),
+                  height: context.heightPercent(0.5),
                   decoration: BoxDecoration(
                     color: context.colorPalette.subTitleColor.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2)),
+              SizedBox(height: context.heightPercent(2)),
               Text(
                 'Set Gold Rate',
                 style: TextStyle(
@@ -346,7 +346,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   color: AppColors.textDark,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(0.5)),
+              SizedBox(height: context.heightPercent(0.5)),
               Text(
                 'Enter the new gold rate per 10 g',
                 style: TextStyle(
@@ -354,7 +354,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   color: context.colorPalette.subTitleColor,
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2.5)),
+              SizedBox(height: context.heightPercent(2.5)),
               TextField(
                 controller: _rateController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -390,7 +390,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: context.getScreenHeight(2.5)),
+              SizedBox(height: context.heightPercent(2.5)),
               Obx(() {
                 final isLoading = controller.actionState == CurrentAppState.LOADING;
 
@@ -409,7 +409,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                         },
                   child: Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(1.5)),
+                    padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
                     decoration: BoxDecoration(
                       color: AppColors.primaryGold,
                       borderRadius: BorderRadius.circular(14),
@@ -454,7 +454,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
           children: List.generate(
             5,
             (_) => Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1)),
               child: _shimmerHistoryTile(context),
             ),
           ),
@@ -476,7 +476,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
       if (history.isEmpty) {
         return Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(3)),
+            padding: EdgeInsets.symmetric(vertical: context.heightPercent(3)),
             child: Column(
               children: [
                 Icon(
@@ -484,7 +484,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                   size: context.getResponsiveSize(12),
                   color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
                 ),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 Text(
                   'No rate history yet',
                   style: TextStyle(
@@ -506,7 +506,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
             final prevRate = index < history.length - 1 ? history[index + 1].rate : null;
 
             return Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1)),
               child: _historyTile(context, rate, isFirst, prevRate),
             );
           }),
@@ -594,7 +594,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.getResponsiveSize(1.5),
-                    vertical: context.getScreenHeight(0.2),
+                    vertical: context.heightPercent(0.2),
                   ),
                   decoration: BoxDecoration(
                     color: isUp
@@ -632,7 +632,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
   Widget _shimmerCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: context.getScreenHeight(22),
+      height: context.heightPercent(22),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(24),
@@ -642,7 +642,7 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
 
   Widget _shimmerHistoryTile(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(8),
+      height: context.heightPercent(8),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(14),

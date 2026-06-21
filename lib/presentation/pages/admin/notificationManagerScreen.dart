@@ -68,15 +68,15 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
-          context.getScreenHeight(1.5),
+          context.heightPercent(1.5),
           context.getResponsiveSize(4),
-          context.getScreenHeight(3),
+          context.heightPercent(3),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _composeForm(context),
-            SizedBox(height: context.getScreenHeight(3)),
+            SizedBox(height: context.heightPercent(3)),
             Text(
               'Sent History',
               style: TextStyle(
@@ -85,7 +85,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                 color: AppColors.textDark,
               ),
             ),
-            SizedBox(height: context.getScreenHeight(1.5)),
+            SizedBox(height: context.heightPercent(1.5)),
             _historyList(context),
           ],
         ),
@@ -120,7 +120,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               color: AppColors.textDark,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           _buildTextField(
             context,
             controller: _titleController,
@@ -129,7 +129,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             maxLines: 1,
             onChanged: controller.setTitle,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           _buildTextField(
             context,
             controller: _bodyController,
@@ -138,9 +138,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             maxLines: 3,
             onChanged: controller.setBody,
           ),
-          SizedBox(height: context.getScreenHeight(1.5)),
+          SizedBox(height: context.heightPercent(1.5)),
           _buildTargetSelector(context),
-          SizedBox(height: context.getScreenHeight(2)),
+          SizedBox(height: context.heightPercent(2)),
           Obx(() {
             final showTargetField = controller.targetType != 'all';
 
@@ -159,7 +159,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                     maxLines: 1,
                     onChanged: controller.setTargetValue,
                   ),
-                  SizedBox(height: context.getScreenHeight(2)),
+                  SizedBox(height: context.heightPercent(2)),
                 ],
               );
             }
@@ -182,7 +182,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               child: Container(
                 width: double.infinity,
                 padding:
-                    EdgeInsets.symmetric(vertical: context.getScreenHeight(1.8)),
+                    EdgeInsets.symmetric(vertical: context.heightPercent(1.8)),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
                   borderRadius: BorderRadius.circular(16),
@@ -247,7 +247,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             color: AppColors.textDark,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(0.8)),
+        SizedBox(height: context.heightPercent(0.8)),
         Obx(() {
           return Row(
             children: options.map((opt) {
@@ -263,7 +263,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                           : 0,
                     ),
                     padding: EdgeInsets.symmetric(
-                      vertical: context.getScreenHeight(1),
+                      vertical: context.heightPercent(1),
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
@@ -287,7 +287,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                               : AppColors.textMuted,
                           size: context.getResponsiveSize(5),
                         ),
-                        SizedBox(height: context.getScreenHeight(0.3)),
+                        SizedBox(height: context.heightPercent(0.3)),
                         Text(
                           opt['label'] as String,
                           style: TextStyle(
@@ -329,7 +329,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             color: AppColors.textDark,
           ),
         ),
-        SizedBox(height: context.getScreenHeight(0.5)),
+        SizedBox(height: context.heightPercent(0.5)),
         TextField(
           controller: controller,
           maxLines: maxLines,
@@ -358,7 +358,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             ),
             contentPadding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(4),
-              vertical: context.getScreenHeight(1.2),
+              vertical: context.heightPercent(1.2),
             ),
           ),
         ),
@@ -376,7 +376,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
           children: List.generate(
             3,
             (_) => Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1)),
               child: _shimmerTile(context),
             ),
           ),
@@ -400,7 +400,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
       if (history.isEmpty) {
         return Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: context.getScreenHeight(3)),
+            padding: EdgeInsets.symmetric(vertical: context.heightPercent(3)),
             child: Column(
               children: [
                 Icon(
@@ -409,7 +409,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                   color: context.colorPalette.subTitleColor
                       .withValues(alpha: 0.4),
                 ),
-                SizedBox(height: context.getScreenHeight(1)),
+                SizedBox(height: context.heightPercent(1)),
                 Text(
                   'No notifications sent yet',
                   style: TextStyle(
@@ -428,13 +428,13 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
           ...List.generate(history.length, (index) {
             final notification = history[index];
             return Padding(
-              padding: EdgeInsets.only(bottom: context.getScreenHeight(1)),
+              padding: EdgeInsets.only(bottom: context.heightPercent(1)),
               child: _historyTile(context, notification),
             );
           }),
           if (controller.hasMore)
             Padding(
-              padding: EdgeInsets.only(top: context.getScreenHeight(1)),
+              padding: EdgeInsets.only(top: context.heightPercent(1)),
               child: Center(
                 child: SizedBox(
                   width: context.getResponsiveSize(5),
@@ -495,7 +495,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(2),
-                  vertical: context.getScreenHeight(0.3),
+                  vertical: context.heightPercent(0.3),
                 ),
                 decoration: BoxDecoration(
                   color: _targetBadgeColor(notification.targetType)
@@ -513,7 +513,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               ),
             ],
           ),
-          SizedBox(height: context.getScreenHeight(0.8)),
+          SizedBox(height: context.heightPercent(0.8)),
           Text(
             notification.body,
             maxLines: 2,
@@ -523,7 +523,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               color: context.colorPalette.subTitleColor,
             ),
           ),
-          SizedBox(height: context.getScreenHeight(0.8)),
+          SizedBox(height: context.heightPercent(0.8)),
           Row(
             children: [
               Icon(
@@ -596,7 +596,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
   Widget _shimmerTile(BuildContext context) {
     return Container(
-      height: context.getScreenHeight(10),
+      height: context.heightPercent(10),
       decoration: BoxDecoration(
         color: context.colorPalette.shimmerBaseColor,
         borderRadius: BorderRadius.circular(14),
