@@ -45,10 +45,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Worker? _productsWorker;
 
   bool get _hasController => widget.controller != null;
-  bool get _canSwipe => _liveProducts.length > 1;
+  bool get _canSwipe => _effectiveProducts.length > 1;
 
-  List<ProductModel> get _effectiveProducts =>
-      _hasController ? _liveProducts : (widget.products ?? []);
+  List<ProductModel> get _effectiveProducts {
+    if (_hasController) {
+      return _liveProducts.isNotEmpty ? _liveProducts : (widget.products ?? []);
+    }
+    return widget.products ?? [];
+  }
 
   @override
   void initState() {
@@ -56,7 +60,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     _currentIndex = widget.initialIndex;
 
     if (_hasController) {
-      _liveProducts.assignAll(_getControllerList());
+      _liveProducts.assignAll(widget.products ?? _getControllerList());
       final idx = _liveProducts.indexWhere((p) => p.id == widget.product.id);
       if (idx != -1) {
         _currentIndex = idx;
@@ -64,8 +68,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       _productsWorker = ever(_getControllerObservable(), (_) {
         final newList = _getControllerList();
         final oldLen = _liveProducts.length;
-        _liveProducts.assignAll(newList);
-        if (mounted && oldLen != newList.length) {
+        if (newList.isNotEmpty) {
+          _liveProducts.assignAll(newList);
+        }
+        if (mounted && oldLen != _liveProducts.length) {
           setState(() {});
         }
       });
@@ -584,86 +590,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       }),
                     ),
 
-                  // Bottom Left: Ribbon Tags
-                  Positioned(
-                    bottom: context.getScreenHeight(8),
-                    left: 0,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                            bottom: context.getScreenHeight(0.8),
-                          ),
-                          padding: EdgeInsets.fromLTRB(
-                            context.getResponsiveSize(4),
-                            context.getScreenHeight(0.6),
-                            context.getResponsiveSize(3),
-                            context.getScreenHeight(0.6),
-                          ),
-                          decoration: BoxDecoration(
-                            color: stockColor,
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(3, 3),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            stockText,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: context.getResponsiveSize(3),
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        if (netWeight != null)
-                          Container(
-                            padding: EdgeInsets.fromLTRB(
-                              context.getResponsiveSize(4),
-                              context.getScreenHeight(0.6),
-                              context.getResponsiveSize(3),
-                              context.getScreenHeight(0.6),
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGold,
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(3, 3),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              "Net Wt.: $netWeight g",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: context.getResponsiveSize(3.2),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
                   // Bottom Right: Zoom Icon
                   if (product.imageUrl != null)
                     Positioned(
-                      bottom: context.getScreenHeight(8),
+                      bottom: context.getScreenHeight(4),
                       right: context.getResponsiveSize(4),
                       child: GestureDetector(
                         onTap: () => showImageZoomDialog(
@@ -741,6 +671,30 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 fontSize: context.getResponsiveSize(3.2),
                                 color: Colors.grey.shade600,
                                 fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: context.getScreenHeight(0.6)),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSize(3),
+                                vertical: context.getScreenHeight(0.4),
+                              ),
+                              decoration: BoxDecoration(
+                                color: stockColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: stockColor.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                stockText,
+                                style: TextStyle(
+                                  color: stockColor,
+                                  fontSize: context.getResponsiveSize(2.5),
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                             ),
                           ],

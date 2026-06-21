@@ -197,8 +197,8 @@ class SearchProductController extends GetxController {
   double get availableWeightMax => filterState.availableWeightMax;
 
   List<ProductModel> get allProducts {
-    final source = isSearching ? _searchResults : _filteredInitialProducts;
-    if (source.isNotEmpty) return source;
+    if (isSearching) return _searchResults;
+    if (hasActiveFilters) return _filteredInitialProducts;
     if (_karatProducts.isNotEmpty) return _karatProducts;
     if (_categoryProducts.isNotEmpty) return _categoryProducts;
     return _initialProducts;
@@ -211,16 +211,30 @@ class SearchProductController extends GetxController {
     recentSearchesController = RecentSearchesController();
     recentSearchesController.loadRecentSearches();
     filterState.setProductsProvider(() => allProducts);
+    ever(_sortBy, (_) => _applySortToCurrentResults());
   }
 
   @override
   void onClose() {
     _debounce?.cancel();
+    filterState.dispose();
+    recentSearchesController.dispose();
     super.onClose();
   }
 
   void setSortOption(SortOption option) {
     _sortBy.value = option;
+  }
+
+  void _applySortToCurrentResults() {
+    final current = _sortBy.value;
+    if (isSearching) {
+      _searchResults.value = sortProducts(_searchResults, current);
+    } else if (hasActiveFilters) {
+      _filteredInitialProducts.value = sortProducts(_filteredInitialProducts, current);
+    } else {
+      _initialProducts.value = sortProducts(_initialProducts, current);
+    }
   }
 
   void toggleLayout() {
@@ -305,11 +319,12 @@ class SearchProductController extends GetxController {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
         final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+        final sorted = sortProducts(fetched, _sortBy.value);
 
         if (isPagination) {
-          _initialProducts.addAll(_dedupe(fetched, _initialProducts));
+          _initialProducts.addAll(_dedupe(sorted, _initialProducts));
         } else {
-          _initialProducts.value = fetched;
+          _initialProducts.value = sorted;
         }
 
         if (fetched.length < _pageLimit) {
@@ -464,6 +479,8 @@ class SearchProductController extends GetxController {
         _filteredInitialProducts.value = allFetched;
       }
 
+      _filteredInitialProducts.value = sortProducts(_filteredInitialProducts, _sortBy.value);
+
       final queryCount = filterState.selectedCategoryIds.isNotEmpty
           ? filterState.selectedCategoryIds.length
           : filterState.selectedKarats.length;
@@ -591,6 +608,8 @@ class SearchProductController extends GetxController {
         _searchResults.value = allFetched;
       }
 
+      _searchResults.value = sortProducts(_searchResults, _sortBy.value);
+
       if (allFetched.length < _pageLimit) {
         _searchHasMore = false;
       } else {
@@ -634,6 +653,7 @@ class SearchProductController extends GetxController {
     bool isPagination = false,
     String? stockFilter,
   }) async {
+    _currentKarats = karats;
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
 
@@ -867,7 +887,11 @@ class SearchProductController extends GetxController {
             ? _currentFilterKaratForOut
             : _currentFilterKaratForAll;
     if (!hasMore || state.value == CurrentAppState.LOADING) return;
-    loadByCategoryWithKaratFilter(catId!, karat!, isPagination: true, stockFilter: stockFilter);
+    if (catId == null || karat == null) {
+      Logger.warning("SearchProductController", "loadMoreFilteredProducts called before initial load");
+      return;
+    }
+    loadByCategoryWithKaratFilter(catId, karat, isPagination: true, stockFilter: stockFilter);
   }
 
   Future<void> loadByCategoryWithKaratFilter(
