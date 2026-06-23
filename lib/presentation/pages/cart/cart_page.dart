@@ -650,7 +650,7 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ),
                 onPressed: () {
-                  Get.find<NavigationController>().switchTab(1);
+                  Get.find<NavigationController>().switchTab(NavigationController.searchIndex);
                 },
                 child: Text(
                   'Browse Products',

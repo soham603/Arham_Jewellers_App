@@ -80,7 +80,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
 
     return GestureDetector(
       onTap: () {
-        Get.find<NavigationController>().switchTab(1);
+        Get.find<NavigationController>().switchTab(NavigationController.searchIndex);
       },
 
       child: Container(

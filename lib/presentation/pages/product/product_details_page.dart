@@ -389,7 +389,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             ),
                             onPressed: () {
                               Navigator.of(context).pop();
-                              Get.find<NavigationController>().switchTab(2);
+                              Get.find<NavigationController>().switchTab(NavigationController.cartIndex);
                             },
                             child: Text(
                               'View Cart',

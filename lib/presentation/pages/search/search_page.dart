@@ -209,7 +209,7 @@ class _SearchPageState extends State<SearchPage> {
                   controller.loadInitialProducts();
                   setState(() {});
                 } else {
-                  Get.find<NavigationController>().switchTab(0);
+                  Get.find<NavigationController>().switchTab(NavigationController.homeIndex);
                 }
               },
               onChanged: (v) {

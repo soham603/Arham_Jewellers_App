@@ -11,7 +11,11 @@ class NavigationController extends GetxController {
 
   late final PageController pageController;
 
+  static const int homeIndex = 0;
+  static const int searchIndex = 1;
   static const int collectionsIndex = 2;
+  static const int cartIndex = 3;
+  static const int profileIndex = 4;
 
   DateTime? _lastBackPress;
 
