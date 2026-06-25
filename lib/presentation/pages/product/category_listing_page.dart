@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -793,54 +794,106 @@ class _Level3Sheet extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(
-                                  context.responsiveWidth(13, tabletVal: 15),
-                                ),
-                              ),
-                              child: _CategoryListingImage(
-                                cat: cat,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(
-                              context.responsiveWidth(6, tabletVal: 10),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim(),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: context.responsiveFont(9),
-                                      fontWeight: FontWeight.w600,
-                                      color: context.colorPalette.goldDeep,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(
+                                          context.responsiveWidth(13, tabletVal: 15),
+                                        ),
+                                      ),
+                                      child: _CategoryListingImage(
+                                        cat: cat,
+                                      ),
                                     ),
-                                  ),
+                                    if (!cat.isActive && Get.find<AuthController>().isAdmin)
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: context.responsiveWidth(6, tabletVal: 10),
+                                            vertical: context.responsiveWidth(2, tabletVal: 4),
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange.withValues(alpha: 0.92),
+                                            borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(
+                                                context.responsiveWidth(6, tabletVal: 8),
+                                              ),
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.2),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: context.responsiveWidth(5, tabletVal: 7),
+                                                height: context.responsiveWidth(5, tabletVal: 7),
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              SizedBox(width: context.responsiveWidth(3, tabletVal: 4)),
+                                              Text(
+                                                'Inactive',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: context.responsiveFont(8, tabletMultiplier: 1.3),
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                                Text(
-                                  ' (${cat.count})',
-                                  style: TextStyle(
-                                    fontSize: context.responsiveFont(9),
-                                    fontWeight: FontWeight.w600,
-                                    color: context.colorPalette.goldDeep,
-                                  ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(
+                                  context.responsiveWidth(6, tabletVal: 10),
                                 ),
-                              ],
-                            ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim(),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: context.responsiveFont(9),
+                                          fontWeight: FontWeight.w600,
+                                          color: context.colorPalette.goldDeep,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      ' (${cat.count})',
+                                      style: TextStyle(
+                                        fontSize: context.responsiveFont(9),
+                                        fontWeight: FontWeight.w600,
+                                        color: context.colorPalette.goldDeep,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                     ),
                   );
                 },
@@ -926,6 +979,48 @@ class _CategoryCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (!category.isActive && Get.find<AuthController>().isAdmin)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.responsiveWidth(6, tabletVal: 10),
+                          vertical: context.responsiveWidth(2, tabletVal: 4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(
+                              context.responsiveWidth(6, tabletVal: 8),
+                            ),
+                          ),
+
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: context.responsiveWidth(5, tabletVal: 7),
+                              height: context.responsiveWidth(5, tabletVal: 7),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: context.responsiveWidth(3, tabletVal: 4)),
+                            Text(
+                              'Inactive',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: context.responsiveFont(8, tabletMultiplier: 1.3),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
@@ -137,6 +139,7 @@ class CategoryController extends GetxController {
   Future<void>? _treeFetchFuture;
   bool _treeHasFullData = false;
   bool _isInitialized = false;
+  Timer? _autoRefreshTimer;
 
   // Flat list of all categories from tree, for admin reuse
   List<CategoryModel> _allCategoriesFlat = [];
@@ -149,7 +152,18 @@ class CategoryController extends GetxController {
       _isInitialized = true;
       // Eagerly fetch the category tree on app start
       fetchCategoryTree();
+      // Auto-refresh every hour
+      _autoRefreshTimer = Timer.periodic(
+        const Duration(hours: 1),
+        (_) => fetchCategoryTree(force: true),
+      );
     }
+  }
+
+  @override
+  void onClose() {
+    _autoRefreshTimer?.cancel();
+    super.onClose();
   }
 
   /// Fetches the full category tree in a single API call.
@@ -181,6 +195,7 @@ class CategoryController extends GetxController {
   Future<void> _doFetchCategoryTree() async {
     try {
       final results = await _categoryRepo.fetchCategoryTree();
+      final bool includeInactive = Get.find<AuthController>().isAdmin;
 
       // Build flat list from tree for admin reuse
       final flat = <CategoryModel>[];
@@ -197,15 +212,15 @@ class CategoryController extends GetxController {
           final children = karatCat.children;
           if (children != null) {
             for (final level2 in children) {
-              if (!level2.isActive) continue;
+              if (!level2.isActive && !includeInactive) continue;
               _k0Categories.add(level2);
               final level3Children = level2.children;
               if (level3Children != null && level3Children.isNotEmpty) {
-                final activeLevel3 = level3Children
-                    .where((c) => c.isActive)
-                    .toList();
-                if (activeLevel3.isNotEmpty) {
-                  _level3Cache[level2.id] = activeLevel3;
+                final filteredLevel3 = includeInactive
+                    ? level3Children.toList()
+                    : level3Children.where((c) => c.isActive).toList();
+                if (filteredLevel3.isNotEmpty) {
+                  _level3Cache[level2.id] = filteredLevel3;
                 }
               }
             }
@@ -220,16 +235,16 @@ class CategoryController extends GetxController {
         final children = karatCat.children;
         if (children != null) {
           for (final level2 in children) {
-            if (!level2.isActive) continue;
+            if (!level2.isActive && !includeInactive) continue;
             level2List.add(level2);
 
             final level3Children = level2.children;
             if (level3Children != null && level3Children.isNotEmpty) {
-              final activeLevel3 = level3Children
-                  .where((c) => c.isActive)
-                  .toList();
-              if (activeLevel3.isNotEmpty) {
-                _level3Cache[level2.id] = activeLevel3;
+              final filteredLevel3 = includeInactive
+                  ? level3Children.toList()
+                  : level3Children.where((c) => c.isActive).toList();
+              if (filteredLevel3.isNotEmpty) {
+                _level3Cache[level2.id] = filteredLevel3;
               }
             }
           }
@@ -264,15 +279,16 @@ class CategoryController extends GetxController {
   void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
     final allLevel3 = <CategoryModel>[];
     final karatMap = <String, String>{};
+    final bool includeInactive = Get.find<AuthController>().isAdmin;
 
     for (final karatNode in treeResults) {
       final karatName = karatNode['name'] as String? ?? '';
       final children = karatNode['children'] as List? ?? [];
       for (final level2 in children) {
-        if (level2['isActive'] == false) continue;
+        if (level2['isActive'] == false && !includeInactive) continue;
         final level3List = level2['children'] as List? ?? [];
         for (final level3 in level3List) {
-          if (level3['isActive'] == false) continue;
+          if (level3['isActive'] == false && !includeInactive) continue;
           final cat = CategoryModel.fromJson(level3);
           allLevel3.add(cat);
           karatMap[cat.id] = karatName;
