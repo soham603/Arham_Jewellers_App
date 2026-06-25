@@ -197,10 +197,16 @@ class CategoryController extends GetxController {
           final children = karatCat.children;
           if (children != null) {
             for (final level2 in children) {
+              if (!level2.isActive) continue;
               _k0Categories.add(level2);
               final level3Children = level2.children;
               if (level3Children != null && level3Children.isNotEmpty) {
-                _level3Cache[level2.id] = level3Children;
+                final activeLevel3 = level3Children
+                    .where((c) => c.isActive)
+                    .toList();
+                if (activeLevel3.isNotEmpty) {
+                  _level3Cache[level2.id] = activeLevel3;
+                }
               }
             }
           }
@@ -214,11 +220,17 @@ class CategoryController extends GetxController {
         final children = karatCat.children;
         if (children != null) {
           for (final level2 in children) {
+            if (!level2.isActive) continue;
             level2List.add(level2);
 
             final level3Children = level2.children;
             if (level3Children != null && level3Children.isNotEmpty) {
-              _level3Cache[level2.id] = level3Children;
+              final activeLevel3 = level3Children
+                  .where((c) => c.isActive)
+                  .toList();
+              if (activeLevel3.isNotEmpty) {
+                _level3Cache[level2.id] = activeLevel3;
+              }
             }
           }
         }
@@ -257,8 +269,10 @@ class CategoryController extends GetxController {
       final karatName = karatNode['name'] as String? ?? '';
       final children = karatNode['children'] as List? ?? [];
       for (final level2 in children) {
+        if (level2['isActive'] == false) continue;
         final level3List = level2['children'] as List? ?? [];
         for (final level3 in level3List) {
+          if (level3['isActive'] == false) continue;
           final cat = CategoryModel.fromJson(level3);
           allLevel3.add(cat);
           karatMap[cat.id] = karatName;

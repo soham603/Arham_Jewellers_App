@@ -590,6 +590,7 @@ class _CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDeleted = cat.isDeleted;
+    final isInactive = !cat.isActive;
     final levelColor = _levelColor(cat.level);
 
     return Container(
@@ -597,7 +598,11 @@ class _CategoryTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(12),
-        border: isDeleted ? Border.all(color: Colors.red.withValues(alpha: 0.25)) : null,
+        border: isDeleted
+            ? Border.all(color: Colors.red.withValues(alpha: 0.25))
+            : isInactive
+                ? Border.all(color: Colors.orange.withValues(alpha: 0.3))
+                : null,
       ),
       child: IntrinsicHeight(
         child: Row(
@@ -605,7 +610,11 @@ class _CategoryTile extends StatelessWidget {
             Container(
               width: 4,
               decoration: BoxDecoration(
-                color: isDeleted ? Colors.red : levelColor,
+                color: isDeleted
+                    ? Colors.red
+                    : isInactive
+                        ? Colors.orange
+                        : levelColor,
                 borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
               ),
             ),
@@ -620,17 +629,27 @@ class _CategoryTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
+                    Wrap(
+                      spacing: context.getResponsiveSize(1.5),
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _LevelBadge(level: cat.level, color: levelColor),
-                        if (isDeleted) ...[
-                          SizedBox(width: context.getResponsiveSize(2)),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
-                            decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                            child: Text('Deleted', style: TextStyle(color: Colors.red, fontSize: context.getResponsiveSize(2.5), fontWeight: FontWeight.w600)),
+                        if (isDeleted)
+                          _StatusPill(
+                            label: 'Deleted',
+                            color: Colors.red,
+                          )
+                        else if (isInactive)
+                          _StatusPill(
+                            label: 'Inactive',
+                            color: Colors.orange,
+                          )
+                        else
+                          _StatusPill(
+                            label: 'Active',
+                            color: Colors.green,
                           ),
-                        ],
                       ],
                     ),
                     SizedBox(height: context.heightPercent(0.3)),
@@ -729,6 +748,43 @@ class _LevelBadge extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(6)),
       child: Text('L${level ?? "?"}', style: TextStyle(fontSize: context.getResponsiveSize(2.5), color: color, fontWeight: FontWeight.w700)),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _StatusPill({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(2), vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          SizedBox(width: context.getResponsiveSize(1.2)),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: context.getResponsiveSize(2.5),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -841,6 +897,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   File? _pickedImage;
   _CategoryImageMeta? _imageMeta;
   bool _isDeleteImage = false;
+  bool _isActive = true;
   bool _submitting = false;
 
   bool get isEditing => !widget.isCreate;
@@ -851,6 +908,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     if (widget.existing != null) {
       _nameCtrl.text = widget.existing!.name;
       _descCtrl.text = widget.existing!.description ?? '';
+      _isActive = widget.existing!.isActive;
     }
   }
 
@@ -888,6 +946,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             name: _nameCtrl.text.trim(),
             imageFile: _pickedImage,
             isDeleteImage: _isDeleteImage,
+            isActive: _isActive,
           )
         : await widget.ctrl.createCategory(
             name: _nameCtrl.text.trim(),
@@ -948,6 +1007,70 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                   validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                 ),
                 SizedBox(height: context.heightPercent(2)),
+
+                if (isEditing) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.heightPercent(1.2),
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isActive
+                          ? Colors.green.withValues(alpha: 0.08)
+                          : Colors.orange.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _isActive
+                            ? Colors.green.withValues(alpha: 0.35)
+                            : Colors.orange.withValues(alpha: 0.35),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _isActive ? Icons.check_circle_rounded : Icons.pause_circle_rounded,
+                          color: _isActive ? Colors.green : Colors.orange,
+                          size: context.getResponsiveSize(5),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(3)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _isActive ? 'Active' : 'Inactive',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.6),
+                                  fontWeight: FontWeight.w700,
+                                  color: context.colorPalette.textColor,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                _isActive
+                                    ? 'Visible to users. All products in this category remain active.'
+                                    : 'Hidden from users. All products in this category become inactive.',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.6),
+                                  color: context.colorPalette.subTitleColor,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(2)),
+                        Switch(
+                          value: _isActive,
+                          activeColor: Colors.green,
+                          inactiveTrackColor: Colors.orange.withValues(alpha: 0.5),
+                          onChanged: (v) => setState(() => _isActive = v),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+                ],
 
                 if (!isEditing) ...[
                   _label('Description (optional)'),

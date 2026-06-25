@@ -92,7 +92,7 @@ class ProductSearchController extends GetxController {
           "search": _query.value.trim(),
           "page": _page,
           "limit": _pageLimit,
-          "showAll": false,
+          "showAll": true,
         },
       );
 

@@ -27,6 +27,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
   late String _selectedKarat;
+  late bool _isActive;
   String? _selectedLevel2Id;
   String? _selectedCategoryId;
   bool _isDeleteImage = false;
@@ -76,6 +77,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.product.name);
     _selectedKarat = widget.product.karat ?? '22K';
+    _isActive = widget.product.isActive;
 
     _adminCtrl = Get.isRegistered<AdminProductController>()
         ? Get.find<AdminProductController>()
@@ -190,11 +192,13 @@ class _ProductEditPageState extends State<ProductEditPage> {
       name: _nameCtrl.text.trim(),
       karat: _selectedKarat,
       categoryId: _selectedCategoryId,
+      isActive: _isActive,
       deleteCurrentImage: _isDeleteImage,
       rawDataPatch: _rawDataPatch,
     );
 
     if (error == null && mounted) {
+      widget.product.isActive = _isActive;
       ToastUtils.showSuccess(successMsg ?? 'Product updated');
       Navigator.of(context).pop(true);
     } else if (mounted) {
@@ -218,227 +222,295 @@ class _ProductEditPageState extends State<ProductEditPage> {
       ),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(
-            context.getResponsiveSize(5),
-            context.heightPercent(2),
-            context.getResponsiveSize(5),
-            context.heightPercent(3),
-          ),
+        child: Column(
           children: [
-            // Image Section
-            _label('Product Image'),
-            SizedBox(height: context.heightPercent(0.8)),
-            Center(
-              child: SizedBox(
-                width: context.heightPercent(18),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: GestureDetector(
-                    onTap: _showImageAction,
-                      child: Container(
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: _adminCtrl.pickedImage != null
-                                ? AppColors.primaryGold
-                                : Colors.grey.shade300,
-                            width: _adminCtrl.pickedImage != null ? 2 : 1,
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.fromLTRB(
+                  context.getResponsiveSize(5),
+                  context.heightPercent(2),
+                  context.getResponsiveSize(5),
+                  context.heightPercent(1),
+                ),
+                children: [
+                  // Image Section
+                  _label('Product Image'),
+                  SizedBox(height: context.heightPercent(0.8)),
+                  Center(
+                    child: SizedBox(
+                      width: context.heightPercent(18),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: GestureDetector(
+                          onTap: _showImageAction,
+                            child: Container(
+                              clipBehavior: Clip.antiAlias,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: _adminCtrl.pickedImage != null
+                                      ? AppColors.primaryGold
+                                      : Colors.grey.shade300,
+                                  width: _adminCtrl.pickedImage != null ? 2 : 1,
+                                ),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: _buildImagePreview(),
                           ),
-                        color: Colors.grey.shade100,
+                        ),
                       ),
-                      child: _buildImagePreview(),
                     ),
                   ),
-                ),
-              ),
-            ),
-            SizedBox(height: context.heightPercent(2.5)),
+                  SizedBox(height: context.heightPercent(2.5)),
 
-            // Name
-            _label('Name'),
-            SizedBox(height: context.heightPercent(0.6)),
-            TextFormField(
-              controller: _nameCtrl,
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(3.8),
-                color: AppColors.textDark,
-              ),
-              decoration: _inputDec('Enter product name'),
-              validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
-            ),
-            SizedBox(height: context.heightPercent(2)),
+                  // Name
+                  _label('Name'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  TextFormField(
+                    controller: _nameCtrl,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.8),
+                      color: AppColors.textDark,
+                    ),
+                    decoration: _inputDec('Enter product name'),
+                    validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
 
-            // Karat
-            _label('Karat'),
-            SizedBox(height: context.heightPercent(0.6)),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedKarat,
-              decoration: _inputDec('Select karat'),
-              items: _availableKarats.map((k) {
-                return DropdownMenuItem(value: k, child: Text(k));
-              }).toList(),
-              onChanged: (v) {
-                if (v != null) {
-                  setState(() {
-                    _selectedKarat = v;
-                    _selectedLevel2Id = null;
-                    _selectedCategoryId = null;
-                  });
-                }
-              },
-            ),
-            SizedBox(height: context.heightPercent(2)),
-
-            // Collection (Level 2)
-            _label('Collection'),
-            SizedBox(height: context.heightPercent(0.6)),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedLevel2Id,
-              decoration: _inputDec(
-                _level2Categories.isEmpty
-                    ? 'No collections for $_selectedKarat'
-                    : 'Select collection',
-              ),
-              isExpanded: true,
-              items: _level2Categories.map((cat) {
-                return DropdownMenuItem<String>(
-                  value: cat.id,
-                  child: Text(cat.name, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: _level2Categories.isEmpty
-                  ? null
-                  : (v) {
-                      setState(() {
-                        _selectedLevel2Id = v;
-                        _selectedCategoryId = null;
-                      });
+                  // Karat
+                  _label('Karat'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedKarat,
+                    decoration: _inputDec('Select karat'),
+                    items: _availableKarats.map((k) {
+                      return DropdownMenuItem(value: k, child: Text(k));
+                    }).toList(),
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() {
+                          _selectedKarat = v;
+                          _selectedLevel2Id = null;
+                          _selectedCategoryId = null;
+                        });
+                      }
                     },
-              validator: (v) {
-                if (_selectedLevel2Id == null && _level2Categories.isNotEmpty) {
-                  return 'Required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.heightPercent(2)),
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
 
-            // Style (Level 3)
-            _label('Style'),
-            SizedBox(height: context.heightPercent(0.6)),
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCategoryId,
-              decoration: _inputDec(
-                _level3Categories.isEmpty && _selectedLevel2Id != null
-                    ? 'No styles available'
-                    : 'Select style',
-              ),
-              isExpanded: true,
-              items: _level3Categories.map((cat) {
-                return DropdownMenuItem<String>(
-                  value: cat.id,
-                  child: Text(cat.name, overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: _level3Categories.isEmpty
-                  ? null
-                  : (v) => setState(() => _selectedCategoryId = v),
-              validator: (v) {
-                if (_selectedCategoryId == null) {
-                  return _level3Categories.isEmpty
-                      ? 'No styles available for this collection'
-                      : 'Required';
-                }
-                return null;
-              },
-            ),
-            SizedBox(height: context.heightPercent(2)),
+                  // Collection (Level 2)
+                  _label('Collection'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedLevel2Id,
+                    decoration: _inputDec(
+                      _level2Categories.isEmpty
+                          ? 'No collections for $_selectedKarat'
+                          : 'Select collection',
+                    ),
+                    isExpanded: true,
+                    items: _level2Categories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat.id,
+                        child: Text(cat.name, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: _level2Categories.isEmpty
+                        ? null
+                        : (v) {
+                            setState(() {
+                              _selectedLevel2Id = v;
+                              _selectedCategoryId = null;
+                            });
+                          },
+                    validator: (v) {
+                      if (_selectedLevel2Id == null && _level2Categories.isNotEmpty) {
+                        return 'Required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
 
-            // Raw Data
-            GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push<Map<String, dynamic>>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RawDataPage(
-                      rawData: widget.product.rawData ?? {},
+                  // Style (Level 3)
+                  _label('Style'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedCategoryId,
+                    decoration: _inputDec(
+                      _level3Categories.isEmpty && _selectedLevel2Id != null
+                          ? 'No styles available'
+                          : 'Select style',
+                    ),
+                    isExpanded: true,
+                    items: _level3Categories.map((cat) {
+                      return DropdownMenuItem<String>(
+                        value: cat.id,
+                        child: Text(cat.name, overflow: TextOverflow.ellipsis),
+                      );
+                    }).toList(),
+                    onChanged: _level3Categories.isEmpty
+                        ? null
+                        : (v) => setState(() => _selectedCategoryId = v),
+                    validator: (v) {
+                      if (_selectedCategoryId == null) {
+                        return _level3Categories.isEmpty
+                            ? 'No styles available for this collection'
+                            : 'Required';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+
+                  // Active Status
+                  _label('Status'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(4),
+                      vertical: context.heightPercent(0.8),
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.grey.shade300),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _isActive ? Icons.check_circle : Icons.cancel,
+                          color: _isActive ? Colors.green : Colors.orange,
+                          size: context.getResponsiveSize(5),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(3)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _isActive ? 'Active' : 'Inactive',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.5),
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                              Text(
+                                _isActive ? 'Product is visible to users' : 'Product is hidden from users',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.5),
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: _isActive,
+                          activeColor: Colors.green,
+                          inactiveTrackColor: Colors.orange.withValues(alpha: 0.5),
+                          onChanged: (v) => setState(() => _isActive = v),
+                        ),
+                      ],
                     ),
                   ),
-                );
-                if (result != null && result.isNotEmpty) {
-                  _rawDataPatch = result;
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(4),
-                  vertical: context.heightPercent(1.2),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.4)),
-                  color: AppColors.primaryGold.withValues(alpha: 0.06),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.table_chart_outlined,
-                      size: context.getResponsiveSize(4.5),
-                      color: AppColors.primaryGold,
-                    ),
-                    SizedBox(width: context.getResponsiveSize(2)),
-                    Text(
-                      'View All Raw Data',
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.5),
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryGold,
+                  SizedBox(height: context.heightPercent(2)),
+
+                  // Raw Data
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push<Map<String, dynamic>>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RawDataPage(
+                            rawData: widget.product.rawData ?? {},
+                          ),
+                        ),
+                      );
+                      if (result != null && result.isNotEmpty) {
+                        _rawDataPatch = result;
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(4),
+                        vertical: context.heightPercent(1.2),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.4)),
+                        color: AppColors.primaryGold.withValues(alpha: 0.06),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.table_chart_outlined,
+                            size: context.getResponsiveSize(4.5),
+                            color: AppColors.primaryGold,
+                          ),
+                          SizedBox(width: context.getResponsiveSize(2)),
+                          Text(
+                            'View All Raw Data',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(3.5),
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(height: context.heightPercent(1)),
+                ],
               ),
             ),
-            SizedBox(height: context.heightPercent(3)),
 
-            // Save Button
-            Obx(() => SizedBox(
-              width: double.infinity,
-              height: context.heightPercent(6.5),
-              child: ElevatedButton(
-                onPressed: _adminCtrl.saving ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGold,
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor:
-                      AppColors.primaryGold.withValues(alpha: 0.5),
-                  elevation: 3,
-                  shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: _adminCtrl.saving
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : Text(
-                        'Save Changes',
-                        style: TextStyle(
-                          fontSize: context.getResponsiveSize(4),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+            // Save Button - fixed at bottom
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                context.getResponsiveSize(5),
+                0,
+                context.getResponsiveSize(5),
+                context.heightPercent(2),
               ),
-            )),
+              child: Obx(() => SizedBox(
+                width: double.infinity,
+                height: context.heightPercent(6.5),
+                child: ElevatedButton(
+                  onPressed: _adminCtrl.saving ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryGold,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor:
+                        AppColors.primaryGold.withValues(alpha: 0.5),
+                    elevation: 3,
+                    shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: _adminCtrl.saving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : Text(
+                          'Save Changes',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(4),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              )),
+            ),
           ],
         ),
       ),

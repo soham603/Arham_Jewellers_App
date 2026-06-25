@@ -129,7 +129,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> get _displayedProducts {
-    final List<ProductModel> base;
+    List<ProductModel> base;
     switch (_stockFilter) {
       case 'ready':
         if (_isMultiCategory) {
@@ -164,6 +164,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
           base = _controller.karatAllProducts;
         }
         break;
+    }
+    if (!_isAdmin) {
+      base = base.where((p) => p.isActive).toList();
     }
     if (!_isMultiCategory) return base;
     var result = base;

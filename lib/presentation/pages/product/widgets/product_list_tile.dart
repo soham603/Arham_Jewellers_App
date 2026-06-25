@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductListTile extends StatelessWidget {
@@ -114,14 +116,55 @@ class ProductListTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (tagNo != null)
-                    Text(
-                      tagNo,
-                      style: TextStyle(
-                        fontSize: 10 * sf,
-                        color: AppColors.textDark.withValues(alpha: 0.5),
-                        fontWeight: FontWeight.w500,
-                      ),
+                  if (tagNo != null || _isAdmin())
+                    Row(
+                      children: [
+                        if (tagNo != null)
+                          Text(
+                            tagNo,
+                            style: TextStyle(
+                              fontSize: 10 * sf,
+                              color: AppColors.textDark.withValues(alpha: 0.5),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        if (tagNo != null && _isAdmin()) SizedBox(width: 6 * sf),
+                        if (_isAdmin())
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 5 * sf,
+                              vertical: 1.5 * sf,
+                            ),
+                            decoration: BoxDecoration(
+                              color: product.isActive
+                                  ? Colors.green.withValues(alpha: 0.9)
+                                  : Colors.orange.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.circular(8 * sf),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 5 * sf,
+                                  height: 5 * sf,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                SizedBox(width: 3 * sf),
+                                Text(
+                                  product.isActive ? 'Active' : 'Inactive',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9 * sf,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   if (categoryName != null)
                     Container(
@@ -183,6 +226,14 @@ class ProductListTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static bool _isAdmin() {
+    try {
+      return Get.find<AuthController>().isAdmin;
+    } catch (_) {
+      return false;
+    }
   }
 
   static String? _cleanText(String? value) {

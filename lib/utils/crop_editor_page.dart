@@ -227,8 +227,8 @@ class _CropEditorPageState extends State<CropEditorPage> {
       body: Column(
         children: [
           Expanded(
-            child: ExtendedImage.file(
-              widget.imageFile,
+            child: ExtendedImage.memory(
+              widget.imageFile.readAsBytesSync(),
               fit: BoxFit.contain,
               mode: ExtendedImageMode.editor,
               cacheRawData: true,

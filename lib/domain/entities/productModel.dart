@@ -8,7 +8,7 @@ class ProductModel {
   final String? nameSlug;
   final String? imageUrl;
   final String? karat;
-  final bool isActive;
+  bool isActive;
 
   /// Dynamic raw stock/tag data
   final Map<String, dynamic>? rawData;

@@ -15,6 +15,8 @@ class CategoryModel {
 
   final bool isDeleted;
 
+  final bool isActive;
+
   final DateTime? createdAt;
 
   final DateTime? updatedAt;
@@ -45,6 +47,7 @@ class CategoryModel {
     this.imagePublicId,
     this.boxName,
     required this.isDeleted,
+    this.isActive = true,
     this.createdAt,
     this.updatedAt,
     this.createdBy,
@@ -76,6 +79,8 @@ class CategoryModel {
       boxName: json['boxName'],
 
       isDeleted: json['isDeleted'] ?? false,
+
+      isActive: json['isActive'] ?? true,
 
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])

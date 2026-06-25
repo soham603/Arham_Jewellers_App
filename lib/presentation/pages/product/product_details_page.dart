@@ -590,6 +590,55 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       }),
                     ),
 
+                  // Top Right: Active/Inactive Badge (admin only)
+                  if (Get.find<AuthController>().isAdmin)
+                    Positioned(
+                      top: context.heightPercent(2),
+                      right: context.getResponsiveSize(4),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.getResponsiveSize(3),
+                          vertical: context.heightPercent(0.6),
+                        ),
+                        decoration: BoxDecoration(
+                          color: product.isActive
+                              ? Colors.green.withValues(alpha: 0.92)
+                              : Colors.orange.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: context.getResponsiveSize(1.8),
+                              height: context.getResponsiveSize(1.8),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(1.5)),
+                            Text(
+                              product.isActive ? 'Active' : 'Inactive',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: context.getResponsiveSize(3),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                   // Bottom Right: Zoom Icon
                   if (product.imageUrl != null)
                     Positioned(

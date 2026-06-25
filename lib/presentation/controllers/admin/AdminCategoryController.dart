@@ -88,18 +88,25 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Filtered views (client-side) 
+  // ── Filtered views (client-side)
   List<CategoryModel> byLevel(
     int level, {
     String? parentId,
     bool includeDeleted = true,
   }) {
-    return _allCategories.where((c) {
+    final filtered = _allCategories.where((c) {
       if (c.level != level) return false;
       if (!includeDeleted && c.isDeleted) return false;
       if (parentId != null && c.parentId != parentId) return false;
       return true;
     }).toList();
+    filtered.sort((a, b) {
+      if (a.isActive != b.isActive) {
+        return a.isActive ? -1 : 1;
+      }
+      return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    });
+    return filtered;
   }
 
   List<CategoryModel> get level1Categories => byLevel(1, includeDeleted: true);
@@ -216,12 +223,13 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Edit 
+  // ── Edit
   Future<(String? error, String? successMessage)> editCategory({
     required String id,
     String? name,
     File? imageFile,
     bool isDeleteImage = false,
+    bool? isActive,
   }) async {
     _actionLoadingId.value = id;
 
@@ -229,13 +237,14 @@ class CategoryManagerController extends GetxController {
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
         if (isDeleteImage) "isDeleteImage": true,
+        if (isActive != null) "isActive": isActive.toString(),
         if (imageFile != null)
           "file": await MultipartFile.fromFile(
             (await _compressImageFile(imageFile)).path,
           ),
       });
 
-      Logger.info("CategoryManagerController", "editCategory fields: name=${name}, isDeleteImage=${isDeleteImage}, hasFile=${imageFile != null}");
+      Logger.info("CategoryManagerController", "editCategory fields: name=${name}, isDeleteImage=${isDeleteImage}, isActive=${isActive}, hasFile=${imageFile != null}");
 
       final response = await _categoryRepo.editCategory(id: id, data: formData);
 
@@ -272,6 +281,7 @@ class CategoryManagerController extends GetxController {
           imageUrl: cat.imageUrl,
           images: cat.images,
           isDeleted: true,
+          isActive: cat.isActive,
           createdAt: cat.createdAt,
           updatedAt: cat.updatedAt,
         );

@@ -318,6 +318,52 @@ class _ProductCardState extends State<ProductCard>
                               ),
                             ),
                           ),
+                        if (_showAdminStatusBadge())
+                          Positioned(
+                            top: 6 * sf,
+                            left: 6 * sf,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 7 * sf,
+                                vertical: 3 * sf,
+                              ),
+                              decoration: BoxDecoration(
+                                color: product.isActive
+                                    ? Colors.green.withValues(alpha: 0.9)
+                                    : Colors.orange.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(10 * sf),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 4 * sf,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 6 * sf,
+                                    height: 6 * sf,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4 * sf),
+                                  Text(
+                                    product.isActive ? 'Active' : 'Inactive',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10 * sf,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -380,6 +426,14 @@ class _ProductCardState extends State<ProductCard>
       return goldRate != null;
     } catch (e, st) {
       Logger.error("ProductCard", "Failed to check retailer price visibility", stackTrace: st);
+      return false;
+    }
+  }
+
+  static bool _showAdminStatusBadge() {
+    try {
+      return Get.find<AuthController>().isAdmin;
+    } catch (_) {
       return false;
     }
   }

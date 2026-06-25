@@ -101,6 +101,7 @@ class AdminProductController extends GetxController {
     String? name,
     String? karat,
     String? categoryId,
+    bool? isActive,
     bool deleteCurrentImage = false,
     Map<String, dynamic>? rawDataPatch,
   }) async {
@@ -111,6 +112,7 @@ class AdminProductController extends GetxController {
         if (name != null && name.trim().isNotEmpty) "name": name.trim(),
         if (karat != null && karat.isNotEmpty) "karat": karat,
         if (categoryId != null && categoryId.isNotEmpty) "categoryId": categoryId,
+        if (isActive != null) "isActive": isActive.toString(),
         if (deleteCurrentImage) "deleteImage": "true",
         if (rawDataPatch != null) "rawDataPatch": jsonEncode(rawDataPatch),
       };
