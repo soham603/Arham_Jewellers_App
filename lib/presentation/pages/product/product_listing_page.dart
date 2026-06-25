@@ -50,11 +50,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double _priceMin = 0;
   double _priceMax = 5000000;
   List<String> _selectedSizes = [];
+  bool? _isActiveFilter;
 
   // ── Selection state
   final Set<String> _selectedProductIds = {};
   bool get _isSelectMode => _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
+  bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
   bool _isLoadingMore = false;
   static const int _shimmerLoadMoreCount = 4;
@@ -167,6 +169,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
     if (!_isAdmin) {
       base = base.where((p) => p.isActive).toList();
+    } else if (_isActiveFilter != null) {
+      base = base.where((p) => p.isActive == _isActiveFilter).toList();
     }
     if (!_isMultiCategory) return base;
     var result = base;
@@ -1036,13 +1040,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
       _weightMax < _displayedWeightMax ||
       _priceMin > 0 ||
       _priceMax < 5000000 ||
-      _selectedSizes.isNotEmpty;
+      _selectedSizes.isNotEmpty ||
+      _isActiveFilter != null;
 
   int get _activeFilterCount {
     var count = 0;
     if (_weightMin > 0 || _weightMax < _displayedWeightMax) count++;
     if (_priceMin > 0 || _priceMax < 5000000) count++;
     count += _selectedSizes.length;
+    if (_isActiveFilter != null) count++;
     return count;
   }
 
@@ -1154,7 +1160,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       showKaratFilter: false,
       showStockFilter: false,
       showWeightFilter: _hasWeightData,
-      showPriceFilter: true,
+      showPriceFilter: _isRetailer || _isAdmin,
       showCategoryFilter: _isMultiCategory,
       categories: categoryModels,
       initialSelectedCategoryIds: _filteredCategoryIds,
@@ -1164,6 +1170,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
       showSizeFilter: _displayedAvailableSizes.isNotEmpty,
       initialSelectedSizes: _selectedSizes,
       availableSizes: _displayedAvailableSizes,
+      showIsActiveFilter: _isAdmin,
+      initialIsActive: _isActiveFilter,
       onApply:
           ({
             required List<String> karats,
@@ -1175,6 +1183,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             required double pMin,
             required double pMax,
             required List<String> sizes,
+            bool? isActive,
           }) {
             setState(() {
               _stockFilter = stockFilter;
@@ -1183,6 +1192,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               _priceMin = pMin;
               _priceMax = pMax;
               _selectedSizes = sizes;
+              _isActiveFilter = isActive;
               if (_isMultiCategory && categoryIds.isNotEmpty) {
                 _filteredCategoryIds = categoryIds;
               }

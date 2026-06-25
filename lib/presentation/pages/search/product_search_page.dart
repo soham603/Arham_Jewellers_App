@@ -80,6 +80,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
             },
           ),
           _buildKaratRow(context),
+          _buildFilterDropdowns(context),
           SizedBox(height: context.heightPercent(0.6)),
           Expanded(
             child: Obx(() {
@@ -127,6 +128,37 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
               }
 
               if (products.isEmpty) {
+                if (controller.isSearching) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          color: context.colorPalette.goldDark,
+                          size: 64,
+                        ),
+                        SizedBox(height: context.heightPercent(2)),
+                        Text(
+                          'No Products Found',
+                          style: TextStyle(
+                            color: context.colorPalette.goldDark,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: context.heightPercent(1)),
+                        Text(
+                          'Try adjusting your search or filters',
+                          style: TextStyle(
+                            color: context.colorPalette.goldDark,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
                 return const SizedBox.shrink();
               }
 
@@ -277,4 +309,114 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
     );
   }
 
+  Widget _buildFilterDropdowns(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        context.getResponsiveSize(4),
+        context.heightPercent(0.6),
+        context.getResponsiveSize(4),
+        0,
+      ),
+      child: Obx(() {
+        return Row(
+          children: [
+            Expanded(
+              child: _buildStockDropdown(context),
+            ),
+            SizedBox(width: context.getResponsiveSize(2)),
+            Expanded(
+              child: _buildActiveDropdown(context),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildStockDropdown(BuildContext context) {
+    final value = controller.stockFilter;
+    return _FilterDropdownContainer(
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          isDense: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: context.colorPalette.goldDark,
+            size: context.getResponsiveSize(5),
+          ),
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(3.3),
+            fontWeight: FontWeight.w600,
+            color: context.colorPalette.goldDeep,
+          ),
+          items: const [
+            DropdownMenuItem(value: 'ready', child: Text('Ready Stock')),
+            DropdownMenuItem(value: 'out', child: Text('Out of Stock')),
+            DropdownMenuItem(value: 'all', child: Text('All Stock')),
+          ],
+          onChanged: (val) {
+            if (val != null) controller.setStockFilter(val);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveDropdown(BuildContext context) {
+    final value = controller.isActiveFilter;
+    return _FilterDropdownContainer(
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<bool?>(
+          value: value,
+          isExpanded: true,
+          isDense: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: context.colorPalette.goldDark,
+            size: context.getResponsiveSize(5),
+          ),
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(3.3),
+            fontWeight: FontWeight.w600,
+            color: context.colorPalette.goldDeep,
+          ),
+          items: const [
+            DropdownMenuItem<bool?>(value: true, child: Text('Active')),
+            DropdownMenuItem<bool?>(value: false, child: Text('Inactive')),
+            DropdownMenuItem<bool?>(value: null, child: Text('All Status')),
+          ],
+          onChanged: (val) {
+            controller.setIsActiveFilter(val);
+          },
+        ),
+      ),
+    );
+  }
+
+}
+
+class _FilterDropdownContainer extends StatelessWidget {
+  final Widget child;
+  const _FilterDropdownContainer({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.getResponsiveSize(2.5),
+        vertical: context.heightPercent(0.4),
+      ),
+      decoration: BoxDecoration(
+        color: context.colorPalette.cardBg,
+        borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
+        border: Border.all(
+          color: context.colorPalette.border,
+          width: 1.5,
+        ),
+      ),
+      child: child,
+    );
+  }
 }

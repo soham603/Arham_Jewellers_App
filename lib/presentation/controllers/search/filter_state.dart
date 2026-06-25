@@ -13,6 +13,9 @@ class FilterStateController extends GetxController {
   final stockFilter = 'ready'.obs;
   String get stockFilterValue => stockFilter.value;
 
+  final isActive = Rxn<bool>();
+  bool? get isActiveValue => isActive.value;
+
   final weightMin = 0.0.obs;
   double get weightMinValue => weightMin.value;
 
@@ -46,7 +49,8 @@ class FilterStateController extends GetxController {
       stockFilter.value != 'ready' ||
       weightMin.value > 0 ||
       weightMax.value < 500 ||
-      selectedSizes.isNotEmpty;
+      selectedSizes.isNotEmpty ||
+      isActive.value != null;
 
   int get activeFilterCount {
     var count = selectedKarats.length;
@@ -54,6 +58,7 @@ class FilterStateController extends GetxController {
     if (stockFilter.value != 'ready') count++;
     if (weightMin.value > 0 || weightMax.value < 500) count++;
     count += selectedSizes.length;
+    if (isActive.value != null) count++;
     return count;
   }
 
@@ -86,6 +91,11 @@ class FilterStateController extends GetxController {
   void setStockFilter(String value) {
     if (stockFilter.value == value) return;
     stockFilter.value = value;
+  }
+
+  void setIsActive(bool? value) {
+    if (isActive.value == value) return;
+    isActive.value = value;
   }
 
   void toggleKaratFilter(String karat) {
@@ -124,6 +134,7 @@ class FilterStateController extends GetxController {
     weightMin.value = 0;
     weightMax.value = 500;
     selectedSizes.clear();
+    isActive.value = null;
   }
 
   void applyFrom({
@@ -134,6 +145,7 @@ class FilterStateController extends GetxController {
     required double wMin,
     required double wMax,
     required List<String> sizes,
+    bool? isActive,
   }) {
     final karatsCopy = List<String>.from(karats);
     final categoryIdsCopy = List<String>.from(categoryIds);
@@ -157,5 +169,6 @@ class FilterStateController extends GetxController {
     selectedSizes
       ..clear()
       ..addAll(sizesCopy);
+    this.isActive.value = isActive;
   }
 }

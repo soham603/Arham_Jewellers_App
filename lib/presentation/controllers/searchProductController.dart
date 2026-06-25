@@ -1038,6 +1038,7 @@ class SearchProductController extends GetxController {
     required double pMin,
     required double pMax,
     required List<String> sizes,
+    bool? isActive,
   }) {
     filterState.applyFrom(
       karats: karats,

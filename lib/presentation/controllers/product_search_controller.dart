@@ -34,6 +34,7 @@ class ProductSearchController extends GetxController {
   List<String> get selectedCategoryIds => filterState.selectedCategoryIdsValue;
   List<String> get selectedCategoryNames => filterState.selectedCategoryNamesValue;
   String get stockFilter => filterState.stockFilterValue;
+  bool? get isActiveFilter => filterState.isActiveValue;
   double get weightMin => filterState.weightMinValue;
   double get weightMax => filterState.weightMaxValue;
   List<String> get selectedSizes => filterState.selectedSizesValue;
@@ -49,6 +50,7 @@ class ProductSearchController extends GetxController {
   void onInit() {
     super.onInit();
     filterState = FilterStateController();
+    filterState.stockFilter.value = 'all';
     filterState.setProductsProvider(() => allProducts);
   }
 
@@ -102,6 +104,21 @@ class ProductSearchController extends GetxController {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
         allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+      }
+
+      if (filterState.isActive.value != null) {
+        final isActive = filterState.isActive.value!;
+        allFetched = allFetched.where((p) => p.isActive == isActive).toList();
+      }
+
+      if (filterState.stockFilterValue == 'ready') {
+        allFetched = allFetched
+            .where((p) => p.grossWeight != null && p.grossWeight! > 0)
+            .toList();
+      } else if (filterState.stockFilterValue == 'out') {
+        allFetched = allFetched
+            .where((p) => p.grossWeight == null || p.grossWeight! <= 0)
+            .toList();
       }
 
       if (filterState.selectedKarats.isNotEmpty) {
@@ -172,6 +189,20 @@ class ProductSearchController extends GetxController {
     }
   }
 
+  void setStockFilter(String value) {
+    filterState.setStockFilter(value);
+    if (isSearching) {
+      _fetchProducts(isPagination: false);
+    }
+  }
+
+  void setIsActiveFilter(bool? value) {
+    filterState.setIsActive(value);
+    if (isSearching) {
+      _fetchProducts(isPagination: false);
+    }
+  }
+
   void applyFilters({
     required List<String> karats,
     required List<String> categoryIds,
@@ -182,6 +213,7 @@ class ProductSearchController extends GetxController {
     required double pMin,
     required double pMax,
     required List<String> sizes,
+    bool? isActive,
   }) {
     filterState.applyFrom(
       karats: karats,
@@ -191,6 +223,7 @@ class ProductSearchController extends GetxController {
       wMin: wMin,
       wMax: wMax,
       sizes: sizes,
+      isActive: isActive,
     );
     if (isSearching) {
       _fetchProducts(isPagination: false);

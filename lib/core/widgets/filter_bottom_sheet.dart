@@ -14,6 +14,7 @@ typedef FilterApplyCallback = void Function({
   required double pMin,
   required double pMax,
   required List<String> sizes,
+  bool? isActive,
 });
 
 class FilterBottomSheet extends StatefulWidget {
@@ -37,6 +38,8 @@ class FilterBottomSheet extends StatefulWidget {
   final bool showSizeFilter;
   final List<String> initialSelectedSizes;
   final List<String> availableSizes;
+  final bool showIsActiveFilter;
+  final bool? initialIsActive;
 
   const FilterBottomSheet({
     super.key,
@@ -60,6 +63,8 @@ class FilterBottomSheet extends StatefulWidget {
     this.initialSelectedCategoryIds = const [],
     this.initialSelectedSizes = const [],
     this.availableSizes = const [],
+    this.showIsActiveFilter = false,
+    this.initialIsActive,
   });
 
   static Future<void> show(
@@ -84,6 +89,8 @@ class FilterBottomSheet extends StatefulWidget {
     bool showSizeFilter = false,
     List<String> initialSelectedSizes = const [],
     List<String> availableSizes = const [],
+    bool showIsActiveFilter = false,
+    bool? initialIsActive,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -110,6 +117,8 @@ class FilterBottomSheet extends StatefulWidget {
         initialSelectedCategoryIds: initialSelectedCategoryIds,
         initialSelectedSizes: initialSelectedSizes,
         availableSizes: availableSizes,
+        showIsActiveFilter: showIsActiveFilter,
+        initialIsActive: initialIsActive,
       ),
     );
   }
@@ -132,6 +141,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late double _effectiveWeightSliderMax;
   late Set<String> _tempSelectedCategoryIds;
   late List<String> _tempSelectedSizes;
+  late bool? _tempIsActive;
   bool _categoriesExpanded = true;
 
   @override
@@ -146,6 +156,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         Set<String>.from(widget.initialSelectedCategoryIds);
 
     _tempSelectedSizes = List<String>.from(widget.initialSelectedSizes);
+
+    _tempIsActive = widget.initialIsActive;
 
     _effectiveWeightSliderMax =
         widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
@@ -250,6 +262,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     if (widget.showSizeFilter) {
       count += _tempSelectedSizes.length;
     }
+    if (widget.showIsActiveFilter && _tempIsActive != null) {
+      count++;
+    }
     return count;
   }
 
@@ -280,6 +295,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       }
       if (widget.showCategoryFilter) _tempSelectedCategoryIds.clear();
       if (widget.showSizeFilter) _tempSelectedSizes.clear();
+      if (widget.showIsActiveFilter) _tempIsActive = null;
     });
   }
 
@@ -300,6 +316,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       pMin: widget.showPriceFilter ? _tempPriceMin : widget.initialPriceMin,
       pMax: widget.showPriceFilter ? _tempPriceMax : widget.initialPriceMax,
       sizes: List<String>.from(_tempSelectedSizes),
+      isActive: widget.showIsActiveFilter ? _tempIsActive : null,
     );
     Navigator.pop(context);
   }
@@ -355,6 +372,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   if (widget.showSizeFilter &&
                       widget.availableSizes.isNotEmpty) ...[
                     _buildSizeSection(context),
+                    const SizedBox(height: 14),
+                  ],
+                  if (widget.showIsActiveFilter) ...[
+                    _buildIsActiveSection(context),
                     const SizedBox(height: 14),
                   ],
                   if (widget.showPriceFilter) _buildPriceSection(context),
@@ -853,6 +874,90 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           }).toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildIsActiveSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Active Status',
+          style: TextStyle(
+            fontSize: context.responsiveFont(12),
+            fontWeight: FontWeight.w600,
+            color: context.colorPalette.goldDeep,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Row(
+          children: [
+            _buildIsActiveOption(
+              context,
+              label: 'All',
+              isSelected: _tempIsActive == null,
+              onTap: () => setState(() => _tempIsActive = null),
+            ),
+            const SizedBox(width: 5),
+            _buildIsActiveOption(
+              context,
+              label: 'Active',
+              isSelected: _tempIsActive == true,
+              onTap: () => setState(() => _tempIsActive = true),
+            ),
+            const SizedBox(width: 5),
+            _buildIsActiveOption(
+              context,
+              label: 'Inactive',
+              isSelected: _tempIsActive == false,
+              onTap: () => setState(() => _tempIsActive = false),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIsActiveOption(
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(
+            vertical: context.responsiveWidth(6, tabletVal: 8),
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.cardBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected
+                  ? context.colorPalette.gold
+                  : context.colorPalette.border,
+              width: 1,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: context.responsiveFont(11),
+                fontWeight: FontWeight.w600,
+                color: isSelected
+                    ? Colors.white
+                    : context.colorPalette.goldDeep,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
