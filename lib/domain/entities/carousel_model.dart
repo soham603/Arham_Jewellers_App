@@ -25,6 +25,12 @@ class CarouselModel {
   final String? imagePublicId;
   final String? mediaType;
 
+  static String? _inferMediaType(String url) {
+    final ext = url.split('.').last.toLowerCase();
+    if (['mp4', 'mov', 'webm', 'avi', 'mkv'].contains(ext)) return 'video';
+    return 'image';
+  }
+
   CarouselModel({
     required this.id,
     required this.title,
@@ -121,7 +127,7 @@ imagePublicId: imagePublicId == _undefined
       deletedBy: json['deletedBy'],
 
       imagePublicId: json['imagePublicId'],
-      mediaType: json['mediaType'],
+      mediaType: json['mediaType'] ?? _inferMediaType(json['imageUrl'] ?? ''),
     );
   }
 }

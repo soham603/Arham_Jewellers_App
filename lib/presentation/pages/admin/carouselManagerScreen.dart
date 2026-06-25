@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
@@ -11,6 +13,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
+import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -33,6 +36,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     with SingleTickerProviderStateMixin {
   late final CarouselsController controller;
   late TabController _tabController;
+  final Map<String, VideoPlayerController> _videoControllers = {};
+  final Set<String> _pendingVideoUrls = {};
+  final Set<String> _failedVideoUrls = {};
 
   @override
   void initState() {
@@ -43,14 +49,221 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       controller = Get.put(CarouselsController());
     }
     _tabController = TabController(length: 2, vsync: this);
+
+    ever<List<CarouselModel>>(controller.adminListRx, (_) {
+      _invalidateVideoCache();
+    });
+
     controller.fetchAdminCarousels();
     controller.fetchDeletedCarousels();
+  }
+
+  void _invalidateVideoCache() {
+    if (_videoControllers.isEmpty && _failedVideoUrls.isEmpty) return;
+    if (!mounted) return;
+    for (final ctrl in _videoControllers.values) {
+      ctrl.dispose();
+    }
+    _videoControllers.clear();
+    _failedVideoUrls.clear();
+    setState(() {});
+  }
+
+  Future<void> _maybeInitVideo(String id, String url) async {
+    if (_videoControllers.containsKey(id)) return;
+    if (_failedVideoUrls.contains(url)) return;
+    if (_pendingVideoUrls.contains(url)) return;
+    _pendingVideoUrls.add(url);
+
+    VideoPlayerController? ctrl;
+
+    try {
+      ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+      _videoControllers[id] = ctrl;
+      await ctrl.initialize();
+    } catch (e) {
+      ctrl?.dispose();
+      _videoControllers.remove(id);
+      Logger.warning(
+        "CarouselManagerScreen",
+        "Network video failed for $id, trying download fallback...",
+      );
+
+      try {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/carousel_video_$id.mp4');
+        if (!await file.exists()) {
+          await Dio().download(
+            url,
+            file.path,
+            options: Options(
+              receiveTimeout: const Duration(seconds: 30),
+              sendTimeout: const Duration(seconds: 15),
+            ),
+          );
+        }
+        ctrl = VideoPlayerController.file(file);
+        _videoControllers[id] = ctrl;
+        await ctrl.initialize();
+      } catch (e2, st2) {
+        Logger.error(
+          "CarouselManagerScreen",
+          "All video playback methods failed for carousel $id",
+          stackTrace: st2,
+        );
+        _failedVideoUrls.add(url);
+        _pendingVideoUrls.remove(url);
+        _videoControllers.remove(id);
+        ctrl?.dispose();
+        if (mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
+          });
+        }
+        return;
+      }
+    }
+
+    _pendingVideoUrls.remove(url);
+
+    try {
+      await ctrl.setLooping(true);
+      await ctrl.setVolume(0);
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
+      }
+    } catch (e, st) {
+      Logger.error(
+        "CarouselManagerScreen",
+        "Failed to setup video for carousel $id",
+        stackTrace: st,
+      );
+      _failedVideoUrls.add(url);
+      _videoControllers.remove(id);
+      ctrl.dispose();
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) setState(() {});
+        });
+      }
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    for (final ctrl in _videoControllers.values) {
+      ctrl.dispose();
+    }
+    _videoControllers.clear();
+    _pendingVideoUrls.clear();
+    _failedVideoUrls.clear();
     super.dispose();
+  }
+
+  Widget _buildCarouselMedia(BuildContext context, CarouselModel item, {
+    double? width,
+    required double height,
+    BoxFit fit = BoxFit.cover,
+  }) {
+    if (item.mediaType == 'video') {
+      final ctrl = _videoControllers[item.id];
+      if (ctrl != null && ctrl.value.isInitialized) {
+        return GestureDetector(
+          onTap: () {
+            if (ctrl.value.isPlaying) {
+              ctrl.pause();
+            } else {
+              ctrl.play();
+            }
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() {});
+            });
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(0),
+            child: SizedBox(
+              width: width ?? double.infinity,
+              height: height,
+              child: Stack(
+                fit: StackFit.passthrough,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: ctrl.value.size.width,
+                      height: ctrl.value.size.height,
+                      child: VideoPlayer(ctrl),
+                    ),
+                  ),
+                  if (!ctrl.value.isPlaying)
+                    Container(color: Colors.black.withValues(alpha: 0.2)),
+                  if (!ctrl.value.isPlaying)
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+
+      if (!_failedVideoUrls.contains(item.imageUrl)) {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _maybeInitVideo(item.id, item.imageUrl),
+        );
+      }
+
+      return Container(
+        color: context.colorPalette.shimmerBaseColor,
+        height: height,
+        width: width,
+        child: Center(
+          child: _failedVideoUrls.contains(item.imageUrl)
+              ? Icon(
+                  Icons.broken_image_rounded,
+                  size: 40,
+                  color: context.colorPalette.subTitleColor,
+                )
+              : Icon(
+                  Icons.play_circle_outline_rounded,
+                  size: 40,
+                  color: context.colorPalette.gold.withValues(alpha: 0.4),
+                ),
+        ),
+      );
+    }
+    return CachedNetworkImage(
+      imageUrl: item.imageUrl,
+      width: width ?? double.infinity,
+      height: height,
+      fit: fit,
+      placeholder: (_, _) => Container(
+        color: context.colorPalette.shimmerBaseColor,
+        height: height,
+        width: width,
+      ),
+      errorWidget: (_, _, _) => Container(
+        height: height,
+        width: width,
+        color: context.colorPalette.boxColor,
+        child: Icon(Icons.image_not_supported, color: context.colorPalette.subTitleColor),
+      ),
+    );
   }
 
   @override
@@ -236,47 +449,10 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(16),
                 ),
-                child: Stack(
-                  children: [
-                    CachedNetworkImage(
-                      imageUrl: item.imageUrl,
-                      width: double.infinity,
-                      height: context.heightPercent(20),
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => Container(
-                        color: context.colorPalette.shimmerBaseColor,
-                        height: context.heightPercent(20),
-                      ),
-                      errorWidget: (_, _, _) => Container(
-                        height: context.heightPercent(20),
-                        color: context.colorPalette.boxColor,
-                        child: Icon(
-                          Icons.image_not_supported,
-                          color: context.colorPalette.subTitleColor,
-                        ),
-                      ),
-                    ),
-                    if (item.mediaType == 'video')
-                      Positioned.fill(
-                        child: Container(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          child: Center(
-                            child: Container(
-                              padding: EdgeInsets.all(context.getResponsiveSize(2)),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.6),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.play_arrow_rounded,
-                                color: Colors.white,
-                                size: context.getResponsiveSize(8),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
+                child: _buildCarouselMedia(
+                  context,
+                  item,
+                  height: context.heightPercent(20),
                 ),
               ),
               // Position badge
@@ -465,19 +641,14 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(16),
             ),
-            child: CachedNetworkImage(
-              imageUrl: item.imageUrl,
+            child: SizedBox(
               width: context.getResponsiveSize(28),
               height: context.heightPercent(12),
-              fit: BoxFit.cover,
-              placeholder: (_, _) =>
-                  Container(color: context.colorPalette.shimmerBaseColor),
-              errorWidget: (_, _, _) => Container(
-                color: context.colorPalette.boxColor,
-                child: Icon(
-                  Icons.image_not_supported,
-                  color: context.colorPalette.subTitleColor,
-                ),
+              child: _buildCarouselMedia(
+                context,
+                item,
+                width: context.getResponsiveSize(28),
+                height: context.heightPercent(12),
               ),
             ),
           ),
@@ -634,7 +805,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required String? linkUrl,
               required File? imageFile,
               required bool? isActive,
-              String? mediaType,
               bool deleteImage = false,
             }) async {
               if (imageFile == null) {
@@ -647,7 +817,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 linkUrl: linkUrl,
                 imageFile: imageFile,
                 isActive: isActive ?? true,
-                mediaType: mediaType,
               );
               if (ok && context.mounted) {
                 Get.back();
@@ -679,7 +848,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
               required String? linkUrl,
               required File? imageFile,
               required bool? isActive,
-              String? mediaType,
               bool deleteImage = false,
             }) async {
               final ok = await controller.editCarousel(
@@ -689,7 +857,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 linkUrl: linkUrl,
                 imageFile: imageFile,
                 isActive: isActive,
-                mediaType: mediaType,
                 deleteImage: deleteImage,
               );
               if (ok && context.mounted) {
@@ -1089,7 +1256,6 @@ class _CarouselFormSheet extends StatefulWidget {
     required String? linkUrl,
     required File? imageFile,
     required bool? isActive,
-    String? mediaType,
     bool deleteImage,
   })
   onSubmit;
@@ -1793,7 +1959,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 : _linkController.text.trim(),
                             imageFile: fileToUpload,
                             isActive: _isActive,
-                            mediaType: _localMediaType,
                             deleteImage: _deleteImage,
                           );
                           if (mounted) {

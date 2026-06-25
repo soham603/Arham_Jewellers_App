@@ -2,12 +2,14 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/carousel_indicator.dart';
@@ -909,6 +911,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
   final Map<int, VideoPlayerController> _videoControllers = {};
   final Set<String> _failedVideoUrls = {};
   final Set<String> _pendingVideoUrls = {};
+  final Map<int, Uint8List> _thumbnails = {};
+  final Set<String> _failedThumbnailUrls = {};
   bool _hasPreloaded = false;
 
   @override
@@ -916,9 +920,19 @@ class _CarouselSectionState extends State<_CarouselSection> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentIndex != widget.currentIndex) {
       _updateVideoPlayback();
+      final list = widget.controller.list;
+      if (widget.currentIndex < list.length) {
+        final item = list[widget.currentIndex];
+        if (item.mediaType == 'video') {
+          _maybeInitVideo(widget.currentIndex, item.imageUrl);
+          _extractThumbnail(widget.currentIndex, item.imageUrl);
+        }
+      }
     }
     if (oldWidget.controller.list.length != widget.controller.list.length) {
       _hasPreloaded = false;
+      _thumbnails.clear();
+      _failedThumbnailUrls.clear();
     }
   }
 
@@ -996,11 +1010,92 @@ class _CarouselSectionState extends State<_CarouselSection> {
     }
   }
 
+  Future<void> _extractThumbnail(int index, String url) async {
+    if (_thumbnails.containsKey(index)) return;
+    if (_failedThumbnailUrls.contains(url)) return;
+
+    Uint8List? data;
+
+    try {
+      data = await VideoThumbnail.thumbnailData(
+        video: url,
+        imageFormat: ImageFormat.JPEG,
+        maxWidth: 600,
+        quality: 80,
+      );
+    } catch (e, st) {
+      Logger.warning(
+        "HomePage",
+        "thumbnailData (URL) failed for index $index, falling back to download. Error: $e",
+      );
+      Logger.error(
+        "HomePage",
+        "Stacktrace for failed thumbnail (URL)",
+        stackTrace: st,
+      );
+    }
+
+    File? tempFile;
+    if (data == null) {
+      try {
+        final dir = await getTemporaryDirectory();
+        tempFile = File('${dir.path}/home_carousel_tn_$index.mp4');
+        if (!await tempFile.exists()) {
+          await Dio().download(
+            url,
+            tempFile.path,
+            options: Options(
+              receiveTimeout: const Duration(seconds: 30),
+              sendTimeout: const Duration(seconds: 15),
+            ),
+          );
+        }
+        data = await VideoThumbnail.thumbnailData(
+          video: tempFile.path,
+          imageFormat: ImageFormat.JPEG,
+          maxWidth: 600,
+          quality: 80,
+        );
+      } catch (e, st) {
+        Logger.warning(
+          "HomePage",
+          "thumbnailData (local) failed for index $index ($url): $e",
+        );
+        Logger.error(
+          "HomePage",
+          "Stacktrace for failed thumbnail (local)",
+          stackTrace: st,
+        );
+      } finally {
+        if (tempFile != null) {
+          try {
+            await tempFile.delete();
+          } catch (_) {}
+        }
+      }
+    }
+
+    if (data != null && mounted) {
+      _thumbnails[index] = data;
+      setState(() {});
+      return;
+    }
+    _failedThumbnailUrls.add(url);
+  }
+
   static const int _batchSize = 3;
 
   void _preloadAllMedia(List<CarouselModel> list) {
     if (_hasPreloaded || list.isEmpty || !mounted) return;
     _hasPreloaded = true;
+
+    if (widget.currentIndex < list.length) {
+      final item = list[widget.currentIndex];
+      if (item.mediaType == 'video') {
+        _maybeInitVideo(widget.currentIndex, item.imageUrl);
+        _extractThumbnail(widget.currentIndex, item.imageUrl);
+      }
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -1016,6 +1111,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
       final item = list[i];
       if (item.mediaType == 'video') {
         _maybeInitVideo(i, item.imageUrl);
+        _extractThumbnail(i, item.imageUrl);
       } else if (item.imageUrl.isNotEmpty) {
         precacheImage(
           CachedNetworkImageProvider(item.imageUrl),
@@ -1039,6 +1135,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
     _videoControllers.clear();
     _failedVideoUrls.clear();
     _pendingVideoUrls.clear();
+    _thumbnails.clear();
+    _failedThumbnailUrls.clear();
     super.dispose();
   }
 
@@ -1131,6 +1229,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
                           : () {},
                       onInvisible: () => _disposeVideoIfNeeded(index),
                       videoController: _videoControllers[index],
+                      thumbnailData: _thumbnails[index],
                     ),
                   ),
                 );
@@ -1156,6 +1255,7 @@ class _CarouselMediaItem extends StatefulWidget {
   final VoidCallback onVisible;
   final VoidCallback onInvisible;
   final VideoPlayerController? videoController;
+  final Uint8List? thumbnailData;
 
   const _CarouselMediaItem({
     required this.item,
@@ -1163,6 +1263,7 @@ class _CarouselMediaItem extends StatefulWidget {
     required this.onVisible,
     required this.onInvisible,
     this.videoController,
+    this.thumbnailData,
   });
 
   @override
@@ -1194,31 +1295,57 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.item.mediaType == 'video') {
-      if (widget.videoController != null && widget.videoController!.value.isInitialized) {
-        final ctrl = widget.videoController!;
-        return SizedBox.expand(
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: ctrl.value.size.width,
-              height: ctrl.value.size.height,
-              child: VideoPlayer(ctrl),
+      if (widget.item.mediaType == 'video') {
+        if (widget.videoController != null && widget.videoController!.value.isInitialized) {
+          final ctrl = widget.videoController!;
+          return SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: ctrl.value.size.width,
+                height: ctrl.value.size.height,
+                child: VideoPlayer(ctrl),
+              ),
+            ),
+          );
+        }
+        if (widget.thumbnailData != null) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.memory(widget.thumbnailData!, fit: BoxFit.cover),
+              Container(color: Colors.black.withValues(alpha: 0.15)),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        return Container(
+          color: context.colorPalette.shimmerBaseColor,
+          child: Center(
+            child: Icon(
+              Icons.play_circle_outline_rounded,
+              size: context.getResponsiveSize(8),
+              color: context.colorPalette.gold.withValues(alpha: 0.4),
             ),
           ),
         );
       }
-      return Container(
-        color: context.colorPalette.shimmerBaseColor,
-        child: Center(
-          child: Icon(
-            Icons.play_circle_outline_rounded,
-            size: context.getResponsiveSize(8),
-            color: context.colorPalette.gold.withValues(alpha: 0.4),
-          ),
-        ),
-      );
-    }
 
     return CachedNetworkImage(
       imageUrl: widget.item.imageUrl,

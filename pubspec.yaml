@@ -60,6 +60,7 @@ dependencies:
   picons: ^3.0.1
   no_screenshot: ^1.0.0
   extended_image: ^10.0.1
+  video_thumbnail: ^0.5.6
 
 dev_dependencies:
   flutter_test:

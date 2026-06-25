@@ -24,6 +24,7 @@ class CarouselsController extends GetxController {
 
   final RxList<CarouselModel> _adminList = <CarouselModel>[].obs;
   List<CarouselModel> get adminList => _adminList;
+  RxList<CarouselModel> get adminListRx => _adminList;
 
   final _deletedState = CurrentAppState.INITIAL.obs;
   CurrentAppState get deletedState => _deletedState.value;
@@ -160,7 +161,6 @@ class CarouselsController extends GetxController {
     String? mobileImageUrl,
     bool? isActive,
     required File imageFile,
-    String? mediaType,
   }) async {
     try {
       _createState.value = CurrentAppState.LOADING;
@@ -173,7 +173,6 @@ class CarouselsController extends GetxController {
         "linkUrl": ?linkUrl,
         "mobileImageUrl": ?mobileImageUrl,
         "image": await MultipartFile.fromFile(imageFile.path),
-        if (mediaType != null) "mediaType": mediaType,
       };
 
       final responseData = await _carouselRepo.createCarousel(
@@ -218,7 +217,6 @@ class CarouselsController extends GetxController {
     int? position,
     bool? isActive,
     File? imageFile,
-    String? mediaType,
     bool deleteImage = false,
   }) async {
     try {
@@ -235,7 +233,6 @@ class CarouselsController extends GetxController {
         "position": ?position,
         "isActive": ?isActive,
         if (deleteImage) "deleteImage": "true",
-        if (mediaType != null) "mediaType": mediaType,
       };
 
       if (imageFile != null) {
