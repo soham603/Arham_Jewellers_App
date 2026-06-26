@@ -52,6 +52,12 @@ class WishlistController extends GetxController {
     _loadWishlist();
   }
 
+  @override
+  void onClose() {
+    _items.clear();
+    super.onClose();
+  }
+
   Future<void> _loadWishlist() async {
     final prefs = await SharedPreferences.getInstance();
     final wishlistJson = prefs.getString(_wishlistKey);

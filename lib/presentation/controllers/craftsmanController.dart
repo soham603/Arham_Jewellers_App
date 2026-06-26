@@ -26,6 +26,12 @@ class CraftsmanController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    _craftsmen.clear();
+    super.onClose();
+  }
+
   Future<void> fetchCraftsmen() async {
     if (_isLoading.value) return;
 

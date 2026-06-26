@@ -30,6 +30,8 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   @override
   void initState() {
     super.initState();
+    // AdminUserController is shared with AdminPanelScreen and
+    // StaffPanelScreen, so do not delete it on dispose.
     controller = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());

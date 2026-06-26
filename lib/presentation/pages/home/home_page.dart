@@ -65,9 +65,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    // CarouselsController is registered globally in main.dart and kept
+    // alive for the lifetime of the app (shared with CarouselManagerScreen).
     carouselController = Get.isRegistered<CarouselsController>()
         ? Get.find<CarouselsController>()
-        : Get.put(CarouselsController());
+        : Get.put(CarouselsController(), permanent: true);
     categoryController = Get.isRegistered<CategoryController>()
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());

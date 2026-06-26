@@ -43,6 +43,9 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    if (Get.isRegistered<CategoryManagerController>()) {
+      Get.delete<CategoryManagerController>();
+    }
     super.dispose();
   }
 

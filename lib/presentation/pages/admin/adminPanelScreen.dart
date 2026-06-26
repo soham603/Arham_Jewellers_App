@@ -43,15 +43,19 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   void initState() {
     super.initState();
     _loadScreenshotProtectionSetting();
+    // Registered as permanent so its fetched orders survive route pops back
+    // here from ApproveOrdersScreen and the admin order detail pages.
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
-        : Get.put(AdminOrderController());
+        : Get.put(AdminOrderController(), permanent: true);
     _adminUserController = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());
+    // Registered as permanent by UserManagementScreen so its fetched
+    // user list survives a route pop back here.
     _userManagementController = Get.isRegistered<AdminUserManagementController>()
         ? Get.find<AdminUserManagementController>()
-        : Get.put(AdminUserManagementController());
+        : Get.put(AdminUserManagementController(), permanent: true);
     _goldRateController = Get.isRegistered<GoldRateController>()
         ? Get.find<GoldRateController>()
         : Get.put(GoldRateController());

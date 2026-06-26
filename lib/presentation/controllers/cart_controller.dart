@@ -117,6 +117,12 @@ class CartController extends GetxController {
     _loadCart();
   }
 
+  @override
+  void onClose() {
+    _items.clear();
+    super.onClose();
+  }
+
   Future<void> _loadCart() async {
     final prefs = await SharedPreferences.getInstance();
     final cartJson = prefs.getString(_cartKey);

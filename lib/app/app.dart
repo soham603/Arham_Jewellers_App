@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:no_screenshot/no_screenshot.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app/routes/app_pages.dart';
 import '../core/theme/app_theme.dart';
+import '../utils/Logger.dart';
 
 class RatneshGoldApp extends StatefulWidget {
   const RatneshGoldApp({super.key});
@@ -54,11 +64,30 @@ class RatneshGoldApp extends StatefulWidget {
   State<RatneshGoldApp> createState() => _RatneshGoldAppState();
 }
 
-class _RatneshGoldAppState extends State<RatneshGoldApp> {
+class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initScreenshotProtection();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // AppLifecycleState.detached is only emitted when the engine itself is
+    // being torn down (rare on iOS/Android where the OS typically kills the
+    // process without emitting this event). This is a best-effort cleanup
+    // path for desktop/web/engine-shutdown scenarios.
+    if (state == AppLifecycleState.detached) {
+      _disposeGlobalControllers();
+    }
   }
 
   Future<void> _initScreenshotProtection() async {
@@ -101,4 +130,30 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> {
       ),
     );
   }
+}
+
+/// Disposes all globally-registered GetX controllers. Each disposal is
+/// wrapped independently so a single failure does not prevent the rest from
+/// being cleaned up. `force: true` is required to dispose controllers that
+/// were registered with `permanent: true` — without it, GetX logs a warning
+/// and skips the deletion.
+void _disposeGlobalControllers() {
+  void safeDispose<T extends GetxController>() {
+    try {
+      if (Get.isRegistered<T>()) Get.delete<T>(force: true);
+    } catch (e) {
+      Logger.error('App', 'Error disposing ${T.toString()}: $e');
+    }
+  }
+
+  safeDispose<CartController>();
+  safeDispose<WishlistController>();
+  safeDispose<AuthController>();
+  safeDispose<GoldRateController>();
+  safeDispose<NotificationController>();
+  safeDispose<CategoryController>();
+  safeDispose<CarouselsController>();
+  safeDispose<UserOrderController>();
+  safeDispose<AncillaryController>();
+  Logger.info('App', 'All global controllers disposed');
 }

@@ -329,4 +329,16 @@ class UserOrderController extends GetxController {
 
     _lastOrderCreatedAt = DateTime.now();
   }
+
+  @override
+  void onClose() {
+    _userOrders.clear();
+    _lastOrderImages.clear();
+    _lastOrderItemNames.clear();
+    _lastOrderItemQuantities.clear();
+    _lastOrderItemPrices.clear();
+    _lastOrderTotal = 0;
+    _lastOrderCreatedAt = DateTime.now();
+    super.onClose();
+  }
 }

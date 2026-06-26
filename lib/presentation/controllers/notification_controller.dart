@@ -51,6 +51,7 @@ class NotificationController extends GetxController {
   final NotificationService _notificationService = NotificationService();
 
   bool _autoFetchOnInit = false;
+  bool _listenersAttached = false;
 
   void enableAutoFetchOnInit() {
     _autoFetchOnInit = true;
@@ -64,6 +65,18 @@ class NotificationController extends GetxController {
     if (_autoFetchOnInit) {
       _setupListeners();
     }
+  }
+
+  @override
+  void onClose() {
+    if (_listenersAttached) {
+      _notificationService.onTokenRefreshed = null;
+      _notificationService.onMessageReceived = null;
+      _notificationService.onMessageOpenedApp = null;
+      _listenersAttached = false;
+    }
+    notifications.clear();
+    super.onClose();
   }
 
   void _setupListeners() {
@@ -84,6 +97,7 @@ class NotificationController extends GetxController {
       _handleNotificationTap(data);
     };
 
+    _listenersAttached = true;
     fetchNotifications();
   }
 

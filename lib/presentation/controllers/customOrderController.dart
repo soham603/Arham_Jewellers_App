@@ -245,4 +245,15 @@ class CustomOrderController extends GetxController {
     _modifyState.value = CurrentAppState.INITIAL;
     _isModifying.value = false;
   }
+
+  @override
+  void onClose() {
+    _createState.value = CurrentAppState.INITIAL;
+    _modifyState.value = CurrentAppState.INITIAL;
+    _isCreating.value = false;
+    _isModifying.value = false;
+    _isDeleting.value = false;
+    _createdOrderId.value = '';
+    super.onClose();
+  }
 }

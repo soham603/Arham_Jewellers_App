@@ -28,14 +28,18 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
   void initState() {
     super.initState();
 
-    if (Get.isRegistered<AdminOrderController>()) {
-      controller = Get.find<AdminOrderController>();
-    } else {
-      controller = Get.put(AdminOrderController());
-    }
+    // AdminOrderController is registered as permanent by AdminPanelScreen
+    // (and StaffPanelScreen as a fallback), so its fetched orders survive
+    // route pops between admin order screens.
+    controller = Get.isRegistered<AdminOrderController>()
+        ? Get.find<AdminOrderController>()
+        : Get.put(AdminOrderController(), permanent: true);
 
+    // CraftsmanController is shared with AdminCustomOrderDetailPage.
+    // Registered as permanent to keep the craftsman list cached across
+    // navigation between admin order screens.
     if (!Get.isRegistered<CraftsmanController>()) {
-      Get.put(CraftsmanController());
+      Get.put(CraftsmanController(), permanent: true);
     }
   }
 

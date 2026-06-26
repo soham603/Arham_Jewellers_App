@@ -32,9 +32,10 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
   @override
   void initState() {
     super.initState();
+    // AdminOrderController is registered as permanent by AdminPanelScreen.
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
-        : Get.put(AdminOrderController());
+        : Get.put(AdminOrderController(), permanent: true);
     _adminUserController = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());

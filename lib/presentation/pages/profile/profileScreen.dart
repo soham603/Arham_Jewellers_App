@@ -34,11 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    if (Get.isRegistered<UserOrderController>()) {
-      orderController = Get.find<UserOrderController>();
-    } else {
-      orderController = Get.put(UserOrderController());
-    }
+    // UserOrderController is registered as permanent in main.dart.
+    orderController = Get.isRegistered<UserOrderController>()
+        ? Get.find<UserOrderController>()
+        : Get.put(UserOrderController(), permanent: true);
 
     if (Get.isRegistered<AuthController>()) {
       authController = Get.find<AuthController>();

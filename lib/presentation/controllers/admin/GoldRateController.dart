@@ -74,6 +74,16 @@ class GoldRateController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    _currentRate.value = null;
+    _statistics.value = null;
+    _history.clear();
+    _selectedDateRange.value = null;
+    _error.value = '';
+    super.onClose();
+  }
+
   Future<void> fetchCurrentRate() async {
     try {
       _currentRateState.value = CurrentAppState.LOADING;

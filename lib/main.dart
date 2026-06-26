@@ -5,9 +5,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
@@ -30,6 +34,15 @@ Future<void> main() async {
       Get.put(AuthController());
       Get.put(GoldRateController());
       Get.put(NotificationController());
+      Get.put(CategoryController(), permanent: true);
+      // Permanent: shared by HomePage and CarouselManagerScreen, and
+      // referenced by _resolveUserOrderDetail in app_pages.dart.
+      Get.put(CarouselsController(), permanent: true);
+      Get.put(UserOrderController(), permanent: true);
+      // Permanent: shared by AncillaryPageScreen (read) and
+      // AncillaryEditorScreen (write) so fetched page content survives
+      // navigation between the two.
+      Get.put(AncillaryController(), permanent: true);
 
       if (!kIsWeb) {
         try {

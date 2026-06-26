@@ -43,6 +43,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
     _bodyController.dispose();
     _targetValueController.dispose();
     _scrollController.dispose();
+    if (Get.isRegistered<NotificationManagerController>()) {
+      Get.delete<NotificationManagerController>();
+    }
     super.dispose();
   }
 

@@ -70,10 +70,11 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
 
   @override
   Widget build(BuildContext context) {
+    // UserOrderController is registered as permanent in main.dart.
     final UserOrderController orderController =
         Get.isRegistered<UserOrderController>()
             ? Get.find<UserOrderController>()
-            : Get.put(UserOrderController());
+            : Get.put(UserOrderController(), permanent: true);
 
     return PopScope(
       canPop: false,

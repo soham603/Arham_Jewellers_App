@@ -43,11 +43,11 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
   @override
   void initState() {
     super.initState();
-    if (Get.isRegistered<CarouselsController>()) {
-      controller = Get.find<CarouselsController>();
-    } else {
-      controller = Get.put(CarouselsController());
-    }
+    // CarouselsController is registered globally in main.dart and kept
+    // alive for the lifetime of the app (shared with HomePage).
+    controller = Get.isRegistered<CarouselsController>()
+        ? Get.find<CarouselsController>()
+        : Get.put(CarouselsController(), permanent: true);
     _tabController = TabController(length: 2, vsync: this);
 
     ever<List<CarouselModel>>(controller.adminListRx, (_) {

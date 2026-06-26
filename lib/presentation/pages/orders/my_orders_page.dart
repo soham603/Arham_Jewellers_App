@@ -32,9 +32,12 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   @override
   void initState() {
     super.initState();
+    // UserOrderController is registered globally in main.dart and kept
+    // alive for the lifetime of the app (it's also needed by the
+    // _resolveUserOrderDetail route resolver).
     _orderController = Get.isRegistered<UserOrderController>()
         ? Get.find<UserOrderController>()
-        : Get.put(UserOrderController());
+        : Get.put(UserOrderController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderController.fetchUserOrders();

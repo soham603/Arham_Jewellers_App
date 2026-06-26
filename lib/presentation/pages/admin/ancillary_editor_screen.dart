@@ -26,9 +26,12 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
   @override
   void initState() {
     super.initState();
+    // AncillaryController is registered as permanent in main.dart and
+    // shared with AncillaryPageScreen so fetched page data is preserved
+    // across the read/edit flow.
     apiController = Get.isRegistered<AncillaryController>()
         ? Get.find<AncillaryController>()
-        : Get.put(AncillaryController());
+        : Get.put(AncillaryController(), permanent: true);
     _loadInitialHtml();
   }
 

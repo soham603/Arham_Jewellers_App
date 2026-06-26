@@ -104,6 +104,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
   @override
   void dispose() {
     _nameCtrl.dispose();
+    if (Get.isRegistered<AdminProductController>()) {
+      Get.delete<AdminProductController>();
+    }
     super.dispose();
   }
 

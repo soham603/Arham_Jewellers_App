@@ -26,6 +26,9 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+    if (Get.isRegistered<ProductSearchController>()) {
+      Get.delete<ProductSearchController>();
+    }
     super.dispose();
   }
 

@@ -23,11 +23,12 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
   void initState() {
     super.initState();
     pageKey = Get.arguments as String? ?? 'TERMS';
-    if (Get.isRegistered<AncillaryController>()) {
-      controller = Get.find<AncillaryController>();
-    } else {
-      controller = Get.put(AncillaryController());
-    }
+    // AncillaryController is registered as permanent in main.dart and
+    // shared with AncillaryEditorScreen so fetched page data survives
+    // navigation between read and edit flows.
+    controller = Get.isRegistered<AncillaryController>()
+        ? Get.find<AncillaryController>()
+        : Get.put(AncillaryController(), permanent: true);
   }
 
   @override

@@ -44,6 +44,9 @@ class _HandsetChangeScreenState extends State<HandsetChangeScreen> {
   void dispose() {
     _scroll.dispose();
     _searchController.dispose();
+    if (Get.isRegistered<HandsetChangeController>()) {
+      Get.delete<HandsetChangeController>();
+    }
     super.dispose();
   }
 

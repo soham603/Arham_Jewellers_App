@@ -28,12 +28,14 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   @override
   void initState() {
     super.initState();
+    // Both controllers are registered as permanent by AdminPanelScreen
+    // and ApproveOrdersScreen respectively, so they survive route pops.
     _controller = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
-        : Get.put(AdminOrderController());
+        : Get.put(AdminOrderController(), permanent: true);
     _craftsmanController = Get.isRegistered<CraftsmanController>()
         ? Get.find<CraftsmanController>()
-        : Get.put(CraftsmanController());
+        : Get.put(CraftsmanController(), permanent: true);
   }
 
   _StatusInfo _getStatusInfo(String status) {

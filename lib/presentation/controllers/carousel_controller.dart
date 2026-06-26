@@ -83,6 +83,15 @@ class CarouselsController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    _list.clear();
+    _adminList.clear();
+    _deletedList.clear();
+    _latestProducts.clear();
+    super.onClose();
+  }
+
   Future<void> getAllCarousels() async {
     try {
       _getCarouselState.value = CurrentAppState.LOADING;

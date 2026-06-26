@@ -27,6 +27,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   void initState() {
     super.initState();
+    // AdminUserManagementController is shared between this screen and
+    // AdminPanelScreen, so register it as permanent to keep its fetched
+    // data alive across route pops.
     controller = Get.isRegistered<AdminUserManagementController>()
         ? Get.find<AdminUserManagementController>()
         : Get.put(AdminUserManagementController(), permanent: true);

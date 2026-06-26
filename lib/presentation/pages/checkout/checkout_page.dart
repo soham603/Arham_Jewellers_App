@@ -27,11 +27,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     super.initState();
-    if (Get.isRegistered<UserOrderController>()) {
-      userOrderController = Get.find<UserOrderController>();
-    } else {
-      userOrderController = Get.put(UserOrderController());
-    }
+    // UserOrderController is registered globally in main.dart and kept
+    // alive for the lifetime of the app.
+    userOrderController = Get.isRegistered<UserOrderController>()
+        ? Get.find<UserOrderController>()
+        : Get.put(UserOrderController(), permanent: true);
   }
 
   @override
