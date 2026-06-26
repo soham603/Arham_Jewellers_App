@@ -722,11 +722,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (user.accountStatus != null)
                 Container(
                   padding: EdgeInsets.symmetric(
-                    horizontal: context.getResponsiveSize(2.5),
+                    horizontal: context.getResponsiveSize(2),
                     vertical: context.heightPercent(0.3),
                   ),
                   decoration: BoxDecoration(
-                    color: user.accountStatus!.toLowerCase() == 'active'
+                    color: user.accountStatus!.toLowerCase() == 'active' || user.accountStatus!.toLowerCase() == 'approved'
                         ? const Color(0xFFE6F7EE)
                         : const Color(0xFFFFF4E5),
                     borderRadius: BorderRadius.circular(100),
@@ -734,11 +734,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Text(
                     user.accountStatus![0].toUpperCase() + user.accountStatus!.substring(1),
                     style: TextStyle(
-                      color: user.accountStatus!.toLowerCase() == 'active'
+                      color: user.accountStatus!.toLowerCase() == 'active' || user.accountStatus!.toLowerCase() == 'approved'
                           ? const Color(0xFF2D8C56)
                           : Colors.orange,
                       fontWeight: FontWeight.w700,
-                      fontSize: context.getResponsiveSize(2.8),
+                      fontSize: context.getResponsiveSize(2.2),
                     ),
                   ),
                 ),
@@ -753,9 +753,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icon(
                       detail.icon,
                       color: AppColors.textMuted,
-                      size: context.getResponsiveSize(4.5),
+                      size: context.getResponsiveSize(4),
                     ),
-                    SizedBox(width: context.getResponsiveSize(2.5)),
+                    SizedBox(width: context.getResponsiveSize(2)),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -388,7 +388,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               ),
                             ),
                             onPressed: () {
-                              Navigator.of(context).pop();
+                              Navigator.of(context).popUntil((route) => route.isFirst);
                               Get.find<NavigationController>().switchTab(NavigationController.cartIndex);
                             },
                             child: Text(

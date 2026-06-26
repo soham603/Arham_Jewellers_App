@@ -9,7 +9,7 @@ class Breakpoints {
   static const double desktopWidth = 1200;
   static const double wideTabletWidth = 900;
   static const double clampMaxWidth = 800;
-  static const double minResponsiveSize = 12.0;
+  static const double minResponsiveSize = 10.0;
   static const double defaultPhoneScale = 1.2;
 }
 

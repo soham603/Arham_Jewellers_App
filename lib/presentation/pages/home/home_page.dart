@@ -583,9 +583,24 @@ GestureDetector(
                           );
                         }),
 
-                        SizedBox(height: context.heightPercent(4)),
+                        SizedBox(height: context.heightPercent(1.5)),
 
-                        const CustomiseOrderBanner(),
+                        GestureDetector(
+                          onTap: () => Get.to(() => const CustomiseOrderPage()),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getResponsiveSize(4),
+                              vertical: context.heightPercent(1),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                'assets/images/bespoke-cta.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
 
                         const NavBarSpacer(),
                       ],
@@ -1352,6 +1367,8 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
     return CachedNetworkImage(
       imageUrl: widget.item.imageUrl,
       fit: BoxFit.cover,
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
       placeholder: (_, _) => CarouselShimmer(),
       errorWidget: (_, _, _) => Container(
         color: context.colorPalette.shimmerBaseColor,
@@ -1576,239 +1593,6 @@ class _CategoryQuickAccessImage extends StatelessWidget {
     }
 
     return const RatneshFallback.s();
-  }
-}
-
-class CustomiseOrderBanner extends StatelessWidget {
-  final VoidCallback? onTap;
-  const CustomiseOrderBanner({super.key, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: 'Customise your jewelry order. Tap to start designing.',
-      button: true,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(4),
-          vertical: context.heightPercent(0.5),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap ?? () => Get.to(() => const CustomiseOrderPage()),
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: const LinearGradient(
-                  colors: [
-                    AppColors.goldGradientLight,
-                    AppColors.goldGradientDark,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: context.colorPalette.goldDeep.withValues(alpha: 0.2),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-                border: Border.all(
-                  color: context.colorPalette.goldDeep.withValues(alpha: 0.15),
-                  width: 1.5,
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.getResponsiveSize(2.5),
-                        vertical: context.heightPercent(0.4),
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.colorPalette.goldDeep,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(16),
-                          bottomLeft: Radius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        "Bespoke Service",
-                        style: TextStyle(
-                          color: AppColors.white,
-                          fontSize: context.responsiveFont(9),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 6,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Craft Your",
-                                style: TextStyle(
-                                  color: AppColors.deepEspresso,
-                                  fontSize: context.responsiveFont(18),
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.1,
-                                ),
-                              ),
-                              Text(
-                                "Dream Jewelry",
-                                style: TextStyle(
-                                  color: AppColors.deepEspresso.withValues(alpha: 0.8),
-                                  fontSize: context.responsiveFont(14),
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-
-                              SizedBox(height: context.heightPercent(0.8)),
-
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _buildFeatureText(context, "Imagine"),
-                                    _buildBulletDot(context),
-                                    _buildFeatureText(context, "Upload"),
-                                    _buildBulletDot(context),
-                                    _buildFeatureText(context, "Craft"),
-                                  ],
-                                ),
-                              ),
-
-                              SizedBox(height: context.heightPercent(0.8)),
-
-                              Text(
-                                "Turn your unique inspirations into stunning gold masterpieces.",
-                                style: TextStyle(
-                                  color: AppColors.espressoMuted,
-                                  fontSize: context.responsiveFont(10),
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2,
-                                ),
-                              ),
-
-                              SizedBox(height: context.heightPercent(1.2)),
-
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: context.getResponsiveSize(3),
-                                  vertical: context.heightPercent(0.6),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: context.colorPalette.gold.withValues(alpha: 0.5),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: context.colorPalette.gold.withValues(alpha: 0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Start Designing",
-                                      style: TextStyle(
-                                        color: context.colorPalette.goldDeep,
-                                        fontSize: context.responsiveFont(11),
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                    SizedBox(width: context.getResponsiveSize(1)),
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      color: context.colorPalette.goldDeep,
-                                      size: context.responsiveWidth(12, tabletVal: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Expanded(
-                          flex: 4,
-                          child: Center(
-                            child: Container(
-                              width: context.responsiveWidth(80, tabletVal: 120),
-                              height: context.responsiveWidth(80, tabletVal: 120),
-                              decoration: BoxDecoration(
-                                color: AppColors.white.withValues(alpha: 0.7),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.white, width: 1.5),
-                              ),
-                              child: Center(
-                                child: ClipOval(
-                                  child: ColorFiltered(
-                                    colorFilter: ColorFilter.mode(
-                                      context.colorPalette.goldDeep,
-                                      BlendMode.srcIn,
-                                    ),
-                                    child: Image.asset(
-                                      'assets/images/bespoke-icon.png',
-                                      width: context.responsiveWidth(60, tabletVal: 90),
-                                      height: context.responsiveWidth(60, tabletVal: 90),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBulletDot(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(0.8)),
-      child: Icon(Icons.circle, size: context.responsiveWidth(3, tabletVal: 4), color: AppColors.deepEspresso),
-    );
-  }
-
-  Widget _buildFeatureText(BuildContext context, String text) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: AppColors.deepEspresso,
-        fontSize: context.responsiveFont(9),
-        fontWeight: FontWeight.w800,
-      ),
-    );
   }
 }
 
