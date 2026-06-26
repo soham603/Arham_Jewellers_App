@@ -70,5 +70,19 @@ abstract class AppTheme {
       ),
       hintStyle: GoogleFonts.inter(fontSize: 14, color: Color(0xFFA39A8F)),
     ),
+    dialogTheme: DialogThemeData(
+      titleTextStyle: GoogleFonts.inter(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textDark,
+      ),
+      contentTextStyle: GoogleFonts.inter(
+        fontSize: 14,
+        color: AppColors.textMuted,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
   );
 }

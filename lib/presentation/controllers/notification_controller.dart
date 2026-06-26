@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationController extends GetxController {
   static const String _storageKey = 'notifications_list';
+  static const String _deletedIdsKey = 'notifications_deleted_ids';
   static const int _maxNotifications = 100;
   static const int _pageSize = 20;
 
@@ -32,6 +33,7 @@ class NotificationController extends GetxController {
   final RxString errorMessage = ''.obs;
   final RxString loadMoreError = ''.obs;
   final RxInt filterIndex = 0.obs;
+  final Set<String> _deletedIds = {};
 
   RxList<NotificationModel> get filteredNotifications {
     if (filterIndex.value == 1) {
@@ -133,6 +135,7 @@ class NotificationController extends GetxController {
           : (responseData['notifications'] ?? []);
       final fetched = items
           .map((json) => NotificationModel.fromJson(json))
+          .where((n) => !_deletedIds.contains(n.id))
           .toList();
 
       if (append) {
@@ -193,8 +196,6 @@ class NotificationController extends GetxController {
     final index = notifications.indexWhere((n) => n.id == id);
     if (index == -1 || notifications[index].isRead) return;
 
-    final previousState = notifications.toList();
-
     final old = notifications[index];
     notifications[index] = NotificationModel(
       id: old.id,
@@ -205,23 +206,19 @@ class NotificationController extends GetxController {
       data: old.data,
     );
     _updateUnreadCount();
+    _saveNotifications();
 
-    try {
-      await _notificationRepo.markNotificationsAsRead(
-        data: {
-          'notificationIds': [id],
-        },
-      );
-      _saveNotifications();
-    } catch (e) {
+    _notificationRepo.markNotificationsAsRead(
+      data: {
+        'notificationIds': [id],
+      },
+    ).catchError((e) {
       Logger.error(
         "NotificationController",
         "Failed to mark notification as read on backend: $e",
       );
-      notifications.value = previousState;
-      _updateUnreadCount();
-      _saveNotifications();
-    }
+      return <String, dynamic>{};
+    });
   }
 
   Future<void> markAllAsRead() async {
@@ -231,8 +228,6 @@ class NotificationController extends GetxController {
         .toList();
 
     if (unreadIds.isEmpty) return;
-
-    final previousState = notifications.toList();
 
     final updated = notifications.map((n) {
       if (!n.isRead) {
@@ -250,21 +245,17 @@ class NotificationController extends GetxController {
 
     notifications.value = updated;
     _updateUnreadCount();
+    _saveNotifications();
 
-    try {
-      await _notificationRepo.markNotificationsAsRead(
-        data: {'notificationIds': unreadIds},
-      );
-      _saveNotifications();
-    } catch (e) {
+    _notificationRepo.markNotificationsAsRead(
+      data: {'notificationIds': unreadIds},
+    ).catchError((e) {
       Logger.error(
         "NotificationController",
         "Failed to mark all as read on backend: $e",
       );
-      notifications.value = previousState;
-      _updateUnreadCount();
-      _saveNotifications();
-    }
+      return <String, dynamic>{};
+    });
   }
 
   void addLocalNotification({
@@ -289,12 +280,14 @@ class NotificationController extends GetxController {
   }
 
   void clearAll() {
+    _deletedIds.clear();
     notifications.clear();
     _updateUnreadCount();
     _saveNotifications();
   }
 
   void deleteNotification(String id) {
+    _deletedIds.add(id);
     notifications.removeWhere((n) => n.id == id);
     _updateUnreadCount();
     _saveNotifications();
@@ -330,6 +323,10 @@ class NotificationController extends GetxController {
             .toList();
         _updateUnreadCount();
       }
+      final deletedJson = prefs.getStringList(_deletedIdsKey);
+      if (deletedJson != null) {
+        _deletedIds.addAll(deletedJson);
+      }
     } catch (e) {
       Logger.error(
         "NotificationController",
@@ -343,6 +340,7 @@ class NotificationController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final jsonList = notifications.map((n) => n.toJson()).toList();
       await prefs.setString(_storageKey, jsonEncode(jsonList));
+      await prefs.setStringList(_deletedIdsKey, _deletedIds.toList());
     } catch (e) {
       Logger.error(
         "NotificationController",
