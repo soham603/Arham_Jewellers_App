@@ -76,12 +76,10 @@ class _ProductCardState extends State<ProductCard>
             _cleanText(product.name) ?? 'Untitled Product';
         final imageUrl = _cleanText(product.displayImageUrl);
         final categoryName = _cleanText(product.category?.name);
-        final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.karigarNetWt);
         final touchData = _parseTouch(product.touch);
         final size = _cleanText(product.size);
 
-        final showTagNo = !widget.compact && tagNo != null;
         final showWeight = fineWeight != null || touchData != null || size != null;
 
         return MouseRegion(

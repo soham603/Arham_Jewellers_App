@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
-import 'package:ratnesh_gold_app/core/widgets/category_picker_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
@@ -45,7 +44,6 @@ class _SearchPageState extends State<SearchPage> {
   final FocusNode _focusNode = FocusNode();
   late final Worker _tabWorker;
 
-  Set<SelectedCategory> _tempSelectedCategories = {};
   List<CategoryModel> _allCategories = [];
   Map<String, List<CategoryModel>> _categoryVariants = {};
 
@@ -157,13 +155,6 @@ class _SearchPageState extends State<SearchPage> {
       }
     }
     return expanded;
-  }
-
-  String? _getCategoryKarat(CategoryModel cat) {
-    if (categoryController.k18Categories.any((c) => c.id == cat.id)) return '18K';
-    if (categoryController.k20Categories.any((c) => c.id == cat.id)) return '20K';
-    if (categoryController.k22Categories.any((c) => c.id == cat.id)) return '22K';
-    return null;
   }
 
   String _getKaratPurity(String? karat) {
@@ -516,190 +507,6 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildCategoriesFilter(BuildContext context) {
-    return Obx(() {
-      final categoryIds = controller.selectedCategoryIds;
-      final categoryNames = controller.selectedCategoryNames;
-      final hasCategories = categoryIds.isNotEmpty;
-
-      return Container(
-        padding: EdgeInsets.fromLTRB(
-          context.getResponsiveSize(4),
-          0,
-          context.getResponsiveSize(4),
-          0,
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _focusNode.unfocus();
-                    CategoryPickerSheet.show(
-                      context,
-                      categories: _allCategories,
-                      categoryVariants: _categoryVariants,
-                      categoryController: categoryController,
-                      selectedCategories: _tempSelectedCategories,
-                      cleanName: _cleanCategoryName,
-                      onSelectionChanged: (updated) {
-                        setState(() {
-                          _tempSelectedCategories = updated;
-                        });
-                      },
-                      onClear: () {
-                        setState(() {
-                          _tempSelectedCategories.clear();
-                        });
-                        Navigator.pop(context);
-                      },
-                    ).then((_) {
-                      final newIds = _tempSelectedCategories.map((c) => c.id).toList();
-                      final newNames = _tempSelectedCategories.map((c) => c.displayName).toList();
-                      controller.applyFilters(
-                        karats: controller.selectedKarats,
-                        categoryIds: newIds,
-                        categoryNames: newNames,
-                        stockFilter: controller.stockFilter,
-                        wMin: controller.weightMin,
-                        wMax: controller.weightMax,
-                        pMin: controller.priceMin,
-                        pMax: controller.priceMax,
-                        sizes: controller.selectedSizes,
-                      );
-                      setState(() {});
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: hasCategories
-                          ? context.colorPalette.gold
-                          : context.colorPalette.cardBg,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: hasCategories
-                            ? context.colorPalette.gold
-                            : context.colorPalette.border,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          size: 14,
-                          color: hasCategories
-                              ? Colors.white
-                              : context.colorPalette.goldDark,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          hasCategories
-                              ? '${categoryNames.length} Categories'
-                              : 'Categories',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: hasCategories
-                                ? Colors.white
-                                : context.colorPalette.goldDeep,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (hasCategories) ...[
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          for (final name in categoryNames)
-                            _activeFilterChip(
-                              context,
-                              label: name,
-                              onRemove: () {
-                                final idx = categoryNames.indexOf(name);
-                                final newIds = List<String>.from(categoryIds);
-                                final newNames = List<String>.from(categoryNames);
-                                if (idx != -1) {
-                                  newIds.removeAt(idx);
-                                  newNames.removeAt(idx);
-                                }
-                                controller.applyFilters(
-                                  karats: controller.selectedKarats,
-                                  categoryIds: newIds,
-                                  categoryNames: newNames,
-                                  stockFilter: controller.stockFilter,
-                                  wMin: controller.weightMin,
-                                  wMax: controller.weightMax,
-                                  pMin: controller.priceMin,
-                                  pMax: controller.priceMax,
-                                  sizes: controller.selectedSizes,
-                                );
-                                setState(() {
-                                  _tempSelectedCategories.removeWhere((c) => c.id == categoryIds[idx]);
-                                });
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      controller.clearAllFilters();
-                      controller.loadInitialProducts();
-                      setState(() {
-                        _tempSelectedCategories.clear();
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: context.colorPalette.cardBg,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: context.colorPalette.border),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.close,
-                            size: context.getResponsiveSize(3),
-                            color: context.colorPalette.goldDark,
-                          ),
-                          SizedBox(width: context.getResponsiveSize(0.8)),
-                          Text(
-                            'Clear',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(2.8),
-                              fontWeight: FontWeight.w500,
-                              color: context.colorPalette.goldDark,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      );
-    });
   }
 
   Widget _activeFilterChip(

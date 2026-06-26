@@ -227,12 +227,10 @@ class _NavItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     final isCenterItem = item.isCenter && item.assetPath != null;
     final borderRadius = BorderRadius.circular(isCenterItem ? 26 : 20);
     final effectiveBubbleSize = isCenterItem ? bubbleSize + 12 : bubbleSize;
-    final centerLift = isCenterItem ? 12.0 : 0.0;
 
     return Expanded(
       child: Tooltip(

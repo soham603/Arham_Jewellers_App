@@ -634,7 +634,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       ctx,
       () async {
         final items = order.items.map((item) {
-          final name = item.product.name ?? '';
+          final name = item.product.name;
           String? karat;
           final karatMatch = RegExp(r'(\d{2})\s*[Kk]').firstMatch(name);
           if (karatMatch != null) {

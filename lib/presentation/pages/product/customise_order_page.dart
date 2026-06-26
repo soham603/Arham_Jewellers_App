@@ -98,17 +98,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     return null;
   }
 
-  String? _contactValidator(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Contact number is required';
-    }
-    final digits = value.trim().replaceAll(RegExp(r'\D'), '');
-    if (digits.length < 10) {
-      return 'Enter a valid 10-digit number';
-    }
-    return null;
-  }
-
   String? _weightValidator(String? value) {
     if (value == null || value.trim().isEmpty) return null; // optional
     final parsed = double.tryParse(value.trim());

@@ -13,9 +13,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/notificationManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/splash/splash_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
@@ -515,107 +513,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               .toList(),
         );
       },
-    );
-  }
-
-  void _showToastTestSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.all(context.getResponsiveSize(5)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Test Toast",
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-            SizedBox(height: context.heightPercent(2)),
-            _toastButton(
-              context,
-              label: "Success",
-              color: const Color(0xFF2E7D32),
-              onTap: () {
-                Navigator.pop(ctx);
-                ToastUtils.showSuccess("This is a success toast message.",
-                    title: "Success");
-              },
-            ),
-            SizedBox(height: context.heightPercent(1)),
-            _toastButton(
-              context,
-              label: "Error",
-              color: const Color(0xFFC62828),
-              onTap: () {
-                Navigator.pop(ctx);
-                ToastUtils.showError("This is an error toast message.",
-                    title: "Error");
-              },
-            ),
-            SizedBox(height: context.heightPercent(1)),
-            _toastButton(
-              context,
-              label: "Warning",
-              color: const Color(0xFFE65100),
-              onTap: () {
-                Navigator.pop(ctx);
-                ToastUtils.showWarning("This is a warning toast message.",
-                    title: "Warning");
-              },
-            ),
-            SizedBox(height: context.heightPercent(1)),
-            _toastButton(
-              context,
-              label: "Info",
-              color: const Color(0xFFA57A36),
-              onTap: () {
-                Navigator.pop(ctx);
-                ToastUtils.showInfo("This is an info toast message.",
-                    title: "Info");
-              },
-            ),
-            SizedBox(height: context.heightPercent(2)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _toastButton(
-    BuildContext context, {
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(4),
-          vertical: context.heightPercent(1.2),
-        ),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: context.getResponsiveSize(4),
-          ),
-        ),
-      ),
     );
   }
 

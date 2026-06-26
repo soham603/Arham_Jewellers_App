@@ -203,7 +203,7 @@ class HandsetChangeController extends GetxController {
       }
 
       final resData = response.data;
-      final message = (resData is Map) ? (resData['error']?['message'] ?? resData['message'] ?? 'Action failed') : 'Action failed';
+      final message = resData['error']?['message'] ?? resData['message'] ?? 'Action failed';
 
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;

@@ -1096,17 +1096,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  String _formatPrice(double value) {
-    if (value >= 10000000) {
-      return '\u20B9${(value / 10000000).toStringAsFixed(1)}Cr';
-    } else if (value >= 100000) {
-      return '\u20B9${(value / 100000).toStringAsFixed(1)}L';
-    } else if (value >= 1000) {
-      return '\u20B9${(value / 1000).toStringAsFixed(1)}K';
-    }
-    return '\u20B9${value.round()}';
-  }
-
   Widget _buildAppBarTitleWidget(BuildContext context) {
     final title = widget.title ?? '${widget.karat} Collection';
     return Text(
@@ -1583,14 +1572,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> _getSelectedProducts() {
-    final allProducts = _isMultiCategory
-        ? _controller.categoryProducts
-        : _isCategoryOnly
-        ? _controller.categoryProducts
-        : _isCategoryFilter
-        ? _controller.filteredProducts
-        : _controller.karatProducts;
-    return allProducts
+    return _displayedProducts
         .where((p) => _selectedProductIds.contains(p.id))
         .toList();
   }

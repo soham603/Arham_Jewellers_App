@@ -124,7 +124,18 @@ class NotificationController extends GetxController {
       if (append) {
         notifications.addAll(fetched);
       } else {
-        notifications.value = fetched;
+        final existingIds = notifications.map((n) => n.id).toSet();
+        final newOnes =
+            fetched.where((n) => !existingIds.contains(n.id)).toList();
+        if (newOnes.isNotEmpty) {
+          notifications.insertAll(0, newOnes);
+          if (notifications.length > _maxNotifications) {
+            notifications.removeRange(
+              _maxNotifications,
+              notifications.length,
+            );
+          }
+        }
       }
 
       _hasMore.value = fetched.length >= _pageSize;
