@@ -860,7 +860,7 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
     ),
   );
 
-  final colWidths = <double>[36, 24, 140, 55, 55, 34, 70, 65];
+  final colWidths = <double>[36, 24, 140, 55, 34, 70, 65];
 
   final tableHeaderStyle = pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColor.fromHex('#FFFFFF'));
   final tableCellStyle = pw.TextStyle(font: regularFont, fontSize: 8.5, color: darkColor);
@@ -941,7 +941,7 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
   }
 
   final tableRows = <pw.TableRow>[
-    buildRow(['#', 'Name', 'Karat', 'Net Wt (g)', 'Qty', 'Price', 'Status'], isHeader: true),
+    buildRow(['#', 'Name', 'Karat', 'Net Wt (g)', 'Qty', 'Status'], isHeader: true),
     ...items.asMap().entries.map((entry) {
       final ci = entry.key;
       final item = entry.value;
@@ -955,7 +955,6 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
         item['karat'] as String? ?? '-',
         netWt != null ? netWt.toStringAsFixed(2) : '-',
         '${item['quantity'] ?? 0}',
-        'Rs. ${(item['price'] as double? ?? 0).toStringAsFixed(2)}',
         itemStatus,
       ], image: img, itemStatus: itemStatus);
     }),
