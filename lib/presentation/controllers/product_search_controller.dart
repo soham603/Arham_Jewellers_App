@@ -88,15 +88,24 @@ class ProductSearchController extends GetxController {
     }
 
     try {
-      final response = await httpClient.get(
-        "/api/v1/products/search",
-        queryParameters: {
-          "search": _query.value.trim(),
-          "page": _page,
-          "limit": _pageLimit,
-          "showAll": true,
-        },
-      );
+      final hasSearch = _query.value.trim().isNotEmpty;
+      final endpoint = hasSearch
+          ? "/api/v1/products/search"
+          : "/api/v1/products/get-all";
+
+      final queryParameters = <String, dynamic>{
+        "page": _page,
+        "limit": _pageLimit,
+      };
+
+      if (hasSearch) {
+        queryParameters["search"] = _query.value.trim();
+        queryParameters["showAll"] = true;
+      } else if (filterState.isActive.value != null) {
+        queryParameters["isActive"] = filterState.isActive.value!;
+      }
+
+      final response = await httpClient.get(endpoint, queryParameters: queryParameters);
 
       List<ProductModel> allFetched = [];
 
@@ -104,11 +113,6 @@ class ProductSearchController extends GetxController {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
         allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-      }
-
-      if (filterState.isActive.value != null) {
-        final isActive = filterState.isActive.value!;
-        allFetched = allFetched.where((p) => p.isActive == isActive).toList();
       }
 
       if (filterState.stockFilterValue == 'ready') {
@@ -184,21 +188,21 @@ class ProductSearchController extends GetxController {
 
   void toggleKaratFilter(String karat) {
     filterState.toggleKaratFilter(karat);
-    if (isSearching) {
+    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
       _fetchProducts(isPagination: false);
     }
   }
 
   void setStockFilter(String value) {
     filterState.setStockFilter(value);
-    if (isSearching) {
+    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
       _fetchProducts(isPagination: false);
     }
   }
 
   void setIsActiveFilter(bool? value) {
     filterState.setIsActive(value);
-    if (isSearching) {
+    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
       _fetchProducts(isPagination: false);
     }
   }
@@ -225,14 +229,14 @@ class ProductSearchController extends GetxController {
       sizes: sizes,
       isActive: isActive,
     );
-    if (isSearching) {
+    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
       _fetchProducts(isPagination: false);
     }
   }
 
   void clearAllFilters() {
     filterState.resetFilters();
-    if (isSearching) {
+    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
       _fetchProducts(isPagination: false);
     }
   }

@@ -364,7 +364,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: presets.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final preset = presets[index];
                 final isSelected = _selectedPreset == preset;
@@ -423,7 +423,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
               controller: _monthScrollController,
               scrollDirection: Axis.horizontal,
               itemCount: _months.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              separatorBuilder: (_, _) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
                 final monthNum = index + 1;
                 final isSelected = _selectedMonth == monthNum && _selectedYear != null;
@@ -473,7 +473,7 @@ class _DateRangePickerSheetState extends State<DateRangePickerSheet> {
               controller: _yearScrollController,
               scrollDirection: Axis.horizontal,
               itemCount: _years.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              separatorBuilder: (_, _) => const SizedBox(width: 6),
               itemBuilder: (context, index) {
                 final year = _years[index];
                 final isSelected = _selectedYear == year;

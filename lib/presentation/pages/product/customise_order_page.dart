@@ -57,7 +57,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];
-  List<_RefImageMeta?> _imageMeta = [null, null, null, null];
+  final List<_RefImageMeta?> _imageMeta = [null, null, null, null];
   final ValueNotifier<bool> _networkImageFailed = ValueNotifier(false);
   final ImagePicker _picker = ImagePicker();
 
@@ -142,10 +142,12 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     if (order.weight != null) weightCtrl.text = order.weight!;
     if (order.noOfPieces != null) noOfPcCtrl.text = order.noOfPieces!;
     if (order.size != null) sizeCtrl.text = order.size!;
-    if (order.lengthBroadness != null)
+    if (order.lengthBroadness != null) {
       lengthBroadnessCtrl.text = order.lengthBroadness!;
-    if (order.productDescription != null)
+    }
+    if (order.productDescription != null) {
       productDescriptionCtrl.text = order.productDescription!;
+    }
 
     if (_caratOptions.contains(order.purity)) {
       selectedCarat = order.purity;

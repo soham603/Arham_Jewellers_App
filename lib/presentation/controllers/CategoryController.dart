@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
+import 'package:image/image.dart' as img;
 import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -9,6 +11,30 @@ import 'package:ratnesh_gold_app/presentation/controllers/searchProductControlle
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+
+Uint8List _compressBytes(Uint8List bytes) {
+  final decoded = img.decodeImage(bytes);
+  if (decoded == null) return bytes;
+
+  final longest = decoded.width > decoded.height
+      ? decoded.width
+      : decoded.height;
+  const maxEdge = 800;
+
+  final img.Image resized;
+  if (longest > maxEdge) {
+    resized = img.copyResize(
+      decoded,
+      width: decoded.width >= decoded.height ? maxEdge : null,
+      height: decoded.height > decoded.width ? maxEdge : null,
+      interpolation: img.Interpolation.linear,
+    );
+  } else {
+    resized = decoded;
+  }
+
+  return Uint8List.fromList(img.encodeJpg(resized, quality: 75));
+}
 
 enum Karat { k18, k20, k22 }
 
@@ -488,7 +514,9 @@ class CategoryController extends GetxController {
         'boxName': ?boxName,
         'description': ?description,
         if (imageFile != null)
-          'file': await MultipartFile.fromFile(imageFile.path),
+          'file': await MultipartFile.fromFile(
+            (await _compressImageFile(imageFile)).path,
+          ),
       });
 
       final response = await _categoryRepo.editCategory(id: id, data: formData);
@@ -550,6 +578,14 @@ class CategoryController extends GetxController {
       Logger.error('CategoryController', '_fetchLevelFlat error: $e');
     }
     return [];
+  }
+
+  static Future<File> _compressImageFile(File file) async {
+    final bytes = await file.readAsBytes();
+    final compressed = await compute(_compressBytes, bytes);
+    final tempDir = await Directory.systemTemp.createTemp('compress');
+    final outPath = '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    return File(outPath)..writeAsBytesSync(compressed);
   }
 
   Rx<CurrentAppState> _stateForKarat(Karat karat) {

@@ -74,7 +74,7 @@ class SearchProductController extends GetxController {
   CurrentAppState get karatState => _karatState.value;
 
   List<String> _currentKarats = [];
-  bool _karatHasMore = true;
+  final bool _karatHasMore = true;
   bool get karatHasMore => _karatHasMore;
 
   final _karatReadyProducts = <ProductModel>[].obs;
@@ -119,9 +119,9 @@ class SearchProductController extends GetxController {
   final _categoryOutState = CurrentAppState.INITIAL.obs;
   final _categoryAllState = CurrentAppState.INITIAL.obs;
 
-  bool _categoryReadyHasMore = true;
-  bool _categoryOutHasMore = true;
-  bool _categoryAllHasMore = true;
+  final bool _categoryReadyHasMore = true;
+  final bool _categoryOutHasMore = true;
+  final bool _categoryAllHasMore = true;
 
   List<ProductModel> get categoryReadyProducts => _categoryReadyProducts;
   List<ProductModel> get categoryOutProducts => _categoryOutProducts;
@@ -697,7 +697,7 @@ class SearchProductController extends GetxController {
               "search": _karatToSearchValue(karat),
               "page": currentPage,
               "limit": _pageLimit,
-              if (stockParam != null) ...stockParam,
+              ...?stockParam,
             },
           );
 
@@ -783,7 +783,7 @@ class SearchProductController extends GetxController {
           "page": 1,
           "limit": _pageLimit,
           "showReverse": true,
-          if (stockParam != null) ...stockParam,
+          ...?stockParam,
         },
       );
 
@@ -830,7 +830,7 @@ class SearchProductController extends GetxController {
               "page": 1,
               "limit": _pageLimit,
               "showReverse": true,
-              if (stockParam != null) ...stockParam,
+              ...?stockParam,
             },
           );
 
@@ -952,7 +952,7 @@ class SearchProductController extends GetxController {
           "page": currentPage,
           "limit": _pageLimit,
           "showReverse": true,
-          if (stockParam != null) ...stockParam,
+          ...?stockParam,
         },
       );
 

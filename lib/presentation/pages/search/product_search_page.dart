@@ -283,7 +283,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                           onTap: () => Get.to(() => ProductEditPage(product: product)),
                         );
                       },
-                      separatorBuilder: (_, __) => SizedBox(height: context.getResponsiveSize(1)),
+                      separatorBuilder: (_, _) => SizedBox(height: context.getResponsiveSize(1)),
                     ),
                   ),
                   if (controller.hasMore)

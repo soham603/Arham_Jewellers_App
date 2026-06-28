@@ -290,7 +290,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
                   title: "Products",
                   subtitle: "Browse & edit products",
                   onTap: () {
-                    Get.find<NavigationController>().switchTab(1, isAdmin: true);
+                    Get.find<NavigationController>().switchTab(1);
                     Get.back();
                   },
                 ),
@@ -329,7 +329,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _managementItems.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   SizedBox(height: context.heightPercent(1.2)),
               itemBuilder: (context, index) {
                 final item = _managementItems[index];
@@ -354,7 +354,7 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
             "Verify orders", () => Get.to(() => const ApproveOrdersScreen())),
         _ManagementItem(Icons.production_quantity_limits_rounded, "Products",
             "Browse & edit products", () {
-          Get.find<NavigationController>().switchTab(1, isAdmin: true);
+          Get.find<NavigationController>().switchTab(1);
           Get.back();
         }),
         _ManagementItem(Icons.category_rounded, "Categories",

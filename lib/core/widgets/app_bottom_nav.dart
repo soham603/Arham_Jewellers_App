@@ -126,17 +126,17 @@ class AppBottomNav extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: colorScheme.outline.withOpacity(0.10),
+              color: colorScheme.outline.withValues(alpha: 0.10),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.20),
+                color: Colors.black.withValues(alpha: 0.20),
                 blurRadius: 24,
                 spreadRadius: 2,
                 offset: const Offset(0, 8),
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: Colors.black.withValues(alpha: 0.15),
                 blurRadius: 12,
                 spreadRadius: 1,
                 offset: const Offset(0, 4),
@@ -172,12 +172,12 @@ class AppBottomNav extends StatelessWidget {
                       iconSize: iconSize,
                       labelFontSize: labelFontSize,
                       selectedBubbleColor:
-                          context.colorPalette.goldDark.withOpacity(0.06),
+                          context.colorPalette.goldDark.withValues(alpha: 0.06),
                       unselectedBubbleColor: Colors.transparent,
                       selectedIconColor: context.colorPalette.goldDark,
                       selectedLabelColor: context.colorPalette.goldDark,
-                      unselectedIconColor: Colors.black.withOpacity(0.65),
-                      unselectedLabelColor: Colors.black.withOpacity(0.65),
+                      unselectedIconColor: Colors.black.withValues(alpha: 0.65),
+                      unselectedLabelColor: Colors.black.withValues(alpha: 0.65),
                     );
                   }),
                 ),
@@ -257,10 +257,10 @@ class _NavItemTile extends StatelessWidget {
               highlightColor: Colors.transparent,
               hoverColor:
                   (isSelected ? selectedIconColor : unselectedLabelColor)
-                      .withOpacity(0.03),
+                      .withValues(alpha: 0.03),
               focusColor:
                   (isSelected ? selectedIconColor : unselectedLabelColor)
-                      .withOpacity(0.05),
+                      .withValues(alpha: 0.05),
 child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: isCenterItem ? 2 : 4,
@@ -293,8 +293,8 @@ child: Padding(
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(
-                                        theme.brightness == Brightness.dark
+                                      color: Colors.black.withValues(
+                                        alpha: theme.brightness == Brightness.dark
                                             ? 0.22
                                             : 0.10,
                                       ),

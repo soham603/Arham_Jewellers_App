@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart' as painting;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -51,6 +52,8 @@ Future<void> main() async {
           Logger.error('Main', 'NotificationService init failed: $e');
         }
       }
+
+      painting.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
 
       runApp(RatneshGoldApp());
     },

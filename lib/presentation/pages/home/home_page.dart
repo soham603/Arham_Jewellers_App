@@ -1680,14 +1680,9 @@ class _CategoryQuickAccessImage extends StatefulWidget {
   State<_CategoryQuickAccessImage> createState() => _CategoryQuickAccessImageState();
 }
 
-class _CategoryQuickAccessImageState extends State<_CategoryQuickAccessImage>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => true;
-
+class _CategoryQuickAccessImageState extends State<_CategoryQuickAccessImage> {
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     if (widget.cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: widget.cat.imageUrl,

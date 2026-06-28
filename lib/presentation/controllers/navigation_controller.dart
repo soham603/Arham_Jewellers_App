@@ -33,8 +33,8 @@ class NavigationController extends GetxController {
     super.onClose();
   }
 
-  void switchTab(int index, {bool isAdmin = false}) {
-    if (!isAdmin && index == collectionsIndex) {
+  void switchTab(int index) {
+    if (index == collectionsIndex) {
       Get.to(() => CategoryListingPage(
             karats: [Karat.k18, Karat.k20, Karat.k22],
             title: 'Collections',
@@ -42,8 +42,7 @@ class NavigationController extends GetxController {
           ));
       return;
     }
-    final pageIndex =
-        isAdmin ? index : (index > collectionsIndex ? index - 1 : index);
+    final pageIndex = index > collectionsIndex ? index - 1 : index;
     if (pageIndex == selectedIndex.value) return;
     selectedIndex.value = pageIndex;
     _isAnimatingToPage = true;

@@ -18,7 +18,7 @@ Uint8List _compressBytes(Uint8List bytes) {
   final longest = decoded.width > decoded.height
       ? decoded.width
       : decoded.height;
-  final maxEdge = 1200;
+  final maxEdge = 800;
 
   final img.Image resized;
   if (longest > maxEdge) {
@@ -32,7 +32,7 @@ Uint8List _compressBytes(Uint8List bytes) {
     resized = decoded;
   }
 
-  return Uint8List.fromList(img.encodeJpg(resized, quality: 80));
+  return Uint8List.fromList(img.encodeJpg(resized, quality: 75));
 }
 
 class CategoryManagerController extends GetxController {
@@ -55,10 +55,6 @@ class CategoryManagerController extends GetxController {
   File? get pickedImage => _pickedImage.value;
   final ImagePicker _picker = ImagePicker();
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   // ── Fetch ALL categories — reuses tree from CategoryController
   Future<void> fetchAll({bool force = false}) async {
@@ -243,9 +239,7 @@ class CategoryManagerController extends GetxController {
             (await _compressImageFile(imageFile)).path,
           ),
       });
-
-      Logger.info("CategoryManagerController", "editCategory fields: name=${name}, isDeleteImage=${isDeleteImage}, isActive=${isActive}, hasFile=${imageFile != null}");
-
+      
       final response = await _categoryRepo.editCategory(id: id, data: formData);
 
       final updated = CategoryModel.fromJson(response['data']);

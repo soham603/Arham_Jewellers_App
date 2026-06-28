@@ -410,7 +410,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                         ),
                         Switch(
                           value: _isActive,
-                          activeColor: Colors.green,
+                          activeThumbColor: Colors.green,
                           inactiveTrackColor: Colors.orange.withValues(alpha: 0.5),
                           onChanged: (v) => setState(() => _isActive = v),
                         ),

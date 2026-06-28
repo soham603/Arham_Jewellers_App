@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart' as painting;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
@@ -56,6 +57,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
     for (final controller in _expandControllers.values) {
       controller.dispose();
     }
+    painting.ImageCache().clear();
     super.dispose();
   }
 

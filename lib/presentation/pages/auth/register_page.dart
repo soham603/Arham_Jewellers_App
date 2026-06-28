@@ -163,10 +163,12 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   String? _validatePhone(String? value) {
-    if (value == null || value.trim().isEmpty)
+    if (value == null || value.trim().isEmpty) {
       return 'Mobile number is required';
-    if (!_phoneRegex.hasMatch(value.trim()))
+    }
+    if (!_phoneRegex.hasMatch(value.trim())) {
       return 'Enter a valid 10‑digit number';
+    }
     return null;
   }
 
@@ -185,8 +187,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _validatePincode(String? value) {
     if (value == null || value.trim().isEmpty) return 'Pincode is required';
-    if (!_pincodeRegex.hasMatch(value.trim()))
+    if (!_pincodeRegex.hasMatch(value.trim())) {
       return 'Enter a valid 6‑digit pincode';
+    }
     return null;
   }
 

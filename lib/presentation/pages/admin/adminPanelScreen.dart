@@ -321,7 +321,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _managementItems.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   SizedBox(height: context.heightPercent(1.2)),
               itemBuilder: (context, index) {
                 final item = _managementItems[index];

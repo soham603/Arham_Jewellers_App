@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart' as painting;
 import 'package:get/get.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -88,6 +89,12 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObse
     if (state == AppLifecycleState.detached) {
       _disposeGlobalControllers();
     }
+  }
+
+  @override
+  void didHaveMemoryPressure() {
+    super.didHaveMemoryPressure();
+    painting.ImageCache().clear();
   }
 
   Future<void> _initScreenshotProtection() async {

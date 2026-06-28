@@ -12,8 +12,7 @@ import 'search/search_page.dart';
 import 'cart/cart_page.dart';
 import 'profile/profileScreen.dart';
 import 'share/share_page.dart';
-import 'product/category_listing_page.dart';
-import '../controllers/CategoryController.dart';
+
 
 class MainShellView extends GetView<NavigationController> {
   const MainShellView({super.key});
@@ -28,11 +27,6 @@ class MainShellView extends GetView<NavigationController> {
   static final _adminPages = <Widget>[
     const HomePage(),
     const SearchPage(),
-    const CategoryListingPage(
-      karats: [Karat.k18, Karat.k20, Karat.k22],
-      title: 'Collections',
-      showBothLogos: true,
-    ),
     const SharePage(),
     const ProfileScreen(),
   ];
@@ -65,7 +59,7 @@ class MainShellView extends GetView<NavigationController> {
         final index = controller.selectedIndex.value;
         final isAdmin = authController.isAdmin;
         final pages = isAdmin ? _adminPages : _regularPages;
-        final navIndex = isAdmin ? index : (index >= 2 ? index + 1 : index);
+        final navIndex = index >= 2 ? index + 1 : index;
         final notificationCount = Get.isRegistered<NotificationController>()
             ? Get.find<NotificationController>().unreadCount.value
             : 0;
@@ -81,7 +75,7 @@ class MainShellView extends GetView<NavigationController> {
           ),
           bottomNavigationBar: AppBottomNav(
             currentIndex: navIndex,
-            onTap: (i) => controller.switchTab(i, isAdmin: isAdmin),
+            onTap: (i) => controller.switchTab(i),
             isAdmin: isAdmin,
             notificationCount: notificationCount,
           ),

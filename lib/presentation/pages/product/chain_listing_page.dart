@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart' as painting;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
@@ -31,6 +32,12 @@ class _ChainListingPageState extends State<ChainListingPage> {
   void initState() {
     super.initState();
     _loadAll();
+  }
+
+  @override
+  void dispose() {
+    painting.ImageCache().clear();
+    super.dispose();
   }
 
   Future<void> _loadAll() async {

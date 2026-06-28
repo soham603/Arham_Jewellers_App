@@ -901,7 +901,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                         SizedBox(width: context.getResponsiveSize(2)),
                         Switch(
                           value: _isActive,
-                          activeColor: Colors.green,
+                          activeThumbColor: Colors.green,
                           inactiveTrackColor: Colors.orange.withValues(alpha: 0.5),
                           onChanged: (v) => setState(() => _isActive = v),
                         ),

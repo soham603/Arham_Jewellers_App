@@ -38,10 +38,6 @@ class ShareController extends GetxController {
   final _currentLevel2 = Rxn<CategoryModel>();
   CategoryModel? get currentLevel2 => _currentLevel2.value;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   // ── Selected level-3 categories (persist across navigation) ─
   // Key format: "${karatName}_${level3Id}" to avoid cross-karat collisions
