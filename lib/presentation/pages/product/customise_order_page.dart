@@ -40,6 +40,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
   // Edit mode
   bool get _isEditMode => widget.existingOrder != null;
+  bool get _isAdmin => Get.find<AuthController>().isAdmin;
 
   // State variables for visually selectable chips
   String selectedCarat = '22K (92%)';
@@ -416,7 +417,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       ),
 
       // BOTTOM ACTION BAR
-      bottomNavigationBar: Container(
+      bottomNavigationBar: _isAdmin ? const SizedBox.shrink() : Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
           context.heightPercent(1.2),
@@ -789,7 +790,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
               ),
 
               SizedBox(height: context.heightPercent(0.5)),
-              SizedBox(height: context.heightPercent(3)),
+              SizedBox(height: _isAdmin ? context.heightPercent(10) : context.heightPercent(3)),
             ],
           ),
         ),

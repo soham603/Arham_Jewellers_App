@@ -195,6 +195,7 @@ class _Level3TabState extends State<_Level3Tab> {
     // Step 3: show L3 under selected L2
     return Obx(() {
       final items = ctrl.level3For(_selectedL2!.id);
+      final availableL2 = ctrl.level2All;
       return _DrillDownList(
         breadcrumb: '${_selectedL1!.name} → ${_selectedL2!.name}',
         onBack: () => setState(() { _selectedL2 = null; }),
@@ -202,7 +203,7 @@ class _Level3TabState extends State<_Level3Tab> {
         emptyMsg: 'No Level 3 under ${_selectedL2!.name}.',
         onRefresh: () => ctrl.fetchAll(force: true),
         onAddNew: () => _showCreateSheet(context, ctrl, level: 3, parentId: _selectedL2!.id),
-        onEdit: (cat) => _showEditSheet(context, ctrl, cat),
+        onEdit: (cat) => _showEditSheet(context, ctrl, cat, availableParents: availableL2),
         onDelete: (cat) => _confirmDelete(context, ctrl, cat),
         onRestore: (cat) => _confirmRestore(context, ctrl, cat),
         ctrl: ctrl,
@@ -686,8 +687,8 @@ void _showCreateSheet(BuildContext context, CategoryManagerController ctrl, {req
   _showFormSheet(context, ctrl, isCreate: true, level: level, parentId: parentId);
 }
 
-void _showEditSheet(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
-  _showFormSheet(context, ctrl, isCreate: false, existing: cat);
+void _showEditSheet(BuildContext context, CategoryManagerController ctrl, CategoryModel cat, {List<CategoryModel>? availableParents}) {
+  _showFormSheet(context, ctrl, isCreate: false, existing: cat, availableParents: availableParents);
 }
 
 void _showFormSheet(BuildContext context, CategoryManagerController ctrl, {
@@ -695,6 +696,7 @@ void _showFormSheet(BuildContext context, CategoryManagerController ctrl, {
   CategoryModel? existing,
   int? level,
   String? parentId,
+  List<CategoryModel>? availableParents,
 }) {
   showModalBottomSheet(
     context: context,
@@ -706,6 +708,7 @@ void _showFormSheet(BuildContext context, CategoryManagerController ctrl, {
       level: level ?? existing?.level ?? 1,
       parentId: parentId ?? existing?.parentId,
       ctrl: ctrl,
+      availableParents: availableParents,
     ),
   );
 }
@@ -716,6 +719,7 @@ class _CategoryFormSheet extends StatefulWidget {
   final int level;
   final String? parentId;
   final CategoryManagerController ctrl;
+  final List<CategoryModel>? availableParents;
 
   const _CategoryFormSheet({
     required this.isCreate,
@@ -723,6 +727,7 @@ class _CategoryFormSheet extends StatefulWidget {
     required this.level,
     this.parentId,
     required this.ctrl,
+    this.availableParents,
   });
 
   @override
@@ -739,6 +744,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   bool _isActive = true;
   bool _submitting = false;
   bool _fromServerEdit = false;
+  String? _selectedParentId;
 
   bool get isEditing => !widget.isCreate;
 
@@ -749,6 +755,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
       _nameCtrl.text = widget.existing!.name;
       _descCtrl.text = widget.existing!.description ?? '';
       _isActive = widget.existing!.isActive;
+      _selectedParentId = widget.existing!.parentId;
     }
   }
 
@@ -785,6 +792,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
         ? await widget.ctrl.editCategory(
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
+            parentId: _selectedParentId,
             imageFile: _pickedImage,
             isDeleteImage: _isDeleteImage,
             isActive: _isActive,
@@ -922,6 +930,48 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                     style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor),
                     maxLines: 3,
                     decoration: _inputDec(context, 'Brief description...'),
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+                ],
+
+                if (isEditing && widget.availableParents != null && widget.availableParents!.isNotEmpty) ...[
+                  _label('Move to Category'),
+                  SizedBox(height: context.heightPercent(0.6)),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.heightPercent(0.3),
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: context.colorPalette.boxColor),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedParentId,
+                        hint: Text(
+                          'Select parent category',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(3.5),
+                            color: context.colorPalette.subTitleColor,
+                          ),
+                        ),
+                        items: widget.availableParents!.map((cat) {
+                          return DropdownMenuItem<String>(
+                            value: cat.id,
+                            child: Text(
+                              cat.name,
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.5),
+                                color: context.colorPalette.textColor,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (v) => setState(() => _selectedParentId = v),
+                      ),
+                    ),
                   ),
                   SizedBox(height: context.heightPercent(2)),
                 ],

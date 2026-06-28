@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -211,15 +210,15 @@ class _ProductEditPageState extends State<ProductEditPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.pageBg,
+      backgroundColor: context.colorPalette.backgroundColor,
       appBar: AppBar(
         title: const Text('Edit Product'),
         backgroundColor: Colors.white,
-        foregroundColor: AppColors.textDark,
+        foregroundColor: context.colorPalette.textColor,
         elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.grey.shade200, height: 1),
+          child: Container(color: context.colorPalette.boxColor, height: 1),
         ),
       ),
       body: Form(
@@ -248,14 +247,14 @@ class _ProductEditPageState extends State<ProductEditPage> {
                             child: Container(
                               clipBehavior: Clip.antiAlias,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: _adminCtrl.pickedImage != null
-                                      ? AppColors.primaryGold
-                                      : Colors.grey.shade300,
+                                      ? context.colorPalette.primaryColor
+                                      : context.colorPalette.boxColor,
                                   width: _adminCtrl.pickedImage != null ? 2 : 1,
                                 ),
-                              color: Colors.grey.shade100,
+                              color: context.colorPalette.boxColor.withValues(alpha: 0.4),
                             ),
                             child: _buildImagePreview(),
                           ),
@@ -272,7 +271,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                     controller: _nameCtrl,
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(3.8),
-                      color: AppColors.textDark,
+                      color: context.colorPalette.textColor,
                     ),
                     decoration: _inputDec('Enter product name'),
                     validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
@@ -285,8 +284,13 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   DropdownButtonFormField<String>(
                     initialValue: _selectedKarat,
                     decoration: _inputDec('Select karat'),
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
+                    menuMaxHeight: context.heightPercent(30),
                     items: _availableKarats.map((k) {
-                      return DropdownMenuItem(value: k, child: Text(k));
+                      return DropdownMenuItem(
+                        value: k,
+                        child: Text(k, style: TextStyle(color: context.colorPalette.textColor)),
+                      );
                     }).toList(),
                     onChanged: (v) {
                       if (v != null) {
@@ -311,10 +315,12 @@ class _ProductEditPageState extends State<ProductEditPage> {
                           : 'Select collection',
                     ),
                     isExpanded: true,
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
+                    menuMaxHeight: context.heightPercent(30),
                     items: _level2Categories.map((cat) {
                       return DropdownMenuItem<String>(
                         value: cat.id,
-                        child: Text(cat.name, overflow: TextOverflow.ellipsis),
+                        child: Text(cat.name, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colorPalette.textColor)),
                       );
                     }).toList(),
                     onChanged: _level2Categories.isEmpty
@@ -345,10 +351,12 @@ class _ProductEditPageState extends State<ProductEditPage> {
                           : 'Select style',
                     ),
                     isExpanded: true,
+                    style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
+                    menuMaxHeight: context.heightPercent(30),
                     items: _level3Categories.map((cat) {
                       return DropdownMenuItem<String>(
                         value: cat.id,
-                        child: Text(cat.name, overflow: TextOverflow.ellipsis),
+                        child: Text(cat.name, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colorPalette.textColor)),
                       );
                     }).toList(),
                     onChanged: _level3Categories.isEmpty
@@ -374,14 +382,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
                       vertical: context.heightPercent(0.8),
                     ),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.grey.shade300),
-                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: _isActive
+                            ? Colors.green.withValues(alpha: 0.35)
+                            : Colors.orange.withValues(alpha: 0.35),
+                      ),
+                      color: _isActive
+                          ? Colors.green.withValues(alpha: 0.08)
+                          : Colors.orange.withValues(alpha: 0.08),
                     ),
                     child: Row(
                       children: [
                         Icon(
-                          _isActive ? Icons.check_circle : Icons.cancel,
+                          _isActive ? Icons.check_circle_rounded : Icons.pause_circle_rounded,
                           color: _isActive ? Colors.green : Colors.orange,
                           size: context.getResponsiveSize(5),
                         ),
@@ -394,15 +408,15 @@ class _ProductEditPageState extends State<ProductEditPage> {
                                 _isActive ? 'Active' : 'Inactive',
                                 style: TextStyle(
                                   fontSize: context.getResponsiveSize(3.5),
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textDark,
+                                  fontWeight: FontWeight.w700,
+                                  color: context.colorPalette.textColor,
                                 ),
                               ),
                               Text(
                                 _isActive ? 'Product is visible to users' : 'Product is hidden from users',
                                 style: TextStyle(
                                   fontSize: context.getResponsiveSize(2.5),
-                                  color: Colors.grey.shade500,
+                                  color: context.colorPalette.subTitleColor,
                                 ),
                               ),
                             ],
@@ -441,8 +455,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.primaryGold.withValues(alpha: 0.4)),
-                        color: AppColors.primaryGold.withValues(alpha: 0.06),
+                        border: Border.all(color: context.colorPalette.primaryColor.withValues(alpha: 0.4)),
+                        color: context.colorPalette.primaryColor.withValues(alpha: 0.06),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -450,7 +464,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                           Icon(
                             Icons.table_chart_outlined,
                             size: context.getResponsiveSize(4.5),
-                            color: AppColors.primaryGold,
+                            color: context.colorPalette.primaryColor,
                           ),
                           SizedBox(width: context.getResponsiveSize(2)),
                           Text(
@@ -458,7 +472,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                             style: TextStyle(
                               fontSize: context.getResponsiveSize(3.5),
                               fontWeight: FontWeight.w600,
-                              color: AppColors.primaryGold,
+                              color: context.colorPalette.primaryColor,
                             ),
                           ),
                         ],
@@ -478,20 +492,19 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 context.getResponsiveSize(5),
                 context.heightPercent(2),
               ),
-              child: Obx(() => SizedBox(
+                child: Obx(() => SizedBox(
                 width: double.infinity,
                 height: context.heightPercent(6.5),
                 child: ElevatedButton(
                   onPressed: _adminCtrl.saving ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
+                    backgroundColor: context.colorPalette.primaryColor,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor:
-                        AppColors.primaryGold.withValues(alpha: 0.5),
-                    elevation: 3,
-                    shadowColor: AppColors.primaryGold.withValues(alpha: 0.4),
+                        context.colorPalette.primaryColor.withValues(alpha: 0.5),
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   child: _adminCtrl.saving
@@ -507,7 +520,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                           'Save Changes',
                           style: TextStyle(
                             fontSize: context.getResponsiveSize(4),
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                 ),
@@ -529,7 +542,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         fit: BoxFit.cover,
         placeholder: (context, url) => Center(
           child: CircularProgressIndicator(
-            color: AppColors.primaryGold,
+            color: context.colorPalette.primaryColor,
             strokeWidth: 2,
           ),
         ),
@@ -547,14 +560,14 @@ class _ProductEditPageState extends State<ProductEditPage> {
           Icon(
             Icons.add_photo_alternate_outlined,
             size: context.getResponsiveSize(10),
-            color: Colors.grey.shade400,
+            color: context.colorPalette.subTitleColor,
           ),
           SizedBox(height: context.heightPercent(0.5)),
           Text(
             'Tap to add image',
             style: TextStyle(
               fontSize: context.getResponsiveSize(2.8),
-              color: Colors.grey.shade500,
+              color: context.colorPalette.subTitleColor,
             ),
           ),
         ],
@@ -566,37 +579,39 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return Text(
       text,
       style: TextStyle(
-        fontSize: context.getResponsiveSize(3.2),
-        fontWeight: FontWeight.w700,
-        color: AppColors.textDark,
+        fontSize: context.getResponsiveSize(3.3),
+        fontWeight: FontWeight.w600,
+        color: context.colorPalette.textColor,
       ),
     );
   }
 
   InputDecoration _inputDec(String hint) {
     return InputDecoration(
+      isDense: true,
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey.shade400),
-      filled: true,
-      fillColor: Colors.white,
+      hintStyle: TextStyle(
+        fontSize: context.getResponsiveSize(3.3),
+        color: context.colorPalette.subTitleColor,
+      ),
       contentPadding: EdgeInsets.symmetric(
-        horizontal: context.getResponsiveSize(4),
-        vertical: context.heightPercent(1.2),
+        horizontal: context.getResponsiveSize(3.5),
+        vertical: context.heightPercent(1.3),
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: context.colorPalette.boxColor),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: context.colorPalette.boxColor),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: context.colorPalette.primaryColor),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.redAccent),
       ),
     );

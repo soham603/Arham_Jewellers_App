@@ -223,6 +223,7 @@ class CategoryManagerController extends GetxController {
   Future<(String? error, String? successMessage)> editCategory({
     required String id,
     String? name,
+    String? parentId,
     File? imageFile,
     bool isDeleteImage = false,
     bool? isActive,
@@ -239,6 +240,7 @@ class CategoryManagerController extends GetxController {
 
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
+        if (parentId != null) "parentId": parentId,
         if (isDeleteImage) "isDeleteImage": true,
         if (isActive != null) "isActive": isActive.toString(),
         if (fileToUpload != null)

@@ -274,33 +274,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
 
-      floatingActionButton: Get.find<AuthController>().isAdmin
-          ? FloatingActionButton.extended(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProductEditPage(product: _currentProduct),
-                  ),
-                );
-                if (result == true && mounted) {
-                  setState(() {});
-                }
-              },
-              backgroundColor: AppColors.primaryGold,
-              icon: const Icon(Icons.edit, color: Colors.white, size: 20),
-              label: Text(
-                'Edit',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: context.getResponsiveSize(3.5),
-                ),
-              ),
-            )
-          : null,
-
-      
       // PREMIUM BOTTOM ACTION BAR
       
       bottomNavigationBar: Get.find<AuthController>().isAdmin
@@ -814,40 +787,82 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Get.to(
-                            () => CustomiseOrderPage(product: product),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.tune,
-                          size: context.getResponsiveSize(4),
-                          color: Colors.white,
-                        ),
-                        label: Text(
-                          "Customize",
-                          style: TextStyle(
-                            fontSize: context.getResponsiveSize(2.8),
-                            fontWeight: FontWeight.w700,
+                      if (Get.find<AuthController>().isAdmin)
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductEditPage(product: product),
+                              ),
+                            );
+                            if (result == true && mounted) {
+                              setState(() {});
+                            }
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            size: context.getResponsiveSize(4),
                             color: Colors.white,
                           ),
+                          label: Text(
+                            "Edit",
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(2.8),
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGold,
+                            elevation: 3,
+                            shadowColor: AppColors.primaryGold.withValues(
+                              alpha: 0.4,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getResponsiveSize(4),
+                              vertical: context.heightPercent(0.8),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        )
+                      else
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Get.to(
+                              () => CustomiseOrderPage(product: product),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.tune,
+                            size: context.getResponsiveSize(4),
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            "Customize",
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(2.8),
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGold,
+                            elevation: 3,
+                            shadowColor: AppColors.primaryGold.withValues(
+                              alpha: 0.4,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.getResponsiveSize(4),
+                              vertical: context.heightPercent(0.8),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGold,
-                          elevation: 3,
-                          shadowColor: AppColors.primaryGold.withValues(
-                            alpha: 0.4,
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.getResponsiveSize(4),
-                            vertical: context.heightPercent(0.8),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
 
