@@ -738,6 +738,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
   bool _isDeleteImage = false;
   bool _isActive = true;
   bool _submitting = false;
+  bool _fromServerEdit = false;
 
   bool get isEditing => !widget.isCreate;
 
@@ -767,6 +768,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
       setState(() {
         _pickedImage = result.file;
         _isDeleteImage = false;
+        _fromServerEdit = false;
         _imageMeta = _CategoryImageMeta(
           originalFile: File(picked.path),
           lastResult: result,
@@ -786,6 +788,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             imageFile: _pickedImage,
             isDeleteImage: _isDeleteImage,
             isActive: _isActive,
+            skipCompression: _fromServerEdit,
           )
         : await widget.ctrl.createCategory(
             name: _nameCtrl.text.trim(),
@@ -982,6 +985,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                                       setState(() {
                                         _pickedImage = result.file;
                                         _isDeleteImage = false;
+                                        _fromServerEdit = true;
                                         _imageMeta = _CategoryImageMeta(
                                           originalFile: localFile,
                                           lastResult: result,

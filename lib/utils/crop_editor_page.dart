@@ -30,6 +30,7 @@ class _CropEditorPageState extends State<CropEditorPage> {
   final ImageEditorController _editorController = ImageEditorController();
   double? _currentAspectRatio;
   double _targetAngle = 0;
+  late final Uint8List _imageBytes;
 
   static const double _minAngle = -45.0;
   static const double _maxAngle = 45.0;
@@ -40,7 +41,10 @@ class _CropEditorPageState extends State<CropEditorPage> {
   void initState() {
     super.initState();
     _currentAspectRatio = widget.aspectRatio;
-    _applyInitialState();
+    _imageBytes = widget.imageFile.readAsBytesSync();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _applyInitialState();
+    });
   }
 
   void _applyInitialState() {
@@ -228,7 +232,7 @@ class _CropEditorPageState extends State<CropEditorPage> {
         children: [
           Expanded(
             child: ExtendedImage.memory(
-              widget.imageFile.readAsBytesSync(),
+              _imageBytes,
               fit: BoxFit.contain,
               mode: ExtendedImageMode.editor,
               cacheRawData: true,

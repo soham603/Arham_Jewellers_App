@@ -217,7 +217,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
                                         showName: false,
                                         showSubtitle: false,
                                         logoSize: context.responsiveWidth(60, tabletVal: 80),
-                                        logoAsset: 'assets/images/arham-logo.png',
+                                        logoAsset: 'assets/images/arham-logo-opt.webp',
                                         iconColor: context.colorPalette.goldDark,
                                       ),
                                       SizedBox(width: context.responsiveWidth(16, tabletVal: 24)),
@@ -226,7 +226,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
                                         showName: false,
                                         showSubtitle: false,
                                         logoSize: context.responsiveWidth(60, tabletVal: 80),
-                                        logoAsset: 'assets/images/ratnesh-logo.png',
+                                        logoAsset: 'assets/images/ratnesh-logo-opt.webp',
                                         iconColor: context.colorPalette.goldDark,
                                       ),
                                     ],
@@ -237,7 +237,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
                                         showName: false,
                                         showSubtitle: false,
                                         logoSize: context.responsiveWidth(80, tabletVal: 110),
-                                        logoAsset: 'assets/images/arham-logo.png',
+                                        logoAsset: 'assets/images/arham-logo-opt.webp',
                                         iconColor: context.colorPalette.goldDark,
                                       )
                                     : LogoWidget(

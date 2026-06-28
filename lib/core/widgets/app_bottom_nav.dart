@@ -53,7 +53,7 @@ class AppBottomNav extends StatelessWidget {
     ),
     _NavItem(
       label: 'Catalog',
-      assetPath: 'assets/images/ratnesh-logo.png',
+      assetPath: 'assets/images/ratnesh-logo-opt.webp',
       isCenter: true,
     ),
     _NavItem(
@@ -81,7 +81,7 @@ class AppBottomNav extends StatelessWidget {
     ),
     _NavItem(
       label: 'Catalog',
-      assetPath: 'assets/images/ratnesh-logo.png',
+      assetPath: 'assets/images/ratnesh-logo-opt.webp',
       isCenter: true,
     ),
     _NavItem(

@@ -226,18 +226,23 @@ class CategoryManagerController extends GetxController {
     File? imageFile,
     bool isDeleteImage = false,
     bool? isActive,
+    bool skipCompression = false,
   }) async {
     _actionLoadingId.value = id;
 
     try {
+      final fileToUpload = imageFile != null
+          ? skipCompression
+              ? imageFile
+              : await _compressImageFile(imageFile)
+          : null;
+
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
         if (isDeleteImage) "isDeleteImage": true,
         if (isActive != null) "isActive": isActive.toString(),
-        if (imageFile != null)
-          "file": await MultipartFile.fromFile(
-            (await _compressImageFile(imageFile)).path,
-          ),
+        if (fileToUpload != null)
+          "file": await MultipartFile.fromFile(fileToUpload.path),
       });
       
       final response = await _categoryRepo.editCategory(id: id, data: formData);

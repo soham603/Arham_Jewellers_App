@@ -48,7 +48,7 @@ class LogoWidget extends StatelessWidget {
       children: [
         if (showIcon)
           Image.asset(
-            logoAsset ?? 'assets/images/ratnesh-logo.png',
+            logoAsset ?? 'assets/images/ratnesh-logo-opt.webp',
             height: logoSize,
             fit: BoxFit.contain,
             color: applyTint ? (iconColor ?? AppColors.primaryGold) : null,

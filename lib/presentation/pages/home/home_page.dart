@@ -313,7 +313,7 @@ GestureDetector(
                                             child: AspectRatio(
                                               aspectRatio: 3 / 4,
                                               child: Image.asset(
-                                                'assets/images/ratnesh-collection.jpg',
+                                                'assets/images/ratnesh-collection-opt.webp',
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -349,7 +349,7 @@ GestureDetector(
                                             child: AspectRatio(
                                               aspectRatio: 3 / 4,
                                               child: Image.asset(
-                                                'assets/images/arham-collection.jpg',
+                                                'assets/images/arham-collection-opt.webp',
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -394,7 +394,7 @@ GestureDetector(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: Image.asset(
-                                        'assets/images/chain-collection-16:9.png',
+                                        'assets/images/chain-collection-opt.webp',
                                         fit: BoxFit.cover,
                                       ),
                                     ),

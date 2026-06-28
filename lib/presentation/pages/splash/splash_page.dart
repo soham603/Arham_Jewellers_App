@@ -74,11 +74,11 @@ class _SplashPageState extends State<SplashPage>
       _imagePrecached = true;
       Future.wait([
         precacheImage(
-          const AssetImage('assets/images/arham-logo.png'),
+          const AssetImage('assets/images/arham-logo-opt.webp'),
           context,
         ),
         precacheImage(
-          const AssetImage('assets/images/ratnesh-logo.png'),
+          const AssetImage('assets/images/ratnesh-logo-opt.webp'),
           context,
         ),
       ]).then((_) {
@@ -190,7 +190,7 @@ class _SplashPageState extends State<SplashPage>
                         width: logoBox,
                         height: logoBox,
                         child: Image.asset(
-                          'assets/images/arham-logo.png',
+                          'assets/images/arham-logo-opt.webp',
                           fit: BoxFit.contain,
                           color: palette.goldDark,
                           colorBlendMode: BlendMode.srcIn,
