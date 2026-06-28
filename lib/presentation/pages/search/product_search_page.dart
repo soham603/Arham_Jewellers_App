@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +9,8 @@ import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/product_search_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/product_edit_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
@@ -22,6 +26,77 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
+  final RxBool _isCatalogLoading = false.obs;
+  bool _catalogFlowActive = false;
+
+  static const Duration _minSpinnerDisplay = Duration(milliseconds: 450);
+  static const Duration _maxSpinnerDisplay = Duration(seconds: 16);
+
+  bool _hasAnyCatalogData() {
+    if (!Get.isRegistered<CategoryController>()) return false;
+    final c = Get.find<CategoryController>();
+    return c.k18Categories.isNotEmpty ||
+        c.k20Categories.isNotEmpty ||
+        c.k22Categories.isNotEmpty;
+  }
+
+  bool _isCatalogReady() {
+    if (!Get.isRegistered<CategoryController>()) return false;
+    final c = Get.find<CategoryController>();
+    final allSuccess = c.k18State == CurrentAppState.SUCCESS &&
+        c.k20State == CurrentAppState.SUCCESS &&
+        c.k22State == CurrentAppState.SUCCESS;
+    return allSuccess && _hasAnyCatalogData();
+  }
+
+  void _onOpenCatalog() {
+    if (_catalogFlowActive) return;
+    _catalogFlowActive = true;
+    _isCatalogLoading.value = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) {
+        _catalogFlowActive = false;
+        return;
+      }
+
+      await _waitForCatalogReady();
+
+      if (!mounted) {
+        _catalogFlowActive = false;
+        return;
+      }
+
+      _navigateToCatalog();
+
+      _isCatalogLoading.value = false;
+      _catalogFlowActive = false;
+    });
+  }
+
+  Future<void> _waitForCatalogReady() async {
+    final minStart = DateTime.now();
+    while (true) {
+      if (_isCatalogReady()) {
+        final elapsed = DateTime.now().difference(minStart);
+        if (elapsed >= _minSpinnerDisplay) return;
+        await Future<void>.delayed(_minSpinnerDisplay - elapsed);
+        return;
+      }
+      final totalElapsed = DateTime.now().difference(minStart);
+      if (totalElapsed >= _maxSpinnerDisplay) return;
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+    }
+  }
+
+  void _navigateToCatalog() {
+    Get.to(() => CategoryListingPage(
+          karats: [Karat.k18, Karat.k20, Karat.k22],
+          title: 'Collections',
+          showBothLogos: true,
+        ));
+  }
+
   @override
   void dispose() {
     _textController.dispose();
@@ -36,6 +111,33 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.colorPalette.backgroundColor,
+      floatingActionButton: Obx(() {
+        final isLoading = _isCatalogLoading.value;
+        return Transform.scale(
+          scale: 0.88,
+          alignment: Alignment.bottomRight,
+          child: FloatingActionButton.extended(
+            onPressed: isLoading ? null : _onOpenCatalog,
+            backgroundColor: context.colorPalette.gold,
+            foregroundColor: Colors.white,
+            disabledElevation: 0,
+            icon: SizedBox(
+              width: 22,
+              height: 22,
+              child: isLoading
+                  ? const CircularProgressIndicator(
+                      strokeWidth: 2.6,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    )
+                  : const Icon(Icons.category_rounded, size: 22),
+            ),
+            label: const Text(
+              'Search in Catalog',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+          ),
+        );
+      }),
       body: Column(
         children: [
           SearchBarWidget(
