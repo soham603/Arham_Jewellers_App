@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
@@ -188,23 +190,17 @@ class ProductSearchController extends GetxController {
 
   void toggleKaratFilter(String karat) {
     filterState.toggleKaratFilter(karat);
-    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
-      _fetchProducts(isPagination: false);
-    }
+    _fetchProducts(isPagination: false);
   }
 
   void setStockFilter(String value) {
     filterState.setStockFilter(value);
-    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
-      _fetchProducts(isPagination: false);
-    }
+    _fetchProducts(isPagination: false);
   }
 
   void setIsActiveFilter(bool? value) {
     filterState.setIsActive(value);
-    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
-      _fetchProducts(isPagination: false);
-    }
+    _fetchProducts(isPagination: false);
   }
 
   void applyFilters({
@@ -229,16 +225,12 @@ class ProductSearchController extends GetxController {
       sizes: sizes,
       isActive: isActive,
     );
-    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
-      _fetchProducts(isPagination: false);
-    }
+    _fetchProducts(isPagination: false);
   }
 
   void clearAllFilters() {
     filterState.resetFilters();
-    if (isSearching || _state.value == CurrentAppState.SUCCESS) {
-      _fetchProducts(isPagination: false);
-    }
+    _fetchProducts(isPagination: false);
   }
 
   void clearSearch() {
@@ -247,6 +239,15 @@ class ProductSearchController extends GetxController {
     _state.value = CurrentAppState.INITIAL;
     _page = 1;
     _hasMore = true;
+  }
+
+  Future<void> refreshProducts() async {
+    final completer = Completer<void>();
+    _fetchProducts(isPagination: false);
+    ever(_state, (_) {
+      if (!completer.isCompleted) completer.complete();
+    });
+    return completer.future;
   }
 
   Future<ProductModel?> searchByBarcode(String barcode) async {

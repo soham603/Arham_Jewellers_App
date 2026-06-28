@@ -188,7 +188,11 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           _buildFilterDropdowns(context),
           SizedBox(height: context.heightPercent(0.6)),
           Expanded(
-            child: Obx(() {
+            child: RefreshIndicator(
+              color: context.colorPalette.gold,
+              backgroundColor: context.colorPalette.cardBg,
+              onRefresh: () => controller.refreshProducts(),
+              child: Obx(() {
               final products = controller.products;
               final state = controller.state;
 
@@ -329,6 +333,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                 ],
               );
             }),
+            ),
           ),
         ],
       ),
