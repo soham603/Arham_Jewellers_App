@@ -279,16 +279,16 @@ class CategoryController extends GetxController {
   void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
     final allLevel3 = <CategoryModel>[];
     final karatMap = <String, String>{};
-    final bool includeInactive = Get.find<AuthController>().isAdmin;
 
     for (final karatNode in treeResults) {
       final karatName = karatNode['name'] as String? ?? '';
       final children = karatNode['children'] as List? ?? [];
       for (final level2 in children) {
-        if (level2['isActive'] == false && !includeInactive) continue;
+        if (level2['isActive'] == false) continue;
         final level3List = level2['children'] as List? ?? [];
         for (final level3 in level3List) {
-          if (level3['isActive'] == false && !includeInactive) continue;
+          if (level3['isDeleted'] == true) continue;
+          if (level3['isActive'] == false) continue;
           final cat = CategoryModel.fromJson(level3);
           allLevel3.add(cat);
           karatMap[cat.id] = karatName;

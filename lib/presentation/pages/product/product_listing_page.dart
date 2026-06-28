@@ -130,6 +130,37 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
   }
 
+  Future<void> _onRefresh() async {
+    if (_isMultiCategory) {
+      await Future.wait([
+        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready'),
+        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out'),
+        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all'),
+      ]);
+    } else if (_isCategoryFilter && _hasKarat) {
+      await Future.wait([
+        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready'),
+        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out'),
+        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all'),
+      ]);
+    } else if (_isCategoryFilter) {
+      await Future.wait([
+        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready'),
+        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out'),
+        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all'),
+      ]);
+    } else {
+      final karatsToLoad =
+          widget.karats ??
+          (widget.karat != null ? [widget.karat!] : <String>[]);
+      await Future.wait([
+        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready'),
+        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out'),
+        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all'),
+      ]);
+    }
+  }
+
   List<ProductModel> get _displayedProducts {
     List<ProductModel> base;
     switch (_stockFilter) {
@@ -444,75 +475,82 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
               if (layoutType == LayoutType.list) {
                 final shimmerCount = _isLoadingMore ? _shimmerLoadMoreCount : 0;
-                return ListView.builder(
-                  padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
-                  itemCount: products.length + (hasMore && !_isLoadingMore ? 1 : 0) + shimmerCount,
-                  itemBuilder: (_, index) {
-                    if (_isLoadingMore && index >= products.length) {
-                      return _shimmerListTile(context);
-                    }
-                    if (hasMore && !_isLoadingMore && index == products.length) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.responsiveWidth(16),
-                          vertical: context.responsiveWidth(8),
-                        ),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _loadMore,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.colorPalette.gold,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: context.responsiveWidth(12),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
-                              ),
-                            ),
-                            child: const Text('Load More'),
+                return RefreshIndicator(
+                  color: context.colorPalette.gold,
+                  onRefresh: _onRefresh,
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
+                    itemCount: products.length + (hasMore && !_isLoadingMore ? 1 : 0) + shimmerCount,
+                    itemBuilder: (_, index) {
+                      if (_isLoadingMore && index >= products.length) {
+                        return _shimmerListTile(context);
+                      }
+                      if (hasMore && !_isLoadingMore && index == products.length) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: context.responsiveWidth(16),
+                            vertical: context.responsiveWidth(8),
                           ),
-                        ),
-                      );
-                    }
-                    final product = products[index];
-                    return ProductListTile(
-                      key: ValueKey(product.id),
-                      product: product,
-                      isSelected: _selectedProductIds.contains(product.id),
-                      onTap: _isSelectMode
-                          ? () => _toggleSelection(product.id)
-                          : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      ProductDetailsPage(
-                                        product: product,
-                                        products: products,
-                                        initialIndex: index,
-                                        controller: _controller,
-                                        listType: _isCategoryOnly
-                                            ? 'category'
-                                            : _isCategoryFilter
-                                                ? 'filtered'
-                                                : 'karat',
-                                      ),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _loadMore,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: context.colorPalette.gold,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.responsiveWidth(12),
                                 ),
-                              );
-                            },
-                      onLongPress: _isAdmin
-                          ? () => _toggleSelection(product.id)
-                          : null,
-                    );
-                  },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                                ),
+                              ),
+                              child: const Text('Load More'),
+                            ),
+                          ),
+                        );
+                      }
+                      final product = products[index];
+                      return ProductListTile(
+                        key: ValueKey(product.id),
+                        product: product,
+                        isSelected: _selectedProductIds.contains(product.id),
+                        onTap: _isSelectMode
+                            ? () => _toggleSelection(product.id)
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        ProductDetailsPage(
+                                          product: product,
+                                          products: products,
+                                          initialIndex: index,
+                                          controller: _controller,
+                                          listType: _isCategoryOnly
+                                              ? 'category'
+                                              : _isCategoryFilter
+                                                  ? 'filtered'
+                                                  : 'karat',
+                                        ),
+                                  ),
+                                );
+                              },
+                        onLongPress: _isAdmin
+                            ? () => _toggleSelection(product.id)
+                            : null,
+                      );
+                    },
+                  ),
                 );
               }
 
               if (layoutType == LayoutType.fullScreen) {
-                return CustomScrollView(
-                  slivers: [
+                return RefreshIndicator(
+                  color: context.colorPalette.gold,
+                  onRefresh: _onRefresh,
+                  child: CustomScrollView(
+                    slivers: [
                     SliverPadding(
                       padding: const EdgeInsets.all(16),
                       sliver: SliverGrid(
@@ -610,10 +648,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         ),
                       ),
                   ],
+                  ),
                 );
               }
 
-              return CustomScrollView(
+              return RefreshIndicator(
+                color: context.colorPalette.gold,
+                onRefresh: _onRefresh,
+                child: CustomScrollView(
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
@@ -716,6 +758,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       ),
                     ),
                 ],
+                ),
               );
             }),
           ),
