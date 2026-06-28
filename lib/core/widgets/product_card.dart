@@ -157,6 +157,7 @@ class _ProductCardState extends State<ProductCard>
                                         isNew: _isRecent(product),
                                         isHovered: _isHovered,
                                         width: width,
+                                        cardRadius: radius,
                                       ),
                                     ),
                                   ),
@@ -451,6 +452,7 @@ class _ProductImage extends StatelessWidget {
     required this.isNew,
     required this.isHovered,
     required this.width,
+    required this.cardRadius,
   });
 
   final String? imageUrl;
@@ -459,6 +461,7 @@ class _ProductImage extends StatelessWidget {
   final bool isNew;
   final bool isHovered;
   final double width;
+  final double cardRadius;
 
   @override
   Widget build(BuildContext context) {
@@ -469,54 +472,73 @@ class _ProductImage extends StatelessWidget {
 
     final imageProvider = imageUrl != null ? CachedNetworkImageProvider(imageUrl!) : null;
 
+    final imgPad = (width * 0.01).clamp(1.0, 3.0);
+    final imgRadius = cardRadius;
+    final imgBorderRadius = BorderRadius.only(
+      topLeft: Radius.circular(imgRadius),
+      topRight: Radius.circular(imgRadius),
+    );
+
     return Stack(
       children: [
         if (imageProvider != null)
-          ClipRect(
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-              child: ColoredBox(
-                color: AppColors.cardBgLight,
-                child: Image(
-                  image: imageProvider,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                    if (wasSynchronouslyLoaded || frame != null) return child;
-                    return const DecoratedBox(
-                      decoration: BoxDecoration(color: AppColors.cardBgLight),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          Padding(
+            padding: EdgeInsets.all(imgPad),
+            child: ClipRRect(
+              borderRadius: imgBorderRadius,
+              child: ClipRect(
+                child: ImageFiltered(
+                  imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: ColoredBox(
+                    color: AppColors.cardBgLight,
+                    child: Image(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded || frame != null) return child;
+                        return const DecoratedBox(
+                          decoration: BoxDecoration(color: AppColors.cardBgLight),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
         if (imageProvider != null)
           Positioned.fill(
-            child: AnimatedScale(
-              scale: isHovered ? 1.05 : 1.0,
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOut,
-              child: Semantics(
-                image: true,
-                label: '$productName image',
-                child: Image(
-                  image: imageProvider,
-                  fit: BoxFit.contain,
-                  width: double.infinity,
-                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                    if (wasSynchronouslyLoaded || frame != null) return child;
-                    return Shimmer.fromColors(
-                      baseColor: AppColors.warmShimmerBase,
-                      highlightColor: AppColors.shimmerHighlight,
-                      child: const DecoratedBox(
-                        decoration: BoxDecoration(color: Colors.white),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) => const RatneshFallback.m(),
+            child: Padding(
+              padding: EdgeInsets.all(imgPad),
+              child: ClipRRect(
+                borderRadius: imgBorderRadius,
+                child: AnimatedScale(
+                  scale: isHovered ? 1.05 : 1.0,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOut,
+                  child: Semantics(
+                    image: true,
+                    label: '$productName image',
+                    child: Image(
+                      image: imageProvider,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                        if (wasSynchronouslyLoaded || frame != null) return child;
+                        return Shimmer.fromColors(
+                          baseColor: AppColors.warmShimmerBase,
+                          highlightColor: AppColors.shimmerHighlight,
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(color: Colors.white),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => const RatneshFallback.m(),
+                    ),
+                  ),
                 ),
               ),
             ),

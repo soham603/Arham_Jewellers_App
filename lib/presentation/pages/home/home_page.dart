@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
@@ -61,6 +62,7 @@ class _HomePageState extends State<HomePage> {
 
   int currentCarouselIndex = 0;
   Timer? _carouselTimer;
+  bool _bespokeLoading = false;
 
   @override
   void initState() {
@@ -586,17 +588,73 @@ GestureDetector(
                         SizedBox(height: context.heightPercent(1.5)),
 
                         GestureDetector(
-                          onTap: () => Get.to(() => const CustomiseOrderPage()),
+                          onTap: _bespokeLoading
+                              ? null
+                              : () {
+                                  setState(() => _bespokeLoading = true);
+                                  SchedulerBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    Get.to(
+                                      () => const CustomiseOrderPage(),
+                                      transition: Transition.fadeIn,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.easeOutCubic,
+                                    )?.then((_) {
+                                      if (mounted) {
+                                        setState(
+                                            () => _bespokeLoading = false);
+                                      }
+                                    });
+                                  });
+                                },
                           child: Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: context.getResponsiveSize(4),
                               vertical: context.heightPercent(1),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(
-                                'assets/images/bespoke-cta.png',
-                                fit: BoxFit.cover,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 8,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/bespoke-cta.jpeg',
+                                      fit: BoxFit.cover,
+                                    ),
+                                    if (_bespokeLoading)
+                                      Positioned.fill(
+                                        child: Shimmer.fromColors(
+                                          baseColor: AppColors.primaryGold
+                                              .withValues(alpha: 0.15),
+                                          highlightColor: AppColors.primaryGold
+                                              .withValues(alpha: 0.35),
+                                          period: const Duration(
+                                              milliseconds: 1200),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.4),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
