@@ -78,6 +78,7 @@ class _HomePageState extends State<HomePage> {
     // CategoryController fetches tree eagerly in onInit()
     // No need to fetch here
     _startCarouselAutoSlide();
+    _initCategoryImagePreload();
   }
 
   void _startCarouselAutoSlide() {
@@ -92,6 +93,42 @@ class _HomePageState extends State<HomePage> {
         curve: Curves.easeInOut,
       );
     });
+  }
+
+  void _initCategoryImagePreload() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _preloadCategoryImages();
+    });
+  }
+
+  bool _preloadedCategoryUrls = false;
+
+  void _preloadCategoryImages() {
+    if (_preloadedCategoryUrls || !mounted) return;
+    final allCategories = [
+      ...categoryController.k18Categories,
+      ...categoryController.k20Categories,
+      ...categoryController.k22Categories,
+    ];
+    if (allCategories.isEmpty) {
+      // Categories not loaded yet; retry on next frame
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _preloadCategoryImages();
+        });
+      }
+      return;
+    }
+    _preloadedCategoryUrls = true;
+    for (final cat in allCategories) {
+      if (cat.imageUrl.isNotEmpty) {
+        precacheImage(
+          CachedNetworkImageProvider(cat.imageUrl),
+          context,
+        );
+      }
+    }
   }
 
   void _onCarouselPageChanged(int index) {
@@ -1576,6 +1613,7 @@ class _CategoryQuickAccess extends StatelessWidget {
           itemBuilder: (_, index) {
             final cat = unique[index];
             return GestureDetector(
+              key: ValueKey(cat.id),
               onTap: () {
                 final cleanedName = cat.name
                     .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
@@ -1631,7 +1669,7 @@ class _CategoryQuickAccess extends StatelessWidget {
   }
 }
 
-class _CategoryQuickAccessImage extends StatelessWidget {
+class _CategoryQuickAccessImage extends StatefulWidget {
   final CategoryModel cat;
 
   const _CategoryQuickAccessImage({
@@ -1639,13 +1677,25 @@ class _CategoryQuickAccessImage extends StatelessWidget {
   });
 
   @override
+  State<_CategoryQuickAccessImage> createState() => _CategoryQuickAccessImageState();
+}
+
+class _CategoryQuickAccessImageState extends State<_CategoryQuickAccessImage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    if (cat.imageUrl.isNotEmpty) {
+    super.build(context);
+    if (widget.cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
-        imageUrl: cat.imageUrl,
+        imageUrl: widget.cat.imageUrl,
         width: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
         height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130),
         fit: BoxFit.cover,
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
         errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
     }

@@ -29,17 +29,34 @@ class CategoryListingPage extends StatefulWidget {
   State<CategoryListingPage> createState() => _CategoryListingPageState();
 }
 
-class _CategoryListingPageState extends State<CategoryListingPage> {
+class _CategoryListingPageState extends State<CategoryListingPage>
+    with TickerProviderStateMixin {
   final CategoryController controller = Get.find<CategoryController>();
 
   final _expandedKarats = <Karat>[].obs;
   final _isLoading = false.obs;
   final _hasError = false.obs;
 
+  final Map<Karat, AnimationController> _expandControllers = {};
+
   @override
   void initState() {
     super.initState();
+    for (final karat in widget.karats) {
+      _expandControllers[karat] = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 400),
+      );
+    }
     _loadAll();
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _expandControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> _loadAll({bool force = false}) async {
@@ -105,18 +122,52 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
   }
 
   void _toggleKarat(Karat karat) {
+    final expandController = _expandControllers[karat];
+    if (expandController == null) return;
+
     if (_expandedKarats.contains(karat)) {
       _expandedKarats.remove(karat);
+      expandController.reverse();
     } else {
-      if (karat == Karat.k18) _expandedKarats.remove(Karat.k20);
-      if (karat == Karat.k20) _expandedKarats.remove(Karat.k18);
+      if (karat == Karat.k18) {
+        _expandedKarats.remove(Karat.k20);
+        _expandControllers[Karat.k20]?.reverse();
+      }
+      if (karat == Karat.k20) {
+        _expandedKarats.remove(Karat.k18);
+        _expandControllers[Karat.k18]?.reverse();
+      }
       _expandedKarats.add(karat);
+      expandController.forward();
     }
   }
 
   bool get _isMultiKarat => widget.karats.length > 1;
 
   bool get _is22kOnly => !_isMultiKarat && widget.karats.first == Karat.k22;
+
+  double _estimateGridHeight(BuildContext context, int itemCount) {
+    if (itemCount == 0) return 0;
+    final width = MediaQuery.of(context).size.width;
+    final spacing = width >= 600 ? 16.0 : 12.0;
+    final crossAxisCount = context.gridColumns(phone: 2, tablet: 3);
+
+    double aspectRatio;
+    if (width >= 1200) {
+      aspectRatio = 1.0;
+    } else if (width >= 900) {
+      aspectRatio = 0.92;
+    } else if (width >= 600) {
+      aspectRatio = 0.82;
+    } else {
+      aspectRatio = 0.85;
+    }
+
+    final cardWidth = (width - (crossAxisCount - 1) * spacing) / crossAxisCount;
+    final cardHeight = cardWidth / aspectRatio;
+    final rows = (itemCount / crossAxisCount).ceil();
+    return rows * cardHeight + (rows - 1) * spacing;
+  }
 
   double _gridAspectRatio(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -438,23 +489,26 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
             isExpanded: _expandedKarats.contains(karat),
             onToggle: () => _toggleKarat(karat),
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: _expandedKarats.contains(karat)
-                ? Padding(
-                    padding: EdgeInsets.only(
-                      bottom: context.responsiveWidth(16, tabletVal: 24),
-                    ),
-                    child: _CategoryGrid(
-                      categories: _listForKarat(karat),
-                      karat: karat,
-                      onTap: (cat) {
-                        _showLevel3Sheet(cat, karat);
-                      },
-                    ),
-                  )
-                : const SizedBox.shrink(),
+          SizeTransition(
+            axisAlignment: -1.0,
+            sizeFactor: CurvedAnimation(
+              parent: _expandControllers[karat] ?? const AlwaysStoppedAnimation(0.0),
+              curve: Curves.easeInOutQuart,
+            ),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: _expandedKarats.contains(karat)
+                    ? context.responsiveWidth(16, tabletVal: 24)
+                    : 0,
+              ),
+              child: _CategoryGrid(
+                categories: _listForKarat(karat),
+                karat: karat,
+                onTap: (cat) {
+                  _showLevel3Sheet(cat, karat);
+                },
+              ),
+            ),
           ),
         ],
       ],
@@ -463,7 +517,7 @@ class _CategoryListingPageState extends State<CategoryListingPage> {
 }
 
 // ── _CategoryListingImage 
-class _CategoryListingImage extends StatelessWidget {
+class _CategoryListingImage extends StatefulWidget {
   final CategoryModel cat;
 
   const _CategoryListingImage({
@@ -471,13 +525,25 @@ class _CategoryListingImage extends StatelessWidget {
   });
 
   @override
+  State<_CategoryListingImage> createState() => _CategoryListingImageState();
+}
+
+class _CategoryListingImageState extends State<_CategoryListingImage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    if (cat.imageUrl.isNotEmpty) {
+    super.build(context);
+    if (widget.cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
-        imageUrl: cat.imageUrl,
+        imageUrl: widget.cat.imageUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
         errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
     }
@@ -600,7 +666,8 @@ class _KaratSectionHeader extends StatelessWidget {
             const Spacer(),
             AnimatedRotation(
               turns: isExpanded ? 0.5 : 0,
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.easeInOutQuart,
               child: Icon(
                 Icons.keyboard_arrow_down,
                 color: context.colorPalette.goldDark,

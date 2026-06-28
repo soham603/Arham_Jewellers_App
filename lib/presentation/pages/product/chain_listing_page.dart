@@ -279,16 +279,25 @@ class _ChainListingPageState extends State<ChainListingPage> {
           AnimatedSize(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: _expandedKarats.contains(karat)
-                ? Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: _ChainCategoryGrid(
-                      categories: _filteredCategories(karat),
-                      karat: karat,
-                      onTap: (cat) => _showLevel3Sheet(cat, karat),
-                    ),
-                  )
-                : const SizedBox.shrink(),
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: _expandedKarats.contains(karat) ? 16 : 0,
+              ),
+              child: ClipRect(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: _expandedKarats.contains(karat)
+                        ? double.infinity
+                        : 0,
+                  ),
+                  child: _ChainCategoryGrid(
+                    categories: _filteredCategories(karat),
+                    karat: karat,
+                    onTap: (cat) => _showLevel3Sheet(cat, karat),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ],
@@ -452,19 +461,31 @@ class _ChainCategoryCard extends StatelessWidget {
 }
 
 // ── _ChainCategoryImage 
-class _ChainCategoryImage extends StatelessWidget {
+class _ChainCategoryImage extends StatefulWidget {
   final CategoryModel cat;
 
   const _ChainCategoryImage({required this.cat});
 
   @override
+  State<_ChainCategoryImage> createState() => _ChainCategoryImageState();
+}
+
+class _ChainCategoryImageState extends State<_ChainCategoryImage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    if (cat.imageUrl.isNotEmpty) {
+    super.build(context);
+    if (widget.cat.imageUrl.isNotEmpty) {
       return CachedNetworkImage(
-        imageUrl: cat.imageUrl,
+        imageUrl: widget.cat.imageUrl,
         width: double.infinity,
         height: double.infinity,
         fit: BoxFit.cover,
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
         errorWidget: (_, _, _) => const RatneshFallback.s(),
       );
     }
