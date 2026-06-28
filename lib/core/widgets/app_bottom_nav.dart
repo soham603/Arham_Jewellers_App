@@ -80,6 +80,11 @@ class AppBottomNav extends StatelessWidget {
       selectedIcon: PiconsRegular.magnifyingGlass,
     ),
     _NavItem(
+      label: 'Catalog',
+      assetPath: 'assets/images/ratnesh-logo.png',
+      isCenter: true,
+    ),
+    _NavItem(
       label: 'Share',
       icon: PiconsRegular.share,
       selectedIcon: PiconsRegular.share,

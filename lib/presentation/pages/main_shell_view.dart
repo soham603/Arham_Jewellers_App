@@ -12,6 +12,8 @@ import 'search/search_page.dart';
 import 'cart/cart_page.dart';
 import 'profile/profileScreen.dart';
 import 'share/share_page.dart';
+import 'product/category_listing_page.dart';
+import '../controllers/CategoryController.dart';
 
 class MainShellView extends GetView<NavigationController> {
   const MainShellView({super.key});
@@ -23,11 +25,16 @@ class MainShellView extends GetView<NavigationController> {
     ProfileScreen(),
   ];
 
-  static const _adminPages = <Widget>[
-    HomePage(),
-    SearchPage(),
-    SharePage(),
-    ProfileScreen(),
+  static final _adminPages = <Widget>[
+    const HomePage(),
+    const SearchPage(),
+    const CategoryListingPage(
+      karats: [Karat.k18, Karat.k20, Karat.k22],
+      title: 'Collections',
+      showBothLogos: true,
+    ),
+    const SharePage(),
+    const ProfileScreen(),
   ];
 
   @override
