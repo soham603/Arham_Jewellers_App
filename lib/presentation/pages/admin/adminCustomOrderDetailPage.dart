@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.da
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -723,9 +724,8 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
     return GestureDetector(
       onTap: () async {
-        final cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
-        final url = "https://wa.me/$cleanPhone";
-        await launchUrl(Uri.parse(url));
+        final url = WhatsAppUtil.buildUrl(phone);
+        await launchUrl(url);
       },
       child: Container(
         width: double.infinity,

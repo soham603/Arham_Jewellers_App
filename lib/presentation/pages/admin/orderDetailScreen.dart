@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderContro
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key, required this.order});
@@ -957,9 +958,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildWhatsAppButton(BuildContext context, AdminOrderModel order) {
     return GestureDetector(
       onTap: () async {
-        final url =
-            "https://wa.me/${order.user.phoneNumber.replaceAll("+", "")}";
-        await launchUrl(Uri.parse(url));
+        final url = WhatsAppUtil.buildUrl(order.user.phoneNumber);
+        await launchUrl(url);
       },
       child: Container(
         width: double.infinity,

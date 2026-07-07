@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -605,10 +606,10 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 final orderHashtag = order.orderToken != null
                     ? '#${order.orderToken}'
                     : '#${order.id.substring(0, 8).toUpperCase()}';
-                final message = Uri.encodeComponent(
-                    'Hello, I need help with my order $orderHashtag');
-                final url = Uri.parse(
-                    "https://wa.me/${AdminConstants.adminPhone.replaceAll('+', '')}?text=$message");
+                final url = WhatsAppUtil.buildUrl(
+                  AdminConstants.adminPhone,
+                  message: 'Hello, I need help with my order $orderHashtag',
+                );
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               },
               icon: const FaIcon(FontAwesomeIcons.whatsapp,
@@ -769,13 +770,10 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             ),
             onPressed: () async {
               Navigator.pop(context);
-              final message = Uri.encodeComponent(
-                'Hi, I would like to enquire about my order $displayId. Please find the attached PDF for details.',
+              final uri = WhatsAppUtil.buildUrl(
+                AdminConstants.adminPhone,
+                message: 'Hi, I would like to enquire about my order $displayId. Please find the attached PDF for details.',
               );
-              final phone =
-                  AdminConstants.adminPhone.replaceAll('+', '');
-              final uri = Uri.parse(
-                  'https://wa.me/$phone?text=$message');
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri,
                     mode: LaunchMode.externalApplication);

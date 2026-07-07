@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/routes/app_routes.dart';
+import '../../../utils/whatsapp_util.dart';
 
 class OrderSuccessPage extends StatefulWidget {
   const OrderSuccessPage({super.key});
@@ -800,11 +801,10 @@ class _ContactAdminCard extends StatelessWidget {
   }
 
   Future<void> _launchWhatsApp() async {
-    final phone = AdminConstants.adminPhone.replaceAll('+', '');
-    final message = Uri.encodeComponent(
-      'Hi, I need help with my order #$orderId',
+    final uri = WhatsAppUtil.buildUrl(
+      AdminConstants.adminPhone,
+      message: 'Hi, I need help with my order #$orderId',
     );
-    final uri = Uri.parse('https://wa.me/$phone?text=$message');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

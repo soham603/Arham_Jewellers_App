@@ -12,6 +12,7 @@ import '../../../core/widgets/animated_text_field.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
+import '../../../utils/whatsapp_util.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -47,11 +48,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   Future<void> _launchWhatsApp() async {
-    final phone = AdminConstants.adminPhone.replaceAll('+', '');
-    final message = Uri.encodeComponent(
-      'Hi, I have forgotten my password. Please help me reset it.',
+    final uri = WhatsAppUtil.buildUrl(
+      AdminConstants.adminPhone,
+      message: 'Hi, I have forgotten my password. Please help me reset it.',
     );
-    final uri = Uri.parse('https://wa.me/$phone?text=$message');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
