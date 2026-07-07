@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 
 class AncillaryRepository extends BaseRepository {
@@ -10,8 +11,8 @@ class AncillaryRepository extends BaseRepository {
       ApiUrlConstants.ancillaryGetPage(pageKey),
       options: Options(
         extra: {'requiresAuth': false},
-        sendTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;
@@ -26,8 +27,8 @@ class AncillaryRepository extends BaseRepository {
       data: data,
       options: Options(
         extra: {'requiresAuth': true},
-        sendTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;

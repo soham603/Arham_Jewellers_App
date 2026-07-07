@@ -4,11 +4,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
@@ -1084,7 +1085,7 @@ class _CarouselSectionState extends State<_CarouselSection> {
         final dir = await getTemporaryDirectory();
         final file = File('${dir.path}/carousel_video_$index.mp4');
         if (!await file.exists()) {
-          await Dio().download(url, file.path);
+          await httpClient.download(url, file.path, options: AppTimeouts.download);
         }
         ctrl = VideoPlayerController.file(file);
         _videoControllers[index] = ctrl;
@@ -1154,13 +1155,10 @@ class _CarouselSectionState extends State<_CarouselSection> {
         final dir = await getTemporaryDirectory();
         tempFile = File('${dir.path}/home_carousel_tn_$index.mp4');
         if (!await tempFile.exists()) {
-          await Dio().download(
+          await httpClient.download(
             url,
             tempFile.path,
-            options: Options(
-              receiveTimeout: const Duration(seconds: 30),
-              sendTimeout: const Duration(seconds: 15),
-            ),
+            options: AppTimeouts.download,
           );
         }
         data = await VideoThumbnail.thumbnailData(

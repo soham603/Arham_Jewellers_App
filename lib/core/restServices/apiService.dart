@@ -3,6 +3,7 @@ import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
@@ -19,9 +20,9 @@ class BaseHttpService {
     _dio = dio.Dio(
       dio.BaseOptions(
         baseUrl: ApiUrlConstants.BASE_URL,
-        connectTimeout: const Duration(minutes: 2),
-        sendTimeout: const Duration(minutes: 2),
-        receiveTimeout: const Duration(minutes: 2),
+        connectTimeout: AppTimeouts.normalSend,
+        sendTimeout: AppTimeouts.normalSend,
+        receiveTimeout: AppTimeouts.normalReceive,
         headers: {"Content-Type": "application/json"},
       ),
     );

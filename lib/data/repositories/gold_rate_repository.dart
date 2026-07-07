@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 
 class GoldRateRepository extends BaseRepository {
@@ -8,8 +9,8 @@ class GoldRateRepository extends BaseRepository {
       ApiUrlConstants.LIVE_RATE_CURRENT,
       options: Options(
         extra: {'requiresAuth': false},
-        sendTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;
@@ -23,8 +24,8 @@ class GoldRateRepository extends BaseRepository {
       queryParameters: queryParams,
       options: Options(
         extra: {'requiresAuth': false},
-        sendTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;
@@ -38,8 +39,8 @@ class GoldRateRepository extends BaseRepository {
       queryParameters: queryParams,
       options: Options(
         extra: {'requiresAuth': false},
-        sendTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;
@@ -53,8 +54,8 @@ class GoldRateRepository extends BaseRepository {
       data: rateData,
       options: Options(
         extra: {'requiresAuth': true},
-        sendTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 5),
+        sendTimeout: AppTimeouts.quickSend,
+        receiveTimeout: AppTimeouts.quickReceive,
       ),
     );
     return response.data;

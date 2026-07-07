@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
+import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:get/get.dart' hide MultipartFile, FormData;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -93,13 +94,10 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         final dir = await getTemporaryDirectory();
         final file = File('${dir.path}/carousel_video_$id.mp4');
         if (!await file.exists()) {
-          await Dio().download(
+          await httpClient.download(
             url,
             file.path,
-            options: Options(
-              receiveTimeout: const Duration(seconds: 30),
-              sendTimeout: const Duration(seconds: 15),
-            ),
+            options: AppTimeouts.download,
           );
         }
         ctrl = VideoPlayerController.file(file);
