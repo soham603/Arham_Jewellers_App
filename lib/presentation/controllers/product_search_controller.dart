@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -92,8 +93,8 @@ class ProductSearchController extends GetxController {
     try {
       final hasSearch = _query.value.trim().isNotEmpty;
       final endpoint = hasSearch
-          ? "/api/v1/products/search"
-          : "/api/v1/products/get-all";
+          ? ApiUrlConstants.PRODUCTS_SEARCH
+          : ApiUrlConstants.PRODUCTS_GET_ALL;
 
       final queryParameters = <String, dynamic>{
         "page": _page,
@@ -257,7 +258,7 @@ class ProductSearchController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/search",
+        ApiUrlConstants.PRODUCTS_SEARCH,
         queryParameters: {"barcode": barcode},
       );
 

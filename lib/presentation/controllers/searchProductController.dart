@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
@@ -307,7 +308,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/get-all",
+        ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
           "page": _initialPage,
           "limit": _pageLimit,
@@ -365,7 +366,7 @@ class SearchProductController extends GetxController {
             filterState.selectedCategoryIds.map((categoryId) async {
           try {
             final response = await httpClient.get(
-              "/api/v1/products/get-all",
+              ApiUrlConstants.PRODUCTS_GET_ALL,
               queryParameters: {
                 "categoryId": categoryId,
                 "page": _filteredInitialPage,
@@ -394,7 +395,7 @@ class SearchProductController extends GetxController {
         final karatFutures = filterState.selectedKarats.map((karat) async {
           try {
             final response = await httpClient.get(
-              "/api/v1/products/search",
+              ApiUrlConstants.PRODUCTS_SEARCH,
               queryParameters: {
                 "search": _karatToSearchValue(karat),
                 "page": _filteredInitialPage,
@@ -420,7 +421,7 @@ class SearchProductController extends GetxController {
         allFetched = results.expand((list) => list).toList();
       } else {
         final response = await httpClient.get(
-          "/api/v1/products/get-all",
+          ApiUrlConstants.PRODUCTS_GET_ALL,
           queryParameters: {
             "page": _filteredInitialPage,
             "limit": _pageLimit,
@@ -543,7 +544,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/search",
+        ApiUrlConstants.PRODUCTS_SEARCH,
         queryParameters: {
           "search": query,
           "page": _searchPage,
@@ -692,7 +693,7 @@ class SearchProductController extends GetxController {
       final karatFutures = karats.map((karat) async {
         try {
           final response = await httpClient.get(
-            "/api/v1/products/search",
+            ApiUrlConstants.PRODUCTS_SEARCH,
             queryParameters: {
               "search": _karatToSearchValue(karat),
               "page": currentPage,
@@ -777,7 +778,7 @@ class SearchProductController extends GetxController {
     try {
       final stockParam = _stockQueryParam(stockFilter);
       final response = await httpClient.get(
-        "/api/v1/products/get-all",
+        ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
           "categoryId": categoryId,
           "page": 1,
@@ -824,7 +825,7 @@ class SearchProductController extends GetxController {
       final futures = categoryIds.map((catId) async {
         try {
           final response = await httpClient.get(
-            "/api/v1/products/get-all",
+            ApiUrlConstants.PRODUCTS_GET_ALL,
             queryParameters: {
               "categoryId": catId,
               "page": 1,
@@ -946,7 +947,7 @@ class SearchProductController extends GetxController {
     try {
       final stockParam = _stockQueryParam(stockFilter);
       final response = await httpClient.get(
-        "/api/v1/products/get-all",
+        ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
           "categoryId": categoryId,
           "page": currentPage,
@@ -1081,7 +1082,7 @@ class SearchProductController extends GetxController {
 
     try {
       final response = await httpClient.get(
-        "/api/v1/products/search",
+        ApiUrlConstants.PRODUCTS_SEARCH,
         queryParameters: {"barcode": barcode},
       );
 

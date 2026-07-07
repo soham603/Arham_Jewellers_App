@@ -49,6 +49,7 @@ class ApiUrlConstants {
   static const String ADMIN_ACCESS_GET_ALL_USERS = '/api/v1/admin-access/get-all-users';
   static const String CREATE_ADMIN = '/api/v1/admin-access/create-admin';
   static const String ADMIN_ACCESS_TOGGLE_RETAILER = '/api/v1/admin-access/toggle-retailer';
+  static const String ADMIN_ACCESS_UPDATE_USER_ACTIVATION = '/api/v1/admin-access/update-user-activation';
 
   static String ancillaryGetPage(String page) => '/api/v1/ancillary/get-page/$page';
   static String ancillaryUpdatePage(String page) => '/api/v1/ancillary/update-page/$page';

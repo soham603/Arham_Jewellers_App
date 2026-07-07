@@ -40,7 +40,7 @@ class AdminAccessRepository extends BaseRepository {
     required Map<String, dynamic> data,
   }) async {
     final response = await dio.patch(
-      '/api/v1/admin-access/update-user-activation',
+      ApiUrlConstants.ADMIN_ACCESS_UPDATE_USER_ACTIVATION,
       data: data,
       options: Options(extra: {'requiresAuth': true}),
     );

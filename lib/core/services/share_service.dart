@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class ShareService {
@@ -222,7 +223,7 @@ class ShareService {
     for (final categoryId in categoryIds) {
       try {
         final response = await httpClient.get(
-          "/api/v1/products/get-all",
+          ApiUrlConstants.PRODUCTS_GET_ALL,
           queryParameters: {
             "categoryId": categoryId,
             "page": 1,
@@ -256,7 +257,7 @@ class ShareService {
 
         while (hasMore) {
           final response = await httpClient.get(
-            "/api/v1/products/get-all",
+            ApiUrlConstants.PRODUCTS_GET_ALL,
             queryParameters: {
               "categoryId": categoryId,
               "page": page,

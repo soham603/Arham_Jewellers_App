@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
+import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import '../../../core/constants/admin_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/animated_text_field.dart';
@@ -281,7 +282,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                                   try {
                                     final response = await httpClient.post(
-                                      '/api/v1/auth/device-change-request',
+                                      ApiUrlConstants.DEVICE_CHANGE_REQUEST,
                                       options: Options(extra: {'requiresAuth': false}),
                                       data: {
                                         'phoneNumber': fullPhoneNumber,
