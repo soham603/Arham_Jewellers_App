@@ -155,9 +155,9 @@ class CategoryController extends GetxController {
 
   // ── Karat name → Karat enum mapping 
   static const _karatNameMap = {
-    '18K': Karat.k18,
-    '20K': Karat.k20,
-    '22K': Karat.k22,
+    '76 GOLD ORNAMENTS': Karat.k18,
+    '84 GOLD ORNAMENTS': Karat.k20,
+    '92 GOLD ORNAMENTS': Karat.k22,
   };
 
   // ── Single API call: fetch full category tree ───
@@ -307,7 +307,9 @@ class CategoryController extends GetxController {
     final karatMap = <String, String>{};
 
     for (final karatNode in treeResults) {
-      final karatName = karatNode['name'] as String? ?? '';
+      final rawName = karatNode['name'] as String? ?? '';
+      final karatEnum = _karatNameMap[rawName];
+      final karatName = karatEnum?.displayName ?? rawName;
       final children = karatNode['children'] as List? ?? [];
       for (final level2 in children) {
         if (level2['isActive'] == false) continue;
