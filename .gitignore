@@ -73,9 +73,6 @@ AGENT.md
 *.keystore
 key.properties
 
-# Android config
-/android/app/google-services.json
-
 # Sensitive local notes
 gitignore/
 

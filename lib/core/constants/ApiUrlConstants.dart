@@ -1,7 +1,5 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class ApiUrlConstants {
-  static String get BASE_URL => dotenv.env['BASE_URL'] ?? '';
+  static const String BASE_URL = 'https://arham-jewellers-backend.onrender.com';
 
   static const String USER_LOGIN = '/api/v1/auth/user-login';
   static const String ADMIN_LOGIN = '/api/v1/auth/admin-login';

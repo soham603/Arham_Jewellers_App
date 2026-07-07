@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart' as painting;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
@@ -27,8 +26,6 @@ Future<void> main() async {
         FlutterError.presentError(details);
         Logger.error('FlutterError', details.exception.toString());
       };
-
-      await dotenv.load();
 
       Get.put(CartController());
       Get.put(WishlistController());
