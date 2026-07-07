@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
@@ -12,6 +11,7 @@ import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import '../../../core/constants/admin_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/animated_text_field.dart';
+import '../../../core/widgets/country_code_prefix.dart';
 import '../../../core/widgets/logo_widget.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/ToastUtil.dart';
@@ -33,7 +33,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
   bool isFormValid = false;
   bool _obscurePassword = true;
   bool _isLoading = false;
-  String selectedCountryCode = "+91";
 
   void validateForm() {
     setState(() {
@@ -160,26 +159,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                         hintText: 'Registered Mobile Number',
                         keyboardType: TextInputType.phone,
                         maxLength: 10,
-                        prefixIcon: CountryCodePicker(
-                          onChanged: (countryCode) {
-                            setState(() {
-                              selectedCountryCode = countryCode.dialCode ?? "+91";
-                            });
-                          },
-                          initialSelection: 'IN',
-                          favorite: const ['+91', 'IN'],
-                          showCountryOnly: false,
-                          showOnlyCountryWhenClosed: false,
-                          showDropDownButton: false,
-                          showFlag: false,
-                          alignLeft: false,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          textStyle: TextStyle(
-                            color: AppColors.textDark,
-                            fontWeight: FontWeight.w600,
-                            fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
-                          ),
-                        ),
+                        prefixIcon: const CountryCodePrefix(),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return "Phone number is required";
@@ -278,7 +258,7 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                                   final newDeviceID = await getDeviceId();
                                   final newDeviceName = await getDeviceName();
                                   final fullPhoneNumber =
-                                      '$selectedCountryCode${phoneController.text.trim()}';
+                                      '+91${phoneController.text.trim()}';
 
                                   try {
                                     final response = await httpClient.post(

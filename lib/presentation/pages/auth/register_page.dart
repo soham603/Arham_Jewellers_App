@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/animated_text_field.dart';
+import '../../../core/widgets/country_code_prefix.dart';
 import '../../../presentation/controllers/AuthController.dart';
 import '../../../utils/Enums.dart';
 import '../../../utils/ToastUtil.dart';
@@ -37,7 +37,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? _selectedState;
   String? _selectedCity;
-  String _selectedCountryCode = '+91';
   bool _isFormValid = false;
   bool _isSubmitting = false;
 
@@ -282,7 +281,7 @@ class _RegisterPageState extends State<RegisterPage> {
           : rawName.toString();
 
       final fullPhoneNumber =
-          '$_selectedCountryCode${phoneController.text.trim()}';
+          '+91${phoneController.text.trim()}';
       final fcmToken = NotificationService().fcmToken;
 
       await authController.registerUser(
@@ -573,29 +572,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   keyboardType: TextInputType.phone,
                                   maxLength: 10,
                                   isRequired: true,
-                                  prefixIcon: CountryCodePicker(
-                                    onChanged: (code) {
-                                      _selectedCountryCode =
-                                          code.dialCode ?? '+91';
-                                    },
-                                    initialSelection: 'IN',
-                                    favorite: const ['+91', 'IN'],
-                                    showCountryOnly: false,
-                                    showOnlyCountryWhenClosed: false,
-                                    showDropDownButton: false,
-                                    showFlag: false,
-                                    alignLeft: false,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                    ),
-                                    textStyle: TextStyle(
-                                      color: AppColors.textDark,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: context
-                                          .getResponsiveSize(3.5)
-                                          .clamp(14.0, 28.0),
-                                    ),
-                                  ),
+                                  prefixIcon: const CountryCodePrefix(),
                                   validator: _validatePhone,
                                 ),
                                 AnimatedTextField(
