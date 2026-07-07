@@ -43,6 +43,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page
 import 'package:ratnesh_gold_app/presentation/pages/profile/goldRateDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -1132,8 +1133,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
       data = await VideoThumbnail.thumbnailData(
         video: url,
         imageFormat: ImageFormat.JPEG,
-        maxWidth: 600,
-        quality: 80,
+        maxWidth: ImageCompressionConstants.videoThumbnailMaxWidth,
+        quality: ImageCompressionConstants.videoThumbnailQuality,
       );
     } catch (e, st) {
       Logger.warning(
@@ -1165,8 +1166,8 @@ class _CarouselSectionState extends State<_CarouselSection> {
         data = await VideoThumbnail.thumbnailData(
           video: tempFile.path,
           imageFormat: ImageFormat.JPEG,
-          maxWidth: 600,
-          quality: 80,
+          maxWidth: ImageCompressionConstants.videoThumbnailMaxWidth,
+          quality: ImageCompressionConstants.videoThumbnailQuality,
         );
       } catch (e, st) {
         Logger.warning(

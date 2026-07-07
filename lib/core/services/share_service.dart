@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class ShareService {
@@ -40,7 +41,7 @@ class ShareService {
   static Future<Uint8List?> _downloadAndCompressImage(
     String imageUrl, {
     int? maxLongestEdge,
-    int quality = 92,
+    int quality = ImageCompressionConstants.shareQuality,
   }) async {
     try {
       final response = await _dio.get<List<int>>(
@@ -62,8 +63,8 @@ class ShareService {
   /// re-encodes as JPEG at given [quality]. No cropping — aspect ratio preserved.
   static Uint8List? _compressImage(
     Uint8List bytes, {
-    int maxLongestEdge = 1600,
-    int quality = 92,
+    int maxLongestEdge = ImageCompressionConstants.shareMaxEdge,
+    int quality = ImageCompressionConstants.shareQuality,
   }) {
     final decoded = img.decodeJpg(bytes);
     if (decoded == null) return bytes;
@@ -97,8 +98,8 @@ class ShareService {
 
       final bytes = await _downloadAndCompressImage(
         imageUrl,
-        maxLongestEdge: 1600,
-        quality: 92,
+        maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
+        quality: ImageCompressionConstants.shareQuality,
       );
       if (bytes == null) return null;
 
@@ -139,8 +140,8 @@ class ShareService {
       if (imageUrl == null || imageUrl.isEmpty) return null;
       return _downloadAndCompressImage(
         imageUrl,
-        maxLongestEdge: 2000,
-        quality: 90,
+        maxLongestEdge: ImageCompressionConstants.pdfProductMaxEdge,
+        quality: ImageCompressionConstants.pdfProductQuality,
       );
     }).toList();
 
@@ -323,8 +324,8 @@ class ShareService {
       if (url == null || url.isEmpty) return null;
       return _downloadAndCompressImage(
         url,
-        maxLongestEdge: 200,
-        quality: 80,
+        maxLongestEdge: ImageCompressionConstants.pdfThumbnailMaxEdge,
+        quality: ImageCompressionConstants.pdfThumbnailQuality,
       );
     }).toList();
     final imageBytesList = await Future.wait(imageFutures);
@@ -360,8 +361,8 @@ class ShareService {
       if (url == null || url.isEmpty) return null;
       return _downloadAndCompressImage(
         url,
-        maxLongestEdge: 200,
-        quality: 80,
+        maxLongestEdge: ImageCompressionConstants.pdfThumbnailMaxEdge,
+        quality: ImageCompressionConstants.pdfThumbnailQuality,
       );
     }).toList();
     final imageBytesList = await Future.wait(imageFutures);

@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
@@ -19,7 +20,7 @@ Uint8List _compressBytes(Uint8List bytes) {
   final longest = decoded.width > decoded.height
       ? decoded.width
       : decoded.height;
-  const maxEdge = 800;
+  const maxEdge = ImageCompressionConstants.categoryMaxEdge;
 
   final img.Image resized;
   if (longest > maxEdge) {
@@ -33,7 +34,7 @@ Uint8List _compressBytes(Uint8List bytes) {
     resized = decoded;
   }
 
-  return Uint8List.fromList(img.encodeJpg(resized, quality: 75));
+  return Uint8List.fromList(img.encodeJpg(resized, quality: ImageCompressionConstants.categoryQuality));
 }
 
 enum Karat { k18, k20, k22 }

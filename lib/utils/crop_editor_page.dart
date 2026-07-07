@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
 class CropEditorPage extends StatefulWidget {
@@ -669,7 +670,7 @@ Future<File?> _processImageIsolate(_ProcessParams params) async {
     );
   }
 
-  final encoded = img.encodeJpg(result, quality: 90);
+  final encoded = img.encodeJpg(result, quality: ImageCompressionConstants.cropEditorQuality);
   final file = File('${params.tempPath}/cropped_${DateTime.now().millisecondsSinceEpoch}.jpg');
   await file.writeAsBytes(encoded);
   return file;

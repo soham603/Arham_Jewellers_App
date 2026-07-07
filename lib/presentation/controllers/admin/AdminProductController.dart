@@ -8,6 +8,7 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
@@ -22,7 +23,7 @@ Uint8List _compressBytes(Uint8List bytes) {
   if (decoded == null) return bytes;
 
   final longest = decoded.width > decoded.height ? decoded.width : decoded.height;
-  final maxEdge = 1200;
+  final maxEdge = ImageCompressionConstants.productMaxEdge;
 
   final img.Image resized;
   if (longest > maxEdge) {
@@ -36,7 +37,7 @@ Uint8List _compressBytes(Uint8List bytes) {
     resized = decoded;
   }
 
-  return Uint8List.fromList(img.encodeJpg(resized, quality: 80));
+  return Uint8List.fromList(img.encodeJpg(resized, quality: ImageCompressionConstants.productQuality));
 }
 
 class AdminProductController extends GetxController {

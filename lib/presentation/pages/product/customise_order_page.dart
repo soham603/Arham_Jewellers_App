@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
+import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 
 /// Tracks the original file + edit state per image slot for re-edit support.
 class _RefImageMeta {
@@ -324,9 +325,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     try {
       final XFile? image = await _picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        maxHeight: 1600,
-        imageQuality: 90,
+        maxWidth: ImageCompressionConstants.imagePickerMaxDimension,
+        maxHeight: ImageCompressionConstants.imagePickerMaxDimension,
+        imageQuality: ImageCompressionConstants.imagePickerQuality,
       );
       if (image == null) return;
       if (!mounted) return;
