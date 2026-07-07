@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.da
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
@@ -39,27 +40,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         : Get.put(CraftsmanController(), permanent: true);
   }
 
-  _StatusInfo _getStatusInfo(String status) {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-        return _StatusInfo('Pending', const Color(0xFFF5A623), const Color(0xFFFFF4E0));
-      case 'APPROVED':
-        return _StatusInfo('Approved', const Color(0xFF2D8C56), const Color(0xFFE6F7EE));
-      case 'ASSIGNED':
-        return _StatusInfo('Assigned', const Color(0xFF3B82F6), const Color(0xFFEFF6FF));
-      case 'COMPLETED':
-        return _StatusInfo('Completed', AppColors.primaryGold, const Color(0xFFF9F3E8));
-      case 'REJECTED':
-        return _StatusInfo('Rejected', const Color(0xFFDC2626), const Color(0xFFFEE2E2));
-      default:
-        return _StatusInfo(status, AppColors.textMuted, AppColors.tileBg);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final statusInfo = _getStatusInfo(order.status);
+    final statusInfo = getStatusInfo(order.status);
     final isPending = order.status.toUpperCase() == 'PENDING';
     final isAssigned = order.status.toUpperCase() == 'ASSIGNED';
 
@@ -806,9 +790,3 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   }
 }
 
-class _StatusInfo {
-  final String label;
-  final Color color;
-  final Color bgColor;
-  const _StatusInfo(this.label, this.color, this.bgColor);
-}

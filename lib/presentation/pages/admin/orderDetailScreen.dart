@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderContro
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -114,6 +115,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget _buildOrderHeader(BuildContext context, AdminOrderModel order) {
+    final statusInfo = getStatusInfo(order.status);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -174,13 +177,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               vertical: context.heightPercent(0.3),
             ),
             decoration: BoxDecoration(
-              color: _orderStatusColor(order.status).withValues(alpha: 0.12),
+              color: statusInfo.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
               order.status,
               style: TextStyle(
-                color: _orderStatusColor(order.status),
+                color: statusInfo.color,
                 fontWeight: FontWeight.w700,
                 fontSize: context.getResponsiveSize(3),
               ),
@@ -1111,23 +1114,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Color _orderStatusColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'APPROVED':
-      case 'CONFIRMED':
-        return Colors.green;
-      case 'REJECTED':
-      case 'CANCELLED':
-        return Colors.red;
-      case 'PROCESSING':
-        return const Color(0xFFA57A36);
-      case 'COMPLETED':
-      case 'DELIVERED':
-        return const Color(0xFFD4AF37);
-      default:
-        return Colors.orange;
-    }
-  }
 }
 
 class _ShimmerChip extends StatelessWidget {

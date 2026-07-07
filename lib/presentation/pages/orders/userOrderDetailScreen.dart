@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
@@ -73,7 +74,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   }
 
   Widget _buildOrderHeader(BuildContext context, UserOrderModel order) {
-    final statusInfo = _getStatusInfo(order.status);
+    final statusInfo = getStatusInfo(order.status);
 
     return Container(
       width: double.infinity,
@@ -847,61 +848,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  _StatusInfo _getStatusInfo(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return _StatusInfo(
-          label: 'Pending',
-          color: const Color(0xFFF5A623),
-          bgColor: const Color(0xFFFFF4E0),
-        );
-      case 'confirmed':
-        return _StatusInfo(
-          label: 'Confirmed',
-          color: const Color(0xFF2D8C56),
-          bgColor: const Color(0xFFE6F7EE),
-        );
-      case 'processing':
-        return _StatusInfo(
-          label: 'Processing',
-          color: const Color(0xFFA57A36),
-          bgColor: const Color(0xFFF9F3E8),
-        );
-      case 'completed':
-      case 'delivered':
-        return _StatusInfo(
-          label: 'Delivered',
-          color: AppColors.primaryGold,
-          bgColor: const Color(0xFFF9F3E8),
-        );
-      case 'cancelled':
-      case 'rejected':
-        return _StatusInfo(
-          label: status[0].toUpperCase() + status.substring(1),
-          color: const Color(0xFFDC2626),
-          bgColor: const Color(0xFFFEE2E2),
-        );
-      default:
-        return _StatusInfo(
-          label: status.isNotEmpty
-              ? '${status[0].toUpperCase()}${status.substring(1)}'
-              : 'Unknown',
-          color: AppColors.textMuted,
-          bgColor: AppColors.tileBg,
-        );
-    }
-  }
 }
 
-class _StatusInfo {
-  final String label;
-  final Color color;
-  final Color bgColor;
 
-  const _StatusInfo({
-    required this.label,
-    required this.color,
-    required this.bgColor,
-  });
-}
 

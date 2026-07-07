@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/orderDetailScreen.dart
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminCustomOrderDetailPage.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/adminOrderShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class ApproveOrdersScreen extends StatefulWidget {
@@ -256,6 +257,8 @@ class _AdminOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final statusInfo = getStatusInfo(order.status);
+
     return GestureDetector(
       onTap: () {
         if (order.isCustom) {
@@ -312,13 +315,13 @@ class _AdminOrderCard extends StatelessWidget {
                           vertical: context.heightPercent(0.3),
                         ),
                         decoration: BoxDecoration(
-                          color: _orderStatusColor(order.status).withValues(alpha: 0.12),
+                          color: statusInfo.color.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Text(
                           order.status,
                           style: TextStyle(
-                            color: _orderStatusColor(order.status),
+                            color: statusInfo.color,
                             fontWeight: FontWeight.w700,
                             fontSize: context.getResponsiveSize(2.8),
                           ),
@@ -456,22 +459,3 @@ class _OrderImagesStack extends StatelessWidget {
   }
 }
 
-Color _orderStatusColor(String status) {
-  switch (status.toUpperCase()) {
-    case 'APPROVED':
-    case 'CONFIRMED':
-      return Colors.green;
-    case 'ASSIGNED':
-      return const Color(0xFF3B82F6);
-    case 'REJECTED':
-    case 'CANCELLED':
-      return Colors.red;
-    case 'PROCESSING':
-      return const Color(0xFFA57A36);
-    case 'COMPLETED':
-    case 'DELIVERED':
-      return const Color(0xFFD4AF37);
-    default:
-      return Colors.orange;
-  }
-}
