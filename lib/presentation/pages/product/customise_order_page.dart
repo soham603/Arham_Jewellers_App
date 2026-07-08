@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/customOrderModel.dart';
@@ -48,14 +49,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   String selectedMarking = 'HUID';
   String selectedStyle = 'Bhungdi';
 
-  static const _caratOptions = [
-    '9K  (38%)',
-    '14K (60%)',
-    '18K (76%)',
-    '20K (84%)',
-    '22K (92%)',
-    '24K (100%)',
-  ];
+  static const _caratOptions = KaratConstants.caratChipOptions;
 
   // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];

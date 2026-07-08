@@ -1,3 +1,4 @@
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'category_model.dart';
 
 class ProductModel {
@@ -194,12 +195,8 @@ class ProductModel {
     }
     value = value.roundToDouble();
 
-    if (value >= 995 && value <= 1005) return "$numStr (24 K)";
-    if (value >= 915 && value <= 925) return "$numStr (22 K)";
-    if (value >= 835 && value <= 845) return "$numStr (20 K)";
-    if (value >= 755 && value <= 765) return "$numStr (18 K)";
-    if (value >= 595 && value <= 605) return "$numStr (14 K)";
-    if (value >= 375 && value <= 385) return "$numStr (9 K)";
+    final karatNum = KaratConstants.karatFromTouchValue(value.toInt());
+    if (karatNum != null) return '$numStr ($karatNum K)';
 
     return null;
   }
@@ -215,21 +212,9 @@ class ProductModel {
     final value = int.tryParse(numStr);
     if (value == null) return null;
 
-    switch (value) {
-      case 9:
-        return '38 (9 K)';
-      case 14:
-        return '60 (14 K)';
-      case 18:
-        return '76 (18 K)';
-      case 20:
-        return '84 (20 K)';
-      case 22:
-        return '92 (22 K)';
-      case 24:
-        return '100 (24 K)';
-    }
-    return null;
+    final karatLabel = '${value}K';
+    final purity = KaratConstants.formattedPurity(karatLabel);
+    return purity.isNotEmpty ? purity : null;
   }
 
   /// Extracts the karat number (e.g. 18, 20, 22) from any available source.
@@ -250,9 +235,8 @@ class ProductModel {
       final prefix = tagNo!.substring(0, 2);
       final n = int.tryParse(prefix);
       if (n != null) {
-        if (n >= 75 && n <= 77) return 18;
-        if (n >= 83 && n <= 85) return 20;
-        if (n >= 91 && n <= 93) return 22;
+        final karat = KaratConstants.karatFromTouchValue(n);
+        if (karat != null) return karat;
       }
     }
     if (name.isNotEmpty) {
@@ -265,9 +249,8 @@ class ProductModel {
       if (purityMatch != null) {
         final n = int.tryParse(purityMatch.group(1)!);
         if (n != null) {
-          if (n >= 75 && n <= 77) return 18;
-          if (n >= 83 && n <= 85) return 20;
-          if (n >= 91 && n <= 93) return 22;
+          final karat = KaratConstants.karatFromTouchValue(n);
+          if (karat != null) return karat;
         }
       }
     }

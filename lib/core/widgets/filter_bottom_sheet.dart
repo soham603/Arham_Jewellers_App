@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -128,7 +129,7 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  static const List<String> _karatOptions = ['18K', '20K', '22K'];
+  static const _karatOptions = KaratConstants.common;
   static const double _minWeightSliderMax = 1.0;
   static const double _minPriceSliderMax = 1.0;
 

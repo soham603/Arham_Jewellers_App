@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
-import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 
 
 class NavigationController extends GetxController {

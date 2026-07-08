@@ -2,6 +2,7 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
@@ -157,14 +158,8 @@ class _SearchPageState extends State<SearchPage> {
     return expanded;
   }
 
-  String _getKaratPurity(String? karat) {
-    switch (karat) {
-      case '18K': return '76%';
-      case '20K': return '84%';
-      case '22K': return '92%';
-      default: return '';
-    }
-  }
+  String _getKaratPurity(String? karat) =>
+      karat != null ? KaratConstants.percentLabel(karat) : '';
 
   @override
   void dispose() {

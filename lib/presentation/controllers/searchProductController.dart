@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
@@ -625,22 +626,8 @@ class SearchProductController extends GetxController {
   }
 
   String _karatToSearchValue(String karat) {
-    switch (karat) {
-      case '9K':
-        return '38';
-      case '14K':
-        return '60';
-      case '18K':
-        return '76';
-      case '20K':
-        return '84';
-      case '22K':
-        return '92';
-      case '24K':
-        return '100';
-      default:
-        return karat;
-    }
+    final value = KaratConstants.touchValueFor(karat);
+    return value != 0 ? value.toString() : karat;
   }
 
   Map<String, int>? _stockQueryParam(String? stockFilter) {

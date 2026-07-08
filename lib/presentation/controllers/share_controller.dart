@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 
 class SelectedLevel3Category {
   final String id;
@@ -96,19 +97,8 @@ class ShareController extends GetxController {
     _productCount.value = await ShareService.fetchProductCount(ids);
   }
 
-  // ── Touch value mapping 
-  static int _touchValueForKarat(String karat) {
-    switch (karat) {
-      case '18K':
-        return 76;
-      case '20K':
-        return 84;
-      case '22K':
-        return 92;
-      default:
-        return 0;
-    }
-  }
+  // ── Touch value mapping ──
+  static int _touchValueForKarat(String karat) => KaratConstants.touchValueFor(karat);
 
   // ── Actions ─
 

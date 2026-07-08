@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
@@ -62,11 +63,7 @@ class _SharePageState extends State<SharePage> {
   }
 
   Widget _buildKaratRow(BuildContext context) {
-    final karatOptions = [
-      {'label': '18K', 'percent': '76%'},
-      {'label': '20K', 'percent': '84%'},
-      {'label': '22K', 'percent': '92%'},
-    ];
+    final karatOptions = KaratConstants.commonOptions;
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),

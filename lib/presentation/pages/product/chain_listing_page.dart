@@ -3,6 +3,7 @@ import 'package:flutter/painting.dart' as painting;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';

@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/searchProductControlle
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
@@ -35,32 +36,6 @@ Uint8List _compressBytes(Uint8List bytes) {
   }
 
   return Uint8List.fromList(img.encodeJpg(resized, quality: ImageCompressionConstants.categoryQuality));
-}
-
-enum Karat { k18, k20, k22 }
-
-extension KaratExtension on Karat {
-  String get slug {
-    switch (this) {
-      case Karat.k18:
-        return '18k';
-      case Karat.k20:
-        return '20k';
-      case Karat.k22:
-        return '22k';
-    }
-  }
-
-  String get displayName {
-    switch (this) {
-      case Karat.k18:
-        return '18K';
-      case Karat.k20:
-        return '20K';
-      case Karat.k22:
-        return '22K';
-    }
-  }
 }
 
 class CategoryController extends GetxController {

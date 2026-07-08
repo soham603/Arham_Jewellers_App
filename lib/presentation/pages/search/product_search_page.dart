@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/widgets/product_list_tile.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
@@ -341,11 +342,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   }
 
   Widget _buildKaratRow(BuildContext context) {
-    final karatOptions = [
-      {'label': '18K', 'percent': '76%'},
-      {'label': '20K', 'percent': '84%'},
-      {'label': '22K', 'percent': '92%'},
-    ];
+    final karatOptions = KaratConstants.commonOptions;
     return Container(
       padding: EdgeInsets.fromLTRB(
         context.getResponsiveSize(4),
