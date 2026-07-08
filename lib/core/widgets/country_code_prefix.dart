@@ -10,13 +10,19 @@ class CountryCodePrefix extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Text(
-        '+91',
-        style: TextStyle(
-          color: AppColors.textDark,
-          fontWeight: FontWeight.w600,
-          fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '+91',
+            style: TextStyle(
+              color: AppColors.textDark,
+              fontWeight: FontWeight.w600,
+              fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
+            ),
+          ),
+        ],
       ),
     );
   }
