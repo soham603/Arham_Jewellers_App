@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart' as painting;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -21,6 +22,10 @@ Future<void> main() async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FlutterError.presentError(details);
