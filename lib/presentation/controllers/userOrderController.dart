@@ -90,25 +90,35 @@ class UserOrderController extends GetxController {
 
   void setFilter(String filter) => _selectedFilter.value = filter;
 
-  List<UserOrderModel> get filteredOrders {
+  final _filteredOrders = <UserOrderModel>[].obs;
+  List<UserOrderModel> get filteredOrders => _filteredOrders;
+
+  void _updateFilteredOrders() {
     switch (_selectedFilter.value) {
       case 'pending':
-        return _userOrders
+        _filteredOrders.value = _userOrders
             .where((o) => o.status.toLowerCase() == 'pending')
             .toList();
       case 'approved':
-        return _userOrders.where((o) {
+        _filteredOrders.value = _userOrders.where((o) {
           final s = o.status.toLowerCase();
           return s == 'confirmed' || s == 'processing' || s == 'approved' || s == 'assigned';
         }).toList();
       case 'rejected':
-        return _userOrders.where((o) {
+        _filteredOrders.value = _userOrders.where((o) {
           final s = o.status.toLowerCase();
           return s == 'rejected' || s == 'cancelled';
         }).toList();
       default:
-        return _userOrders.toList();
+        _filteredOrders.value = _userOrders.toList();
     }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    ever(_selectedFilter, (_) => _updateFilteredOrders());
+    ever(_userOrders, (_) => _updateFilteredOrders());
   }
 
 
@@ -256,6 +266,8 @@ class UserOrderController extends GetxController {
       }
 
       _ordersState.value = CurrentAppState.SUCCESS;
+
+      _updateFilteredOrders();
 
       Logger.info("UserOrderController", "Orders fetched successfully");
     } catch (e, st) {

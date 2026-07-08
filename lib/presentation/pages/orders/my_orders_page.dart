@@ -40,8 +40,8 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
         : Get.put(UserOrderController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _orderController.setFilter(_filters[_activeTabIndex]);
       _orderController.fetchUserOrders();
-      _orderController.setFilter(_filters[0]);
     });
 
     _scrollController.addListener(() {
