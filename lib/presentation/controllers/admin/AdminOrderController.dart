@@ -42,7 +42,7 @@ class AdminOrderController extends GetxController {
 
   bool get hasMore => _hasMore;
 
-  final _productRawDataCache = <String, Map<String, dynamic>>{};
+  final _productRawDataCache = <String, Map<String, dynamic>>{}.obs;
   final _isFetchingProductDetails = false.obs;
   bool get isFetchingProductDetails => _isFetchingProductDetails.value;
 
