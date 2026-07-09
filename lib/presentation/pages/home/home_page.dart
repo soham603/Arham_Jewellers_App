@@ -78,8 +78,28 @@ class _HomePageState extends State<HomePage> {
     categoryController = Get.isRegistered<CategoryController>()
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());
-    // CategoryController fetches tree eagerly in onInit()
-    // No need to fetch here
+
+    // Ensure data is loaded — controllers may have been initialized before
+    // login (in main.dart) when no auth token existed, causing their initial
+    // fetches to fail. Re-trigger here if data is still empty.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (carouselController.list.isEmpty) {
+        carouselController.getAllCarousels();
+      }
+      if (carouselController.latestProducts.isEmpty) {
+        carouselController.loadLatestProducts();
+      }
+      final allCats = [
+        ...categoryController.k18Categories,
+        ...categoryController.k20Categories,
+        ...categoryController.k22Categories,
+      ];
+      if (allCats.isEmpty) {
+        categoryController.fetchCategoryTree(force: true);
+      }
+    });
+
     _startCarouselAutoSlide();
     _initCategoryImagePreload();
   }
@@ -1565,6 +1585,38 @@ class _CategoryQuickAccess extends StatelessWidget {
         }
       }
       if (unique.isEmpty) {
+        final anyError = controller.k18State == CurrentAppState.ERROR ||
+                         controller.k20State == CurrentAppState.ERROR ||
+                         controller.k22State == CurrentAppState.ERROR;
+        final anyLoading = controller.k18State == CurrentAppState.LOADING ||
+                           controller.k20State == CurrentAppState.LOADING ||
+                           controller.k22State == CurrentAppState.LOADING;
+
+        if (anyError && !anyLoading) {
+          return SizedBox(
+            height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.heightPercent(5),
+            child: Center(
+              child: GestureDetector(
+                onTap: () => controller.fetchCategoryTree(force: true),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.refresh, color: context.colorPalette.goldDeep, size: 28),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Failed to load. Tap to retry.',
+                      style: TextStyle(
+                        fontSize: context.responsiveFont(12),
+                        color: context.colorPalette.goldDeep,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         return SizedBox(
           height: context.responsiveWidth(75, tabletVal: 145, largeTabletVal: 130) + 7 + context.heightPercent(5),
           child: Shimmer.fromColors(

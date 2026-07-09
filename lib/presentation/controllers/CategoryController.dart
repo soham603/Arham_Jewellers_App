@@ -260,6 +260,7 @@ class CategoryController extends GetxController {
 
       _treeHasFullData = true;
     } catch (e, st) {
+      _treeFetchFuture = null;
       _k18State.value = CurrentAppState.ERROR;
       _k20State.value = CurrentAppState.ERROR;
       _k22State.value = CurrentAppState.ERROR;
