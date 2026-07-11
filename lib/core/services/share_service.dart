@@ -290,7 +290,7 @@ class ShareService {
     return allProducts;
   }
 
-  static const MethodChannel _channel = MethodChannel('com.arhamjewellers/file_saver');
+  static const MethodChannel _channel = MethodChannel('com.shreearhamgold.ratneshgold/file_saver');
 
   static Future<String?> _saveBytesToDownloads({
     required List<int> bytes,
