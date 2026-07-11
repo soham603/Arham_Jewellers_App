@@ -89,40 +89,50 @@ class ShareService {
     ValueNotifier<bool>? cancelled,
   }) async {
     final tempDir = await getTemporaryDirectory();
+    final tempFiles = <File>[];
 
-    final imageFutures = products.asMap().entries.map((entry) async {
-      final i = entry.key;
-      final product = entry.value;
-      final imageUrl = product.displayImageUrl;
-      if (imageUrl == null || imageUrl.isEmpty) return null;
+    try {
+      final imageFutures = products.asMap().entries.map((entry) async {
+        final i = entry.key;
+        final product = entry.value;
+        final imageUrl = product.displayImageUrl;
+        if (imageUrl == null || imageUrl.isEmpty) return null;
 
-      final bytes = await _downloadAndCompressImage(
-        imageUrl,
-        maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
-        quality: ImageCompressionConstants.shareQuality,
+        final bytes = await _downloadAndCompressImage(
+          imageUrl,
+          maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
+          quality: ImageCompressionConstants.shareQuality,
+        );
+        if (bytes == null) return null;
+
+        final fileName = 'product_${i + 1}_${product.id}.jpg';
+        final file = File('${tempDir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        tempFiles.add(file);
+        return XFile(file.path, name: fileName);
+      }).toList();
+
+      final results = await Future.wait(imageFutures);
+      final files = results.whereType<XFile>().toList();
+
+      if (files.isEmpty) return;
+
+      if (cancelled?.value == true) return;
+
+      final shareText = _buildShareText(filterInfo, title: title);
+
+      await Share.shareXFiles(
+        files,
+        subject: _brandName,
+        text: shareText,
       );
-      if (bytes == null) return null;
-
-      final fileName = 'product_${i + 1}_${product.id}.jpg';
-      final file = File('${tempDir.path}/$fileName');
-      await file.writeAsBytes(bytes);
-      return XFile(file.path, name: fileName);
-    }).toList();
-
-    final results = await Future.wait(imageFutures);
-    final files = results.whereType<XFile>().toList();
-
-    if (files.isEmpty) return;
-
-    if (cancelled?.value == true) return;
-
-    final shareText = _buildShareText(filterInfo, title: title);
-
-    await Share.shareXFiles(
-      files,
-      subject: _brandName,
-      text: shareText,
-    );
+    } finally {
+      for (final file in tempFiles) {
+        try {
+          await file.delete();
+        } catch (_) {}
+      }
+    }
   }
 
   static Future<void> shareAsPdf({
@@ -177,11 +187,17 @@ class ShareService {
         ? '$safeTitle Products.pdf'
         : '$_brandName Products.pdf';
 
-    await Share.shareXFiles(
-      [XFile(file.path, name: shareFileName)],
-      subject: '$_brandName - Product Catalog',
-      text: _buildShareText(filterInfo, title: title),
-    );
+    try {
+      await Share.shareXFiles(
+        [XFile(file.path, name: shareFileName)],
+        subject: '$_brandName - Product Catalog',
+        text: _buildShareText(filterInfo, title: title),
+      );
+    } finally {
+      try {
+        await file.delete();
+      } catch (_) {}
+    }
   }
 
   /// Fetches products for the given category IDs, deduplicates, and shares as images.

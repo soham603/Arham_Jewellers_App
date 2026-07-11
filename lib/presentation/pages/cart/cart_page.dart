@@ -587,10 +587,14 @@ class _CartPageState extends State<CartPage> {
       dialogDismissed = true;
 
       if (mounted) {
-        await Share.shareXFiles(
-          [XFile(file.path, name: 'Cart_Enquiry.pdf', mimeType: 'application/pdf')],
-          subject: 'Cart Enquiry PDF',
-        );
+        try {
+          await Share.shareXFiles(
+            [XFile(file.path, name: 'Cart_Enquiry.pdf', mimeType: 'application/pdf')],
+            subject: 'Cart Enquiry PDF',
+          );
+        } finally {
+          try { await file.delete(); } catch (_) {}
+        }
       }
     } catch (e) {
       if (!dialogDismissed && mounted) navigator.pop();
