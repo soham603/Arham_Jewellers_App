@@ -393,4 +393,11 @@ class ProductModel {
   /// these should be hidden from ready stock listings and details.
   bool get isOld22kReadyStock =>
       name.startsWith('OLD ') && karatNumber == 22;
+
+  /// 1 = approved, 0 = not approved, null = N/A (out of stock)
+  int? get approvalStockTag {
+    final value = rawData?['ApprovalStocktag'];
+    if (value == null) return null;
+    return int.tryParse(value.toString());
+  }
 }

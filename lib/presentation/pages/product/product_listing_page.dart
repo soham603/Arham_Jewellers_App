@@ -45,6 +45,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
 
   String _stockFilter = 'ready';
+  int? _approvalFilter; // null = All, 1 = Approved, 0 = Not Approved, -1 = N/A
   double _weightMin = 0;
   double _weightMax = 500;
   double _priceMin = 0;
@@ -887,6 +888,24 @@ class _ProductListingPageState extends State<ProductListingPage> {
               ),
             ),
           ),
+          if (_stockFilter == 'ready') ...[
+            SizedBox(height: context.responsiveWidth(6)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16)),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildApprovalChip('All', null, context),
+                    SizedBox(width: context.responsiveWidth(6)),
+                    _buildApprovalChip('Approved', 1, context),
+                    SizedBox(width: context.responsiveWidth(6)),
+                    _buildApprovalChip('Not Approved', 0, context),
+                  ],
+                ),
+              ),
+            ),
+          ],
           SizedBox(height: context.responsiveWidth(4)),
           Container(
             padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16), vertical: context.responsiveWidth(8)),
@@ -1032,6 +1051,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         if (!isSelected) {
           setState(() {
             _stockFilter = value;
+            if (value != 'ready') _approvalFilter = null;
           });
         }
       },
@@ -1073,6 +1093,50 @@ class _ProductListingPageState extends State<ProductListingPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApprovalChip(
+    String label,
+    int? value,
+    BuildContext context,
+  ) {
+    final isSelected = _approvalFilter == value;
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected) {
+          setState(() {
+            _approvalFilter = value;
+          });
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.responsiveWidth(8, largeTabletVal: 14),
+          vertical: context.responsiveWidth(4, largeTabletVal: 8),
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colorPalette.gold.withValues(alpha: 0.12)
+              : context.colorPalette.cream,
+          borderRadius: BorderRadius.circular(context.responsiveWidth(6, largeTabletVal: 10)),
+          border: Border.all(
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.border.withValues(alpha: 0.6),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: context.responsiveFont(10, largeTabletMultiplier: 1.6),
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected
+                ? context.colorPalette.gold
+                : context.colorPalette.goldDark.withValues(alpha: 0.7),
+          ),
         ),
       ),
     );
@@ -1125,6 +1189,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
         if (s == null) return false;
         return _selectedSizes.contains(s);
       }).toList();
+    }
+
+    if (_approvalFilter != null) {
+      result = result.where((p) => p.approvalStockTag == _approvalFilter).toList();
     }
 
     return result;
