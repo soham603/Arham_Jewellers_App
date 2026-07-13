@@ -43,6 +43,7 @@ class ProductListingPage extends StatefulWidget {
 
 class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
+  final ScrollController _scrollController = ScrollController();
 
   String _stockFilter = 'ready';
   int? _approvalFilter; // null = All, 1 = Approved, 0 = Not Approved, -1 = N/A
@@ -61,6 +62,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   bool _isLoadingMore = false;
   static const int _shimmerLoadMoreCount = 4;
+  static const int _initialShimmerGridCount = 6;
+  static const int _initialShimmerListCount = 4;
 
   late String _selectedKarat;
   List<String> _filteredCategoryIds = [];
@@ -290,10 +293,23 @@ class _ProductListingPageState extends State<ProductListingPage> {
     ever(_controller.sortByObs, (_) {
       setState(() {});
     });
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent * 0.8) {
+      if (_hasMore && !_isLoadingMore && !_isCategoryOnly) {
+        _loadMore();
+      }
+    }
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     final tag = _isCategoryFilter
         ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
@@ -389,7 +405,48 @@ class _ProductListingPageState extends State<ProductListingPage> {
               final layoutType = _controller.layoutType;
 
               if (state == CurrentAppState.LOADING && products.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+                if (layoutType == LayoutType.list) {
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
+                    itemCount: _initialShimmerListCount,
+                    itemBuilder: (_, index) => _shimmerListTile(context),
+                  );
+                }
+                final gridCrossCount = layoutType == LayoutType.fullScreen
+                    ? 1
+                    : MediaQuery.of(context).size.width >= 1000
+                        ? 3
+                        : context.gridColumns(phone: 2, tablet: 3);
+                final gridAspectRatio = layoutType == LayoutType.fullScreen
+                    ? (MediaQuery.of(context).size.width >= 1000
+                        ? 0.7
+                        : MediaQuery.of(context).size.width >= 600
+                            ? 0.68
+                            : 0.65)
+                    : (MediaQuery.of(context).size.width >= 1000
+                        ? 0.62
+                        : MediaQuery.of(context).size.width >= 600
+                            ? 0.55
+                            : 0.488);
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: gridCrossCount,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: gridAspectRatio,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (_, index) => _shimmerCard(context),
+                          childCount: _initialShimmerGridCount,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
               }
 
               if (state == CurrentAppState.ERROR && products.isEmpty) {
@@ -480,36 +537,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   color: context.colorPalette.gold,
                   onRefresh: _onRefresh,
                   child: ListView.builder(
+                    controller: _scrollController,
                     padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
-                    itemCount: products.length + (hasMore && !_isLoadingMore ? 1 : 0) + shimmerCount,
+                    itemCount: products.length + shimmerCount,
                     itemBuilder: (_, index) {
                       if (_isLoadingMore && index >= products.length) {
                         return _shimmerListTile(context);
-                      }
-                      if (hasMore && !_isLoadingMore && index == products.length) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.responsiveWidth(16),
-                            vertical: context.responsiveWidth(8),
-                          ),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _loadMore,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: context.colorPalette.gold,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.responsiveWidth(12),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
-                                ),
-                              ),
-                              child: const Text('Load More'),
-                            ),
-                          ),
-                        );
                       }
                       final product = products[index];
                       return ProductListTile(
@@ -551,6 +584,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   color: context.colorPalette.gold,
                   onRefresh: _onRefresh,
                   child: CustomScrollView(
+                    controller: _scrollController,
                     slivers: [
                     SliverPadding(
                       padding: const EdgeInsets.all(16),
@@ -622,32 +656,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
                           ),
                         ),
                       ),
-                    if (hasMore && !_isLoadingMore)
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.responsiveWidth(16),
-                            vertical: context.responsiveWidth(8),
-                          ),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _loadMore,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: context.colorPalette.gold,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: context.responsiveWidth(12),
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
-                                ),
-                              ),
-                              child: const Text('Load More'),
-                            ),
-                          ),
-                        ),
-                      ),
                   ],
                   ),
                 );
@@ -657,6 +665,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 color: context.colorPalette.gold,
                 onRefresh: _onRefresh,
                 child: CustomScrollView(
+                controller: _scrollController,
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.all(16),
@@ -732,32 +741,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         ),
                       ),
                     ),
-                  if (hasMore && !_isLoadingMore)
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.responsiveWidth(16),
-                          vertical: context.responsiveWidth(8),
-                        ),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _loadMore,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.colorPalette.gold,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                vertical: context.responsiveWidth(12),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
-                              ),
-                            ),
-                            child: const Text('Load More'),
-                          ),
-                        ),
-                      ),
-                    ),
                 ],
                 ),
               );
@@ -804,6 +787,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
         setState(() {
           _selectedKarat = karat;
         });
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(0);
+        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -1053,6 +1039,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
             _stockFilter = value;
             if (value != 'ready') _approvalFilter = null;
           });
+          if (_scrollController.hasClients) {
+            _scrollController.jumpTo(0);
+          }
         }
       },
       child: Container(
@@ -1297,6 +1286,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 _filteredCategoryIds = categoryIds;
               }
             });
+            if (_scrollController.hasClients) {
+              _scrollController.jumpTo(0);
+            }
           },
     );
   }

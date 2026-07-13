@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:video_player/video_player.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -1425,49 +1426,58 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
     }
   }
 
+  Future<void> _openLink() async {
+    final url = widget.item.linkUrl;
+    if (url == null || url.trim().isEmpty) return;
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-      if (widget.item.mediaType == 'video') {
-        if (widget.videoController != null && widget.videoController!.value.isInitialized) {
-          final ctrl = widget.videoController!;
-          return SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: ctrl.value.size.width,
-                height: ctrl.value.size.height,
-                child: VideoPlayer(ctrl),
-              ),
+    Widget media;
+    if (widget.item.mediaType == 'video') {
+      if (widget.videoController != null && widget.videoController!.value.isInitialized) {
+        final ctrl = widget.videoController!;
+        media = SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: ctrl.value.size.width,
+              height: ctrl.value.size.height,
+              child: VideoPlayer(ctrl),
             ),
-          );
-        }
-        if (widget.thumbnailData != null) {
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.memory(widget.thumbnailData!, fit: BoxFit.cover),
-              Container(color: Colors.black.withValues(alpha: 0.15)),
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
+          ),
+        );
+      } else if (widget.thumbnailData != null) {
+        media = Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.memory(widget.thumbnailData!, fit: BoxFit.cover),
+            Container(color: Colors.black.withValues(alpha: 0.15)),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ],
-          );
-        }
-        return Container(
+            ),
+          ],
+        );
+      } else {
+        media = Container(
           color: context.colorPalette.shimmerBaseColor,
           child: Center(
             child: Icon(
@@ -1478,17 +1488,24 @@ class _CarouselMediaItemState extends State<_CarouselMediaItem> {
           ),
         );
       }
+    } else {
+      media = CachedNetworkImage(
+        imageUrl: widget.item.imageUrl,
+        fit: BoxFit.cover,
+        fadeInDuration: Duration.zero,
+        fadeOutDuration: Duration.zero,
+        placeholder: (_, _) => CarouselShimmer(),
+        errorWidget: (_, _, _) => Container(
+          color: context.colorPalette.shimmerBaseColor,
+        ),
+      );
+    }
 
-    return CachedNetworkImage(
-      imageUrl: widget.item.imageUrl,
-      fit: BoxFit.cover,
-      fadeInDuration: Duration.zero,
-      fadeOutDuration: Duration.zero,
-      placeholder: (_, _) => CarouselShimmer(),
-      errorWidget: (_, _, _) => Container(
-        color: context.colorPalette.shimmerBaseColor,
-      ),
-    );
+    final hasLink = widget.item.linkUrl != null && widget.item.linkUrl!.trim().isNotEmpty;
+    if (hasLink) {
+      return GestureDetector(onTap: _openLink, child: media);
+    }
+    return media;
   }
 }
 

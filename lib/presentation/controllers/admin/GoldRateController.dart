@@ -51,7 +51,11 @@ class GoldRateController extends GetxController {
   final _dateRangeLabel = ''.obs;
   String get dateRangeLabel => _dateRangeLabel.value;
 
+  final _fallbackMessage = ''.obs;
+  String get fallbackMessage => _fallbackMessage.value;
+
   bool _isInitialized = false;
+  bool _isRetryingFallback = false;
 
   bool _autoFetchOnInit = false;
 
@@ -81,6 +85,8 @@ class GoldRateController extends GetxController {
     _history.clear();
     _selectedDateRange.value = null;
     _error.value = '';
+    _fallbackMessage.value = '';
+    _isRetryingFallback = false;
     super.onClose();
   }
 
@@ -118,32 +124,38 @@ class GoldRateController extends GetxController {
     String? year,
     String? startDate,
     String? endDate,
+    bool noParams = false,
   }) async {
     if (_historyState.value == CurrentAppState.LOADING) return;
 
-    if (period != null && _activeFilterType.value == 'period') {
+    if (!noParams && period != null && _activeFilterType.value == 'period') {
       _selectedPeriod.value = period;
     }
+
+    if (!noParams) _fallbackMessage.value = '';
 
     _historyState.value = CurrentAppState.LOADING;
 
     try {
       final queryParams = <String, String>{};
 
-      if (startDate != null && endDate != null) {
-        queryParams['startDate'] = startDate;
-        queryParams['endDate'] = endDate;
-      } else if (_activeFilterType.value == 'custom' &&
-          _selectedDateRange.value != null) {
-        final range = _selectedDateRange.value!;
-        queryParams['startDate'] = DateFormat('yyyy-MM-dd').format(range.start);
-        queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(range.end);
-      } else if (month != null) {
-        queryParams['month'] = month;
-      } else if (year != null) {
-        queryParams['year'] = year;
-      } else {
-        queryParams['period'] = _selectedPeriod.value;
+      if (!noParams) {
+        if (startDate != null && endDate != null) {
+          queryParams['startDate'] = startDate;
+          queryParams['endDate'] = endDate;
+        } else if (_activeFilterType.value == 'custom' &&
+            _selectedDateRange.value != null) {
+          final range = _selectedDateRange.value!;
+          queryParams['startDate'] =
+              DateFormat('yyyy-MM-dd').format(range.start);
+          queryParams['endDate'] = DateFormat('yyyy-MM-dd').format(range.end);
+        } else if (month != null) {
+          queryParams['month'] = month;
+        } else if (year != null) {
+          queryParams['year'] = year;
+        } else {
+          queryParams['period'] = _selectedPeriod.value;
+        }
       }
 
       final response = await _goldRateRepo.fetchHistory(
@@ -183,14 +195,50 @@ class GoldRateController extends GetxController {
         _history.assignAll(items);
         _historyState.value = CurrentAppState.SUCCESS;
       } else {
+        final errorCode = response['error']?['code'];
+        final errorMsg =
+            response['error']?['message'] ??
+            response['message'] ??
+            'Failed to load history';
+
+        if (errorCode == 'NOT_FOUND' && !_isRetryingFallback) {
+          _fallbackMessage.value = errorMsg;
+          _isRetryingFallback = true;
+          _historyState.value = CurrentAppState.SUCCESS;
+          _history.clear();
+          await fetchHistory(noParams: true);
+          _isRetryingFallback = false;
+          return;
+        }
+
         _historyState.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to load history';
+        _error.value = errorMsg;
       }
     } on DioException catch (e, st) {
+      final errorMsg =
+          e.response?.data?['error']?['message'] ??
+          e.response?.data?['message'] ??
+          e.message ??
+          'Something went wrong';
+      final errorCode = e.response?.data?['error']?['code'];
+
+      if (errorCode == 'NOT_FOUND' && !_isRetryingFallback) {
+        Logger.info(
+          'GoldRateController',
+          'fetchHistory NOT_FOUND with params, retrying without params',
+        );
+        _fallbackMessage.value = errorMsg;
+        _isRetryingFallback = true;
+        _historyState.value = CurrentAppState.SUCCESS;
+        _history.clear();
+        await fetchHistory(noParams: true);
+        _isRetryingFallback = false;
+        return;
+      }
+
       Logger.error('GoldRateController', 'fetchHistory Dio: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
-      _error.value =
-          e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
+      _error.value = errorMsg;
     } catch (e, st) {
       Logger.error('GoldRateController', 'fetchHistory: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;

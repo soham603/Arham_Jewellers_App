@@ -68,6 +68,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                 ),
               ),
               SizedBox(height: context.heightPercent(1.5)),
+              _fallbackBanner(context),
               _historyList(context),
             ],
           ),
@@ -442,6 +443,51 @@ if (rate == null || rate < 0.1 || rate > 1000000) {
         ),
       ),
     );
+  }
+
+  Widget _fallbackBanner(BuildContext context) {
+    return Obx(() {
+      final msg = controller.fallbackMessage;
+      if (msg.isEmpty) return const SizedBox.shrink();
+
+      return Padding(
+        padding: EdgeInsets.only(bottom: context.heightPercent(1.5)),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(3.5),
+            vertical: context.heightPercent(1),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.orange.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.orange.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: context.getResponsiveSize(3.5),
+                color: Colors.orange.shade700,
+              ),
+              SizedBox(width: context.getResponsiveSize(2)),
+              Expanded(
+                child: Text(
+                  msg,
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3),
+                    fontWeight: FontWeight.w500,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   Widget _historyList(BuildContext context) {
