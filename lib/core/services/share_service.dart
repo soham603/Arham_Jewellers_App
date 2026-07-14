@@ -82,79 +82,24 @@ class ShareService {
     return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
   }
 
-  static Future<void> shareImagesDirectly({
+  /// Downloads and compresses all product images in batches with progress tracking.
+  /// Returns the list of compressed image bytes (same length as [products]).
+  static Future<List<Uint8List?>> _downloadAndCompressAllImages({
     required List<ProductModel> products,
-    required String filterInfo,
-    String? title,
-    ValueNotifier<bool>? cancelled,
-  }) async {
-    final tempDir = await getTemporaryDirectory();
-    final tempFiles = <File>[];
-
-    try {
-      final imageFutures = products.asMap().entries.map((entry) async {
-        final i = entry.key;
-        final product = entry.value;
-        final imageUrl = product.displayImageUrl;
-        if (imageUrl == null || imageUrl.isEmpty) return null;
-
-        final bytes = await _downloadAndCompressImage(
-          imageUrl,
-          maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
-          quality: ImageCompressionConstants.shareQuality,
-        );
-        if (bytes == null) return null;
-
-        final fileName = 'product_${i + 1}_${product.id}.jpg';
-        final file = File('${tempDir.path}/$fileName');
-        await file.writeAsBytes(bytes);
-        tempFiles.add(file);
-        return XFile(file.path, name: fileName);
-      }).toList();
-
-      final results = await Future.wait(imageFutures);
-      final files = results.whereType<XFile>().toList();
-
-      if (files.isEmpty) return;
-
-      if (cancelled?.value == true) return;
-
-      final shareText = _buildShareText(filterInfo, title: title);
-
-      await Share.shareXFiles(
-        files,
-        subject: _brandName,
-        text: shareText,
-      );
-    } finally {
-      for (final file in tempFiles) {
-        try {
-          await file.delete();
-        } catch (_) {}
-      }
-    }
-  }
-
-  static Future<void> shareAsPdf({
-    required List<ProductModel> products,
-    required String filterInfo,
-    String? title,
-    int productsPerPage = 1,
+    required int maxLongestEdge,
+    required int quality,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
     const batchSize = 12;
     final imageBytesList = <Uint8List?>[];
 
     for (int i = 0; i < products.length; i += batchSize) {
-      if (cancelled?.value == true) return;
+      if (cancelled?.value == true) return imageBytesList;
 
       final batch = products.skip(i).take(batchSize);
       final batchCount = batch.length;
-      
+
       // Download raw bytes first (async I/O — non-blocking)
       final downloadFutures = batch.map((product) async {
         final imageUrl = product.displayImageUrl;
@@ -174,8 +119,8 @@ class ShareService {
       }).toList();
 
       final rawBytesList = await Future.wait(downloadFutures);
-      
-      if (cancelled?.value == true) return;
+
+      if (cancelled?.value == true) return imageBytesList;
 
       // Download contributes 50% of total progress
       final downloadProgress = (i + batchCount) / products.length * 0.5;
@@ -184,8 +129,8 @@ class ShareService {
       // Compress in background isolate (CPU-bound — doesn't block UI)
       final compressedBatch = await compute(_compressImageBatchInIsolate, {
         'imageBytes': rawBytesList,
-        'maxLongestEdge': ImageCompressionConstants.pdfProductMaxEdge,
-        'quality': ImageCompressionConstants.pdfProductQuality,
+        'maxLongestEdge': maxLongestEdge,
+        'quality': quality,
       });
 
       imageBytesList.addAll(compressedBatch);
@@ -193,11 +138,83 @@ class ShareService {
       // Compression contributes remaining 50% of total progress
       final compressProgress = (i + batchCount) / products.length;
       progress?.value = compressProgress;
-      
+
       Logger.info("ShareService", "Processed ${imageBytesList.length}/${products.length} images");
     }
 
+    return imageBytesList;
+  }
+
+  static Future<void> shareImagesDirectly({
+    required List<ProductModel> products,
+    required String filterInfo,
+    String? title,
+    ValueNotifier<bool>? cancelled,
+    ValueNotifier<double>? progress,
+  }) async {
+    final imageBytesList = await _downloadAndCompressAllImages(
+      products: products,
+      maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
+      quality: ImageCompressionConstants.shareQuality,
+      cancelled: cancelled,
+      progress: progress,
+    );
+
     if (cancelled?.value == true) return;
+
+    final files = <XFile>[];
+    final tempDir = await getTemporaryDirectory();
+
+    try {
+      for (int i = 0; i < imageBytesList.length; i++) {
+        final bytes = imageBytesList[i];
+        if (bytes == null) continue;
+
+        final product = products[i];
+        final fileName = 'product_${i + 1}_${product.id}.jpg';
+        final file = File('${tempDir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        files.add(XFile(file.path, name: fileName));
+      }
+
+      if (files.isEmpty) return;
+
+      final shareText = _buildShareText(filterInfo, title: title);
+
+      await Share.shareXFiles(
+        files,
+        subject: _brandName,
+        text: shareText,
+      );
+    } finally {
+      for (final file in files) {
+        try {
+          await File(file.path).delete();
+        } catch (_) {}
+      }
+    }
+  }
+
+  static Future<void> shareAsPdf({
+    required List<ProductModel> products,
+    required String filterInfo,
+    String? title,
+    int productsPerPage = 1,
+    ValueNotifier<bool>? cancelled,
+    ValueNotifier<double>? progress,
+  }) async {
+    final imageBytesList = await _downloadAndCompressAllImages(
+      products: products,
+      maxLongestEdge: ImageCompressionConstants.pdfProductMaxEdge,
+      quality: ImageCompressionConstants.pdfProductQuality,
+      cancelled: cancelled,
+      progress: progress,
+    );
+
+    if (cancelled?.value == true) return;
+
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
 
     progress?.value = 0.95;
 
@@ -225,13 +242,13 @@ class ShareService {
     final file = File('${tempDir.path}/$fileName');
     await file.writeAsBytes(pdfBytes);
 
-    if (cancelled?.value == true) return;
-
     final shareFileName = safeTitle != null
         ? '$safeTitle Products.pdf'
         : '$_brandName Products.pdf';
 
     try {
+      if (cancelled?.value == true) return;
+
       await Share.shareXFiles(
         [XFile(file.path, name: shareFileName)],
         subject: '$_brandName - Product Catalog',
@@ -250,11 +267,18 @@ class ShareService {
     required String filterInfo,
     String? title,
     ValueNotifier<bool>? cancelled,
+    ValueNotifier<double>? progress,
   }) async {
     final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
     if (cancelled?.value == true) return;
-    await shareImagesDirectly(products: products, filterInfo: filterInfo, title: title, cancelled: cancelled);
+    await shareImagesDirectly(
+      products: products,
+      filterInfo: filterInfo,
+      title: title,
+      cancelled: cancelled,
+      progress: progress,
+    );
   }
 
   /// Fetches products for the given category IDs, deduplicates, and shares as PDF.

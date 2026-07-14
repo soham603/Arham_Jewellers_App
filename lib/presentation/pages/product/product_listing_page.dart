@@ -1801,8 +1801,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (products.isEmpty) return;
 
     final cancelled = ValueNotifier(false);
+    final progress = ValueNotifier(0.0);
 
-    _showLoadingDialog(context, 'Preparing images...', onCancel: () {
+    _showProgressLoadingDialog(context, progress, onCancel: () {
       cancelled.value = true;
     });
 
@@ -1811,9 +1812,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
       cancelled: cancelled,
+      progress: progress,
     ).whenComplete(() {
       if (mounted && !cancelled.value) Navigator.of(context).pop();
       if (!cancelled.value) _clearSelection();
+      cancelled.dispose();
+      progress.dispose();
     });
   }
 
@@ -1836,8 +1840,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
       cancelled: cancelled,
       progress: progress,
     ).whenComplete(() {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
       if (!cancelled.value) _clearSelection();
+      cancelled.dispose();
       progress.dispose();
     });
   }
@@ -1903,64 +1908,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 ),
               ),
             ),
-        ),
-      ),
-    );
-  }
-
-  void _showLoadingDialog(BuildContext context, String message, {VoidCallback? onCancel}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(6)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: context.colorPalette.gold,
-                  ),
-                ),
-                SizedBox(height: context.heightPercent(1.5)),
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.5),
-                    fontWeight: FontWeight.w500,
-                    color: context.colorPalette.textColor,
-                  ),
-                ),
-                if (onCancel != null) ...[
-                  SizedBox(height: context.heightPercent(2)),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onCancel();
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        fontWeight: FontWeight.w600,
-                        color: context.colorPalette.subTitleColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
         ),
       ),
     );
