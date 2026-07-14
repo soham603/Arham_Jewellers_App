@@ -121,9 +121,15 @@ class SearchProductController extends GetxController {
   final _categoryOutState = CurrentAppState.INITIAL.obs;
   final _categoryAllState = CurrentAppState.INITIAL.obs;
 
-  final bool _categoryReadyHasMore = true;
-  final bool _categoryOutHasMore = true;
-  final bool _categoryAllHasMore = true;
+  bool _categoryReadyHasMore = true;
+  bool _categoryOutHasMore = true;
+  bool _categoryAllHasMore = true;
+
+  int _multiCategoryReadyPage = 1;
+  int _multiCategoryOutPage = 1;
+  int _multiCategoryAllPage = 1;
+
+  List<String> _currentMultiCategoryIds = [];
 
   List<ProductModel> get categoryReadyProducts => _categoryReadyProducts;
   List<ProductModel> get categoryOutProducts => _categoryOutProducts;
@@ -797,15 +803,44 @@ class SearchProductController extends GetxController {
     _categoryState.value = CurrentAppState.INITIAL;
   }
 
-  Future<void> loadProductsByMultipleCategories(List<String> categoryIds, {String? stockFilter}) async {
+  Future<void> loadProductsByMultipleCategories(
+    List<String> categoryIds, {
+    bool isPagination = false,
+    String? stockFilter,
+  }) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
 
     final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
     final existing = isReady ? _categoryReadyProducts : isOut ? _categoryOutProducts : _categoryAllProducts;
 
+    final hasMore = isReady ? _categoryReadyHasMore : isOut ? _categoryOutHasMore : _categoryAllHasMore;
+    if (!hasMore && isPagination) return;
+    if (state.value == CurrentAppState.LOADING) return;
+
+    int currentPage = isReady ? _multiCategoryReadyPage : isOut ? _multiCategoryOutPage : _multiCategoryAllPage;
+    bool currentHasMore = hasMore;
+
+    if (!isPagination) {
+      currentPage = 1;
+      currentHasMore = true;
+      _currentMultiCategoryIds = List<String>.from(categoryIds);
+      if (isReady) {
+        _multiCategoryReadyPage = 1;
+        _categoryReadyHasMore = true;
+        _categoryReadyProducts.clear();
+      } else if (isOut) {
+        _multiCategoryOutPage = 1;
+        _categoryOutHasMore = true;
+        _categoryOutProducts.clear();
+      } else {
+        _multiCategoryAllPage = 1;
+        _categoryAllHasMore = true;
+        _categoryAllProducts.clear();
+      }
+    }
+
     state.value = CurrentAppState.LOADING;
-    existing.clear();
 
     try {
       final stockParam = _stockQueryParam(stockFilter);
@@ -815,7 +850,7 @@ class SearchProductController extends GetxController {
             ApiUrlConstants.PRODUCTS_GET_ALL,
             queryParameters: {
               "categoryId": catId,
-              "page": 1,
+              "page": currentPage,
               "limit": _pageLimit,
               "showReverse": true,
               ...?stockParam,
@@ -837,18 +872,31 @@ class SearchProductController extends GetxController {
       });
 
       final results = await Future.wait(futures);
-      final seenIds = <String>{};
-      final allProducts = <ProductModel>[];
+      final allFetched = _dedupe(results.expand((list) => list).toList(), existing);
 
-      for (final products in results) {
-        for (final p in products) {
-          if (seenIds.add(p.id)) {
-            allProducts.add(p);
-          }
-        }
+      if (isPagination) {
+        existing.addAll(allFetched);
+      } else {
+        existing.value = allFetched;
       }
 
-      existing.value = allProducts;
+      if (allFetched.length < _pageLimit * categoryIds.length) {
+        currentHasMore = false;
+      } else {
+        currentPage++;
+      }
+
+      if (isReady) {
+        _categoryReadyHasMore = currentHasMore;
+        _multiCategoryReadyPage = currentPage;
+      } else if (isOut) {
+        _categoryOutHasMore = currentHasMore;
+        _multiCategoryOutPage = currentPage;
+      } else {
+        _categoryAllHasMore = currentHasMore;
+        _multiCategoryAllPage = currentPage;
+      }
+
       state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
@@ -857,6 +905,15 @@ class SearchProductController extends GetxController {
         "loadProductsByMultipleCategories error: $e\n$st",
       );
     }
+  }
+
+  void loadMoreMultipleCategories({String? stockFilter}) {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+    final hasMore = isReady ? _categoryReadyHasMore : isOut ? _categoryOutHasMore : _categoryAllHasMore;
+    final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
+    if (!hasMore || state.value == CurrentAppState.LOADING) return;
+    loadProductsByMultipleCategories(_currentMultiCategoryIds, isPagination: true, stockFilter: stockFilter);
   }
 
   void loadMoreFilteredProducts({String? stockFilter}) {

@@ -124,10 +124,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   void _loadMore() {
-    if (_isCategoryOnly || _isLoadingMore) return;
+    if (_isLoadingMore) return;
     setState(() => _isLoadingMore = true);
     final stockFilter = _stockFilter;
-    if (_isCategoryFilter) {
+    if (_isMultiCategory) {
+      _controller.loadMoreMultipleCategories(stockFilter: stockFilter);
+    } else if (_isCategoryFilter) {
       _controller.loadMoreFilteredProducts(stockFilter: stockFilter);
     } else {
       _controller.loadMoreKaratProducts(stockFilter: stockFilter);
@@ -300,7 +302,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.8) {
-      if (_hasMore && !_isLoadingMore && !_isCategoryOnly) {
+      if (_hasMore && !_isLoadingMore && !(_isCategoryOnly && !_isMultiCategory)) {
         _loadMore();
       }
     }
