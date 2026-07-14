@@ -122,8 +122,8 @@ class ShareService {
 
       if (cancelled?.value == true) return imageBytesList;
 
-      // Download contributes 50% of total progress
-      final downloadProgress = (i + batchCount) / products.length * 0.5;
+      // Download fills first half of this batch's contribution
+      final downloadProgress = i / products.length + (batchCount / products.length) * 0.5;
       progress?.value = downloadProgress;
 
       // Compress in background isolate (CPU-bound — doesn't block UI)
@@ -135,7 +135,7 @@ class ShareService {
 
       imageBytesList.addAll(compressedBatch);
 
-      // Compression contributes remaining 50% of total progress
+      // Compression fills the full batch contribution
       final compressProgress = (i + batchCount) / products.length;
       progress?.value = compressProgress;
 

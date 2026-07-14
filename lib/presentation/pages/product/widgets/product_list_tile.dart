@@ -14,12 +14,14 @@ class ProductListTile extends StatelessWidget {
     required this.onTap,
     this.onLongPress,
     this.isSelected = false,
+    this.isSelectMode = false,
   });
 
   final ProductModel product;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool isSelected;
+  final bool isSelectMode;
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +106,27 @@ class ProductListTile extends StatelessWidget {
                       child: Icon(
                         Icons.check,
                         color: Colors.white,
+                        size: 12 * sf,
+                      ),
+                    ),
+                  )
+                else if (isSelectMode)
+                  Positioned(
+                    top: 2 * sf,
+                    right: 2 * sf,
+                    child: Container(
+                      padding: EdgeInsets.all(1 * sf),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGold.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primaryGold,
+                          width: 2 * sf,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.transparent,
                         size: 12 * sf,
                       ),
                     ),

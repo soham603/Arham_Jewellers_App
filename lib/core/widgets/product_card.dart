@@ -23,6 +23,7 @@ class ProductCard extends StatefulWidget {
     this.onAddToCart,
     this.onLongPress,
     this.isSelected = false,
+    this.isSelectMode = false,
     this.showWishlistRemoveAlert = false,
   });
 
@@ -32,6 +33,7 @@ class ProductCard extends StatefulWidget {
   final VoidCallback? onAddToCart;
   final VoidCallback? onLongPress;
   final bool isSelected;
+  final bool isSelectMode;
   final bool showWishlistRemoveAlert;
 
   @override
@@ -313,6 +315,27 @@ class _ProductCardState extends State<ProductCard>
                               child: Icon(
                                 Icons.check,
                                 color: Colors.white,
+                                size: 14 * sf,
+                              ),
+                            ),
+                          )
+                        else if (widget.isSelectMode)
+                          Positioned(
+                            top: 6 * sf,
+                            right: Get.find<AuthController>().isAdmin ? 6 * sf : 36 * sf,
+                            child: Container(
+                              padding: EdgeInsets.all(2 * sf),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGold.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.primaryGold,
+                                  width: 2 * sf,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.check,
+                                color: Colors.transparent,
                                 size: 14 * sf,
                               ),
                             ),

@@ -34,7 +34,7 @@ class ProductListingPage extends StatefulWidget {
     this.categoryIds,
     this.categoryNames,
     this.title,
-    this.startInSelectMode = false,
+    this.startInSelectMode = true,
   });
 
   @override
@@ -56,7 +56,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   // ── Selection state
   final Set<String> _selectedProductIds = {};
-  bool get _isSelectMode => _selectedProductIds.isNotEmpty;
+  bool _isSelectModeEnabled = false;
+  bool get _isSelectMode => _isSelectModeEnabled || _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
   bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
@@ -82,6 +83,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _clearSelection() {
     setState(() {
       _clearCategoryCaches();
+      _isSelectModeEnabled = false;
       _selectedProductIds.clear();
     });
   }
@@ -322,13 +324,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     _controller = Get.put(SearchProductController(), tag: tag);
 
-    if (widget.startInSelectMode && _isAdmin) {
-      _selectedProductIds.add('_placeholder_');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _selectedProductIds.remove('_placeholder_');
-        });
-      });
+    if (widget.startInSelectMode && _isMultiCategory && _isAdmin) {
+      _isSelectModeEnabled = true;
     }
 
     _selectedKarat = widget.karat ?? (_isMultiCategory ? '' : '22K');
@@ -425,9 +422,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       ),
       body: Column(
         children: [
-          if (_isMultiCategory)
-            _buildKaratRow(context)
-          else if (_karatPurityLabel != null)
+          if (_karatPurityLabel != null && !_isMultiCategory)
             Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 2),
@@ -614,6 +609,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         key: ValueKey(product.id),
                         product: product,
                         isSelected: _selectedProductIds.contains(product.id),
+                        isSelectMode: _isSelectMode,
                         onTap: _isSelectMode
                             ? () => _toggleSelection(product.id)
                             : () {
@@ -671,6 +667,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                               key: ValueKey(product.id),
                               product: product,
                               isSelected: _selectedProductIds.contains(product.id),
+                              isSelectMode: _isSelectMode,
                               onTap: _isSelectMode
                                   ? () => _toggleSelection(product.id)
                                   : () {
@@ -754,6 +751,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                             key: ValueKey(product.id),
                             product: product,
                             isSelected: _selectedProductIds.contains(product.id),
+                            isSelectMode: _isSelectMode,
                             onTap: _isSelectMode
                                 ? () => _toggleSelection(product.id)
                                 : () {
@@ -817,88 +815,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  Widget _buildKaratRow(BuildContext context) {
-    final karatOptions = [
-      {'label': '18K', 'percent': '76%'},
-      {'label': '20K', 'percent': '84%'},
-      {'label': '22K', 'percent': '92%'},
-    ];
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        context.getResponsiveSize(4),
-        context.heightPercent(0.4),
-        context.getResponsiveSize(4),
-        context.heightPercent(0.4),
-      ),
-      child: Row(
-        children: [
-          for (int i = 0; i < karatOptions.length; i++) ...[
-            Expanded(
-              child: _buildKaratChip(context, karatOptions[i]['label']!, karatOptions[i]['percent']!),
-            ),
-            if (i < karatOptions.length - 1)
-              SizedBox(width: context.getResponsiveSize(2)),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKaratChip(BuildContext context, String karat, String percent) {
-    final isSelected = _selectedKarat == karat;
-    return GestureDetector(
-      onTap: () {
-        if (_selectedKarat == karat) return;
-        setState(() {
-          _clearCategoryCaches();
-          _selectedKarat = karat;
-        });
-        if (_scrollController.hasClients) {
-          _scrollController.jumpTo(0);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(2),
-          vertical: context.heightPercent(0.6),
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? context.colorPalette.gold
-              : context.colorPalette.cardBg,
-          borderRadius: BorderRadius.circular(context.getResponsiveSize(2.5)),
-          border: Border.all(
-            color: isSelected
-                ? context.colorPalette.gold
-                : context.colorPalette.border,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: context.colorPalette.gold.withValues(alpha: 0.4),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [],
-        ),
-        child: Text(
-          '$karat ($percent)',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3.2),
-            fontWeight: FontWeight.w700,
-            color: isSelected
-                ? Colors.white
-                : context.colorPalette.goldDeep,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildSortLayoutBar(BuildContext context) {
     return Obx(() {
       final currentSort = _controller.sortBy;
@@ -907,9 +823,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(height: context.responsiveWidth(8)),
-          const CategoryDivider(vertical: 4),
-          SizedBox(height: context.responsiveWidth(4)),
+          if (!_isMultiCategory) ...[
+            SizedBox(height: context.responsiveWidth(8)),
+            const CategoryDivider(vertical: 4),
+            SizedBox(height: context.responsiveWidth(4)),
+          ],
           Padding(
             padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16)),
             child: SingleChildScrollView(
@@ -1478,8 +1396,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_isMultiCategory && _selectedProductIds.isNotEmpty)
-            _buildCategoryBreakdownRow(context),
+          if (_isMultiCategory)
+            Obx(() {
+              _currentStockState;
+              _clearCategoryCaches();
+              return _buildCategoryBreakdownRow(context);
+            }),
           Row(
             children: [
               Expanded(
