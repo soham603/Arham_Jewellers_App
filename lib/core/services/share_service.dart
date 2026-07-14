@@ -88,6 +88,7 @@ class ShareService {
     required List<ProductModel> products,
     required int maxLongestEdge,
     required int quality,
+    bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
@@ -122,22 +123,26 @@ class ShareService {
 
       if (cancelled?.value == true) return imageBytesList;
 
-      // Download fills first half of this batch's contribution
-      final downloadProgress = i / products.length + (batchCount / products.length) * 0.5;
-      progress?.value = downloadProgress;
+      if (compressImages) {
+        // Compress in background isolate (CPU-bound — doesn't block UI)
+        final compressedBatch = await compute(_compressImageBatchInIsolate, {
+          'imageBytes': rawBytesList,
+          'maxLongestEdge': maxLongestEdge,
+          'quality': quality,
+        });
 
-      // Compress in background isolate (CPU-bound — doesn't block UI)
-      final compressedBatch = await compute(_compressImageBatchInIsolate, {
-        'imageBytes': rawBytesList,
-        'maxLongestEdge': maxLongestEdge,
-        'quality': quality,
-      });
+        imageBytesList.addAll(compressedBatch);
 
-      imageBytesList.addAll(compressedBatch);
+        // Compression fills the full batch contribution
+        final compressProgress = (i + batchCount) / products.length;
+        progress?.value = compressProgress;
+      } else {
+        imageBytesList.addAll(rawBytesList);
 
-      // Compression fills the full batch contribution
-      final compressProgress = (i + batchCount) / products.length;
-      progress?.value = compressProgress;
+        // Download fills the full batch contribution when not compressing
+        final downloadProgress = (i + batchCount) / products.length;
+        progress?.value = downloadProgress;
+      }
 
       Logger.info("ShareService", "Processed ${imageBytesList.length}/${products.length} images");
     }
@@ -149,6 +154,7 @@ class ShareService {
     required List<ProductModel> products,
     required String filterInfo,
     String? title,
+    bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
@@ -156,6 +162,7 @@ class ShareService {
       products: products,
       maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
       quality: ImageCompressionConstants.shareQuality,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     );
@@ -200,6 +207,7 @@ class ShareService {
     required String filterInfo,
     String? title,
     int productsPerPage = 1,
+    bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
@@ -207,6 +215,7 @@ class ShareService {
       products: products,
       maxLongestEdge: ImageCompressionConstants.pdfProductMaxEdge,
       quality: ImageCompressionConstants.pdfProductQuality,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     );
@@ -266,6 +275,7 @@ class ShareService {
     required List<String> categoryIds,
     required String filterInfo,
     String? title,
+    bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
@@ -276,6 +286,7 @@ class ShareService {
       products: products,
       filterInfo: filterInfo,
       title: title,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     );
@@ -287,6 +298,7 @@ class ShareService {
     required String filterInfo,
     String? title,
     int productsPerPage = 1,
+    bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
   }) async {
@@ -298,6 +310,7 @@ class ShareService {
       filterInfo: filterInfo,
       title: title,
       productsPerPage: productsPerPage,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     );

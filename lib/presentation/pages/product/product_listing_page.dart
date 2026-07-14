@@ -1560,13 +1560,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final titleController = TextEditingController(
       text: widget.title ?? '${widget.karat ?? ''} Collection'.trim(),
     );
+    final compressNotifier = ValueNotifier(true);
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) => Container(
+      builder: (ctx) => ValueListenableBuilder<bool>(
+        valueListenable: compressNotifier,
+        builder: (ctx, compressImages, _) => Container(
           padding: EdgeInsets.fromLTRB(
             20,
             20,
@@ -1633,7 +1635,57 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   color: context.colorPalette.textColor,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              Container(
+                padding: EdgeInsets.all(context.getResponsiveSize(3)),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: context.colorPalette.border),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      compressImages ? Icons.compress_rounded : Icons.expand_rounded,
+                      size: context.getResponsiveSize(5),
+                      color: context.colorPalette.goldDeep,
+                    ),
+                    SizedBox(width: context.getResponsiveSize(2.5)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Compress images',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(3.5),
+                              fontWeight: FontWeight.w600,
+                              color: context.colorPalette.textColor,
+                            ),
+                          ),
+                          SizedBox(height: context.heightPercent(0.15)),
+                          Text(
+                            compressImages
+                                ? 'Smaller file size, but slower processing'
+                                : 'Maximum quality, larger file size',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(2.8),
+                              color: context.colorPalette.subTitleColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: compressImages,
+                      onChanged: (value) => compressNotifier.value = value,
+                      activeThumbColor: context.colorPalette.gold,
+                      activeTrackColor: context.colorPalette.gold.withValues(alpha: 0.3),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
               _shareOptionTile(
                 ctx,
                 icon: Icons.image_outlined,
@@ -1642,7 +1694,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 subtitle: 'Send product images directly',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _shareAsImages(context, titleController.text.trim());
+                  _shareAsImages(context, titleController.text.trim(), compressImages: compressImages);
                 },
               ),
               const SizedBox(height: 10),
@@ -1654,7 +1706,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 subtitle: 'Create a branded product catalog',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _showProductsPerPageDialog(context, titleController.text.trim());
+                  _showProductsPerPageDialog(context, titleController.text.trim(), compressImages: compressImages);
                 },
               ),
               const SizedBox(height: 12),
@@ -1665,7 +1717,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  void _showProductsPerPageDialog(BuildContext context, String title) {
+  void _showProductsPerPageDialog(BuildContext context, String title, {bool compressImages = true}) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1673,7 +1725,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       builder: (ctx) => ShareProductsPerPageSheet(
         onSelected: (productsPerPage) {
           Navigator.pop(ctx);
-          _shareAsPdf(context, title, productsPerPage: productsPerPage);
+          _shareAsPdf(context, title, productsPerPage: productsPerPage, compressImages: compressImages);
         },
       ),
     );
@@ -1751,7 +1803,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         .toList();
   }
 
-  void _shareAsImages(BuildContext context, String title) {
+  void _shareAsImages(BuildContext context, String title, {bool compressImages = true}) {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
@@ -1766,6 +1818,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       products: products,
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     ).whenComplete(() {
@@ -1776,7 +1829,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     });
   }
 
-  void _shareAsPdf(BuildContext context, String title, {int productsPerPage = 1}) {
+  void _shareAsPdf(BuildContext context, String title, {int productsPerPage = 1, bool compressImages = true}) {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
@@ -1792,6 +1845,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
       productsPerPage: productsPerPage,
+      compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
     ).whenComplete(() {
