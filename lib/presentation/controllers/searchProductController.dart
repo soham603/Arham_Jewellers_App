@@ -368,6 +368,8 @@ class SearchProductController extends GetxController {
     try {
       List<ProductModel> allFetched = [];
 
+      List<List<ProductModel>>? perItemResults;
+
       if (filterState.selectedCategoryIds.isNotEmpty) {
         final categoryFutures =
             filterState.selectedCategoryIds.map((categoryId) async {
@@ -396,8 +398,8 @@ class SearchProductController extends GetxController {
           }
           return <ProductModel>[];
         });
-        final results = await Future.wait(categoryFutures);
-        allFetched = results.expand((list) => list).toList();
+        perItemResults = await Future.wait(categoryFutures);
+        allFetched = perItemResults.expand((list) => list).toList();
       } else if (filterState.selectedKarats.isNotEmpty) {
         final karatFutures = filterState.selectedKarats.map((karat) async {
           try {
@@ -424,8 +426,8 @@ class SearchProductController extends GetxController {
           }
           return <ProductModel>[];
         });
-        final results = await Future.wait(karatFutures);
-        allFetched = results.expand((list) => list).toList();
+        perItemResults = await Future.wait(karatFutures);
+        allFetched = perItemResults.expand((list) => list).toList();
       } else {
         final response = await httpClient.get(
           ApiUrlConstants.PRODUCTS_GET_ALL,
@@ -489,14 +491,19 @@ class SearchProductController extends GetxController {
 
       _filteredInitialProducts.value = sortProducts(_filteredInitialProducts, _sortBy.value);
 
-      final queryCount = filterState.selectedCategoryIds.isNotEmpty
-          ? filterState.selectedCategoryIds.length
-          : filterState.selectedKarats.length;
-      final expected = _pageLimit * queryCount;
-      if (allFetched.length < expected) {
-        _filteredInitialHasMore = false;
+      if (perItemResults != null) {
+        final anyItemHasMore = perItemResults.any((list) => list.length >= _pageLimit);
+        if (anyItemHasMore) {
+          _filteredInitialPage++;
+        } else {
+          _filteredInitialHasMore = false;
+        }
       } else {
-        _filteredInitialPage++;
+        if (allFetched.length < _pageLimit) {
+          _filteredInitialHasMore = false;
+        } else {
+          _filteredInitialPage++;
+        }
       }
 
       _filteredInitialState.value = CurrentAppState.SUCCESS;
@@ -722,10 +729,11 @@ class SearchProductController extends GetxController {
         existing.value = allFetched;
       }
 
-      if (allFetched.length < _pageLimit * karats.length) {
-        currentHasMore = false;
-      } else {
+      final anyKaratHasMore = results.any((list) => list.length >= _pageLimit);
+      if (anyKaratHasMore) {
         currentPage++;
+      } else {
+        currentHasMore = false;
       }
 
       if (isReady) {
@@ -880,10 +888,11 @@ class SearchProductController extends GetxController {
         existing.value = allFetched;
       }
 
-      if (allFetched.length < _pageLimit * categoryIds.length) {
-        currentHasMore = false;
-      } else {
+      final anyCategoryHasMore = results.any((list) => list.length >= _pageLimit);
+      if (anyCategoryHasMore) {
         currentPage++;
+      } else {
+        currentHasMore = false;
       }
 
       if (isReady) {

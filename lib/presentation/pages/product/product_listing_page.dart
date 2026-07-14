@@ -123,8 +123,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
   }
 
-  void _loadMore() {
+  Future<void> _loadMore() async {
     if (_isLoadingMore) return;
+    if (!_hasMore || _currentStockState == CurrentAppState.LOADING) return;
     setState(() => _isLoadingMore = true);
     final stockFilter = _stockFilter;
     if (_isMultiCategory) {
@@ -133,6 +134,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
       _controller.loadMoreFilteredProducts(stockFilter: stockFilter);
     } else {
       _controller.loadMoreKaratProducts(stockFilter: stockFilter);
+    }
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (mounted && _currentStockState == CurrentAppState.LOADING) {
+      setState(() => _isLoadingMore = false);
     }
   }
 
