@@ -181,6 +181,11 @@ class ShareController extends GetxController {
 
   List<String> get selectedCategoryIds => _selectedLevel3.values.map((s) => s.id).toList();
 
+  List<String> get selectedKarats => _selectedLevel3.values
+      .map((s) => s.karatName)
+      .toSet()
+      .toList();
+
   @override
   void onClose() {
     _selectedLevel3.clear();

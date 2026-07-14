@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
@@ -92,15 +95,28 @@ class _ProductListingPageState extends State<ProductListingPage> {
   Map<String, List<ProductModel>> get _purityCategoryGroups {
     if (_cachedPurityCategoryGroups != null) return _cachedPurityCategoryGroups!;
     final groups = <String, List<ProductModel>>{};
+    final categoryController = Get.find<CategoryController>();
+
     for (final product in _displayedProducts) {
+      final categoryId = product.category?.id;
       String? purity;
-      if (_selectedKarat.isNotEmpty) {
-        purity = _purityForKarat(_selectedKarat);
+
+      if (categoryId != null) {
+        final karat = categoryController.getLevel3Karat(categoryId);
+        if (karat != null) {
+          final touchValue = KaratConstants.touchValueFor(karat);
+          purity = touchValue.toString();
+        }
       }
-      purity ??= _purityForKarat(product.karat ?? '') ??
-          (product.karatNumber != null ? '${product.karatNumber}' : '??');
-      final categoryName =
-          product.category?.name?.toUpperCase() ?? 'OTHER';
+
+      purity ??= product.karatNumber != null
+          ? KaratConstants.touchValueFor('${product.karatNumber}K').toString()
+          : '??';
+
+      final categoryName = cleanCategoryName(
+          product.category?.name ?? '').toUpperCase().isEmpty
+          ? 'OTHER'
+          : cleanCategoryName(product.category?.name ?? '').toUpperCase();
       final key = '$purity $categoryName';
       groups.putIfAbsent(key, () => []).add(product);
     }
@@ -283,11 +299,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
       }).toList();
     }
     if (_selectedKarat.isNotEmpty) {
-      final targetKarat = int.tryParse(
-        _selectedKarat.replaceAll(RegExp(r'[^0-9]'), ''),
-      );
-      if (targetKarat != null) {
-        result = result.where((p) => p.karatNumber == targetKarat).toList();
+      final targetKarats = _selectedKarat
+          .split(',')
+          .map((k) => int.tryParse(k.trim().replaceAll(RegExp(r'[^0-9]'), '')))
+          .whereType<int>()
+          .toList();
+      if (targetKarats.isNotEmpty) {
+        result = result.where((p) => targetKarats.contains(p.karatNumber)).toList();
       }
     }
     return result;
@@ -328,7 +346,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
       _isSelectModeEnabled = true;
     }
 
-    _selectedKarat = widget.karat ?? (_isMultiCategory ? '' : '22K');
+    _selectedKarat = widget.karat ??
+        (_isMultiCategory
+            ? (widget.karats != null && widget.karats!.isNotEmpty
+                ? widget.karats!.join(', ')
+                : '')
+            : '22K');
 
     if (_isMultiCategory) {
       _filteredCategoryIds = List<String>.from(widget.categoryIds!);
@@ -1199,6 +1222,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
             ? widget.karats!.join(', ')
             : null);
     if (karatLabel == null) return null;
+
+    if (karatLabel.contains(',')) {
+      final parts = karatLabel.split(',').map((k) {
+        final trimmed = k.trim();
+        final purity = _purityForKarat(trimmed);
+        return purity != null ? '$trimmed·$purity%' : trimmed;
+      }).join(', ');
+      return parts;
+    }
+
     final purity = _purityForKarat(karatLabel);
     if (purity == null) return null;
     return '$karatLabel · $purity%';

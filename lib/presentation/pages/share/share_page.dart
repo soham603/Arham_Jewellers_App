@@ -565,7 +565,7 @@ class _SharePageState extends State<SharePage> {
                         Get.to(() => ProductListingPage(
                           categoryIds: controller.selectedCategoryIds,
                           categoryNames: catNames,
-                          karat: controller.selectedKarat,
+                          karats: controller.selectedKarats,
                           title: 'Selected Products',
                           startInSelectMode: true,
                         ));
