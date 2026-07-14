@@ -70,6 +70,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   void _toggleSelection(String productId) {
     setState(() {
+      _clearCategoryCaches();
       if (_selectedProductIds.contains(productId)) {
         _selectedProductIds.remove(productId);
       } else {
@@ -80,11 +81,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   void _clearSelection() {
     setState(() {
+      _clearCategoryCaches();
       _selectedProductIds.clear();
     });
   }
 
+  Map<String, List<ProductModel>>? _cachedPurityCategoryGroups;
   Map<String, List<ProductModel>> get _purityCategoryGroups {
+    if (_cachedPurityCategoryGroups != null) return _cachedPurityCategoryGroups!;
     final groups = <String, List<ProductModel>>{};
     for (final product in _displayedProducts) {
       String? purity;
@@ -98,10 +102,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
       final key = '$purity $categoryName';
       groups.putIfAbsent(key, () => []).add(product);
     }
-    return groups;
+    return _cachedPurityCategoryGroups = groups;
   }
 
+  Map<String, ({int selected, int total})>? _cachedCategorySelectionBreakdown;
   Map<String, ({int selected, int total})> get _categorySelectionBreakdown {
+    if (_cachedCategorySelectionBreakdown != null) return _cachedCategorySelectionBreakdown!;
     final breakdown = <String, ({int selected, int total})>{};
     for (final entry in _purityCategoryGroups.entries) {
       final selected = entry.value
@@ -109,7 +115,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
           .length;
       breakdown[entry.key] = (selected: selected, total: entry.value.length);
     }
-    return breakdown;
+    return _cachedCategorySelectionBreakdown = breakdown;
+  }
+
+  void _clearCategoryCaches() {
+    _cachedPurityCategoryGroups = null;
+    _cachedCategorySelectionBreakdown = null;
   }
 
   void _toggleGroupSelection(String groupKey) {
@@ -117,6 +128,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (products == null || products.isEmpty) return;
     final allSelected = products.every((p) => _selectedProductIds.contains(p.id));
     setState(() {
+      _clearCategoryCaches();
       if (allSelected) {
         for (final p in products) {
           _selectedProductIds.remove(p.id);
@@ -187,6 +199,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   Future<void> _onRefresh() async {
+    _clearCategoryCaches();
     if (_isMultiCategory) {
       await Future.wait([
         _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready'),
@@ -837,6 +850,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       onTap: () {
         if (_selectedKarat == karat) return;
         setState(() {
+          _clearCategoryCaches();
           _selectedKarat = karat;
         });
         if (_scrollController.hasClients) {
@@ -1273,6 +1287,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   String? _purityForKarat(String karat) {
+    if (karat.isEmpty) return null;
     if (karat.contains('18')) return '76';
     if (karat.contains('20')) return '84';
     if (karat.contains('22')) return '92';
@@ -1523,6 +1538,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             final selected = entry.value.selected;
             final total = entry.value.total;
             final isGroupFullySelected = selected == total && total > 0;
+            final isPartiallySelected = selected > 0 && selected < total;
 
             return GestureDetector(
               onTap: () => _toggleGroupSelection(groupKey),
@@ -1532,26 +1548,46 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 decoration: BoxDecoration(
                   color: isGroupFullySelected
                       ? context.colorPalette.gold.withValues(alpha: 0.12)
-                      : context.colorPalette.cardBg,
+                      : isPartiallySelected
+                          ? context.colorPalette.gold.withValues(alpha: 0.06)
+                          : context.colorPalette.cardBg,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isGroupFullySelected
                         ? context.colorPalette.gold
-                        : context.colorPalette.border,
+                        : isPartiallySelected
+                            ? context.colorPalette.gold.withValues(alpha: 0.5)
+                            : context.colorPalette.border,
                     width: isGroupFullySelected ? 1.5 : 1,
                   ),
                 ),
-                child: Text(
-                  '$groupKey $selected/$total',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: isGroupFullySelected
-                        ? FontWeight.w700
-                        : FontWeight.w500,
-                    color: isGroupFullySelected
-                        ? context.colorPalette.gold
-                        : context.colorPalette.goldDark,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isPartiallySelected)
+                      Icon(
+                        Icons.indeterminate_check_box_outlined,
+                        size: 14,
+                        color: context.colorPalette.gold.withValues(alpha: 0.7),
+                      ),
+                    if (isPartiallySelected) const SizedBox(width: 4),
+                    Text(
+                      '$groupKey $selected/$total',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isGroupFullySelected
+                            ? FontWeight.w700
+                            : isPartiallySelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                        color: isGroupFullySelected
+                            ? context.colorPalette.gold
+                            : isPartiallySelected
+                                ? context.colorPalette.gold
+                                : context.colorPalette.goldDark,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
