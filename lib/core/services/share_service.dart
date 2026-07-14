@@ -141,23 +141,65 @@ class ShareService {
     String? title,
     int productsPerPage = 1,
     ValueNotifier<bool>? cancelled,
+    ValueNotifier<double>? progress,
   }) async {
     final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
     final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
 
-    final imageFutures = products.map((product) async {
-      final imageUrl = product.displayImageUrl;
-      if (imageUrl == null || imageUrl.isEmpty) return null;
-      return _downloadAndCompressImage(
-        imageUrl,
-        maxLongestEdge: ImageCompressionConstants.pdfProductMaxEdge,
-        quality: ImageCompressionConstants.pdfProductQuality,
-      );
-    }).toList();
+    const batchSize = 12;
+    final imageBytesList = <Uint8List?>[];
 
-    final imageBytesList = await Future.wait(imageFutures);
+    for (int i = 0; i < products.length; i += batchSize) {
+      if (cancelled?.value == true) return;
+
+      final batch = products.skip(i).take(batchSize);
+      final batchCount = batch.length;
+      
+      // Download raw bytes first (async I/O — non-blocking)
+      final downloadFutures = batch.map((product) async {
+        final imageUrl = product.displayImageUrl;
+        if (imageUrl == null || imageUrl.isEmpty) return null;
+        try {
+          final response = await _dio.get<List<int>>(
+            imageUrl,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          if (response.statusCode == 200 && response.data != null) {
+            return Uint8List.fromList(response.data!);
+          }
+        } catch (e) {
+          Logger.error("ShareService", "Failed to download image: $imageUrl\n$e");
+        }
+        return null;
+      }).toList();
+
+      final rawBytesList = await Future.wait(downloadFutures);
+      
+      if (cancelled?.value == true) return;
+
+      // Download contributes 50% of total progress
+      final downloadProgress = (i + batchCount) / products.length * 0.5;
+      progress?.value = downloadProgress;
+
+      // Compress in background isolate (CPU-bound — doesn't block UI)
+      final compressedBatch = await compute(_compressImageBatchInIsolate, {
+        'imageBytes': rawBytesList,
+        'maxLongestEdge': ImageCompressionConstants.pdfProductMaxEdge,
+        'quality': ImageCompressionConstants.pdfProductQuality,
+      });
+
+      imageBytesList.addAll(compressedBatch);
+
+      // Compression contributes remaining 50% of total progress
+      final compressProgress = (i + batchCount) / products.length;
+      progress?.value = compressProgress;
+      
+      Logger.info("ShareService", "Processed ${imageBytesList.length}/${products.length} images");
+    }
 
     if (cancelled?.value == true) return;
+
+    progress?.value = 0.95;
 
     final pdfBytes = await compute(_buildPdfInIsolate, {
       'arhamLogoBytes': arhamLogoBytes,
@@ -169,6 +211,8 @@ class ShareService {
     });
 
     if (cancelled?.value == true) return;
+
+    progress?.value = 1.0;
 
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -220,6 +264,7 @@ class ShareService {
     String? title,
     int productsPerPage = 1,
     ValueNotifier<bool>? cancelled,
+    ValueNotifier<double>? progress,
   }) async {
     final products = await fetchProductsForCategories(categoryIds);
     if (products.isEmpty) return;
@@ -230,6 +275,7 @@ class ShareService {
       title: title,
       productsPerPage: productsPerPage,
       cancelled: cancelled,
+      progress: progress,
     );
   }
 
@@ -420,6 +466,31 @@ class ShareService {
 
     return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
   }
+}
+
+Future<List<Uint8List?>> _compressImageBatchInIsolate(Map<String, dynamic> params) async {
+  final imageBytes = params['imageBytes'] as List<Uint8List?>;
+  final maxLongestEdge = params['maxLongestEdge'] as int;
+  final quality = params['quality'] as int;
+
+  return imageBytes.map((bytes) {
+    if (bytes == null) return null;
+    
+    final decoded = img.decodeJpg(bytes);
+    if (decoded == null) return bytes;
+
+    final longest = decoded.width > decoded.height ? decoded.width : decoded.height;
+    if (longest <= maxLongestEdge) return bytes;
+
+    final resized = img.copyResize(
+      decoded,
+      width: decoded.width >= decoded.height ? maxLongestEdge : null,
+      height: decoded.height > decoded.width ? maxLongestEdge : null,
+      interpolation: img.Interpolation.linear,
+    );
+
+    return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
+  }).toList();
 }
 
 Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {

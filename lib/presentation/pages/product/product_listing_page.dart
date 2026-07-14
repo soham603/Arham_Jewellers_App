@@ -1822,8 +1822,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (products.isEmpty) return;
 
     final cancelled = ValueNotifier(false);
+    final progress = ValueNotifier(0.0);
 
-    _showLoadingDialog(context, 'Generating PDF...', onCancel: () {
+    _showProgressLoadingDialog(context, progress, onCancel: () {
       cancelled.value = true;
     });
 
@@ -1833,10 +1834,78 @@ class _ProductListingPageState extends State<ProductListingPage> {
       title: title.isNotEmpty ? title : null,
       productsPerPage: productsPerPage,
       cancelled: cancelled,
+      progress: progress,
     ).whenComplete(() {
-      if (mounted && !cancelled.value) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop();
       if (!cancelled.value) _clearSelection();
+      progress.dispose();
     });
+  }
+
+  void _showProgressLoadingDialog(BuildContext context, ValueNotifier<double> progress, {VoidCallback? onCancel}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+            child: Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: EdgeInsets.all(context.getResponsiveSize(8)),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: context.getResponsiveSize(5),
+                          height: context.getResponsiveSize(5),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.colorPalette.gold,
+                          ),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(2)),
+                        ValueListenableBuilder<double>(
+                          valueListenable: progress,
+                          builder: (context, value, _) => Text(
+                            '${(value * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(5),
+                              fontWeight: FontWeight.w700,
+                              color: context.colorPalette.gold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (onCancel != null) ...[
+                      SizedBox(height: context.heightPercent(2.5)),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onCancel();
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(3.5),
+                            fontWeight: FontWeight.w600,
+                            color: context.colorPalette.subTitleColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+        ),
+      ),
+    );
   }
 
   void _showLoadingDialog(BuildContext context, String message, {VoidCallback? onCancel}) {

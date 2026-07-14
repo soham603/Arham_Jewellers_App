@@ -12,8 +12,8 @@ abstract class ImageCompressionConstants {
   static const int shareQuality = 92;
 
   // ── PDF: product catalog ──
-  static const int pdfProductMaxEdge = 2000;
-  static const int pdfProductQuality = 90;
+  static const int pdfProductMaxEdge = 1200;
+  static const int pdfProductQuality = 80;
 
   // ── PDF: order/cart thumbnails ──
   static const int pdfThumbnailMaxEdge = 200;
