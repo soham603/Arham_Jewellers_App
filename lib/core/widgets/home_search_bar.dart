@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../presentation/controllers/CategoryController.dart';
 import '../../presentation/controllers/navigation_controller.dart';
+import '../utils/string_utils.dart';
 
 class HomeSearchBar extends StatefulWidget {
   final VoidCallback? onScannerTap;
@@ -26,13 +27,6 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
   Timer? _timer;
   int _currentIndex = 0;
 
-  static String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   List<String> _extractCategoryNames(CategoryController controller) {
     final all = <CategoryModel>[
       ...controller.k18Categories,
@@ -42,7 +36,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
     final seen = <String>{};
     final names = <String>[];
     for (final cat in all) {
-      final cleaned = _cleanCategoryName(cat.name);
+      final cleaned = cleanCategoryName(cat.name);
       if (cleaned.isNotEmpty && seen.add(cleaned.toLowerCase())) {
         names.add(cleaned);
       }

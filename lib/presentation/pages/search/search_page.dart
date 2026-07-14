@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/categoryShimmer.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -128,19 +129,12 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   Set<String> _expandCategoryIds(List<String> selectedIds) {
     final cleanedSelected = <String>{};
     for (final id in selectedIds) {
       for (final entry in _categoryVariants.entries) {
         if (entry.value.any((c) => c.id == id)) {
-          cleanedSelected.add(_cleanCategoryName(entry.key).toLowerCase());
+          cleanedSelected.add(cleanCategoryName(entry.key).toLowerCase());
           break;
         }
       }
@@ -148,7 +142,7 @@ class _SearchPageState extends State<SearchPage> {
     if (cleanedSelected.isEmpty) return selectedIds.toSet();
     final expanded = <String>{};
     for (final entry in _categoryVariants.entries) {
-      final cleanedKey = _cleanCategoryName(entry.key).toLowerCase();
+      final cleanedKey = cleanCategoryName(entry.key).toLowerCase();
       if (cleanedSelected.contains(cleanedKey)) {
         for (final cat in entry.value) {
           expanded.add(cat.id);

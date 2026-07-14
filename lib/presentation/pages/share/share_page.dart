@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
-import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/share_controller.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
-import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 
 class SharePage extends StatefulWidget {
   const SharePage({super.key});
@@ -23,14 +22,22 @@ class _SharePageState extends State<SharePage> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(ShareController());
+    controller = Get.isRegistered<ShareController>()
+        ? Get.find<ShareController>()
+        : Get.put(ShareController());
     categoryController = Get.isRegistered<CategoryController>()
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());
 
-    if (categoryController.k18Categories.isEmpty) {
+    if (!categoryController.hasTreeData) {
       categoryController.fetchCategoryTree();
     }
+  }
+
+  @override
+  void dispose() {
+    Get.delete<ShareController>();
+    super.dispose();
   }
 
   @override
@@ -220,14 +227,14 @@ class _SharePageState extends State<SharePage> {
         itemBuilder: (context, index) {
           final cat = categories[index];
 
-          return GestureDetector(
-            onTap: () => controller.drillIntoLevel2(cat),
-            child: Obx(() {
-              final selectedCount = controller.selectedLevel3.values
-                  .where((s) => s.karatName == controller.selectedKarat && s.level2Name == cat.name)
-                  .length;
+          return Obx(() {
+            final selectedCount = controller.selectedLevel3.values
+                .where((s) => s.karatName == controller.selectedKarat && s.level2Name == cat.name)
+                .length;
 
-              return Container(
+            return GestureDetector(
+              onTap: () => controller.drillIntoLevel2(cat),
+              child: Container(
                 margin: EdgeInsets.symmetric(
                   horizontal: context.getResponsiveSize(4),
                   vertical: context.heightPercent(0.4),
@@ -245,7 +252,7 @@ class _SharePageState extends State<SharePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _cleanCategoryName(cat.name),
+                            cleanCategoryName(cat.name),
                             style: TextStyle(
                               fontSize: context.getResponsiveSize(3.8),
                               fontWeight: FontWeight.w600,
@@ -273,9 +280,9 @@ class _SharePageState extends State<SharePage> {
                     ),
                   ],
                 ),
-              );
-            }),
-          );
+              ),
+            );
+          });
         },
       ),
     );
@@ -303,7 +310,7 @@ class _SharePageState extends State<SharePage> {
           child: Row(
             children: [
               Text(
-                _cleanCategoryName(controller.currentLevel2?.name ?? ''),
+                cleanCategoryName(controller.currentLevel2?.name ?? ''),
                 style: TextStyle(
                   fontSize: context.getResponsiveSize(3.5),
                   fontWeight: FontWeight.w600,
@@ -464,13 +471,6 @@ class _SharePageState extends State<SharePage> {
     );
   }
 
-  String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   Widget _buildPlaceholder(BuildContext context, {required IconData icon, required String message}) {
     return Center(
       child: Column(
@@ -492,404 +492,103 @@ class _SharePageState extends State<SharePage> {
 
   Widget _buildShareBar(BuildContext context) {
     return Obx(() {
-      if (!controller.hasSelection) return const SizedBox.shrink();
-
-      return Container(
-        padding: EdgeInsets.fromLTRB(
-          context.getResponsiveSize(4),
-          context.responsiveWidth(12, tabletVal: 16),
-          context.getResponsiveSize(4),
-          context.responsiveWidth(12, tabletVal: 16) + MediaQuery.of(context).padding.bottom,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: context.colorPalette.border)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => controller.clearSelection(),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsiveWidth(10, tabletVal: 14),
-                  vertical: context.responsiveWidth(8, tabletVal: 12),
+      return AnimatedSize(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        child: controller.hasSelection
+            ? Container(
+                padding: EdgeInsets.fromLTRB(
+                  context.getResponsiveSize(4),
+                  context.responsiveWidth(12, tabletVal: 16),
+                  context.getResponsiveSize(4),
+                  context.responsiveWidth(12, tabletVal: 16) + MediaQuery.of(context).padding.bottom,
                 ),
                 decoration: BoxDecoration(
-                  color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
-                  border: Border.all(color: context.colorPalette.border),
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: context.colorPalette.border)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close, size: context.responsiveWidth(16, tabletVal: 20), color: context.colorPalette.goldDark),
-                    SizedBox(width: context.responsiveWidth(4)),
-                    Text(
-                      'Clear',
-                      style: TextStyle(
-                        fontSize: context.responsiveWidth(12, tabletVal: 16),
-                        fontWeight: FontWeight.w600,
-                        color: context.colorPalette.goldDark,
+                    GestureDetector(
+                      onTap: () => controller.clearSelection(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.responsiveWidth(10, tabletVal: 14),
+                          vertical: context.responsiveWidth(8, tabletVal: 12),
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.colorPalette.cardBg,
+                          borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
+                          border: Border.all(color: context.colorPalette.border),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.close, size: context.responsiveWidth(16, tabletVal: 20), color: context.colorPalette.goldDark),
+                            SizedBox(width: context.responsiveWidth(4)),
+                            Text(
+                              'Clear',
+                              style: TextStyle(
+                                fontSize: context.responsiveWidth(12, tabletVal: 16),
+                                fontWeight: FontWeight.w600,
+                                color: context.colorPalette.goldDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: context.responsiveWidth(10, tabletVal: 14)),
+                    Expanded(
+                      child: Text(
+                        '${controller.selectedCount} selected',
+                        style: TextStyle(
+                          fontSize: context.responsiveWidth(14, tabletVal: 18),
+                          fontWeight: FontWeight.w600,
+                          color: context.colorPalette.goldDeep,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        final catNames = <String, String>{
+                          for (final entry in controller.selectedLevel3.entries)
+                            entry.value.id: entry.value.name,
+                        };
+                        Get.to(() => ProductListingPage(
+                          categoryIds: controller.selectedCategoryIds,
+                          categoryNames: catNames,
+                          karat: controller.selectedKarat,
+                          title: 'Selected Products',
+                          startInSelectMode: true,
+                        ));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.responsiveWidth(10, tabletVal: 14),
+                          vertical: context.responsiveWidth(8, tabletVal: 12),
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.colorPalette.cardBg,
+                          borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
+                          border: Border.all(color: context.colorPalette.border),
+                        ),
+                        child: Icon(Icons.check_rounded, size: context.responsiveWidth(18, tabletVal: 22), color: context.colorPalette.goldDark),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(width: context.responsiveWidth(10, tabletVal: 14)),
-            Expanded(
-              child: Text(
-                '${controller.selectedCount} selected',
-                style: TextStyle(
-                  fontSize: context.responsiveWidth(14, tabletVal: 18),
-                  fontWeight: FontWeight.w600,
-                  color: context.colorPalette.goldDeep,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                final catNames = <String, String>{
-                  for (final entry in controller.selectedLevel3.entries)
-                    entry.value.id: entry.value.name,
-                };
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProductListingPage(
-                      categoryIds: controller.selectedCategoryIds,
-                      categoryNames: catNames,
-                      karat: controller.selectedKarat,
-                      title: 'Selected Products',
-                      startInSelectMode: true,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsiveWidth(10, tabletVal: 14),
-                  vertical: context.responsiveWidth(8, tabletVal: 12),
-                ),
-                decoration: BoxDecoration(
-                  color: context.colorPalette.cardBg,
-                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
-                  border: Border.all(color: context.colorPalette.border),
-                ),
-                child: Icon(Icons.check_rounded, size: context.responsiveWidth(18, tabletVal: 22), color: context.colorPalette.goldDark),
-              ),
-            ),
-            SizedBox(width: context.responsiveWidth(8, tabletVal: 12)),
-            GestureDetector(
-              onTap: () => _showShareOptions(context),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsiveWidth(10, tabletVal: 14),
-                  vertical: context.responsiveWidth(8, tabletVal: 12),
-                ),
-                decoration: BoxDecoration(
-                  color: context.colorPalette.goldDark,
-                  borderRadius: BorderRadius.circular(context.responsiveWidth(8, tabletVal: 12)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.share_rounded, size: context.responsiveWidth(16, tabletVal: 20), color: Colors.white),
-                    SizedBox(width: context.responsiveWidth(4)),
-                    Text(
-                      'Share',
-                      style: TextStyle(fontSize: context.responsiveWidth(12, tabletVal: 16), fontWeight: FontWeight.w600, color: Colors.white),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+              )
+            : const SizedBox.shrink(),
       );
     });
   }
 
-  void _showShareOptions(BuildContext context) async {
-    _showLoadingDialog(context, 'Checking product count...');
-
-    await controller.fetchProductCount();
-
-    if (!mounted) return;
-    Navigator.of(context).pop();
-
-    if (!mounted) return;
-
-    final isImageShareDisabled = controller.productCount > 100;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          20 + MediaQuery.of(ctx).padding.bottom,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            SizedBox(height: context.heightPercent(2)),
-            Text(
-              'Share ${controller.selectedCount} categor${controller.selectedCount == 1 ? 'y' : 'ies'}',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4.5),
-                fontWeight: FontWeight.w700,
-                color: context.colorPalette.textColor,
-              ),
-            ),
-            SizedBox(height: context.heightPercent(0.5)),
-            Text(
-              controller.selectedCategoriesInfo,
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(2.8),
-                color: context.colorPalette.subTitleColor,
-              ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: context.heightPercent(2)),
-            _shareOptionTile(
-              context,
-              icon: Icons.image_outlined,
-              iconColor: const Color(0xFF25D366),
-              title: 'Share Images',
-              subtitle: isImageShareDisabled
-                  ? 'Disabled — max 100 images for WhatsApp'
-                  : 'Send product images with category details',
-              disabled: isImageShareDisabled,
-              onTap: isImageShareDisabled
-                  ? null
-                  : () {
-                      Navigator.pop(ctx);
-                      _shareAsImages(context);
-                    },
-            ),
-            SizedBox(height: context.heightPercent(1.2)),
-            _shareOptionTile(
-              context,
-              icon: Icons.picture_as_pdf_outlined,
-              iconColor: const Color(0xFFE53935),
-              title: 'Share as PDF',
-              subtitle: 'Create a branded product catalog',
-              onTap: () {
-                Navigator.pop(ctx);
-                _showProductsPerPageDialog(context);
-              },
-            ),
-            SizedBox(height: context.heightPercent(1.5)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _shareOptionTile(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required VoidCallback? onTap,
-    bool disabled = false,
-  }) {
-    final effectiveIconColor = disabled ? Colors.grey : iconColor;
-    final effectiveTextColor = disabled ? Colors.grey : context.colorPalette.textColor;
-    final effectiveSubtitleColor = disabled ? Colors.grey.shade400 : context.colorPalette.subTitleColor;
-    final effectiveBorderColor = disabled ? Colors.grey.shade300 : context.colorPalette.border;
-    final effectiveBgColor = disabled ? Colors.grey.shade100 : context.colorPalette.cardBg;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(context.getResponsiveSize(4)),
-        decoration: BoxDecoration(
-          color: effectiveBgColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: effectiveBorderColor),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
-              decoration: BoxDecoration(
-                color: effectiveIconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: effectiveIconColor, size: context.getResponsiveSize(6)),
-            ),
-            SizedBox(width: context.getResponsiveSize(3)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.8),
-                      fontWeight: FontWeight.w600,
-                      color: effectiveTextColor,
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(0.3)),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(2.8),
-                      color: effectiveSubtitleColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              disabled ? Icons.lock_outline_rounded : Icons.chevron_right_rounded,
-              color: effectiveSubtitleColor,
-              size: context.getResponsiveSize(5),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showProductsPerPageDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => ShareProductsPerPageSheet(
-        onSelected: (productsPerPage) {
-          Navigator.pop(ctx);
-          _shareAsPdf(context, productsPerPage: productsPerPage);
-        },
-      ),
-    );
-  }
-
-  void _shareAsImages(BuildContext context) {
-    final categoryIds = controller.selectedCategoryIds;
-    final filterInfo = controller.selectedCategoriesInfo;
-
-    final cancelled = ValueNotifier(false);
-
-    _showLoadingDialog(context, 'Preparing images...', onCancel: () {
-      cancelled.value = true;
-    });
-
-    ShareService.shareImagesFromCategories(
-      categoryIds: categoryIds,
-      filterInfo: filterInfo,
-      cancelled: cancelled,
-    ).whenComplete(() {
-      if (mounted && !cancelled.value) Navigator.of(context).pop();
-    });
-  }
-
-  void _shareAsPdf(BuildContext context, {int productsPerPage = 1}) {
-    final categoryIds = controller.selectedCategoryIds;
-    final filterInfo = controller.selectedCategoriesInfo;
-
-    final cancelled = ValueNotifier(false);
-
-    _showLoadingDialog(context, 'Generating PDF...', onCancel: () {
-      cancelled.value = true;
-    });
-
-    ShareService.sharePdfFromCategories(
-      categoryIds: categoryIds,
-      filterInfo: filterInfo,
-      productsPerPage: productsPerPage,
-      cancelled: cancelled,
-    ).whenComplete(() {
-      if (mounted && !cancelled.value) Navigator.of(context).pop();
-    });
-  }
-
-  void _showLoadingDialog(BuildContext context, String message, {VoidCallback? onCancel}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(6)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: context.colorPalette.gold,
-                  ),
-                ),
-                SizedBox(height: context.heightPercent(1.5)),
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.5),
-                    fontWeight: FontWeight.w500,
-                    color: context.colorPalette.textColor,
-                  ),
-                ),
-                if (onCancel != null) ...[
-                  SizedBox(height: context.heightPercent(2)),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onCancel();
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: context.getResponsiveSize(3.2),
-                        fontWeight: FontWeight.w600,
-                        color: context.colorPalette.subTitleColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }

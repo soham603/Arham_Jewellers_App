@@ -4,6 +4,7 @@ import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import '../utils/string_utils.dart';
 
 typedef FilterApplyCallback = void Function({
   required List<String> karats,
@@ -181,17 +182,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   //  Helpers 
 
-  String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   Map<String, List<CategoryModel>> _getDeduplicatedCategories() {
     final Map<String, List<CategoryModel>> grouped = {};
     for (final cat in widget.categories) {
-      final key = _cleanCategoryName(cat.name);
+      final key = cleanCategoryName(cat.name);
       grouped.putIfAbsent(key, () => []).add(cat);
     }
     return grouped;

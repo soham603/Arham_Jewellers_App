@@ -241,7 +241,7 @@ class CategoryManagerController extends GetxController {
 
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        if (parentId != null) "parentId": parentId,
+        "parentId": ?parentId,
         if (isDeleteImage) "isDeleteImage": true,
         if (isActive != null) "isActive": isActive.toString(),
         if (fileToUpload != null)

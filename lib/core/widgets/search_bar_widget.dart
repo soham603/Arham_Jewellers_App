@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 import '../../presentation/controllers/CategoryController.dart';
+import '../utils/string_utils.dart';
 
 class SearchBarWidget extends StatefulWidget {
   final TextEditingController controller;
@@ -105,13 +106,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     }
   }
 
-  static String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   List<String> _extractCategoryNames(CategoryController controller) {
     final all = <CategoryModel>[
       ...controller.k18Categories,
@@ -123,7 +117,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     final names = <String>[];
 
     for (final cat in all) {
-      final cleaned = _cleanCategoryName(cat.name);
+      final cleaned = cleanCategoryName(cat.name);
       if (cleaned.isNotEmpty && seen.add(cleaned.toLowerCase())) {
         names.add(cleaned);
       }
@@ -390,13 +384,6 @@ class _AnimatedHintState extends State<_AnimatedHint> {
     }
   }
 
-  static String _cleanCategoryName(String name) {
-    return name
-        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-        .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-        .trim();
-  }
-
   List<String> _extractCategoryNames(CategoryController controller) {
     final all = <CategoryModel>[
       ...controller.k18Categories,
@@ -406,7 +393,7 @@ class _AnimatedHintState extends State<_AnimatedHint> {
     final seen = <String>{};
     final names = <String>[];
     for (final cat in all) {
-      final cleaned = _cleanCategoryName(cat.name);
+      final cleaned = cleanCategoryName(cat.name);
       if (cleaned.isNotEmpty && seen.add(cleaned.toLowerCase())) {
         names.add(cleaned);
       }
