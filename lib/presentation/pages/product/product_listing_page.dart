@@ -84,6 +84,51 @@ class _ProductListingPageState extends State<ProductListingPage> {
     });
   }
 
+  Map<String, List<ProductModel>> get _purityCategoryGroups {
+    final groups = <String, List<ProductModel>>{};
+    for (final product in _displayedProducts) {
+      String? purity;
+      if (_selectedKarat.isNotEmpty) {
+        purity = _purityForKarat(_selectedKarat);
+      }
+      purity ??= _purityForKarat(product.karat ?? '') ??
+          (product.karatNumber != null ? '${product.karatNumber}' : '??');
+      final categoryName =
+          product.category?.name?.toUpperCase() ?? 'OTHER';
+      final key = '$purity $categoryName';
+      groups.putIfAbsent(key, () => []).add(product);
+    }
+    return groups;
+  }
+
+  Map<String, ({int selected, int total})> get _categorySelectionBreakdown {
+    final breakdown = <String, ({int selected, int total})>{};
+    for (final entry in _purityCategoryGroups.entries) {
+      final selected = entry.value
+          .where((p) => _selectedProductIds.contains(p.id))
+          .length;
+      breakdown[entry.key] = (selected: selected, total: entry.value.length);
+    }
+    return breakdown;
+  }
+
+  void _toggleGroupSelection(String groupKey) {
+    final products = _purityCategoryGroups[groupKey];
+    if (products == null || products.isEmpty) return;
+    final allSelected = products.every((p) => _selectedProductIds.contains(p.id));
+    setState(() {
+      if (allSelected) {
+        for (final p in products) {
+          _selectedProductIds.remove(p.id);
+        }
+      } else {
+        for (final p in products) {
+          _selectedProductIds.add(p.id);
+        }
+      }
+    });
+  }
+
   bool get _isCategoryFilter => widget.categoryId != null || _isMultiCategory;
   bool get _isMultiCategory => widget.categoryIds != null && widget.categoryIds!.isNotEmpty;
   bool get _hasKarat => widget.karat != null;
@@ -273,7 +318,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       });
     }
 
-    _selectedKarat = _isMultiCategory ? '' : (widget.karat ?? '22K');
+    _selectedKarat = widget.karat ?? (_isMultiCategory ? '' : '22K');
 
     if (_isMultiCategory) {
       _filteredCategoryIds = List<String>.from(widget.categoryIds!);
@@ -1395,7 +1440,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  // ── Selection bottom bar 
+  // ── Selection bottom bar
   Widget _buildSelectionBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1415,75 +1460,103 @@ class _ProductListingPageState extends State<ProductListingPage> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(
-            onTap: _clearSelection,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: context.colorPalette.cardBg,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: context.colorPalette.border),
+          if (_isMultiCategory && _selectedProductIds.isNotEmpty)
+            _buildCategoryBreakdownRow(context),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${_selectedProductIds.length} selected',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: context.colorPalette.goldDeep,
+                  ),
+                ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.close,
-                    size: 16,
+              GestureDetector(
+                onTap: () => _showShareOptionsDialog(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
                     color: context.colorPalette.goldDark,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Clear',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: context.colorPalette.goldDark,
-                    ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.share_rounded, size: 16, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text(
+                        'Share',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              '${_selectedProductIds.length} selected',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: context.colorPalette.goldDeep,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () => _showShareOptionsDialog(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: context.colorPalette.goldDark,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.share_rounded, size: 16, color: Colors.white),
-                  SizedBox(width: 4),
-                  Text(
-                    'Share',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryBreakdownRow(BuildContext context) {
+    final breakdown = _categorySelectionBreakdown;
+    if (breakdown.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: breakdown.entries.map((entry) {
+            final groupKey = entry.key;
+            final selected = entry.value.selected;
+            final total = entry.value.total;
+            final isGroupFullySelected = selected == total && total > 0;
+
+            return GestureDetector(
+              onTap: () => _toggleGroupSelection(groupKey),
+              child: Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isGroupFullySelected
+                      ? context.colorPalette.gold.withValues(alpha: 0.12)
+                      : context.colorPalette.cardBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isGroupFullySelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.border,
+                    width: isGroupFullySelected ? 1.5 : 1,
+                  ),
+                ),
+                child: Text(
+                  '$groupKey $selected/$total',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isGroupFullySelected
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: isGroupFullySelected
+                        ? context.colorPalette.gold
+                        : context.colorPalette.goldDark,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
