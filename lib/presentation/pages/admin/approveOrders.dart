@@ -292,7 +292,9 @@ class _AdminOrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Order #${order.id.substring(0, 8)}",
+                    order.partyName?.isNotEmpty == true
+                        ? order.partyName!
+                        : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: context.getResponsiveSize(4.4),

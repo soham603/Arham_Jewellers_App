@@ -22,7 +22,6 @@ class MyOrdersPage extends StatefulWidget {
 
 class _MyOrdersPageState extends State<MyOrdersPage> {
   late final UserOrderController _orderController;
-  final ScrollController _scrollController = ScrollController();
   DateTime? _lastBackPress;
   int _activeTabIndex = 0;
 
@@ -43,19 +42,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
       _orderController.setFilter(_filters[_activeTabIndex]);
       _orderController.fetchUserOrders();
     });
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 200) {
-        _orderController.loadMoreOrders();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   Widget _buildOrdersList() {
@@ -80,6 +66,9 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
         return _EmptyOrdersView(context: context);
       }
 
+      final hasMore = _orderController.hasMoreOrders;
+      final itemCount = orders.length + (hasMore ? 1 : 0);
+
       return RefreshIndicator(
         color: AppColors.primaryGold,
         backgroundColor: Colors.white,
@@ -87,32 +76,56 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           await _orderController.refreshOrders();
         },
         child: ListView.separated(
-          controller: _scrollController,
           padding: EdgeInsets.fromLTRB(
             context.getResponsiveSize(4),
             context.heightPercent(2),
             context.getResponsiveSize(4),
             context.heightPercent(2),
           ),
-          itemCount: orders.length +
-              (_orderController.hasMoreOrders ? 1 : 0),
+          itemCount: itemCount,
           separatorBuilder: (_, _) =>
               SizedBox(height: context.heightPercent(1.5)),
           itemBuilder: (context, index) {
-            if (index == orders.length) {
+            if (index == orders.length && hasMore) {
               return Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: context.heightPercent(2),
+                padding: EdgeInsets.only(
+                  top: context.heightPercent(1),
                 ),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryGold,
-                    strokeWidth: 2,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: context.heightPercent(5.5),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: AppColors.primaryGold,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: _orderController.isFetchingOrders
+                        ? null
+                        : () => _orderController.loadMoreOrders(),
+                    child: _orderController.isFetchingOrders
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(
+                            'Load More',
+                            style: TextStyle(
+                              fontSize: context.getResponsiveSize(4),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
               );
             }
-
             return _OrderCard(
               order: orders[index],
               context: context,
@@ -284,31 +297,24 @@ class _OrderCard extends StatelessWidget {
                   // ── Header row: order token + status badge 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            order.orderToken != null
-                                ? 'Order #${order.orderToken}'
-                                : 'Order #${order.id.substring(0, 8).toUpperCase()}',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(4.5),
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textDark,
-                            ),
-                          ),
-                          SizedBox(height: context.heightPercent(0.4)),
                           Text(
                             _formatDate(order.createdAt),
                             style: TextStyle(
-                              fontSize: context.getResponsiveSize(3.2),
+                              fontSize: context.getResponsiveSize(3.6),
                               color: AppColors.textMuted,
                             ),
                           ),
+                        ],
+                      ),
+                      Row(
+                        children: [
                           if (order.isCustomOrder) ...[
-                            SizedBox(height: context.heightPercent(0.6)),
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: context.getResponsiveSize(2),
@@ -331,11 +337,8 @@ class _OrderCard extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            SizedBox(width: context.getResponsiveSize(1.5)),
                           ],
-                        ],
-                      ),
-                      Row(
-                        children: [
                           StatusBadge(
                             label: statusInfo.label,
                             color: statusInfo.color,

@@ -56,16 +56,29 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           onPressed: () => Get.back(),
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textDark, size: context.getResponsiveSize(5)),
         ),
-        title: Text(
-          'Order #${order.id.substring(0, 8).toUpperCase()}',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(5.5),
-            fontWeight: FontWeight.w700,
-            color: AppColors.textDark,
-          ),
-        ),
+        title: const SizedBox.shrink(),
         titleSpacing: context.getResponsiveSize(4),
         actions: [
+          Container(
+            margin: EdgeInsets.only(right: context.getResponsiveSize(2)),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF3E0),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.primaryGold.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Text(
+              "CUSTOM",
+              style: TextStyle(
+                color: AppColors.primaryGold,
+                fontWeight: FontWeight.w800,
+                fontSize: context.getResponsiveSize(2.6),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
           Container(
             margin: EdgeInsets.only(right: context.getResponsiveSize(4)),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -93,7 +106,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               _buildInfoCard(
                 context,
                 children: [
-                  _buildInfoRow(context, 'Order ID', '#${order.id.substring(0, 8).toUpperCase()}'),
+                  _buildInfoRow(context, 'Order ID', '#${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}'),
                   _buildInfoDivider(),
                   _buildInfoRow(context, 'Date', _formatDate(order.createdAt)),
                   _buildInfoDivider(),
@@ -127,6 +140,12 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     if (order.user.name.isNotEmpty) _buildInfoDivider(),
                     if (order.user.phoneNumber.isNotEmpty)
                       _buildInfoRow(context, 'User Phone', order.user.phoneNumber),
+                    if (order.user.phoneNumber.isNotEmpty) _buildInfoDivider(),
+                    if (order.user.companyName.isNotEmpty)
+                      _buildInfoRow(context, 'Company', order.user.companyName),
+                    if (order.user.companyName.isNotEmpty) _buildInfoDivider(),
+                    if (order.user.city.isNotEmpty)
+                      _buildInfoRow(context, 'City', order.user.city),
                   ],
                 ),
                 SizedBox(height: context.heightPercent(2)),

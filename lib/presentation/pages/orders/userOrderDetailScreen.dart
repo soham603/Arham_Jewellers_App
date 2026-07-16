@@ -54,11 +54,13 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildOrderHeader(context, order),
+            _buildStatusBadge(context, order),
             SizedBox(height: context.heightPercent(2)),
             _buildOrderItems(context, order),
-            SizedBox(height: context.heightPercent(2)),
-            _buildTotalAmount(context, order),
+            if (order.totalAmount != null) ...[
+              SizedBox(height: context.heightPercent(2)),
+              _buildTotalAmount(context, order),
+            ],
             if (order.adminMessage != null &&
                 order.adminMessage!.isNotEmpty) ...[
               SizedBox(height: context.heightPercent(2)),
@@ -73,68 +75,28 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Widget _buildOrderHeader(BuildContext context, UserOrderModel order) {
+  Widget _buildStatusBadge(BuildContext context, UserOrderModel order) {
     final statusInfo = getStatusInfo(order.status);
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getResponsiveSize(4)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE7DED2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  order.orderToken != null
-                      ? 'Order #${order.orderToken}'
-                      : 'Order #${order.id.substring(0, 8).toUpperCase()}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: context.getResponsiveSize(5),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(2.5),
-                  vertical: context.heightPercent(0.3),
-                ),
-                decoration: BoxDecoration(
-                  color: statusInfo.bgColor,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: Text(
-                  statusInfo.label,
-                  style: TextStyle(
-                    color: statusInfo.color,
-                    fontWeight: FontWeight.w700,
-                    fontSize: context.getResponsiveSize(3),
-                  ),
-                ),
-              ),
-            ],
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.getResponsiveSize(3),
+          vertical: context.heightPercent(0.5),
+        ),
+        decoration: BoxDecoration(
+          color: statusInfo.bgColor,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Text(
+          statusInfo.label,
+          style: TextStyle(
+            color: statusInfo.color,
+            fontWeight: FontWeight.w700,
+            fontSize: context.getResponsiveSize(3),
           ),
-          SizedBox(height: context.heightPercent(1.5)),
-          _infoRow(
-            context,
-            icon: Icons.access_time_rounded,
-            label: "Created",
-            value: DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
-          ),
-          SizedBox(height: context.heightPercent(0.8)),
-          _infoRow(
-            context,
-            icon: Icons.update_rounded,
-            label: "Updated",
-            value: DateFormat("dd MMM yyyy • hh:mm a").format(order.updatedAt.toLocal()),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -818,35 +780,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     return amount.toStringAsFixed(0);
   }
 
-  Widget _infoRow(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: context.getResponsiveSize(4), color: AppColors.textMuted),
-        SizedBox(width: context.getResponsiveSize(2)),
-        Text(
-          "$label: ",
-          style: TextStyle(
-            color: AppColors.textMuted,
-            fontSize: context.getResponsiveSize(3.2),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: context.getResponsiveSize(3.2),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+
 
 }
 

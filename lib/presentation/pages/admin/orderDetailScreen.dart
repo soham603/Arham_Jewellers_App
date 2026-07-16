@@ -138,7 +138,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             children: [
               Expanded(
                 child: Text(
-                  "Order #${order.id.substring(0, 8)}",
+                  order.partyName?.isNotEmpty == true
+                      ? order.partyName!
+                      : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
@@ -799,7 +801,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                   SizedBox(height: context.heightPercent(0.8)),
                   Text(
-                    "Order #${order.id.substring(0, 8)}",
+                    order.partyName?.isNotEmpty == true
+                        ? order.partyName!
+                        : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: context.getResponsiveSize(3.4),
@@ -1023,7 +1027,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
               SizedBox(height: context.heightPercent(0.8)),
               Text(
-                "Order #${order.id.substring(0, 8)}",
+                order.partyName?.isNotEmpty == true
+                    ? order.partyName!
+                    : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: context.getResponsiveSize(3.4),
