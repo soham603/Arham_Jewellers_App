@@ -405,12 +405,10 @@ class _OrderImagesStack extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = context.getResponsiveSize(20);
 
-    final List<String?> images = order.isCustom
-        ? order.referenceImages.cast<String?>()
-        : order.orderItems
-            .map((item) => item.product.imageUrl)
-            .where((url) => url != null && url.isNotEmpty)
-            .toList();
+    final images = order.orderItems
+        .map((item) => item.product.imageUrl)
+        .where((url) => url != null && url.isNotEmpty)
+        .toList();
 
     if (images.isEmpty) {
       return ClipRRect(
@@ -420,7 +418,7 @@ class _OrderImagesStack extends StatelessWidget {
     }
 
     final displayImages = images.take(3).toList();
-    final totalItems = images.length;
+    final totalItems = order.orderItems.length;
 
     return SizedBox(
       width: size,
