@@ -291,15 +291,7 @@ class _AdminOrderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    order.partyName?.isNotEmpty == true
-                        ? order.partyName!
-                        : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: context.getResponsiveSize(4.4),
-                    ),
-                  ),
+                  _OrderTitle(order: order),
                   SizedBox(height: context.heightPercent(0.6)),
                   Text(
                     DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
@@ -368,6 +360,39 @@ class _AdminOrderCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _OrderTitle extends StatelessWidget {
+  const _OrderTitle({required this.order});
+  final AdminOrderModel order;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = _getTitle();
+    return Text(
+      title,
+      style: TextStyle(
+        fontWeight: FontWeight.w700,
+        fontSize: context.getResponsiveSize(4.4),
+      ),
+    );
+  }
+
+  String _getTitle() {
+    if (order.partyName?.isNotEmpty == true) {
+      return order.partyName!;
+    }
+    if (order.user.name.isNotEmpty) {
+      return order.user.name;
+    }
+    if (order.user.companyName.isNotEmpty) {
+      return order.user.companyName;
+    }
+    final shortId = order.id.length >= 8
+        ? order.id.substring(0, 8).toUpperCase()
+        : order.id.toUpperCase();
+    return "Order #$shortId";
   }
 }
 
