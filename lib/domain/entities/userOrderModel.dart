@@ -165,7 +165,7 @@ class UserOrderProductModel {
     return UserOrderProductModel(
       id: json["id"]?.toString() ?? '',
       name: json["name"]?.toString() ?? '',
-      slug: json["slug"]?.toString() ?? '',
+      slug: json["nameSlug"]?.toString() ?? json["slug"]?.toString() ?? '',
       isActive: json["isActive"] ?? false,
       imageUrl: json["imageUrl"],
       karigarNetWt: json["karigarNetWt"] != null

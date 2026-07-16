@@ -86,13 +86,15 @@ class AdminOrderModel {
                   0
               : null,
 
-      createdAt: DateTime.parse(
-        json["createdAt"],
-      ),
+      createdAt: DateTime.tryParse(
+            json["createdAt"]?.toString() ?? '',
+          ) ??
+          DateTime.now(),
 
-      updatedAt: DateTime.parse(
-        json["updatedAt"],
-      ),
+      updatedAt: DateTime.tryParse(
+            json["updatedAt"]?.toString() ?? '',
+          ) ??
+          DateTime.now(),
 
       isCustom: json["isCustomOrder"] ?? json["isCustom"] ?? false,
 
