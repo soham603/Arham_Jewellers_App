@@ -135,15 +135,9 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                             fontWeight: FontWeight.w600,
                             color: AppColors.textDark,
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'PENDING', child: Text('Pending')),
-                            DropdownMenuItem(value: 'APPROVED', child: Text('Approved')),
-                            DropdownMenuItem(value: 'ASSIGNED', child: Text('Assigned')),
-                            DropdownMenuItem(value: 'COMPLETED', child: Text('Completed')),
-                            DropdownMenuItem(value: 'REJECTED', child: Text('Rejected')),
-                            DropdownMenuItem(value: 'CANCELLED_BY_USER', child: Text('Cancelled')),
-                            DropdownMenuItem(value: 'EXECUTED', child: Text('Executed')),
-                          ],
+                          items: orderStatuses
+                              .map((s) => DropdownMenuItem(value: s.$1, child: Text(s.$2)))
+                              .toList(),
                           onChanged: (val) {
                             if (val != null) controller.changeStatus(val);
                           },

@@ -1,3 +1,12 @@
+const orderStatuses = [
+  ('PENDING', 'Pending'),
+  ('APPROVED', 'Approved'),
+  ('ASSIGNED', 'Assigned'),
+  ('COMPLETED', 'Completed'),
+  ('REJECTED', 'Rejected'),
+  ('CANCELLED_BY_USER', 'Cancelled'),
+];
+
 enum CurrentAppState {
   INITIAL,
   LOADING,

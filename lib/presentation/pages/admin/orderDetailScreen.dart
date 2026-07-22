@@ -2,7 +2,6 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
@@ -10,7 +9,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderContro
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 
@@ -108,103 +106,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ],
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOrderHeader(BuildContext context, AdminOrderModel order) {
-    final statusInfo = getStatusInfo(order.status);
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getResponsiveSize(4)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  order.partyName?.isNotEmpty == true
-                      ? order.partyName!
-                      : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w700,
-                    fontSize: context.getResponsiveSize(5),
-                  ),
-                ),
-              ),
-              if (order.isCustom)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.getResponsiveSize(2.5),
-                    vertical: context.heightPercent(0.3),
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF3E0),
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(
-                      color: AppColors.primaryGold.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Text(
-                    "CUSTOM",
-                    style: TextStyle(
-                      color: AppColors.primaryGold,
-                      fontWeight: FontWeight.w800,
-                      fontSize: context.getResponsiveSize(2.6),
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: context.heightPercent(1)),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.getResponsiveSize(2.5),
-              vertical: context.heightPercent(0.3),
-            ),
-            decoration: BoxDecoration(
-              color: statusInfo.color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(100),
-            ),
-            child: Text(
-              order.status,
-              style: TextStyle(
-                color: statusInfo.color,
-                fontWeight: FontWeight.w700,
-                fontSize: context.getResponsiveSize(3),
-              ),
-            ),
-          ),
-          SizedBox(height: context.heightPercent(1.5)),
-          _infoRow(
-            context,
-            icon: Icons.access_time_rounded,
-            label: "Created",
-            value: DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
-          ),
-          SizedBox(height: context.heightPercent(0.8)),
-          _infoRow(
-            context,
-            icon: Icons.update_rounded,
-            label: "Updated",
-            value: DateFormat("dd MMM yyyy • hh:mm a").format(order.updatedAt.toLocal()),
-          ),
         ],
       ),
     );
@@ -557,37 +458,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _infoRow(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: context.getResponsiveSize(4), color: AppColors.textMuted),
-        SizedBox(width: context.getResponsiveSize(2)),
-        Text(
-          "$label: ",
-          style: TextStyle(
-            color: AppColors.textMuted,
-            fontSize: context.getResponsiveSize(3.2),
-          ),
-        ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-                fontSize: context.getResponsiveSize(3.2),
-              ),
-            ),
-          ),
       ],
     );
   }

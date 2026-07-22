@@ -120,7 +120,7 @@ class AdminOrderController extends GetxController {
 
         allItems = [...normalResult.items, ...customResult.items];
         totalItems = normalResult.total + customResult.total;
-        totalPages = totalItems > 0 ? (totalItems / _pageLimit).ceil() : 1;
+        totalPages = totalItems > 0 ? (totalItems / (_pageLimit * 2)).ceil() : 1;
       } else {
         final params = {
           ...baseParams,

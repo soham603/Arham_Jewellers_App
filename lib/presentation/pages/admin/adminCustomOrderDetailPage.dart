@@ -198,30 +198,32 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   context,
                   children: [
                     ...order.orderItems.map(
-                      (item) => Padding(
-                        padding: EdgeInsets.only(bottom: context.heightPercent(1)),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty
-                                  ? () => showImageZoomDialog(context, item.product.imageUrl!)
-                                  : null,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: SizedBox(
-                                  width: context.getResponsiveSize(12),
-                                  height: context.getResponsiveSize(12),
-                                  child: item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty
-                                      ? CachedNetworkImage(
-                                          imageUrl: item.product.imageUrl!,
-                                          fit: BoxFit.cover,
-                                          placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                          errorWidget: (_, _, _) => const RatneshFallback.xs(),
-                                        )
-                                      : const RatneshFallback.xs(),
+                      (item) {
+                        final hasImage = item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: context.heightPercent(1)),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: hasImage
+                                    ? () => showImageZoomDialog(context, item.product.imageUrl!)
+                                    : null,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: SizedBox(
+                                    width: context.getResponsiveSize(12),
+                                    height: context.getResponsiveSize(12),
+                                    child: hasImage
+                                        ? CachedNetworkImage(
+                                            imageUrl: item.product.imageUrl!,
+                                            fit: BoxFit.cover,
+                                            placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                            errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                                          )
+                                        : const RatneshFallback.xs(),
+                                  ),
                                 ),
                               ),
-                            ),
                             SizedBox(width: context.getResponsiveSize(3)),
                             Expanded(
                               child: Column(
@@ -253,8 +255,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                             ),
                           ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                  ),
                   ],
                 ),
                 SizedBox(height: context.heightPercent(2)),
