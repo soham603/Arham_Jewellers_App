@@ -36,7 +36,6 @@ class SearchProductController extends GetxController {
   final _initialState = CurrentAppState.INITIAL.obs;
   CurrentAppState get initialState => _initialState.value;
 
-  int _initialPage = 1;
   bool _initialHasMore = true;
   bool get initialHasMore => _initialHasMore;
 
@@ -46,7 +45,6 @@ class SearchProductController extends GetxController {
   final _searchState = CurrentAppState.INITIAL.obs;
   CurrentAppState get searchState => _searchState.value;
 
-  int _searchPage = 1;
   bool _searchHasMore = true;
   bool get searchHasMore => _searchHasMore;
 
@@ -62,12 +60,8 @@ class SearchProductController extends GetxController {
   final _filteredInitialState = CurrentAppState.INITIAL.obs;
   CurrentAppState get filteredInitialState => _filteredInitialState.value;
 
-  int _filteredInitialPage = 1;
   bool _filteredInitialHasMore = true;
   bool get filteredInitialHasMore => _filteredInitialHasMore;
-
-  Timer? _debounce;
-  bool _hasLoadedInitial = false;
 
   final _karatProducts = <ProductModel>[].obs;
   List<ProductModel> get karatProducts => _karatProducts;
@@ -224,7 +218,6 @@ class SearchProductController extends GetxController {
 
   @override
   void onClose() {
-    _debounce?.cancel();
     filterState.dispose();
     recentSearchesController.dispose();
     super.onClose();
@@ -296,347 +289,28 @@ class SearchProductController extends GetxController {
     return list;
   }
 
-  void ensureProductsLoaded() {
-    if (!_hasLoadedInitial && _initialProducts.isEmpty) {
-      _hasLoadedInitial = true;
-      loadInitialProducts();
-    }
-  }
+  void ensureProductsLoaded() {}
 
-  Future<void> loadInitialProducts({bool isPagination = false}) async {
-    if (!_initialHasMore && isPagination) return;
-    if (_initialState.value == CurrentAppState.LOADING) return;
+  Future<void> loadInitialProducts({bool isPagination = false}) async {}
 
-    if (!isPagination) {
-      _initialState.value = CurrentAppState.LOADING;
-      _initialPage = 1;
-      _initialHasMore = true;
-    }
-
-    try {
-      final response = await httpClient.get(
-        ApiUrlConstants.PRODUCTS_GET_ALL,
-        queryParameters: {
-          "page": _initialPage,
-          "limit": _pageLimit,
-          "showReverse": true,
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        final fetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-        final sorted = sortProducts(fetched, _sortBy.value);
-
-        if (isPagination) {
-          _initialProducts.addAll(_dedupe(sorted, _initialProducts));
-        } else {
-          _initialProducts.value = sorted;
-        }
-
-        if (fetched.length < _pageLimit) {
-          _initialHasMore = false;
-        } else {
-          _initialPage++;
-        }
-
-        _initialState.value = CurrentAppState.SUCCESS;
-      } else {
-        _initialState.value = CurrentAppState.ERROR;
-      }
-    } catch (e, st) {
-      _initialState.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadInitialProducts error: $e\n$st",
-      );
-    }
-  }
-
-  Future<void> loadFilteredProducts({bool isPagination = false}) async {
-    if (!_filteredInitialHasMore && isPagination) return;
-    if (_filteredInitialState.value == CurrentAppState.LOADING) return;
-
-    if (!isPagination) {
-      _filteredInitialState.value = CurrentAppState.LOADING;
-      _filteredInitialPage = 1;
-      _filteredInitialHasMore = true;
-      _filteredInitialProducts.clear();
-    }
-
-    try {
-      List<ProductModel> allFetched = [];
-
-      List<List<ProductModel>>? perItemResults;
-
-      if (filterState.selectedCategoryIds.isNotEmpty) {
-        final categoryFutures =
-            filterState.selectedCategoryIds.map((categoryId) async {
-          try {
-            final response = await httpClient.get(
-              ApiUrlConstants.PRODUCTS_GET_ALL,
-              queryParameters: {
-                "categoryId": categoryId,
-                "page": _filteredInitialPage,
-                "limit": _pageLimit,
-                "showReverse": true,
-                if (filterState.stockFilter.value != 'ready') "showAll": true,
-              },
-            );
-
-            if (response.statusCode == 200 || response.statusCode == 201) {
-              final data = response.data['data'];
-              final List raw = data['data'] is List ? data['data'] : [];
-              return raw.map((e) => ProductModel.fromJson(e)).toList();
-            }
-          } catch (e) {
-            Logger.error(
-              "SearchProductController",
-              "Failed to fetch category $categoryId: $e",
-            );
-          }
-          return <ProductModel>[];
-        });
-        perItemResults = await Future.wait(categoryFutures);
-        allFetched = perItemResults.expand((list) => list).toList();
-      } else if (filterState.selectedKarats.isNotEmpty) {
-        final karatFutures = filterState.selectedKarats.map((karat) async {
-          try {
-            final response = await httpClient.get(
-              ApiUrlConstants.PRODUCTS_SEARCH,
-              queryParameters: {
-                "search": _karatToSearchValue(karat),
-                "page": _filteredInitialPage,
-                "limit": _pageLimit,
-                if (filterState.stockFilter.value != 'ready') "showAll": true,
-              },
-            );
-
-            if (response.statusCode == 200 || response.statusCode == 201) {
-              final data = response.data['data'];
-              final List raw = data['data'] is List ? data['data'] : [];
-              return raw.map((e) => ProductModel.fromJson(e)).toList();
-            }
-          } catch (e) {
-            Logger.error(
-              "SearchProductController",
-              "Failed to fetch karat $karat: $e",
-            );
-          }
-          return <ProductModel>[];
-        });
-        perItemResults = await Future.wait(karatFutures);
-        allFetched = perItemResults.expand((list) => list).toList();
-      } else {
-        final response = await httpClient.get(
-          ApiUrlConstants.PRODUCTS_GET_ALL,
-          queryParameters: {
-            "page": _filteredInitialPage,
-            "limit": _pageLimit,
-            "showReverse": true,
-            if (filterState.stockFilter.value != 'ready') "showAll": true,
-          },
-        );
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final data = response.data['data'];
-          final List raw = data['data'] is List ? data['data'] : [];
-          allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-        }
-      }
-
-      final seen = <String>{};
-      allFetched = allFetched.where((p) => seen.add(p.id)).toList();
-
-      if (filterState.selectedKarats.isNotEmpty) {
-        final filterKaratNums = filterState.selectedKarats
-            .map((k) {
-              final m = RegExp(r'(\d+)').firstMatch(k);
-              return m != null ? int.tryParse(m.group(1)!) : null;
-            })
-            .whereType<int>()
-            .toSet();
-        if (filterKaratNums.isNotEmpty) {
-          allFetched = allFetched.where((p) {
-            final pk = p.karatNumber;
-            return pk != null && filterKaratNums.contains(pk);
-          }).toList();
-        }
-      }
-
-      if (filterState.weightMin.value > 0 ||
-          filterState.weightMax.value < 500) {
-        allFetched = allFetched.where((p) {
-          final gw = p.grossWeight;
-          if (gw == null) return true;
-          return gw >= filterState.weightMin.value &&
-              gw <= filterState.weightMax.value;
-        }).toList();
-      }
-
-      if (filterState.selectedSizes.isNotEmpty) {
-        allFetched = allFetched.where((p) {
-          final s = p.size;
-          if (s == null) return false;
-          return filterState.selectedSizes.contains(s);
-        }).toList();
-      }
-
-      if (isPagination) {
-        _filteredInitialProducts.addAll(_dedupe(allFetched, _filteredInitialProducts));
-      } else {
-        _filteredInitialProducts.value = allFetched;
-      }
-
-      _filteredInitialProducts.value = sortProducts(_filteredInitialProducts, _sortBy.value);
-
-      if (perItemResults != null) {
-        final anyItemHasMore = perItemResults.any((list) => list.length >= _pageLimit);
-        if (anyItemHasMore) {
-          _filteredInitialPage++;
-        } else {
-          _filteredInitialHasMore = false;
-        }
-      } else {
-        if (allFetched.length < _pageLimit) {
-          _filteredInitialHasMore = false;
-        } else {
-          _filteredInitialPage++;
-        }
-      }
-
-      _filteredInitialState.value = CurrentAppState.SUCCESS;
-    } catch (e, st) {
-      _filteredInitialState.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadFilteredProducts error: $e\n$st",
-      );
-    }
-  }
+  Future<void> loadFilteredProducts({bool isPagination = false}) async {}
 
   void onSearchChanged(String query) {
     _searchQuery.value = query;
 
     if (query.trim().isEmpty) {
       clearSearch();
-      if (hasActiveFilters) loadFilteredProducts();
       return;
     }
-
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      _runSearch(query.trim(), isPagination: false);
-    });
   }
 
   void onSearchSubmitted(String query) {
     if (query.trim().isEmpty) return;
-    _debounce?.cancel();
     _searchQuery.value = query.trim();
     recentSearchesController.addToRecentSearches(query.trim());
-    _runSearch(query.trim(), isPagination: false);
   }
 
-  Future<void> loadMoreSearchResults() async {
-    if (!_searchHasMore || _searchState.value == CurrentAppState.LOADING) {
-      return;
-    }
-    await _runSearch(_searchQuery.value.trim(), isPagination: true);
-  }
-
-  Future<void> _runSearch(String query, {required bool isPagination}) async {
-    if (_searchState.value == CurrentAppState.LOADING && !isPagination) return;
-
-    if (!isPagination) {
-      _searchState.value = CurrentAppState.LOADING;
-      _searchPage = 1;
-      _searchHasMore = true;
-      _searchResults.clear();
-    }
-
-    try {
-      final response = await httpClient.get(
-        ApiUrlConstants.PRODUCTS_SEARCH,
-        queryParameters: {
-          "search": query,
-          "page": _searchPage,
-          "limit": _pageLimit,
-          if (filterState.stockFilter.value != 'ready') "showAll": true,
-        },
-      );
-
-      List<ProductModel> allFetched = [];
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data['data'];
-        final List raw = data['data'] is List ? data['data'] : [];
-        allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-      }
-
-      if (filterState.selectedKarats.isNotEmpty) {
-        final filterKaratNums = filterState.selectedKarats
-            .map((k) {
-              final m = RegExp(r'(\d+)').firstMatch(k);
-              return m != null ? int.tryParse(m.group(1)!) : null;
-            })
-            .whereType<int>()
-            .toSet();
-        if (filterKaratNums.isNotEmpty) {
-          allFetched = allFetched.where((p) {
-            final pk = p.karatNumber;
-            return pk != null && filterKaratNums.contains(pk);
-          }).toList();
-        }
-      }
-
-      if (filterState.selectedCategoryIds.isNotEmpty) {
-        allFetched = allFetched.where((p) {
-          final catId = p.category?.id;
-          if (catId == null) return false;
-          return filterState.selectedCategoryIds.contains(catId);
-        }).toList();
-      }
-
-      if (filterState.weightMin.value > 0 ||
-          filterState.weightMax.value < 500) {
-        allFetched = allFetched.where((p) {
-          final gw = p.grossWeight;
-          if (gw == null) return true;
-          return gw >= filterState.weightMin.value &&
-              gw <= filterState.weightMax.value;
-        }).toList();
-      }
-
-      if (filterState.selectedSizes.isNotEmpty) {
-        allFetched = allFetched.where((p) {
-          final s = p.size;
-          if (s == null) return false;
-          return filterState.selectedSizes.contains(s);
-        }).toList();
-      }
-
-      if (isPagination) {
-        _searchResults.addAll(_dedupe(allFetched, _searchResults));
-      } else {
-        _searchResults.value = allFetched;
-      }
-
-      _searchResults.value = sortProducts(_searchResults, _sortBy.value);
-
-      if (allFetched.length < _pageLimit) {
-        _searchHasMore = false;
-      } else {
-        _searchPage++;
-      }
-
-      _searchState.value = CurrentAppState.SUCCESS;
-    } catch (e, st) {
-      _searchState.value = CurrentAppState.ERROR;
-      Logger.error("SearchProductController", "_runSearch error: $e\n$st");
-    }
-  }
+  Future<void> loadMoreSearchResults() async {}
 
   String _karatToSearchValue(String karat) {
     final value = KaratConstants.touchValueFor(karat);
@@ -1078,7 +752,6 @@ class SearchProductController extends GetxController {
     filterState.resetFilters();
     _filteredInitialProducts.clear();
     _filteredInitialState.value = CurrentAppState.INITIAL;
-    _filteredInitialPage = 1;
     _filteredInitialHasMore = true;
   }
 
@@ -1103,28 +776,16 @@ class SearchProductController extends GetxController {
       wMax: wMax,
       sizes: sizes,
     );
-    if (isSearching) {
-      _runSearch(_searchQuery.value.trim(), isPagination: false);
-    } else {
-      loadFilteredProducts();
-    }
   }
 
   void setStockFilter(String value) {
     filterState.setStockFilter(value);
-    if (isSearching) {
-      _runSearch(_searchQuery.value.trim(), isPagination: false);
-    } else if (hasActiveFilters) {
-      loadFilteredProducts();
-    }
   }
 
   void clearSearch() {
-    _debounce?.cancel();
     _searchQuery.value = '';
     _searchResults.clear();
     _searchState.value = CurrentAppState.INITIAL;
-    _searchPage = 1;
     _searchHasMore = true;
   }
 

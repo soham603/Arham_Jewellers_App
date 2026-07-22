@@ -42,7 +42,6 @@ class _SearchPageState extends State<SearchPage> {
       ? Get.find<CategoryController>()
       : Get.put(CategoryController());
   final TextEditingController _textController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   late final Worker _tabWorker;
 
@@ -52,9 +51,6 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
-    // CategoryController fetches tree eagerly in onInit()
-    // Just load local category variants from cached data
     _loadCategories();
     if (widget.initialCategoryId != null &&
         widget.initialCategoryId!.isNotEmpty &&
@@ -84,7 +80,6 @@ class _SearchPageState extends State<SearchPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _focusNode.requestFocus();
-          controller.ensureProductsLoaded();
         }
       });
     }
@@ -97,17 +92,6 @@ class _SearchPageState extends State<SearchPage> {
         });
       }
     });
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      if (controller.isSearching) {
-        controller.loadMoreSearchResults();
-      } else if (controller.hasActiveFilters) {
-        controller.loadFilteredProducts(isPagination: true);
-      }
-    }
   }
 
   void _loadCategories() {
@@ -159,7 +143,6 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _tabWorker.dispose();
     _textController.dispose();
-    _scrollController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -186,7 +169,6 @@ class _SearchPageState extends State<SearchPage> {
                   _textController.clear();
                   controller.clearSearch();
                   controller.clearAllFilters();
-                  controller.loadInitialProducts();
                   setState(() {});
                 } else {
                   Get.find<NavigationController>().switchTab(NavigationController.homeIndex);
@@ -302,7 +284,6 @@ class _SearchPageState extends State<SearchPage> {
                 controller.sortByObs.value;
 
                 return CustomScrollView(
-                  controller: _scrollController,
                   slivers: [
                     // ── Latest Level-3 Categories 
                     if (!isSearching &&
