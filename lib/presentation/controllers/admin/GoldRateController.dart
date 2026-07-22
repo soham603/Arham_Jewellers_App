@@ -280,7 +280,7 @@ class GoldRateController extends GetxController {
       };
 
       if (date != null) {
-        rateData['date'] = DateFormat('yyyy-MM-dd').format(date);
+        rateData['date'] = date.toIso8601String();
       }
 
       final response = await _goldRateRepo.updateRate(
@@ -288,14 +288,11 @@ class GoldRateController extends GetxController {
       );
 
       if (response['code'] != 'ERROR') {
-        final data = response['data'];
-        if (data != null) {
-          _currentRate.value = GoldRateModel.fromJson(data);
-        }
         _actionState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(
           'Gold rate updated to ₹${rate.toStringAsFixed(0)}/10g',
         );
+        await fetchCurrentRate();
         fetchHistory();
 
         if (Get.isRegistered<NotificationController>()) {

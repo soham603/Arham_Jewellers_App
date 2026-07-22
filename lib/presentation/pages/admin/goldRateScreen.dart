@@ -18,6 +18,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
   final GoldRateController controller = Get.find<GoldRateController>();
   final TextEditingController _rateController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  TimeOfDay _selectedTime = TimeOfDay.now();
 
   @override
   void dispose() {
@@ -302,6 +303,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
   void _showSetRateSheet(BuildContext context) {
     _rateController.clear();
     _selectedDate = DateTime.now();
+    _selectedTime = TimeOfDay.now();
     final currentRate = controller.currentRate?.rate;
     if (currentRate != null) {
       _rateController.text = currentRate.toStringAsFixed(0);
@@ -498,6 +500,103 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                     ),
                   ),
                 ),
+                SizedBox(height: context.heightPercent(1.5)),
+                GestureDetector(
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: _selectedTime,
+                      builder: (ctx, child) => Theme(
+                        data: Theme.of(ctx).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: AppColors.primaryGold,
+                            onPrimary: Colors.white,
+                            surface: Colors.white,
+                            onSurface: AppColors.textDark,
+                          ),
+                          timePickerTheme: TimePickerThemeData(
+                            hourMinuteTextStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(40),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            dayPeriodTextStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(14),
+                              fontWeight: FontWeight.w600,
+                            ),
+                            dialTextStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(12),
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (picked != null) {
+                      setSheetState(() {
+                        _selectedTime = picked;
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(4),
+                      vertical: context.heightPercent(1.5),
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.boxColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: context.getResponsiveSize(8),
+                          height: context.getResponsiveSize(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGold.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.access_time_rounded,
+                            size: context.getResponsiveSize(4),
+                            color: AppColors.primaryGold,
+                          ),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(3)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Rate Time',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.8),
+                                  color: context.colorPalette.subTitleColor,
+                                ),
+                              ),
+                              SizedBox(height: context.heightPercent(0.3)),
+                              Text(
+                                _selectedTime.format(context),
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.8),
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: context.getResponsiveSize(5),
+                          color: context.colorPalette.subTitleColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 SizedBox(height: context.heightPercent(2.5)),
                 Obx(() {
                   final isLoading = controller.actionState == CurrentAppState.LOADING;
@@ -513,7 +612,14 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                               return;
                             }
                             Get.back();
-                            controller.setRate(rate: rate, date: _selectedDate);
+                            final combinedDateTime = DateTime(
+                              _selectedDate.year,
+                              _selectedDate.month,
+                              _selectedDate.day,
+                              _selectedTime.hour,
+                              _selectedTime.minute,
+                            );
+                            controller.setRate(rate: rate, date: combinedDateTime);
                           },
                     child: Container(
                       width: double.infinity,
