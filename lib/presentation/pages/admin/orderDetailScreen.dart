@@ -12,6 +12,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
+import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key, required this.order});
@@ -66,8 +67,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildOrderHeader(context, order),
-                  SizedBox(height: context.heightPercent(2)),
                   _buildOrderItems(context, order),
                   SizedBox(height: context.heightPercent(2)),
                   _buildTotalAmount(context, order),
@@ -247,34 +246,39 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               child: Container(
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
-                  color: item.isRejected
+                  color: item.isRejected == true
                       ? Colors.red.withValues(alpha: 0.05)
                       : const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: item.isRejected
+                    color: item.isRejected == true
                         ? Colors.red.withValues(alpha: 0.2)
                         : Colors.grey.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: context.getResponsiveSize(14),
-                        height: context.getResponsiveSize(14),
-                        child: imageUrl != null && imageUrl.isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (_, _) => const Center(
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                errorWidget: (_, _, _) =>
-                                    const RatneshFallback.xs(),
-                              )
-                            : const RatneshFallback.xs(),
+                    GestureDetector(
+                      onTap: imageUrl != null && imageUrl.isNotEmpty
+                          ? () => showImageZoomDialog(context, imageUrl)
+                          : null,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          width: context.getResponsiveSize(14),
+                          height: context.getResponsiveSize(14),
+                          child: imageUrl != null && imageUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, _) => const Center(
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  errorWidget: (_, _, _) =>
+                                      const RatneshFallback.xs(),
+                                )
+                              : const RatneshFallback.xs(),
+                        ),
                       ),
                     ),
                     SizedBox(width: context.getResponsiveSize(3)),
@@ -294,7 +298,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   ),
                                 ),
                               ),
-                              if (item.isRejected)
+                              if (item.isRejected == true)
                                 Container(
                                   padding: EdgeInsets.symmetric(
                                     horizontal: context.getResponsiveSize(1.5),

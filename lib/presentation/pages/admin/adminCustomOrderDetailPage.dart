@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
+import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -184,35 +185,76 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     if (order.lengthBroadness != null && order.lengthBroadness!.isNotEmpty) _buildInfoDivider(),
                     if (order.productDescription != null && order.productDescription!.isNotEmpty)
                       _buildInfoRow(context, 'Description', order.productDescription!),
-                    // Fallback: show catalog items if no custom item info
-                    if (order.itemName == null || order.itemName!.isEmpty) ...[
-                      ...order.orderItems.map(
-                        (item) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  item.product.name,
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(3.8),
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.textDark,
+                  ],
+                ),
+                SizedBox(height: context.heightPercent(2)),
+              ],
+
+              // ── Catalog Items ──
+              if (order.orderItems.isNotEmpty) ...[
+                _buildSectionTitle(context, 'Catalog Items'),
+                SizedBox(height: context.heightPercent(1)),
+                _buildInfoCard(
+                  context,
+                  children: [
+                    ...order.orderItems.map(
+                      (item) => Padding(
+                        padding: EdgeInsets.only(bottom: context.heightPercent(1)),
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty
+                                  ? () => showImageZoomDialog(context, item.product.imageUrl!)
+                                  : null,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: SizedBox(
+                                  width: context.getResponsiveSize(12),
+                                  height: context.getResponsiveSize(12),
+                                  child: item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty
+                                      ? CachedNetworkImage(
+                                          imageUrl: item.product.imageUrl!,
+                                          fit: BoxFit.cover,
+                                          placeholder: (_, _) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                          errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                                        )
+                                      : const RatneshFallback.xs(),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(3)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.product.name,
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(3.6),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textDark,
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(height: context.heightPercent(0.3)),
+                                  Wrap(
+                                    spacing: context.getResponsiveSize(2),
+                                    runSpacing: context.heightPercent(0.3),
+                                    children: [
+                                      if (item.product.tagNo != null && item.product.tagNo!.isNotEmpty)
+                                        _buildItemChip(context, label: item.product.tagNo!),
+                                      if (item.quantity > 0)
+                                        _buildItemChip(context, label: 'x${item.quantity}'),
+                                      if (item.price > 0)
+                                        _buildItemChip(context, label: '₹${item.price.toStringAsFixed(2)}'),
+                                    ],
+                                  ),
+                                ],
                               ),
-                              Text(
-                                'x${item.quantity}',
-                                style: TextStyle(
-                                  fontSize: context.getResponsiveSize(3.5),
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ],
                 ),
                 SizedBox(height: context.heightPercent(2)),
@@ -230,7 +272,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     separatorBuilder: (_, _) => SizedBox(width: context.getResponsiveSize(3)),
                     itemBuilder: (context, index) {
                       return GestureDetector(
-                        onTap: () => _showImageZoom(context, order.referenceImages[index]),
+                        onTap: () => showImageZoomDialog(context, order.referenceImages[index]),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(14),
                           child: Container(
@@ -284,13 +326,13 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
               // ── Assigned Craftsman ──
               if (isAssigned || order.status.toUpperCase() == 'COMPLETED') ...[
-                if (order.assignedKarigarName != null && order.assignedKarigarName!.isNotEmpty) ...[
+                if (order.assignedKarigarId != null && order.assignedKarigarId!.isNotEmpty) ...[
                   _buildSectionTitle(context, 'Assigned Craftsman'),
                   SizedBox(height: context.heightPercent(1)),
                   _buildInfoCard(
                     context,
                     children: [
-                      _buildInfoRow(context, 'Name', order.assignedKarigarName!),
+                      _buildInfoRow(context, 'Name', _craftsmanController.getById(order.assignedKarigarId!)?.name ?? order.assignedKarigarId!),
                       if (order.talkedToStaffName != null && order.talkedToStaffName!.isNotEmpty) ...[
                         _buildInfoDivider(),
                         _buildInfoRow(context, 'Contact Person', order.talkedToStaffName!),
@@ -677,49 +719,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Image Zoom ──
-  void _showImageZoom(BuildContext context, String imageUrl) {
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: EdgeInsets.zero,
-        child: GestureDetector(
-          onTap: () => Get.back(),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (_, _) => const Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
-                  errorWidget: (_, _, _) => const Icon(Icons.error_outline, color: Colors.white, size: 40),
-                ),
-              ),
-              Positioned(
-                top: 16,
-                right: 16,
-                child: GestureDetector(
-                  onTap: () => Get.back(),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.close, color: Colors.white, size: 20),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   // ── WhatsApp Button ──
   Widget _buildWhatsAppButton(BuildContext context, AdminOrderModel order) {
     final phone = order.contactNumber ?? order.user.phoneNumber;
@@ -802,6 +801,27 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   }
 
   Widget _buildInfoDivider() => Divider(height: 1, color: AppColors.divider);
+
+  Widget _buildItemChip(BuildContext context, {required String label}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.getResponsiveSize(2),
+        vertical: context.heightPercent(0.2),
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.pageBg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: context.getResponsiveSize(2.8),
+          fontWeight: FontWeight.w600,
+          color: AppColors.textMuted,
+        ),
+      ),
+    );
+  }
 
   String _formatDate(DateTime date) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

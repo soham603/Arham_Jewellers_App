@@ -99,34 +99,48 @@ class AdminOrderController extends GetxController {
         _isPaginationLoading.value = true;
       }
 
-      final result = await _orderRepo.fetchAdminOrders(
-        queryParams: {
-          "page": _page,
-          "limit": _pageLimit,
-          "status": selectedStatus.value,
-          if (searchController.text.trim().isNotEmpty)
-            "userPhoneNumber": "+91${searchController.text.trim()}",
-        },
-      );
+      final baseParams = <String, dynamic>{
+        "page": _page,
+        "limit": _pageLimit,
+        "status": selectedStatus.value,
+        if (searchController.text.trim().isNotEmpty)
+          "userPhoneNumber": "+91${searchController.text.trim()}",
+      };
 
-      final List<AdminOrderModel> filtered;
-      if (selectedOrderType.value == "custom") {
-        filtered = result.items.where((o) => o.isCustom).toList();
-      } else if (selectedOrderType.value == "normal") {
-        filtered = result.items.where((o) => !o.isCustom).toList();
+      List<AdminOrderModel> allItems;
+      int totalItems;
+      int totalPages;
+
+      if (selectedOrderType.value == "all") {
+        final normalParams = {...baseParams, "orderType": "normal"};
+        final customParams = {...baseParams, "orderType": "custom"};
+
+        final normalResult = await _orderRepo.fetchAdminOrders(queryParams: normalParams);
+        final customResult = await _orderRepo.fetchAdminOrders(queryParams: customParams);
+
+        allItems = [...normalResult.items, ...customResult.items];
+        totalItems = normalResult.total + customResult.total;
+        totalPages = totalItems > 0 ? (totalItems / _pageLimit).ceil() : 1;
       } else {
-        filtered = result.items;
+        final params = {
+          ...baseParams,
+          "orderType": selectedOrderType.value,
+        };
+        final result = await _orderRepo.fetchAdminOrders(queryParams: params);
+        allItems = result.items;
+        totalItems = result.total;
+        totalPages = result.totalPages;
       }
 
-      filtered.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      allItems.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
       if (isPagination) {
-        _orders.addAll(filtered);
+        _orders.addAll(allItems);
       } else {
-        _orders.value = filtered;
+        _orders.value = allItems;
       }
 
-      _hasMore = result.currentPage < result.totalPages;
+      _hasMore = _page < totalPages;
 
       if (_hasMore) {
         _page++;

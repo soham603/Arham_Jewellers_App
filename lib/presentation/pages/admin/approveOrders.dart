@@ -141,6 +141,8 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                             DropdownMenuItem(value: 'ASSIGNED', child: Text('Assigned')),
                             DropdownMenuItem(value: 'COMPLETED', child: Text('Completed')),
                             DropdownMenuItem(value: 'REJECTED', child: Text('Rejected')),
+                            DropdownMenuItem(value: 'CANCELLED_BY_USER', child: Text('Cancelled')),
+                            DropdownMenuItem(value: 'EXECUTED', child: Text('Executed')),
                           ],
                           onChanged: (val) {
                             if (val != null) controller.changeStatus(val);

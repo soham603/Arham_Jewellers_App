@@ -27,7 +27,6 @@ class AdminOrderModel {
   final String? marking;
   final List<String> referenceImages;
   final String? assignedKarigarId;
-  final String? assignedKarigarName;
   final String? talkedToStaffName;
   final String? assignAdminNotes;
   final String? completeAdminNotes;
@@ -60,7 +59,6 @@ class AdminOrderModel {
     this.marking,
     this.referenceImages = const [],
     this.assignedKarigarId,
-    this.assignedKarigarName,
     this.talkedToStaffName,
     this.assignAdminNotes,
     this.completeAdminNotes,
@@ -131,8 +129,7 @@ class AdminOrderModel {
           ? List<String>.from(
               (json["referenceImages"] as List).map((e) => e.toString()))
           : [],
-      assignedKarigarId: json["assignedKarigarId"]?.toString(),
-      assignedKarigarName: json["assignedKarigarName"]?.toString(),
+      assignedKarigarId: json["assignedKarigar"]?.toString(),
       talkedToStaffName: json["talkedToStaffName"]?.toString(),
       assignAdminNotes: json["assignAdminNotes"]?.toString(),
       completeAdminNotes: json["completeAdminNotes"]?.toString(),
@@ -192,8 +189,8 @@ class AdminOrderItemModel {
   final int quantity;
   final double price;
 
-  final String stockNote;
-  final bool isRejected;
+  final String? stockNote;
+  final bool? isRejected;
 
   final AdminOrderProductModel product;
 
@@ -203,8 +200,8 @@ class AdminOrderItemModel {
     required this.productId,
     required this.quantity,
     required this.price,
-    required this.stockNote,
-    required this.isRejected,
+    this.stockNote,
+    this.isRejected,
     required this.product,
   });
 
@@ -244,12 +241,16 @@ class AdminOrderProductModel {
   final String id;
   final String name;
   final String? imageUrl;
+  final String? tagNo;
+  final String? karat;
   final Map<String, dynamic>? rawData;
 
   AdminOrderProductModel({
     required this.id,
     required this.name,
     this.imageUrl,
+    this.tagNo,
+    this.karat,
     this.rawData,
   });
 
@@ -260,6 +261,8 @@ class AdminOrderProductModel {
       id: json["id"] ?? "",
       name: json["name"] ?? "",
       imageUrl: json["imageUrl"],
+      tagNo: json["tagNo"]?.toString(),
+      karat: json["karat"]?.toString(),
       rawData: json["rawData"] != null
           ? Map<String, dynamic>.from(json["rawData"])
           : null,
