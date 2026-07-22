@@ -95,34 +95,25 @@ class AdminUserController extends GetxController {
         queryParams['userId'] = _selectedUserId.value;
       }
 
-      final response = await _adminAccessRepo.fetchAccessRequests(
+      final result = await _adminAccessRepo.fetchAccessRequests(
         queryParams: queryParams,
       );
 
-      if (response['data'] != null) {
-        final data = response['data'];
-        final List raw = data['results'] ?? [];
-        final fetched = raw.map((e) => AccessRequestModel.fromJson(e)).toList();
+      if (isPagination) {
+        _requests.addAll(result.items);
+      } else {
+        _requests.value = result.items;
+      }
 
-        if (isPagination) {
-          _requests.addAll(fetched);
-        } else {
-          _requests.value = fetched;
-        }
+      _total.value = result.total;
 
-        _total.value = data['total'] ?? fetched.length;
-
-        if (fetched.length < _pageLimit) {
+      if (result.items.length < _pageLimit) {
           _hasMore = false;
         } else {
           _page++;
         }
 
         _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to fetch';
-      }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();
@@ -188,20 +179,12 @@ class AdminUserController extends GetxController {
     _searchState.value = CurrentAppState.LOADING;
 
     try {
-      final response = await _adminAccessRepo.fetchUsers(
+      final result = await _adminAccessRepo.fetchUsers(
         queryParams: {'name': query.trim()},
       );
 
-      if (response['data'] != null) {
-        final data = response['data']['data'];
-        final List usersRaw = data['users'] ?? [];
-        final users = usersRaw.map((e) => UserSearchModel.fromJson(e)).toList();
-        _searchResults.value = users;
-        _searchState.value = CurrentAppState.SUCCESS;
-      } else {
-        _searchState.value = CurrentAppState.ERROR;
-        _searchResults.clear();
-      }
+      _searchResults.value = result.items;
+      _searchState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _searchState.value = CurrentAppState.ERROR;
       _searchResults.clear();

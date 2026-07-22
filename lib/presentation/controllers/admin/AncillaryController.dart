@@ -47,18 +47,11 @@ class AncillaryController extends GetxController {
     try {
       _state.value = CurrentAppState.LOADING;
 
-      final response = await _ancillaryRepo.fetchPage(pageKey: pageKey);
-
-      if (response['success'] != false) {
-        final data = response['data'];
-        if (data != null) {
-          _pages[pageKey] = AncillaryPageModel.fromJson(data);
-        }
-        _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to load page';
+      final page = await _ancillaryRepo.fetchPage(pageKey: pageKey);
+      if (page != null) {
+        _pages[pageKey] = page;
       }
+      _state.value = CurrentAppState.SUCCESS;
     } on DioException catch (e, st) {
       Logger.error('AncillaryController', 'fetchPage Dio: $e\n$st');
       _state.value = CurrentAppState.ERROR;

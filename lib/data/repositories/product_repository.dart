@@ -1,18 +1,28 @@
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
+import 'package:ratnesh_gold_app/domain/entities/paginated_result.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/domain/repositories/i_product_repository.dart';
 
-class ProductRepository extends BaseRepository {
-  Future<Map<String, dynamic>> fetchProducts({
+class ProductRepository extends BaseRepository implements IProductRepository {
+  @override
+  Future<PaginatedResult<ProductModel>> fetchProducts({
     Map<String, dynamic>? queryParams,
   }) async {
     final response = await dio.get(
       ApiUrlConstants.PRODUCTS_GET_ALL,
       queryParameters: queryParams,
     );
-    return response.data;
+    checkApiError(response.data);
+    requireData(response.data);
+    return parsePaginatedList(
+      response.data,
+      fromJson: (e) => ProductModel.fromJson(e),
+    );
   }
 
-  Future<Map<String, dynamic>> searchProducts({
+  @override
+  Future<PaginatedResult<ProductModel>> searchProducts({
     required String query,
     Map<String, dynamic>? queryParams,
   }) async {
@@ -24,9 +34,15 @@ class ProductRepository extends BaseRepository {
       ApiUrlConstants.PRODUCTS_SEARCH,
       queryParameters: params,
     );
-    return response.data;
+    checkApiError(response.data);
+    requireData(response.data);
+    return parsePaginatedList(
+      response.data,
+      fromJson: (e) => ProductModel.fromJson(e),
+    );
   }
 
+  @override
   Future<Map<String, dynamic>> updateProduct({
     required String id,
     required dynamic data,

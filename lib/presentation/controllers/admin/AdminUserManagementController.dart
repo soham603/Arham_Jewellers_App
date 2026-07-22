@@ -90,34 +90,25 @@ class AdminUserManagementController extends GetxController {
         }
       }
 
-      final response = await _adminAccessRepo.fetchUsers(
+      final result = await _adminAccessRepo.fetchUsers(
         queryParams: queryParams,
       );
 
-      if (response['data'] != null) {
-        final data = response['data']['data'];
-        final List raw = data['users'] ?? [];
-        final fetched = raw.map((e) => UserSearchModel.fromJson(e)).toList();
+      if (isPagination) {
+        _users.addAll(result.items);
+      } else {
+        _users.value = result.items;
+      }
 
-        if (isPagination) {
-          _users.addAll(fetched);
-        } else {
-          _users.value = fetched;
-        }
+      _total.value = result.total;
 
-        _total.value = data['total'] ?? fetched.length;
-
-        if (fetched.length < _pageLimit) {
+      if (result.items.length < _pageLimit) {
           _hasMore = false;
         } else {
           _page++;
         }
 
         _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to fetch users';
-      }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();

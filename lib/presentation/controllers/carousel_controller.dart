@@ -96,11 +96,7 @@ class CarouselsController extends GetxController {
     try {
       _getCarouselState.value = CurrentAppState.LOADING;
 
-      final data = await _carouselRepo.fetchCarousels();
-
-      _list.value = (data)
-          .map((e) => CarouselModel.fromJson(e))
-          .toList();
+      _list.value = await _carouselRepo.fetchCarousels();
 
       _getCarouselState.value = CurrentAppState.SUCCESS;
     } catch (e) {
@@ -118,13 +114,9 @@ class CarouselsController extends GetxController {
     try {
       _adminState.value = CurrentAppState.LOADING;
 
-      final data = await _carouselRepo.fetchCarousels(
+      _adminList.value = await _carouselRepo.fetchCarousels(
         queryParams: {"showAll": true},
       );
-
-      _adminList.value = (data)
-          .map((e) => CarouselModel.fromJson(e))
-          .toList();
 
       _adminState.value = CurrentAppState.SUCCESS;
     } catch (e) {
@@ -142,13 +134,9 @@ class CarouselsController extends GetxController {
     try {
       _deletedState.value = CurrentAppState.LOADING;
 
-      final data = await _carouselRepo.fetchCarousels(
+      _deletedList.value = await _carouselRepo.fetchCarousels(
         queryParams: {"showDeleted": true},
       );
-
-      _deletedList.value = (data)
-          .map((e) => CarouselModel.fromJson(e))
-          .toList();
 
       _deletedState.value = CurrentAppState.SUCCESS;
     } catch (e) {
@@ -453,7 +441,7 @@ class CarouselsController extends GetxController {
         _productHasMore.value = true;
       }
 
-      final responseData = await _carouselRepo.fetchLatestProducts(
+      final result = await _carouselRepo.fetchLatestProducts(
         queryParams: {
           "page": _productPage,
           "limit": _productLimit,
@@ -461,30 +449,14 @@ class CarouselsController extends GetxController {
         },
       );
 
-      final data = responseData['data'];
-
-      final List raw =
-          data['data'] is List
-              ? data['data']
-              : [];
-
-      final fetched = raw
-          .map((e) => ProductModel.fromJson(e))
-          .toList();
-
       if (isPagination) {
-        _latestProducts.addAll(fetched);
+        _latestProducts.addAll(result.items);
       } else {
-        _latestProducts.value = fetched;
+        _latestProducts.value = result.items;
       }
 
-      final dynamic rawTotalPages = data['totalPages'] ?? 1;
-      final int totalPages = rawTotalPages is int
-          ? rawTotalPages
-          : int.tryParse(rawTotalPages.toString()) ?? 1;
-
-      if (_productPage >= totalPages ||
-          fetched.length < _productLimit) {
+      if (_productPage >= result.totalPages ||
+          result.items.length < _productLimit) {
         _productHasMore.value = false;
       } else {
         _productPage++;

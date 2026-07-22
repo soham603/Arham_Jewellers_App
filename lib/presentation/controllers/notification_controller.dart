@@ -123,18 +123,13 @@ class NotificationController extends GetxController {
         'limit': _pageSize,
       };
 
-      final responseData = await _notificationRepo.getAllNotifications(
+      final result = await _notificationRepo.getAllNotifications(
         queryParams: queryParams,
       );
 
       if (generation != _fetchGeneration) return;
 
-      final nestedData = responseData['data'];
-      final List<dynamic> items = nestedData is Map
-          ? (nestedData['notifications'] ?? nestedData['data'] ?? [])
-          : (responseData['notifications'] ?? []);
-      final fetched = items
-          .map((json) => NotificationModel.fromJson(json))
+      final fetched = result.items
           .where((n) => !_deletedIds.contains(n.id))
           .toList();
 

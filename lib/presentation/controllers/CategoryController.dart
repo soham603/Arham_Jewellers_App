@@ -206,8 +206,7 @@ class CategoryController extends GetxController {
       }
       _allCategoriesFlat = flat;
 
-      for (final item in results) {
-        final karatCat = CategoryModel.fromJson(item);
+      for (final karatCat in results) {
         final nameLower = karatCat.name.toLowerCase();
 
         if (nameLower == '0k') {
@@ -268,9 +267,9 @@ class CategoryController extends GetxController {
     }
   }
 
-  void _flattenTreeNode(dynamic node, List<CategoryModel> flat) {
-    flat.add(CategoryModel.fromJson(node));
-    final children = node['children'] as List? ?? [];
+  void _flattenTreeNode(CategoryModel node, List<CategoryModel> flat) {
+    flat.add(node);
+    final children = node.children ?? [];
     for (final child in children) {
       _flattenTreeNode(child, flat);
     }
@@ -279,24 +278,23 @@ class CategoryController extends GetxController {
   // Backward-compatible alias (always fetches full tree)
   Future<void> fetchAllKaratCategories({bool force = false}) => fetchCategoryTree(force: force);
 
-  void _populateLatestLevel3FromTree(List<dynamic> treeResults) {
+  void _populateLatestLevel3FromTree(List<CategoryModel> treeResults) {
     final allLevel3 = <CategoryModel>[];
     final karatMap = <String, String>{};
 
     for (final karatNode in treeResults) {
-      final rawName = karatNode['name'] as String? ?? '';
+      final rawName = karatNode.name;
       final karatEnum = _karatNameMap[rawName];
       final karatName = karatEnum?.displayName ?? rawName;
-      final children = karatNode['children'] as List? ?? [];
+      final children = karatNode.children ?? [];
       for (final level2 in children) {
-        if (level2['isActive'] == false) continue;
-        final level3List = level2['children'] as List? ?? [];
+        if (!level2.isActive) continue;
+        final level3List = level2.children ?? [];
         for (final level3 in level3List) {
-          if (level3['isDeleted'] == true) continue;
-          if (level3['isActive'] == false) continue;
-          final cat = CategoryModel.fromJson(level3);
-          allLevel3.add(cat);
-          karatMap[cat.id] = karatName;
+          if (level3.isDeleted) continue;
+          if (!level3.isActive) continue;
+          allLevel3.add(level3);
+          karatMap[level3.id] = karatName;
         }
       }
     }
@@ -391,19 +389,17 @@ class CategoryController extends GetxController {
         if (includeDeleted) 'isDeleted': true,
       };
 
-      final data = await _categoryRepo.fetchCategories(queryParams: queryParams);
-      final List raw = data['results'] ?? [];
-      final fetched = raw.map((e) => CategoryModel.fromJson(e)).toList();
+      final result = await _categoryRepo.fetchCategories(queryParams: queryParams);
 
       if (isPagination) {
-        _adminCategoryList.addAll(fetched);
+        _adminCategoryList.addAll(result.items);
       } else {
-        _adminCategoryList.value = fetched;
+        _adminCategoryList.value = result.items;
       }
 
-      _adminTotal.value = data['total'] ?? fetched.length;
+      _adminTotal.value = result.total;
 
-      if (fetched.length < _adminLimit) {
+      if (result.items.length < _adminLimit) {
         adminHasMore = false;
       } else {
         _adminPage++;
@@ -546,13 +542,12 @@ class CategoryController extends GetxController {
     }
 
     try {
-      final data = await _categoryRepo.fetchCategories(queryParams: {
+      final result = await _categoryRepo.fetchCategories(queryParams: {
         'level': level,
         'parentId': ?parentId,
         'full': true,
       });
-      final List raw = data['results'] ?? [];
-      return raw.map((e) => CategoryModel.fromJson(e)).toList();
+      return result.items;
     } catch (e) {
       Logger.error('CategoryController', '_fetchLevelFlat error: $e');
     }

@@ -1,8 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/handsetChangeModel.dart';
+import 'package:ratnesh_gold_app/domain/entities/paginated_result.dart';
+import 'package:ratnesh_gold_app/domain/repositories/i_auth_repository.dart';
 
-class AuthRepository extends BaseRepository {
+class AuthRepository extends BaseRepository implements IAuthRepository {
+  @override
   Future<({int statusCode, Map<String, dynamic> data})> loginUser({
     required String phone,
     required String password,
@@ -22,6 +26,7 @@ class AuthRepository extends BaseRepository {
     return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
   }
 
+  @override
   Future<({int statusCode, Map<String, dynamic> data})> loginAdmin({
     required String phone,
     required String password,
@@ -41,6 +46,7 @@ class AuthRepository extends BaseRepository {
     return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
   }
 
+  @override
   Future<({int statusCode, Map<String, dynamic> data})> registerUser({
     required Map<String, dynamic> userData,
   }) async {
@@ -52,6 +58,7 @@ class AuthRepository extends BaseRepository {
     return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
   }
 
+  @override
   Future<({int statusCode, Map<String, dynamic> data})> forgotPassword({
     required String phone,
   }) async {
@@ -63,7 +70,8 @@ class AuthRepository extends BaseRepository {
     return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
   }
 
-  Future<({int statusCode, Map<String, dynamic> data})> fetchHandsetRequests({
+  @override
+  Future<PaginatedResult<HandsetChangeRequestModel>> fetchHandsetRequests({
     Map<String, dynamic>? queryParams,
   }) async {
     final response = await dio.get(
@@ -71,9 +79,25 @@ class AuthRepository extends BaseRepository {
       queryParameters: queryParams,
       options: Options(extra: {'requiresAuth': true}),
     );
-    return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
+    final responseData = response.data;
+    checkApiError(responseData);
+    requireData(responseData);
+    final data = responseData['data'] ?? {};
+    final candidates = data is Map
+        ? (data['requests'] ?? data['data'] ?? data['results'] ?? [])
+        : [];
+    final List raw = candidates is List ? candidates : [];
+    final pagination = data is Map<String, dynamic> ? parsePagination(data) : (total: raw.length, totalPages: 1, currentPage: 1);
+
+    return PaginatedResult(
+      items: raw.map((e) => HandsetChangeRequestModel.fromJson(e)).toList(),
+      total: pagination.total,
+      totalPages: pagination.totalPages,
+      currentPage: pagination.currentPage,
+    );
   }
 
+  @override
   Future<({int statusCode, Map<String, dynamic> data})> handleHandsetRequest({
     required String requestId,
     required String action,

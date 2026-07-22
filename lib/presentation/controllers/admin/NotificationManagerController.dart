@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
+import 'package:ratnesh_gold_app/domain/entities/sent_notification_model.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -145,39 +147,27 @@ class NotificationManagerController extends GetxController {
         'limit': _pageLimit,
       };
 
-      final response = await _notificationRepo.getNotificationHistory(
+      final result = await _notificationRepo.getNotificationHistory(
         queryParams: queryParams,
       );
 
-      if (response['code'] != 'ERROR') {
-        final rawData = response['data'];
-        List raw = [];
-
-        if (rawData is List) {
-          raw = rawData;
-        } else if (rawData is Map<String, dynamic>) {
-          raw = rawData['notifications'] ?? rawData['data'] ?? [];
-        }
-
-        final fetched = raw.map((e) => SentNotification.fromJson(e)).toList();
-
-        if (isPagination) {
-          _history.addAll(fetched);
-        } else {
-          _history.assignAll(fetched);
-        }
-
-        if (fetched.length < _pageLimit) {
-          _hasMore = false;
-        } else {
-          _page++;
-        }
-
-        _historyState.value = CurrentAppState.SUCCESS;
+      if (isPagination) {
+        _history.addAll(result.items);
       } else {
-        _historyState.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to load history';
+        _history.assignAll(result.items);
       }
+
+      if (result.items.length < _pageLimit) {
+        _hasMore = false;
+      } else {
+        _page++;
+      }
+
+      _historyState.value = CurrentAppState.SUCCESS;
+    } on ApiException catch (e) {
+      Logger.error('NotificationManagerController', 'fetchHistory Api: ${e.message}');
+      _historyState.value = CurrentAppState.ERROR;
+      _error.value = e.message;
     } on DioException catch (e, st) {
       Logger.error('NotificationManagerController', 'fetchHistory Dio: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
@@ -206,40 +196,5 @@ class NotificationManagerController extends GetxController {
     _body.value = '';
     _targetType.value = 'all';
     _targetValue.value = '';
-  }
-}
-
-class SentNotification {
-  final String id;
-  final String title;
-  final String body;
-  final String targetType;
-  final String? targetValue;
-  final DateTime sentAt;
-  final String? sentBy;
-  final int? recipientCount;
-
-  SentNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.targetType,
-    this.targetValue,
-    required this.sentAt,
-    this.sentBy,
-    this.recipientCount,
-  });
-
-  factory SentNotification.fromJson(Map<String, dynamic> json) {
-    return SentNotification(
-      id: json['id'] ?? '',
-      title: json['title'] ?? '',
-      body: json['body'] ?? '',
-      targetType: json['targetType'] ?? json['target_type'] ?? 'all',
-      targetValue: json['targetValue'] ?? json['target_value'],
-      sentAt: DateTime.tryParse(json['sentAt'] ?? json['sent_at'] ?? json['timestamp'] ?? '') ?? DateTime.now(),
-      sentBy: json['sentBy'] ?? json['sent_by'],
-      recipientCount: json['recipientCount'] ?? json['recipient_count'],
-    );
   }
 }

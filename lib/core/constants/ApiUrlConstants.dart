@@ -53,6 +53,9 @@ class ApiUrlConstants {
   static String ancillaryUpdatePage(String page) => '/api/v1/ancillary/update-page/$page';
 
   static const String CRAFTSMAN_GET_ALL = '/api/v1/craftsman/get-All';
+  static const String CRAFTSMAN_IMPORT = '/api/v1/craftsman/import-AllData';
+  static String craftsmanDelete(String id) => '/api/v1/craftsman/$id';
+  static String craftsmanRestore(String id) => '/api/v1/craftsman/$id/restore';
 
   static const String NOTIFICATION_GET_ALL = '/api/v1/notifications/get-all';
   static const String NOTIFICATION_ACTION = '/api/v1/notifications/action';

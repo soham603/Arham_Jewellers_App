@@ -239,27 +239,19 @@ class UserOrderController extends GetxController {
 
       Logger.info("UserOrderController", "Fetching orders page: $_ordersPage");
 
-      final responseData = await _orderRepo.fetchUserOrders(
+      final result = await _orderRepo.fetchUserOrders(
         queryParams: {"page": _ordersPage, "limit": _ordersLimit},
       );
 
-      final data = responseData["data"] ?? {};
-
-      final List rawOrders = data["orders"] is List ? data["orders"] : [];
-
-      final fetchedOrders = rawOrders
-          .map((e) => UserOrderModel.fromJson(e))
-          .toList();
-
       if (isPagination) {
-        _userOrders.addAll(fetchedOrders);
+        _userOrders.addAll(result.items);
       } else {
-        _userOrders.value = fetchedOrders;
+        _userOrders.value = result.items;
       }
 
-      _totalOrders.value = data["total"] ?? 0;
+      _totalOrders.value = result.total;
 
-      if (fetchedOrders.length < _ordersLimit) {
+      if (result.items.length < _ordersLimit) {
         _hasMoreOrders.value = false;
       } else {
         _ordersPage++;

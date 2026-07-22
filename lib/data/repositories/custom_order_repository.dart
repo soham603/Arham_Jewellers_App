@@ -1,7 +1,9 @@
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
+import 'package:ratnesh_gold_app/domain/repositories/i_custom_order_repository.dart';
 
-class CustomOrderRepository extends BaseRepository {
+class CustomOrderRepository extends BaseRepository implements ICustomOrderRepository {
+  @override
   Future<Map<String, dynamic>> createCustomOrder({
     required dynamic data,
   }) async {
@@ -12,6 +14,7 @@ class CustomOrderRepository extends BaseRepository {
     return response.data;
   }
 
+  @override
   Future<Map<String, dynamic>> modifyCustomOrder({
     required String orderId,
     required dynamic data,
@@ -23,6 +26,7 @@ class CustomOrderRepository extends BaseRepository {
     return response.data;
   }
 
+  @override
   Future<Map<String, dynamic>> deleteCustomOrder({
     required String orderId,
   }) async {

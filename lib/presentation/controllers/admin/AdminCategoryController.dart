@@ -73,11 +73,10 @@ class CategoryManagerController extends GetxController {
         }
       }
       // Force refresh or tree not available: fetch directly
-      final data = await _categoryRepo.fetchCategories(
+      final result = await _categoryRepo.fetchCategories(
         queryParams: {"full": true},
       );
-      final List raw = data['results'] ?? [];
-      _allCategories.value = raw.map((e) => CategoryModel.fromJson(e)).toList();
+      _allCategories.value = result.items;
     } catch (e) {
       Logger.error("CategoryManagerController", "fetchAll error: $e");
     } finally {

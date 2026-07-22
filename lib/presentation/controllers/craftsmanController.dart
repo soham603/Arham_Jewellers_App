@@ -39,10 +39,7 @@ class CraftsmanController extends GetxController {
       _isLoading.value = true;
       _state.value = CurrentAppState.LOADING;
 
-      final raw = await _craftsmanRepo.fetchCraftsmen();
-
-      _craftsmen.value =
-          raw.map((e) => CraftsmanModel.fromJson(e)).toList();
+      _craftsmen.value = await _craftsmanRepo.fetchCraftsmen();
       _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       Logger.error("CraftsmanController", "fetchCraftsmen error: $e\n$st");

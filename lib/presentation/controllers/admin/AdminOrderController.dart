@@ -99,7 +99,7 @@ class AdminOrderController extends GetxController {
         _isPaginationLoading.value = true;
       }
 
-      final response = await _orderRepo.fetchAdminOrders(
+      final result = await _orderRepo.fetchAdminOrders(
         queryParams: {
           "page": _page,
           "limit": _pageLimit,
@@ -109,23 +109,13 @@ class AdminOrderController extends GetxController {
         },
       );
 
-      final data = response["data"];
-
-      final totalPages = data["totalPages"] ?? 1;
-
-      final currentPage = data["page"] ?? 1;
-
-      final List raw = data["results"] ?? [];
-
-      final fetched = raw.map((e) => AdminOrderModel.fromJson(e)).toList();
-
       final List<AdminOrderModel> filtered;
       if (selectedOrderType.value == "custom") {
-        filtered = fetched.where((o) => o.isCustom).toList();
+        filtered = result.items.where((o) => o.isCustom).toList();
       } else if (selectedOrderType.value == "normal") {
-        filtered = fetched.where((o) => !o.isCustom).toList();
+        filtered = result.items.where((o) => !o.isCustom).toList();
       } else {
-        filtered = fetched;
+        filtered = result.items;
       }
 
       filtered.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
@@ -136,7 +126,7 @@ class AdminOrderController extends GetxController {
         _orders.value = filtered;
       }
 
-      _hasMore = currentPage < totalPages;
+      _hasMore = result.currentPage < result.totalPages;
 
       if (_hasMore) {
         _page++;
@@ -166,7 +156,7 @@ class AdminOrderController extends GetxController {
     try {
       final futures = uncached.entries.map((entry) async {
         try {
-          final response = await _orderRepo.searchProducts(
+          final result = await _orderRepo.searchProducts(
             query: entry.value,
             queryParams: {
               "page": 1,
@@ -174,13 +164,9 @@ class AdminOrderController extends GetxController {
               "showAll": true,
             },
           );
-          final List raw = response['data']['data'] ?? [];
-          final match = raw.cast<Map<String, dynamic>?>().firstWhere(
-                (p) => p?['id'] == entry.key,
-                orElse: () => raw.isNotEmpty ? raw.first as Map<String, dynamic>? : null,
-              );
-          if (match != null && match['rawData'] != null) {
-            _productRawDataCache[entry.key] = Map<String, dynamic>.from(match['rawData']);
+          final match = result.items.where((p) => p.id == entry.key).firstOrNull;
+          if (match != null && match.rawData != null) {
+            _productRawDataCache[entry.key] = Map<String, dynamic>.from(match.rawData!);
           }
         } catch (e) {
           Logger.error("AdminOrderController", "Product detail fetch failed for ${entry.key}: $e");

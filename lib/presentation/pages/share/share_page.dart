@@ -46,7 +46,7 @@ class _SharePageState extends State<SharePage> {
       backgroundColor: context.colorPalette.backgroundColor,
       appBar: AppBar(
         title: Text(
-          'Share Categories',
+          'Share',
           style: TextStyle(
             fontSize: context.getResponsiveSize(4.5),
             fontWeight: FontWeight.w700,

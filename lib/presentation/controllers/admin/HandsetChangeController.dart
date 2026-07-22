@@ -80,36 +80,23 @@ class HandsetChangeController extends GetxController {
         queryParams['search'] = _searchQuery.value.trim();
       }
 
-      final response = await _authRepo.fetchHandsetRequests(queryParams: queryParams);
+      final result = await _authRepo.fetchHandsetRequests(queryParams: queryParams);
 
-      if (response.statusCode == 200) {
-        final data = response.data['data'];
-        final List raw = (data['requests'] ?? data['data'] ?? data['results'] ?? data) is List
-            ? (data['requests'] ?? data['data'] ?? data['results'] ?? data) as List
-            : [];
-        final fetched =
-            raw.map((e) => HandsetChangeRequestModel.fromJson(e)).toList();
+      if (isPagination) {
+        _requests.addAll(result.items);
+      } else {
+        _requests.value = result.items;
+      }
 
-        if (isPagination) {
-          _requests.addAll(fetched);
-        } else {
-          _requests.value = fetched;
-        }
+      _total.value = result.total;
 
-        final pagination = data['pagination'];
-        _total.value = pagination?['totalRecords'] ?? data['total'] ?? data['totalItems'] ?? fetched.length;
-
-        if (fetched.length < _pageLimit) {
+      if (result.items.length < _pageLimit) {
           _hasMore = false;
         } else {
           _page++;
         }
 
         _state.value = CurrentAppState.SUCCESS;
-      } else {
-        _state.value = CurrentAppState.ERROR;
-        _error.value = response.data['message'] ?? 'Failed to fetch';
-      }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();

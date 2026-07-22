@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:intl/intl.dart';
+import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/gold_rate_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
@@ -94,18 +95,12 @@ class GoldRateController extends GetxController {
     try {
       _currentRateState.value = CurrentAppState.LOADING;
 
-      final response = await _goldRateRepo.fetchCurrentRate();
-
-      if (response['code'] != 'ERROR') {
-        final data = response['data'];
-        if (data != null) {
-          _currentRate.value = GoldRateModel.fromJson(data);
-        }
-        _currentRateState.value = CurrentAppState.SUCCESS;
-      } else {
-        _currentRateState.value = CurrentAppState.ERROR;
-        _error.value = response['message'] ?? 'Failed to load gold rate';
-      }
+      _currentRate.value = await _goldRateRepo.fetchCurrentRate();
+      _currentRateState.value = CurrentAppState.SUCCESS;
+    } on ApiException catch (e) {
+      Logger.error('GoldRateController', 'fetchCurrentRate Api: ${e.message}');
+      _currentRateState.value = CurrentAppState.ERROR;
+      _error.value = e.message;
     } on DioException catch (e, st) {
       Logger.error('GoldRateController', 'fetchCurrentRate Dio: $e\n$st');
       _currentRateState.value = CurrentAppState.ERROR;
@@ -158,74 +153,47 @@ class GoldRateController extends GetxController {
         }
       }
 
-      final response = await _goldRateRepo.fetchHistory(
+      final result = await _goldRateRepo.fetchHistory(
         queryParams: queryParams,
       );
 
-      if (response['code'] != 'ERROR') {
-        final rawData = response['data'];
-        List<GoldRateModel> items = [];
+      _history.assignAll(result.items);
 
-        if (rawData is List) {
-          items = rawData.map((e) => GoldRateModel.fromJson(e)).toList();
-        } else if (rawData is Map<String, dynamic>) {
-          final dailyTrend = rawData['dailyTrend'];
-          if (dailyTrend is List) {
-            items = dailyTrend.map<GoldRateModel>((e) {
-              final dateStr = e['date'] ?? '';
-              final closingRate = (e['closingRate'] ?? e['avg'] ?? 0)
-                  .toDouble();
-              return GoldRateModel(
-                id: null,
-                rate: closingRate,
-                source: null,
-                timestamp: DateTime.tryParse(dateStr) ?? DateTime.now(),
-                metadata: null,
-              );
-            }).toList();
-          }
-
-          if (rawData['summary'] != null) {
-            _statistics.value = GoldRateStatistics.fromJson(rawData['summary']);
-            _statisticsState.value = CurrentAppState.SUCCESS;
-          }
-        }
-
-        items.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        _history.assignAll(items);
-        _historyState.value = CurrentAppState.SUCCESS;
-      } else {
-        final errorCode = response['error']?['code'];
-        final errorMsg =
-            response['error']?['message'] ??
-            response['message'] ??
-            'Failed to load history';
-
-        if (errorCode == 'NOT_FOUND' && !_isRetryingFallback) {
-          _fallbackMessage.value = errorMsg;
-          _isRetryingFallback = true;
-          _historyState.value = CurrentAppState.SUCCESS;
-          _history.clear();
-          await fetchHistory(noParams: true);
-          _isRetryingFallback = false;
-          return;
-        }
-
-        _historyState.value = CurrentAppState.ERROR;
-        _error.value = errorMsg;
+      if (result.statistics != null) {
+        _statistics.value = result.statistics;
+        _statisticsState.value = CurrentAppState.SUCCESS;
       }
+
+      _historyState.value = CurrentAppState.SUCCESS;
+    } on ApiException catch (e) {
+      if (e.code == 'NOT_FOUND' && !_isRetryingFallback) {
+        Logger.info(
+          'GoldRateController',
+          'fetchHistory NOT_FOUND with params, retrying without params',
+        );
+        _fallbackMessage.value = e.message;
+        _isRetryingFallback = true;
+        _historyState.value = CurrentAppState.SUCCESS;
+        _history.clear();
+        await fetchHistory(noParams: true);
+        _isRetryingFallback = false;
+        return;
+      }
+
+      Logger.error('GoldRateController', 'fetchHistory Api: ${e.message}');
+      _historyState.value = CurrentAppState.ERROR;
+      _error.value = e.message;
     } on DioException catch (e, st) {
       final errorMsg =
           e.response?.data?['error']?['message'] ??
           e.response?.data?['message'] ??
           e.message ??
           'Something went wrong';
-      final errorCode = e.response?.data?['error']?['code'];
 
-      if (errorCode == 'NOT_FOUND' && !_isRetryingFallback) {
+      if (e.response?.statusCode == 404 && !_isRetryingFallback) {
         Logger.info(
           'GoldRateController',
-          'fetchHistory NOT_FOUND with params, retrying without params',
+          'fetchHistory 404 with params, retrying without params',
         );
         _fallbackMessage.value = errorMsg;
         _isRetryingFallback = true;
@@ -269,19 +237,19 @@ class GoldRateController extends GetxController {
         queryParams['period'] = period ?? _selectedPeriod.value;
       }
 
-      final response = await _goldRateRepo.fetchStatistics(
+      final result = await _goldRateRepo.fetchStatistics(
         queryParams: queryParams,
       );
-
-      if (response['code'] != 'ERROR') {
-        final data = response['data'];
-        if (data != null && data['summary'] != null) {
-          _statistics.value = GoldRateStatistics.fromJson(data['summary']);
-        }
-        _statisticsState.value = CurrentAppState.SUCCESS;
+      if (result != null) {
+        _statistics.value = result;
       } else {
-        _statisticsState.value = CurrentAppState.ERROR;
+        _statistics.value = null;
       }
+      _statisticsState.value = CurrentAppState.SUCCESS;
+    } on ApiException catch (e) {
+      Logger.error('GoldRateController', 'fetchStatistics Api: ${e.message}');
+      _statisticsState.value = CurrentAppState.ERROR;
+      _error.value = e.message;
     } on DioException catch (e, st) {
       if (e.response?.statusCode == 404) {
         _statistics.value = null;
