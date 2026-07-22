@@ -17,6 +17,7 @@ class GoldRateScreen extends StatefulWidget {
 class _GoldRateScreenState extends State<GoldRateScreen> {
   final GoldRateController controller = Get.find<GoldRateController>();
   final TextEditingController _rateController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void dispose() {
@@ -300,6 +301,7 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
 
   void _showSetRateSheet(BuildContext context) {
     _rateController.clear();
+    _selectedDate = DateTime.now();
     final currentRate = controller.currentRate?.rate;
     if (currentRate != null) {
       _rateController.text = currentRate.toStringAsFixed(0);
@@ -309,136 +311,242 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(
-            context.getResponsiveSize(5),
-            context.heightPercent(2),
-            context.getResponsiveSize(5),
-            context.heightPercent(3),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setSheetState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          decoration: BoxDecoration(
-            color: context.colorPalette.backgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: context.getResponsiveSize(10),
-                  height: context.heightPercent(0.5),
-                  decoration: BoxDecoration(
-                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(100),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(
+              context.getResponsiveSize(5),
+              context.heightPercent(2),
+              context.getResponsiveSize(5),
+              context.heightPercent(3),
+            ),
+            decoration: BoxDecoration(
+              color: context.colorPalette.backgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: context.getResponsiveSize(10),
+                    height: context.heightPercent(0.5),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.subTitleColor.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: context.heightPercent(2)),
-              Text(
-                'Set Gold Rate',
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(5),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-              ),
-              SizedBox(height: context.heightPercent(0.5)),
-              Text(
-                'Enter the new gold rate per 10 g',
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(3.5),
-                  color: context.colorPalette.subTitleColor,
-                ),
-              ),
-              SizedBox(height: context.heightPercent(2.5)),
-              TextField(
-                controller: _rateController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                autofocus: true,
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(5),
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-                decoration: InputDecoration(
-                  prefixText: '₹ ',
-                  prefixStyle: TextStyle(
+                SizedBox(height: context.heightPercent(2)),
+                Text(
+                  'Set Gold Rate',
+                  style: TextStyle(
                     fontSize: context.getResponsiveSize(5),
                     fontWeight: FontWeight.w700,
-                    color: AppColors.primaryGold,
+                    color: AppColors.textDark,
                   ),
-                  hintText: 'e.g. 7200',
-                  hintStyle: TextStyle(
-                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
+                ),
+                SizedBox(height: context.heightPercent(0.5)),
+                Text(
+                  'Enter the new gold rate per 10 g',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.5),
+                    color: context.colorPalette.subTitleColor,
                   ),
-                  filled: true,
-                  fillColor: context.colorPalette.boxColor,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
+                ),
+                SizedBox(height: context.heightPercent(2.5)),
+                TextField(
+                  controller: _rateController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(5),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
+                  decoration: InputDecoration(
+                    prefixText: '₹ ',
+                    prefixStyle: TextStyle(
+                      fontSize: context.getResponsiveSize(5),
+                      fontWeight: FontWeight.w700,
                       color: AppColors.primaryGold,
-                      width: 1.5,
+                    ),
+                    hintText: 'e.g. 7200',
+                    hintStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor.withValues(alpha: 0.4),
+                    ),
+                    filled: true,
+                    fillColor: context.colorPalette.boxColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide(
+                        color: AppColors.primaryGold,
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: context.heightPercent(2.5)),
-              Obx(() {
-                final isLoading = controller.actionState == CurrentAppState.LOADING;
-
-                return GestureDetector(
-                  onTap: isLoading
-                      ? null
-                      : () async {
-                          final text = _rateController.text.trim().replaceAll(',', '');
-                          final rate = double.tryParse(text);
-if (rate == null || rate < 0.1 || rate > 1000000) {
-  ToastUtils.showWarning('Enter a rate between ₹0.10 and ₹10,00,000');
-                            return;
-                          }
-                          Get.back();
-                          controller.setRate(rate: rate);
-                        },
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryGold,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: isLoading
-                        ? Center(
-                            child: SizedBox(
-                              width: context.getResponsiveSize(5),
-                              height: context.getResponsiveSize(5),
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                SizedBox(height: context.heightPercent(2)),
+                GestureDetector(
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate,
+                      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                      lastDate: DateTime.now(),
+                      helpText: 'SELECT RATE DATE',
+                      builder: (ctx, child) => Theme(
+                        data: Theme.of(ctx).copyWith(
+                          colorScheme: ColorScheme.light(
+                            primary: AppColors.primaryGold,
+                            onPrimary: Colors.white,
+                            surface: Colors.white,
+                            onSurface: AppColors.textDark,
+                          ),
+                          datePickerTheme: DatePickerThemeData(
+                            headerHeadlineStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(22),
+                              fontWeight: FontWeight.w600,
                             ),
-                          )
-                        : Text(
-                            'Update Rate',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: context.getResponsiveSize(4.2),
+                            headerHelpStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(13),
+                            ),
+                            dayStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(14),
+                            ),
+                            weekdayStyle: TextStyle(
+                              fontSize: ctx.responsiveFont(12),
+                            ),
+                            dayShape: WidgetStateProperty.all(
+                              const CircleBorder(),
                             ),
                           ),
+                        ),
+                        child: child!,
+                      ),
+                    );
+                    if (picked != null) {
+                      setSheetState(() {
+                        _selectedDate = picked;
+                      });
+                    }
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(4),
+                      vertical: context.heightPercent(1.5),
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.colorPalette.boxColor,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: context.getResponsiveSize(8),
+                          height: context.getResponsiveSize(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGold.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today_rounded,
+                            size: context.getResponsiveSize(4),
+                            color: AppColors.primaryGold,
+                          ),
+                        ),
+                        SizedBox(width: context.getResponsiveSize(3)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Rate Date',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.8),
+                                  color: context.colorPalette.subTitleColor,
+                                ),
+                              ),
+                              SizedBox(height: context.heightPercent(0.3)),
+                              Text(
+                                DateFormat('dd MMM yyyy').format(_selectedDate),
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.8),
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: context.getResponsiveSize(5),
+                          color: context.colorPalette.subTitleColor,
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              }),
-            ],
+                ),
+                SizedBox(height: context.heightPercent(2.5)),
+                Obx(() {
+                  final isLoading = controller.actionState == CurrentAppState.LOADING;
+
+                  return GestureDetector(
+                    onTap: isLoading
+                        ? null
+                        : () async {
+                            final text = _rateController.text.trim().replaceAll(',', '');
+                            final rate = double.tryParse(text);
+                            if (rate == null || rate < 0.1 || rate > 1000000) {
+                              ToastUtils.showWarning('Enter a rate between ₹0.10 and ₹10,00,000');
+                              return;
+                            }
+                            Get.back();
+                            controller.setRate(rate: rate, date: _selectedDate);
+                          },
+                    child: Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGold,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: isLoading
+                          ? Center(
+                              child: SizedBox(
+                                width: context.getResponsiveSize(5),
+                                height: context.getResponsiveSize(5),
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              'Update Rate',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: context.getResponsiveSize(4.2),
+                              ),
+                            ),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
         ),
       ),

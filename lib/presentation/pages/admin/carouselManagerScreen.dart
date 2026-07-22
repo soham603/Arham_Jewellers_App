@@ -316,19 +316,29 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: context.colorPalette.primaryColor,
-          unselectedLabelColor: context.colorPalette.subTitleColor,
-          indicatorColor: context.colorPalette.primaryColor,
-          labelStyle: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            fontWeight: FontWeight.w600,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight + 1),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TabBar(
+                controller: _tabController,
+                labelColor: context.colorPalette.primaryColor,
+                unselectedLabelColor: context.colorPalette.subTitleColor,
+                indicatorColor: context.colorPalette.primaryColor,
+                dividerColor: Colors.transparent,
+                labelStyle: TextStyle(
+                  fontSize: context.getResponsiveSize(3.8),
+                  fontWeight: FontWeight.w600,
+                ),
+                tabs: const [
+                  Tab(text: 'Active'),
+                  Tab(text: 'Deleted'),
+                ],
+              ),
+              Container(height: 1, color: AppColors.divider),
+            ],
           ),
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'Deleted'),
-          ],
         ),
       ),
       body: TabBarView(
@@ -429,7 +439,7 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       decoration: BoxDecoration(
         color: context.colorPalette.boxColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: context.colorPalette.boxColor),
+        border: Border.all(color: context.colorPalette.border),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1129,9 +1139,9 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
           vertical: context.heightPercent(0.6),
         ),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: color.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.4)),
         ),
         child: isLoading
             ? SizedBox(

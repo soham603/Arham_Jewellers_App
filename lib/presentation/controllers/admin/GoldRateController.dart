@@ -264,7 +264,7 @@ class GoldRateController extends GetxController {
     }
   }
 
-  Future<bool> setRate({required double rate}) async {
+  Future<bool> setRate({required double rate, DateTime? date}) async {
     _actionState.value = CurrentAppState.LOADING;
 
     try {
@@ -273,12 +273,18 @@ class GoldRateController extends GetxController {
           ? (rate - currentRateValue).toStringAsFixed(2)
           : '0.00';
 
+      final rateData = <String, dynamic>{
+        'rate': rate,
+        'source': 'market',
+        'metadata': {'change': change},
+      };
+
+      if (date != null) {
+        rateData['date'] = DateFormat('yyyy-MM-dd').format(date);
+      }
+
       final response = await _goldRateRepo.updateRate(
-        rateData: {
-          'rate': rate,
-          'source': 'market',
-          'metadata': {'change': change},
-        },
+        rateData: rateData,
       );
 
       if (response['code'] != 'ERROR') {

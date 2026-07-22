@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminCategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
@@ -69,18 +70,25 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.heightPercent(4.5)),
-          child: TabBar(
-            controller: _tabController,
-            labelColor: context.colorPalette.primaryColor,
-            unselectedLabelColor: context.colorPalette.subTitleColor,
-            indicatorColor: context.colorPalette.primaryColor,
-            indicatorWeight: 3,
-            labelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w600),
-            unselectedLabelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w400),
-            tabs: const [
-              Tab(text: 'Level 2'),
-              Tab(text: 'Level 3'),
+          preferredSize: const Size.fromHeight(kToolbarHeight + 1),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TabBar(
+                controller: _tabController,
+                labelColor: context.colorPalette.primaryColor,
+                unselectedLabelColor: context.colorPalette.subTitleColor,
+                indicatorColor: context.colorPalette.primaryColor,
+                dividerColor: Colors.transparent,
+                indicatorWeight: 3,
+                labelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w600),
+                unselectedLabelStyle: TextStyle(fontSize: context.getResponsiveSize(3.5), fontWeight: FontWeight.w400),
+                tabs: const [
+                  Tab(text: 'Level 2'),
+                  Tab(text: 'Level 3'),
+                ],
+              ),
+              Container(height: 1, color: AppColors.divider),
             ],
           ),
         ),

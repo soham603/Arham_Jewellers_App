@@ -1,7 +1,10 @@
 /// Returns a match score between [query] and [target] (0.0 = no match, 1.0 = exact).
 ///
 /// Scoring tiers:
-///   1.0  – exact substring
+///   1.0   – exact match
+///   0.95  – target starts with query
+///   0.90  – target ends with query
+///   0.80  – target contains query (mid-string)
 ///   0.35–0.6 – subsequence match (all chars appear in order)
 ///   0.2–0.4  – Levenshtein-based typo tolerance
 double fuzzyMatchScore(String query, String target) {
@@ -12,8 +15,15 @@ double fuzzyMatchScore(String query, String target) {
 
   if (t.isEmpty) return 0.0;
 
-  // Exact substring match
-  if (t.contains(q)) return 1.0;
+  // Exact match
+  if (t == q) return 1.0;
+
+  // Substring match with positional scoring
+  if (t.contains(q)) {
+    if (t.startsWith(q)) return 0.95;
+    if (t.endsWith(q)) return 0.90;
+    return 0.80;
+  }
 
   // Subsequence match — every char of q appears in t in order
   if (_isSubsequence(q, t)) {
