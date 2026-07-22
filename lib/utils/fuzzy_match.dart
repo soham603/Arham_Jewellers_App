@@ -2,8 +2,8 @@
 ///
 /// Scoring tiers:
 ///   1.0  – exact substring
-///   0.8  – subsequence match (all chars appear in order)
-///   0.4+ – Levenshtein-based typo tolerance
+///   0.35–0.6 – subsequence match (all chars appear in order)
+///   0.2–0.4  – Levenshtein-based typo tolerance
 double fuzzyMatchScore(String query, String target) {
   if (query.isEmpty) return 1.0;
 
@@ -17,9 +17,8 @@ double fuzzyMatchScore(String query, String target) {
 
   // Subsequence match — every char of q appears in t in order
   if (_isSubsequence(q, t)) {
-    // Score higher when more of the target is consumed
     final coverage = q.length / t.length;
-    return 0.6 + (coverage * 0.2); // 0.6 – 0.8
+    return 0.35 + (coverage * 0.25); // 0.35 – 0.6
   }
 
   // Levenshtein-based match for typo tolerance
@@ -29,7 +28,7 @@ double fuzzyMatchScore(String query, String target) {
 
   final similarity = 1.0 - (dist / maxLen);
   if (similarity >= 0.5) {
-    return 0.3 + (similarity * 0.3); // 0.45 – 0.6
+    return 0.2 + (similarity * 0.2); // 0.3 – 0.4
   }
 
   return 0.0;
@@ -78,7 +77,7 @@ List<T> fuzzyFilter<T>(
   String query,
   List<T> items,
   String Function(T) getText, {
-  double threshold = 0.4,
+  double threshold = 0.35,
 }) {
   if (query.trim().isEmpty) return items;
 

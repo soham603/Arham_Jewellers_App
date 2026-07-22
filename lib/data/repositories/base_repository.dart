@@ -29,7 +29,7 @@ class BaseRepository {
   ({int total, int totalPages, int currentPage}) parsePagination(
     Map<String, dynamic> data,
   ) {
-    final rawTotal = data['total'] ?? 0;
+    final rawTotal = data['total'] ?? data['totalCount'] ?? data['totalRecords'] ?? 0;
     final total = rawTotal is int
         ? rawTotal
         : int.tryParse(rawTotal.toString()) ?? 0;
@@ -37,7 +37,7 @@ class BaseRepository {
     final totalPages = rawTotalPages is int
         ? rawTotalPages
         : int.tryParse(rawTotalPages.toString()) ?? 1;
-    final rawPage = data['page'] ?? 1;
+    final rawPage = data['page'] ?? data['currentPage'] ?? 1;
     final currentPage = rawPage is int
         ? rawPage
         : int.tryParse(rawPage.toString()) ?? 1;
@@ -77,6 +77,9 @@ class BaseRepository {
       );
     }
 
-    return PaginatedResult(items: [], total: 0, totalPages: 1, currentPage: 1);
+    throw ApiException(
+      'Unexpected response format',
+      response: responseData,
+    );
   }
 }

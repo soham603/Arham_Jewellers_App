@@ -30,7 +30,7 @@ class OrderRepository extends BaseRepository implements IOrderRepository {
     checkApiError(responseData);
     requireData(responseData);
     final rawData = responseData["data"];
-    final data = rawData is Map<String, dynamic> ? rawData : {};
+    final data = rawData is Map<String, dynamic> ? rawData : <String, dynamic>{};
 
     final List rawOrders = data["orders"] is List ? data["orders"] : [];
     final pagination = parsePagination(data);
@@ -77,7 +77,7 @@ class OrderRepository extends BaseRepository implements IOrderRepository {
     checkApiError(responseData);
     requireData(responseData);
     final rawData = responseData["data"];
-    final data = rawData is Map<String, dynamic> ? rawData : {};
+    final data = rawData is Map<String, dynamic> ? rawData : <String, dynamic>{};
 
     final List raw = data["results"] ?? [];
     final pagination = parsePagination(data);

@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/craftsmanManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
@@ -312,6 +313,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Set daily rate",
                   onTap: () => Get.to(() => const GoldRateScreen()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.engineering_rounded,
+                  title: "Manage Karigar",
+                  subtitle: "Import & manage craftsmen",
+                  onTap: () => Get.to(() => const CraftsmanManagerScreen()),
+                ),
                 // ── Screenshot Protection Toggle ──
                 _screenshotProtectionTile(context),
               ],
@@ -361,6 +369,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             "Change requests", () => Get.to(() => const HandsetChangeScreen())),
         _ManagementItem(Icons.monetization_on_rounded, "Gold Rate",
             "Set daily rate", () => Get.to(() => const GoldRateScreen())),
+        _ManagementItem(Icons.engineering_rounded, "Manage Karigar",
+            "Import & manage craftsmen",
+            () => Get.to(() => const CraftsmanManagerScreen())),
       ];
 
   Widget _adminListTile(
