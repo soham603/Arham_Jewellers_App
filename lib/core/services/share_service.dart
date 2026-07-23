@@ -546,15 +546,11 @@ class ShareService {
     progress?.value = 0.6;
 
     final displayId = order.id.substring(0, 8).toUpperCase();
-    final orderDate = '${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year}';
 
     final pdfBytes = await compute(_buildCustomOrderPdfInIsolate, {
       'arhamLogoBytes': arhamLogoBytes,
       'ratneshLogoBytes': ratneshLogoBytes,
       'orderId': displayId,
-      'orderDate': orderDate,
-      'customerName': order.user.name,
-      'customerPhone': order.user.phoneNumber,
       'itemName': order.itemName ?? '-',
       'weight': order.weight ?? '-',
       'purity': order.purity ?? '-',
@@ -1343,9 +1339,6 @@ Future<List<int>> _buildCustomOrderPdfInIsolate(Map<String, dynamic> params) asy
   final arhamLogoBytes = params['arhamLogoBytes'] as Uint8List;
   final ratneshLogoBytes = params['ratneshLogoBytes'] as Uint8List;
   final orderId = params['orderId'] as String;
-  final orderDate = params['orderDate'] as String;
-  final customerName = params['customerName'] as String;
-  final customerPhone = params['customerPhone'] as String;
   final itemName = params['itemName'] as String;
   final weight = params['weight'] as String;
   final purity = params['purity'] as String;
@@ -1399,15 +1392,11 @@ Future<List<int>> _buildCustomOrderPdfInIsolate(Map<String, dynamic> params) asy
         pw.Divider(color: goldColor, thickness: 1),
         pw.SizedBox(height: 6),
         pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: pw.MainAxisAlignment.center,
           children: [
             pw.Text(
               'Custom Order Details',
               style: pw.TextStyle(font: boldFont, fontSize: 14, color: darkColor),
-            ),
-            pw.Text(
-              'Date: $orderDate',
-              style: pw.TextStyle(font: regularFont, fontSize: 9, color: mutedColor),
             ),
           ],
         ),
@@ -1417,9 +1406,6 @@ Future<List<int>> _buildCustomOrderPdfInIsolate(Map<String, dynamic> params) asy
 
   final summaryRows = <Map<String, String>>[
     {'label': 'Order ID', 'value': '#$orderId'},
-    {'label': 'Date', 'value': orderDate},
-    {'label': 'Customer', 'value': customerName},
-    {'label': 'Phone', 'value': customerPhone},
     {'label': 'Item Name', 'value': itemName},
     {'label': 'Weight', 'value': weight},
     {'label': 'Purity', 'value': purity},
