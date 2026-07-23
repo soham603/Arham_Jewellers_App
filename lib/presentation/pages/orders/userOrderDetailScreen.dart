@@ -15,6 +15,8 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
+import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
+import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -135,7 +137,27 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.heightPercent(1.2)),
-              child: Container(
+              child: GestureDetector(
+                onTap: () {
+                  ProductNavigationUtil.navigateToProductDetails(
+                    id: item.product.id,
+                    name: item.product.name,
+                    tagNo: item.product.tagNo,
+                    karat: item.product.karat,
+                    nameSlug: item.product.slug,
+                    imageUrl: item.product.imageUrl,
+                    isActive: item.product.isActive,
+                    rawData: {
+                      if (item.product.karigarNetWt != null)
+                        'KarigarNetWt': item.product.karigarNetWt,
+                      if (item.product.karigarFineWt != null)
+                        'KarigarFineWt': item.product.karigarFineWt,
+                      if (item.product.size1 != null)
+                        'Size1': item.product.size1,
+                    },
+                  );
+                },
+                child: Container(
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected
@@ -150,22 +172,27 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 ),
                 child: Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        width: context.getResponsiveSize(14),
-                        height: context.getResponsiveSize(14),
-                        child: imageUrl != null && imageUrl.isNotEmpty
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (_, _) => const Center(
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                errorWidget: (_, _, _) =>
-                                    const RatneshFallback.xs(),
-                              )
-                            : const RatneshFallback.xs(),
+                    GestureDetector(
+                      onTap: imageUrl != null && imageUrl.isNotEmpty
+                          ? () => showImageZoomDialog(context, imageUrl)
+                          : null,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: SizedBox(
+                          width: context.getResponsiveSize(14),
+                          height: context.getResponsiveSize(14),
+                          child: imageUrl != null && imageUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, _) => const Center(
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  errorWidget: (_, _, _) =>
+                                      const RatneshFallback.xs(),
+                                )
+                              : const RatneshFallback.xs(),
+                        ),
                       ),
                     ),
                     SizedBox(width: context.getResponsiveSize(3)),
@@ -251,6 +278,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                     ),
                   ],
                 ),
+              ),
               ),
             );
           }),

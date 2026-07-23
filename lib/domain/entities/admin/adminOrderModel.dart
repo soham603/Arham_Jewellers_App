@@ -240,6 +240,7 @@ class AdminOrderItemModel {
 class AdminOrderProductModel {
   final String id;
   final String name;
+  final String? slug;
   final String? imageUrl;
   final String? tagNo;
   final String? karat;
@@ -248,6 +249,7 @@ class AdminOrderProductModel {
   AdminOrderProductModel({
     required this.id,
     required this.name,
+    this.slug,
     this.imageUrl,
     this.tagNo,
     this.karat,
@@ -260,6 +262,7 @@ class AdminOrderProductModel {
     return AdminOrderProductModel(
       id: json["id"] ?? "",
       name: json["name"] ?? "",
+      slug: json["nameSlug"]?.toString() ?? json["slug"]?.toString(),
       imageUrl: json["imageUrl"],
       tagNo: json["tagNo"]?.toString(),
       karat: json["karat"]?.toString(),

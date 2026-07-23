@@ -146,6 +146,8 @@ class UserOrderProductModel {
   final String slug;
   final bool isActive;
   final String? imageUrl;
+  final String? tagNo;
+  final String? karat;
   final double? karigarNetWt;
   final double? karigarFineWt;
   final String? size1;
@@ -156,6 +158,8 @@ class UserOrderProductModel {
     required this.slug,
     required this.isActive,
     this.imageUrl,
+    this.tagNo,
+    this.karat,
     this.karigarNetWt,
     this.karigarFineWt,
     this.size1,
@@ -168,6 +172,8 @@ class UserOrderProductModel {
       slug: json["nameSlug"]?.toString() ?? json["slug"]?.toString() ?? '',
       isActive: json["isActive"] ?? false,
       imageUrl: json["imageUrl"],
+      tagNo: json["tagNo"]?.toString(),
+      karat: json["karat"]?.toString(),
       karigarNetWt: json["karigarNetWt"] != null
           ? double.tryParse(json["karigarNetWt"].toString())
           : null,

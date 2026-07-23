@@ -14,6 +14,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
+import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -118,33 +119,34 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               SizedBox(height: context.heightPercent(2)),
 
               // ── Customer Details ──
-              if (order.partyName != null || order.contactNumber != null || order.user.name.isNotEmpty) ...[
+              if (order.partyName != null || order.contactNumber != null || order.user.name.isNotEmpty || order.user.phoneNumber.isNotEmpty || order.user.companyName.isNotEmpty || order.user.city.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Customer Details'),
                 SizedBox(height: context.heightPercent(1)),
                 _buildInfoCard(
                   context,
                   children: [
-                    if (order.partyName != null && order.partyName!.isNotEmpty)
+                    if (order.partyName != null && order.partyName!.isNotEmpty) ...[
                       _buildInfoRow(context, 'Party Name', order.partyName!),
-                    if (order.partyName != null && order.partyName!.isNotEmpty) _buildInfoDivider(),
-                    if (order.contactNumber != null && order.contactNumber!.isNotEmpty)
+                      _buildInfoDivider(),
+                    ] else if (order.user.name.isNotEmpty) ...[
+                      _buildInfoRow(context, 'Name', order.user.name),
+                      _buildInfoDivider(),
+                    ],
+                    if (order.contactNumber != null && order.contactNumber!.isNotEmpty) ...[
                       _buildInfoRow(context, 'Contact', order.contactNumber!),
-                    if (order.contactNumber != null && order.contactNumber!.isNotEmpty) _buildInfoDivider(),
-                    if (order.area != null && order.area!.isNotEmpty)
+                      _buildInfoDivider(),
+                    ] else if (order.user.phoneNumber.isNotEmpty) ...[
+                      _buildInfoRow(context, 'Phone', order.user.phoneNumber),
+                      _buildInfoDivider(),
+                    ],
+                    if (order.area != null && order.area!.isNotEmpty) ...[
                       _buildInfoRow(context, 'Area', order.area!),
-                    if (order.area != null && order.area!.isNotEmpty) _buildInfoDivider(),
-                    if (order.partyCode != null && order.partyCode!.isNotEmpty)
-                      _buildInfoRow(context, 'Party Code', order.partyCode!),
-                    if (order.partyCode != null && order.partyCode!.isNotEmpty) _buildInfoDivider(),
-                    if (order.user.name.isNotEmpty)
-                      _buildInfoRow(context, 'User Name', order.user.name),
-                    if (order.user.name.isNotEmpty) _buildInfoDivider(),
-                    if (order.user.phoneNumber.isNotEmpty)
-                      _buildInfoRow(context, 'User Phone', order.user.phoneNumber),
-                    if (order.user.phoneNumber.isNotEmpty) _buildInfoDivider(),
-                    if (order.user.companyName.isNotEmpty)
+                      _buildInfoDivider(),
+                    ],
+                    if (order.user.companyName.isNotEmpty) ...[
                       _buildInfoRow(context, 'Company', order.user.companyName),
-                    if (order.user.companyName.isNotEmpty) _buildInfoDivider(),
+                      _buildInfoDivider(),
+                    ],
                     if (order.user.city.isNotEmpty)
                       _buildInfoRow(context, 'City', order.user.city),
                   ],
@@ -202,9 +204,26 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                         final hasImage = item.product.imageUrl != null && item.product.imageUrl!.isNotEmpty;
                         return Padding(
                           padding: EdgeInsets.only(bottom: context.heightPercent(1)),
-                          child: Row(
-                            children: [
-                              GestureDetector(
+                          child: GestureDetector(
+                            onTap: () {
+                              final isStock = item.product.rawData?['IsStock'];
+                              final bool isActive = isStock != null
+                                  ? (isStock == 1 || isStock == true || isStock == '1')
+                                  : true;
+                              ProductNavigationUtil.navigateToProductDetails(
+                                id: item.product.id,
+                                name: item.product.name,
+                                tagNo: item.product.tagNo,
+                                karat: item.product.karat,
+                                nameSlug: item.product.slug,
+                                imageUrl: item.product.imageUrl,
+                                isActive: isActive,
+                                rawData: item.product.rawData,
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                GestureDetector(
                                 onTap: hasImage
                                     ? () => showImageZoomDialog(context, item.product.imageUrl!)
                                     : null,
@@ -253,9 +272,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      );
+                              ],
+                            ),
+                          ),
+                        );
                     },
                   ),
                   ],

@@ -11,6 +11,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
+import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key, required this.order});
@@ -144,7 +145,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
             return Padding(
               padding: EdgeInsets.only(bottom: context.heightPercent(1.2)),
-              child: Container(
+              child: GestureDetector(
+                onTap: () {
+                  final isStock = item.product.rawData?['IsStock'];
+                  final bool isActive = isStock != null
+                      ? (isStock == 1 || isStock == true || isStock == '1')
+                      : true;
+                  ProductNavigationUtil.navigateToProductDetails(
+                    id: item.product.id,
+                    name: item.product.name,
+                    tagNo: item.product.tagNo,
+                    karat: item.product.karat,
+                    nameSlug: item.product.slug,
+                    imageUrl: item.product.imageUrl,
+                    isActive: isActive,
+                    rawData: item.product.rawData,
+                  );
+                },
+                child: Container(
                 padding: EdgeInsets.all(context.getResponsiveSize(3)),
                 decoration: BoxDecoration(
                   color: item.isRejected == true
@@ -274,6 +292,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   ],
                 ),
+              ),
               ),
             );
           }),
