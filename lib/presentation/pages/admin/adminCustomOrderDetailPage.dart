@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -28,6 +29,7 @@ class AdminCustomOrderDetailPage extends StatefulWidget {
 class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage> {
   late final AdminOrderController _controller;
   late final CraftsmanController _craftsmanController;
+  bool _isSharing = false;
 
   @override
   void initState() {
@@ -437,12 +439,309 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ),
               ],
 
+              if (isAssigned) ...[
+                SizedBox(height: context.heightPercent(1.5)),
+                _buildSendToKarigarButton(context),
+              ],
+
               // ── WhatsApp Button ──
               SizedBox(height: context.heightPercent(2)),
               _buildWhatsAppButton(context, order),
 
               SizedBox(height: context.heightPercent(3)),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Send to Karigar Button ──
+  Widget _buildSendToKarigarButton(BuildContext context) {
+    return GestureDetector(
+      onTap: _isSharing ? null : () => _showShareOptionsBottomSheet(context),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
+        decoration: BoxDecoration(
+          color: _isSharing ? const Color(0xFFF5F5F5) : const Color(0xFFE9F9EE),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isSharing)
+              SizedBox(
+                width: context.getResponsiveSize(4),
+                height: context.getResponsiveSize(4),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.grey.shade400,
+                ),
+              )
+            else
+              Icon(Icons.share_rounded, color: Colors.green, size: context.getResponsiveSize(4.5)),
+            SizedBox(width: context.getResponsiveSize(2)),
+            Text(
+              _isSharing ? "Preparing..." : "Send to Karigar",
+              style: TextStyle(
+                color: _isSharing ? Colors.grey.shade500 : Colors.green,
+                fontWeight: FontWeight.w700,
+                fontSize: context.getResponsiveSize(3.8),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Share Options Bottom Sheet ──
+  void _showShareOptionsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          20 + MediaQuery.of(ctx).padding.bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            SizedBox(height: context.heightPercent(2)),
+            Text(
+              'Share Order Details',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(4.5),
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.heightPercent(1.5)),
+            _shareOptionTile(
+              context,
+              icon: Icons.image_outlined,
+              iconColor: const Color(0xFF25D366),
+              title: 'Share as Images',
+              subtitle: 'Send order images directly',
+              onTap: () {
+                Navigator.pop(ctx);
+                _shareOrderAsImages(context);
+              },
+            ),
+            SizedBox(height: context.heightPercent(1)),
+            _shareOptionTile(
+              context,
+              icon: Icons.picture_as_pdf_outlined,
+              iconColor: const Color(0xFFE53935),
+              title: 'Share as PDF',
+              subtitle: 'Create a branded order document',
+              onTap: () {
+                Navigator.pop(ctx);
+                _shareOrderAsPdf(context);
+              },
+            ),
+            SizedBox(height: context.heightPercent(1.5)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _shareOptionTile(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
+        decoration: BoxDecoration(
+          color: AppColors.tileBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(context.getResponsiveSize(2)),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: context.getResponsiveSize(5.5),
+              ),
+            ),
+            SizedBox(width: context.getResponsiveSize(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.8),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(0.2)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(2.8),
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textMuted,
+              size: context.getResponsiveSize(5),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Share Order as Images ──
+  void _shareOrderAsImages(BuildContext context) async {
+    if (_isSharing) return;
+    setState(() => _isSharing = true);
+
+    final progress = ValueNotifier(0.0);
+    _showProgressLoadingDialog(context, progress);
+
+    final result = await ShareService.shareCustomOrderAsImages(
+      order: widget.order,
+      progress: progress,
+    );
+
+    if (mounted) Navigator.of(context).pop();
+    progress.dispose();
+
+    if (!mounted) return;
+    setState(() => _isSharing = false);
+    if (result == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No images available to share'),
+          backgroundColor: Color(0xFFDC2626),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } else if (result == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to share images. Please try again.'),
+          backgroundColor: Color(0xFFDC2626),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // ── Share Order as PDF ──
+  void _shareOrderAsPdf(BuildContext context) async {
+    if (_isSharing) return;
+    setState(() => _isSharing = true);
+
+    final progress = ValueNotifier(0.0);
+    _showProgressLoadingDialog(context, progress);
+
+    final success = await ShareService.shareCustomOrderAsPdf(
+      order: widget.order,
+      progress: progress,
+    );
+
+    if (mounted) Navigator.of(context).pop();
+    progress.dispose();
+
+    if (!mounted) return;
+    setState(() => _isSharing = false);
+    if (success != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to share PDF. Please try again.'),
+          backgroundColor: Color(0xFFDC2626),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  // ── Progress Loading Dialog ──
+  void _showProgressLoadingDialog(BuildContext context, ValueNotifier<double> progress) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Material(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: EdgeInsets.all(context.getResponsiveSize(8)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: context.getResponsiveSize(5),
+                        height: context.getResponsiveSize(5),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primaryGold,
+                        ),
+                      ),
+                      SizedBox(width: context.getResponsiveSize(2)),
+                      ValueListenableBuilder<double>(
+                        valueListenable: progress,
+                        builder: (context, value, _) => Text(
+                          '${(value * 100).toInt()}%',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(5),
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryGold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

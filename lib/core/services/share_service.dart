@@ -8,6 +8,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
@@ -502,6 +503,205 @@ class ShareService {
     final fileName = 'Cart_Enquiry_$timestamp.pdf';
 
     return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+  }
+
+  static Future<bool?> shareCustomOrderAsPdf({
+    required AdminOrderModel order,
+    ValueNotifier<double>? progress,
+  }) async {
+    try {
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    progress?.value = 0.1;
+
+    final refImageFutures = order.referenceImages.map((url) {
+      if (url.isEmpty) return Future<Uint8List?>.value(null);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
+        quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
+      );
+    }).toList();
+
+    final productImageFutures = order.orderItems.map((item) {
+      final url = item.product.displayImageUrl;
+      if (url == null || url.isEmpty) return Future<Uint8List?>.value(null);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
+        quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
+      );
+    }).toList();
+
+    final List<Uint8List?> refImageBytesList;
+    final List<Uint8List?> productImageBytesList;
+    final results = await Future.wait([
+      Future.wait(refImageFutures),
+      Future.wait(productImageFutures),
+    ]);
+    refImageBytesList = List<Uint8List?>.from(results[0]);
+    productImageBytesList = List<Uint8List?>.from(results[1]);
+
+    progress?.value = 0.6;
+
+    final displayId = order.id.substring(0, 8).toUpperCase();
+    final orderDate = '${order.createdAt.day}/${order.createdAt.month}/${order.createdAt.year}';
+
+    final pdfBytes = await compute(_buildCustomOrderPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'orderId': displayId,
+      'orderDate': orderDate,
+      'customerName': order.user.name,
+      'customerPhone': order.user.phoneNumber,
+      'itemName': order.itemName ?? '-',
+      'weight': order.weight ?? '-',
+      'purity': order.purity ?? '-',
+      'pieces': order.noOfPieces ?? '-',
+      'marking': order.marking ?? '-',
+      'deliveryDate': order.deliveryDate ?? '-',
+      'refImageBytesList': refImageBytesList,
+      'productImageBytesList': productImageBytesList,
+    });
+
+    progress?.value = 0.9;
+
+    final tempDir = await getTemporaryDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = 'CustomOrder_${displayId}_$timestamp.pdf';
+    final file = File('${tempDir.path}/$fileName');
+    await file.writeAsBytes(pdfBytes);
+
+    progress?.value = 0.95;
+
+    try {
+      await Share.shareXFiles(
+        [XFile(file.path, name: 'Custom Order $displayId.pdf')],
+        subject: '$_brandName - Custom Order $displayId',
+        text: '$_brandName\n$_brandSubtitle\n\nCustom Order #$displayId',
+      );
+      progress?.value = 1.0;
+      return true;
+    } finally {
+      try {
+        await file.delete();
+      } catch (_) {}
+    }
+    } catch (e) {
+      Logger.error("ShareService", "Failed to share custom order as PDF: $e");
+      return false;
+    }
+  }
+
+  static Future<bool?> shareCustomOrderAsImages({
+    required AdminOrderModel order,
+    ValueNotifier<double>? progress,
+  }) async {
+    try {
+    progress?.value = 0.1;
+
+    final refImageFutures = order.referenceImages.map((url) {
+      if (url.isEmpty) return Future<Uint8List?>.value(null);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
+        quality: ImageCompressionConstants.shareQuality,
+      );
+    }).toList();
+
+    final productImageFutures = order.orderItems.map((item) {
+      final url = item.product.displayImageUrl;
+      if (url == null || url.isEmpty) return Future<Uint8List?>.value(null);
+      return _downloadAndCompressImage(
+        url,
+        maxLongestEdge: ImageCompressionConstants.shareMaxEdge,
+        quality: ImageCompressionConstants.shareQuality,
+      );
+    }).toList();
+
+    final List<Uint8List?> refImageBytesList;
+    final List<Uint8List?> productImageBytesList;
+    final results = await Future.wait([
+      Future.wait(refImageFutures),
+      Future.wait(productImageFutures),
+    ]);
+    refImageBytesList = List<Uint8List?>.from(results[0]);
+    productImageBytesList = List<Uint8List?>.from(results[1]);
+
+    progress?.value = 0.6;
+
+    final allBytes = [...refImageBytesList, ...productImageBytesList]
+        .whereType<Uint8List>()
+        .toList();
+
+    if (allBytes.isEmpty) return null;
+
+    final tempDir = await getTemporaryDirectory();
+    final files = <XFile>[];
+
+    try {
+      for (int i = 0; i < refImageBytesList.length; i++) {
+        final bytes = refImageBytesList[i];
+        if (bytes == null) continue;
+        final fileName = 'ref_image_${i + 1}.jpg';
+        final file = File('${tempDir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        files.add(XFile(file.path, name: fileName));
+      }
+
+      for (int i = 0; i < productImageBytesList.length; i++) {
+        final bytes = productImageBytesList[i];
+        if (bytes == null) continue;
+        final fileName = 'product_image_${i + 1}.jpg';
+        final file = File('${tempDir.path}/$fileName');
+        await file.writeAsBytes(bytes);
+        files.add(XFile(file.path, name: fileName));
+      }
+
+      if (files.isEmpty) return null;
+
+      progress?.value = 0.8;
+
+      final itemName = order.itemName ?? '-';
+      final weight = order.weight ?? '-';
+      final purity = order.purity ?? '-';
+      final noOfPieces = order.noOfPieces ?? '-';
+      final marking = order.marking ?? '-';
+      final deliveryDate = order.deliveryDate ?? '-';
+
+      final shareText = 'Custom Order Details\n'
+          '━━━━━━━━━━━━━━━━━━━━\n'
+          'Item: $itemName\n'
+          'Weight: ${weight == '-' ? '-' : '${weight}g'}\n'
+          'Purity: $purity\n'
+          'Pieces: $noOfPieces\n'
+          'Hallmark/HUID: $marking\n'
+          'Delivery Date: $deliveryDate\n'
+          '━━━━━━━━━━━━━━━━━━━━\n'
+          '$_brandName\n'
+          '$_brandSubtitle';
+
+      progress?.value = 0.95;
+
+      await Share.shareXFiles(
+        files,
+        subject: '$_brandName - Custom Order',
+        text: shareText,
+      );
+      progress?.value = 1.0;
+      return true;
+    } finally {
+      for (final file in files) {
+        try {
+          await File(file.path).delete();
+        } catch (_) {}
+      }
+    }
+    } catch (e) {
+      Logger.error("ShareService", "Failed to share custom order as images: $e");
+      return false;
+    }
   }
 }
 
@@ -1135,6 +1335,181 @@ Future<List<int>> _buildOrderDetailsPdfInIsolate(Map<String, dynamic> params) as
       ),
     ),
   );
+
+  return await pdf.save();
+}
+
+Future<List<int>> _buildCustomOrderPdfInIsolate(Map<String, dynamic> params) async {
+  final arhamLogoBytes = params['arhamLogoBytes'] as Uint8List;
+  final ratneshLogoBytes = params['ratneshLogoBytes'] as Uint8List;
+  final orderId = params['orderId'] as String;
+  final orderDate = params['orderDate'] as String;
+  final customerName = params['customerName'] as String;
+  final customerPhone = params['customerPhone'] as String;
+  final itemName = params['itemName'] as String;
+  final weight = params['weight'] as String;
+  final purity = params['purity'] as String;
+  final pieces = params['pieces'] as String;
+  final marking = params['marking'] as String;
+  final deliveryDate = params['deliveryDate'] as String;
+  final refImageBytesList = params['refImageBytesList'] as List<Uint8List?>;
+  final productImageBytesList = params['productImageBytesList'] as List<Uint8List?>;
+
+  final brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
+  final brandSubtitle = 'Purity - Quality - Trust';
+
+  final pdf = pw.Document();
+
+  final regularFont = pw.Font.helvetica();
+  final boldFont = pw.Font.helveticaBold();
+
+  final arhamLogo = pw.MemoryImage(arhamLogoBytes);
+  final ratneshLogo = pw.MemoryImage(ratneshLogoBytes);
+
+  final goldColor = PdfColor.fromHex('#A57A36');
+  final darkColor = PdfColor.fromHex('#2D2118');
+  final mutedColor = PdfColor.fromHex('#7E756C');
+  final borderColor = PdfColor.fromHex('#D4C9B8');
+  final labelColor = PdfColor.fromHex('#5C534A');
+
+  final header = pw.Container(
+    padding: const pw.EdgeInsets.only(bottom: 16),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.center,
+          children: [
+            pw.Image(arhamLogo, width: 90, height: 36),
+            pw.SizedBox(width: 16),
+            pw.Image(ratneshLogo, width: 36, height: 36),
+          ],
+        ),
+        pw.SizedBox(height: 8),
+        pw.Text(
+          brandName,
+          style: pw.TextStyle(font: boldFont, fontSize: 18, color: goldColor),
+        ),
+        pw.SizedBox(height: 2),
+        pw.Text(
+          brandSubtitle,
+          style: pw.TextStyle(font: regularFont, fontSize: 9, color: mutedColor),
+        ),
+        pw.SizedBox(height: 10),
+        pw.Divider(color: goldColor, thickness: 1),
+        pw.SizedBox(height: 6),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              'Custom Order Details',
+              style: pw.TextStyle(font: boldFont, fontSize: 14, color: darkColor),
+            ),
+            pw.Text(
+              'Date: $orderDate',
+              style: pw.TextStyle(font: regularFont, fontSize: 9, color: mutedColor),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+
+  final summaryRows = <Map<String, String>>[
+    {'label': 'Order ID', 'value': '#$orderId'},
+    {'label': 'Date', 'value': orderDate},
+    {'label': 'Customer', 'value': customerName},
+    {'label': 'Phone', 'value': customerPhone},
+    {'label': 'Item Name', 'value': itemName},
+    {'label': 'Weight', 'value': weight},
+    {'label': 'Purity', 'value': purity},
+    {'label': 'Pieces', 'value': pieces},
+    {'label': 'Hallmark / HUID', 'value': marking},
+    {'label': 'Delivery Date', 'value': deliveryDate},
+  ];
+
+  final summaryTable = pw.Table(
+    columnWidths: const {
+      0: pw.FixedColumnWidth(160),
+      1: pw.FixedColumnWidth(360),
+    },
+    border: pw.TableBorder(
+      top: pw.BorderSide(color: borderColor, width: 0.5),
+      bottom: pw.BorderSide(color: borderColor, width: 0.5),
+      left: pw.BorderSide(color: borderColor, width: 0.5),
+      right: pw.BorderSide(color: borderColor, width: 0.5),
+      horizontalInside: pw.BorderSide(color: borderColor, width: 0.5),
+      verticalInside: pw.BorderSide(color: borderColor, width: 0.5),
+    ),
+    children: summaryRows.map((row) {
+      return pw.TableRow(
+        children: [
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: pw.BoxDecoration(color: PdfColor.fromHex('#F9F3E8')),
+            child: pw.Text(
+              row['label']!,
+              style: pw.TextStyle(font: boldFont, fontSize: 9.5, color: labelColor),
+            ),
+          ),
+          pw.Container(
+            padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: pw.Text(
+              row['value']!,
+              style: pw.TextStyle(font: regularFont, fontSize: 9.5, color: darkColor),
+            ),
+          ),
+        ],
+      );
+    }).toList(),
+  );
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(30),
+      build: (context) => [header, pw.SizedBox(height: 8), summaryTable],
+      footer: (context) => pw.Container(
+        alignment: pw.Alignment.centerRight,
+        child: pw.Text(
+          'Page ${context.pageNumber} of ${context.pagesCount}',
+          style: pw.TextStyle(font: regularFont, fontSize: 8, color: mutedColor),
+        ),
+      ),
+    ),
+  );
+
+  for (final imageBytes in refImageBytesList) {
+    if (imageBytes == null) continue;
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(30),
+        build: (context) => pw.Container(
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: borderColor, width: 0.5),
+          ),
+          child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+        ),
+      ),
+    );
+  }
+
+  for (final imageBytes in productImageBytesList) {
+    if (imageBytes == null) continue;
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(30),
+        build: (context) => pw.Container(
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: borderColor, width: 0.5),
+          ),
+          child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+        ),
+      ),
+    );
+  }
 
   return await pdf.save();
 }

@@ -27,6 +27,10 @@ abstract class ImageCompressionConstants {
   static const int videoThumbnailMaxWidth = 600;
   static const int videoThumbnailQuality = 80;
 
+  // ── PDF: custom order full-page images ──
+  static const int pdfCustomOrderImageMaxEdge = 1600;
+  static const int pdfCustomOrderImageQuality = 85;
+
   // ── Crop editor output ──
   static const int cropEditorQuality = 90;
 }
