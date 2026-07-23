@@ -358,6 +358,30 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                     context,
                     children: [
                       _buildInfoRow(context, 'Name', _craftsmanController.getById(order.assignedKarigarId!)?.name ?? order.assignedKarigarId!),
+                      if (_craftsmanController.getById(order.assignedKarigarId!)?.phoneNumber.isNotEmpty == true) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Phone', _craftsmanController.getById(order.assignedKarigarId!)!.phoneNumber),
+                      ],
+                      if (_craftsmanController.getById(order.assignedKarigarId!)?.whatsAppNo?.isNotEmpty == true) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'WhatsApp', _craftsmanController.getById(order.assignedKarigarId!)!.whatsAppNo!),
+                      ],
+                      if (() {
+                        final c = _craftsmanController.getById(order.assignedKarigarId!);
+                        return [c?.taluka, c?.areaName, c?.cityName, c?.state].any((e) => e != null && e.isNotEmpty);
+                      }()) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Address', [
+                          _craftsmanController.getById(order.assignedKarigarId!)?.taluka,
+                          _craftsmanController.getById(order.assignedKarigarId!)?.areaName,
+                          _craftsmanController.getById(order.assignedKarigarId!)?.cityName,
+                          _craftsmanController.getById(order.assignedKarigarId!)?.state,
+                        ].where((e) => e != null && e.isNotEmpty).join(', ')),
+                      ],
+                      if (_craftsmanController.getById(order.assignedKarigarId!)?.emailId?.isNotEmpty == true) ...[
+                        _buildInfoDivider(),
+                        _buildInfoRow(context, 'Email', _craftsmanController.getById(order.assignedKarigarId!)!.emailId!),
+                      ],
                       if (order.talkedToStaffName != null && order.talkedToStaffName!.isNotEmpty) ...[
                         _buildInfoDivider(),
                         _buildInfoRow(context, 'Contact Person', order.talkedToStaffName!),
