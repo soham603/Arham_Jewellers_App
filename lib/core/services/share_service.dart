@@ -83,6 +83,51 @@ class ShareService {
     return Uint8List.fromList(img.encodeJpg(resized, quality: quality));
   }
 
+  static Future<List<Uint8List?>> _downloadImageUrls({
+    required List<String?> urls,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
+    double rangeStart = 0.0,
+    double rangeEnd = 1.0,
+  }) async {
+    const batchSize = 12;
+    final result = <Uint8List?>[];
+    final total = urls.length;
+
+    if (total == 0) return result;
+
+    for (int i = 0; i < total; i += batchSize) {
+      if (cancelled?.value == true) return result;
+
+      final batchEnd = (i + batchSize).clamp(0, total);
+      final batch = urls.sublist(i, batchEnd);
+
+      final downloadFutures = batch.map((url) async {
+        if (url == null || url.isEmpty) return null;
+        try {
+          final response = await _dio.get<List<int>>(
+            url,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          if (response.statusCode == 200 && response.data != null) {
+            return Uint8List.fromList(response.data!);
+          }
+        } catch (e) {
+          Logger.error("ShareService", "Failed to download image: $url\n$e");
+        }
+        return null;
+      }).toList();
+
+      final rawBytes = await Future.wait(downloadFutures);
+      result.addAll(rawBytes);
+
+      final fraction = batchEnd / total;
+      progress?.value = rangeStart + (rangeEnd - rangeStart) * fraction;
+    }
+
+    return result;
+  }
+
   /// Downloads and compresses all product images in batches with progress tracking.
   /// Returns the list of compressed image bytes (same length as [products]).
   static Future<List<Uint8List?>> _downloadAndCompressAllImages({
@@ -415,20 +460,37 @@ class ShareService {
     required DateTime createdAt,
     required List<Map<String, dynamic>> items,
     double? totalAmount,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
   }) async {
+    progress?.value = 0.0;
+
+    final imageUrls = items.map((item) {
+      final url = item['imageUrl'] as String?;
+      return (url != null && url.isNotEmpty) ? url : null;
+    }).toList();
+
+    final rawBytesList = await _downloadImageUrls(
+      urls: imageUrls,
+      progress: progress,
+      cancelled: cancelled,
+      rangeStart: 0.0,
+      rangeEnd: 0.4,
+    );
+
+    if (cancelled?.value == true) return null;
+
+    final imageBytesList = await compute(_compressImageBatchInIsolate, {
+      'imageBytes': rawBytesList,
+      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
+      'quality': ImageCompressionConstants.pdfThumbnailQuality,
+    });
+
+    progress?.value = 0.5;
+    if (cancelled?.value == true) return null;
+
     final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
     final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
-    final imageFutures = items.map((item) async {
-      final url = item['imageUrl'] as String?;
-      if (url == null || url.isEmpty) return null;
-      return _downloadAndCompressImage(
-        url,
-        maxLongestEdge: ImageCompressionConstants.pdfThumbnailMaxEdge,
-        quality: ImageCompressionConstants.pdfThumbnailQuality,
-      );
-    }).toList();
-    final imageBytesList = await Future.wait(imageFutures);
 
     final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
       'arhamLogoBytes': arhamLogoBytes,
@@ -442,11 +504,118 @@ class ShareService {
       'imageBytesList': imageBytesList,
     });
 
+    progress?.value = 0.8;
+    if (cancelled?.value == true) return null;
+
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     final displayId = orderToken != null ? '$orderToken' : orderId.substring(0, 8).toUpperCase();
     final fileName = 'Order_${displayId}_$timestamp.pdf';
 
-    return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+    final result = await _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+
+    progress?.value = 0.95;
+    progress?.value = 1.0;
+
+    return result;
+  }
+
+  static Future<bool> shareOrderPdfToWhatsApp({
+    required String orderId,
+    int? orderToken,
+    required String status,
+    required DateTime createdAt,
+    required List<Map<String, dynamic>> items,
+    double? totalAmount,
+    required String message,
+    required String phone,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
+  }) async {
+    progress?.value = 0.0;
+
+    final imageUrls = items.map((item) {
+      final url = item['imageUrl'] as String?;
+      return (url != null && url.isNotEmpty) ? url : null;
+    }).toList();
+
+    final rawBytesList = await _downloadImageUrls(
+      urls: imageUrls,
+      progress: progress,
+      cancelled: cancelled,
+      rangeStart: 0.0,
+      rangeEnd: 0.4,
+    );
+
+    if (cancelled?.value == true) return false;
+
+    final imageBytesList = await compute(_compressImageBatchInIsolate, {
+      'imageBytes': rawBytesList,
+      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
+      'quality': ImageCompressionConstants.pdfThumbnailQuality,
+    });
+
+    progress?.value = 0.5;
+    if (cancelled?.value == true) return false;
+
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'orderId': orderId,
+      'orderToken': orderToken,
+      'status': status,
+      'createdAt': createdAt.toIso8601String(),
+      'items': items,
+      'totalAmount': totalAmount,
+      'imageBytesList': imageBytesList,
+    });
+
+    progress?.value = 0.8;
+    if (cancelled?.value == true) return false;
+
+    final tempDir = await getTemporaryDirectory();
+    final sharedDir = Directory('${tempDir.path}/shared_pdfs');
+    if (!await sharedDir.exists()) {
+      await sharedDir.create(recursive: true);
+    }
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final displayId = orderToken != null ? '$orderToken' : orderId.substring(0, 8).toUpperCase();
+    final fileName = 'Order_${displayId}_$timestamp.pdf';
+    final file = File('${sharedDir.path}/$fileName');
+    await file.writeAsBytes(pdfBytes);
+
+    progress?.value = 0.95;
+    if (cancelled?.value == true) {
+      try { await file.delete(); } catch (_) {}
+      return false;
+    }
+
+    try {
+      if (Platform.isAndroid) {
+        final result = await _channel.invokeMethod<bool>('shareToWhatsApp', {
+          'filePath': file.path,
+          'message': message,
+          'phone': phone,
+        });
+        progress?.value = 1.0;
+        return result ?? false;
+      } else {
+        await Share.shareXFiles(
+          [XFile(file.path, name: fileName)],
+          text: message,
+        );
+        progress?.value = 1.0;
+        return true;
+      }
+    } catch (e) {
+      Logger.error("ShareService", "Failed to share order PDF to WhatsApp: $e");
+      return false;
+    } finally {
+      try { await file.delete(); } catch (_) {}
+    }
   }
 
   static Future<Uint8List> generateCartEnquiryPdfBytes({
@@ -503,6 +672,108 @@ class ShareService {
     final fileName = 'Cart_Enquiry_$timestamp.pdf';
 
     return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
+  }
+
+  static Future<bool> shareCartEnquiryPdfToWhatsApp({
+    required List<ProductModel> products,
+    required List<int> quantities,
+    required String message,
+    required String phone,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
+  }) async {
+    progress?.value = 0.0;
+
+    final imageUrls = products.map((p) {
+      final url = p.displayImageUrl;
+      return (url != null && url.isNotEmpty) ? url : null;
+    }).toList();
+
+    final rawBytesList = await _downloadImageUrls(
+      urls: imageUrls,
+      progress: progress,
+      cancelled: cancelled,
+      rangeStart: 0.0,
+      rangeEnd: 0.4,
+    );
+
+    if (cancelled?.value == true) return false;
+
+    final imageBytesList = await compute(_compressImageBatchInIsolate, {
+      'imageBytes': rawBytesList,
+      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
+      'quality': ImageCompressionConstants.pdfThumbnailQuality,
+    });
+
+    progress?.value = 0.5;
+    if (cancelled?.value == true) return false;
+
+    final rows = <Map<String, dynamic>>[];
+    for (var i = 0; i < products.length; i++) {
+      final p = products[i];
+      rows.add({
+        'index': i + 1,
+        'name': p.name,
+        'category': p.category?.name ?? '-',
+        'karat': p.touch ?? p.karat ?? '-',
+        'netWt': p.karigarNetWt,
+        'qty': quantities[i],
+      });
+    }
+
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    final pdfBytes = await compute(_buildCartEnquiryPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'rows': rows,
+      'imageBytesList': imageBytesList,
+    });
+
+    progress?.value = 0.8;
+    if (cancelled?.value == true) return false;
+
+    final tempDir = await getTemporaryDirectory();
+    final sharedDir = Directory('${tempDir.path}/shared_pdfs');
+    if (!await sharedDir.exists()) {
+      await sharedDir.create(recursive: true);
+    }
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final fileName = 'Cart_Enquiry_$timestamp.pdf';
+    final file = File('${sharedDir.path}/$fileName');
+    await file.writeAsBytes(pdfBytes);
+
+    progress?.value = 0.95;
+    if (cancelled?.value == true) {
+      try { await file.delete(); } catch (_) {}
+      return false;
+    }
+
+    try {
+      if (Platform.isAndroid) {
+        final result = await _channel.invokeMethod<bool>('shareToWhatsApp', {
+          'filePath': file.path,
+          'message': message,
+          'phone': phone,
+        });
+        progress?.value = 1.0;
+        return result ?? false;
+      } else {
+        await Share.shareXFiles(
+          [XFile(file.path, name: fileName)],
+          text: message,
+        );
+        progress?.value = 1.0;
+        return true;
+      }
+    } catch (e) {
+      Logger.error("ShareService", "Failed to share cart enquiry PDF to WhatsApp: $e");
+      return false;
+    } finally {
+      try { await file.delete(); } catch (_) {}
+    }
   }
 
   static Future<bool?> shareCustomOrderAsPdf({

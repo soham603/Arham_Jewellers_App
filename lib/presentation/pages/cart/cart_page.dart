@@ -1,13 +1,12 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
+import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
+import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -15,8 +14,9 @@ import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -476,7 +476,7 @@ class _CartPageState extends State<CartPage> {
                         final quantities = cartController.items
                             .map((e) => e.quantity)
                             .toList();
-                        _downloadPdf(context, products, quantities);
+                        _sendPdfToWhatsApp(context, products, quantities);
                       }
                     : null,
                 child: Text(
@@ -527,78 +527,61 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
-  Future<void> _downloadPdf(
+  Future<void> _sendPdfToWhatsApp(
     BuildContext context,
     List<ProductModel> products,
     List<int> quantities,
   ) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(6)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: AppColors.primaryGold,
-                  ),
-                ),
-                SizedBox(height: context.heightPercent(1.5)),
-                Text(
-                  'Generating enquiry PDF...',
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.5),
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      );
+    final progress = ValueNotifier<double>(0.0);
+    final cancelled = ValueNotifier<bool>(false);
+
+    PdfLoadingDialog.show(
+      context,
+      message: 'Preparing PDF...',
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
+    );
 
     final navigator = Navigator.of(context);
     bool dialogDismissed = false;
     try {
-      final pdfBytes = await ShareService.generateCartEnquiryPdfBytes(
+      final productNames = products.map((p) => p.name).join(', ');
+      final message = 'Cart Enquiry\n\nProducts: $productNames\n\n'
+          'Please find the attached PDF for details.';
+
+      final success = await ShareService.shareCartEnquiryPdfToWhatsApp(
         products: products,
         quantities: quantities,
+        message: message,
+        phone: AdminConstants.adminPhone,
+        progress: progress,
+        cancelled: cancelled,
       );
 
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/Cart_Enquiry.pdf');
-      await file.writeAsBytes(pdfBytes);
+      if (!cancelled.value) {
+        navigator.pop();
+        dialogDismissed = true;
+      }
 
-      navigator.pop();
-      dialogDismissed = true;
-
-      if (mounted) {
-        try {
-          await Share.shareXFiles(
-            [XFile(file.path, name: 'Cart_Enquiry.pdf', mimeType: 'application/pdf')],
-            subject: 'Cart Enquiry PDF',
-          );
-        } finally {
-          try { await file.delete(); } catch (_) {}
+      if (!success && !cancelled.value && mounted) {
+        final url = WhatsAppUtil.buildUrl(
+          AdminConstants.adminPhone,
+          message: message,
+        );
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url, mode: LaunchMode.externalApplication);
+        } else {
+          ToastUtils.showError('Could not open WhatsApp');
         }
       }
     } catch (e) {
       if (!dialogDismissed && mounted) navigator.pop();
-      if (mounted) ToastUtils.showError('Failed to generate or share PDF');
+      if (mounted) ToastUtils.showError('Failed to prepare or share PDF');
+    } finally {
+      progress.dispose();
+      cancelled.dispose();
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
+import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/product_card.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -1810,7 +1811,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final cancelled = ValueNotifier(false);
     final progress = ValueNotifier(0.0);
 
-    _showProgressLoadingDialog(context, progress, onCancel: () {
+    PdfLoadingDialog.show(context, message: 'Sharing images...', progress: progress, onCancel: () {
       cancelled.value = true;
     });
 
@@ -1836,7 +1837,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final cancelled = ValueNotifier(false);
     final progress = ValueNotifier(0.0);
 
-    _showProgressLoadingDialog(context, progress, onCancel: () {
+    PdfLoadingDialog.show(context, message: 'Generating PDF...', progress: progress, onCancel: () {
       cancelled.value = true;
     });
 
@@ -1854,72 +1855,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
       cancelled.dispose();
       progress.dispose();
     });
-  }
-
-  void _showProgressLoadingDialog(BuildContext context, ValueNotifier<double> progress, {VoidCallback? onCancel}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: Center(
-            child: Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: EdgeInsets.all(context.getResponsiveSize(8)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: context.getResponsiveSize(5),
-                          height: context.getResponsiveSize(5),
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.colorPalette.gold,
-                          ),
-                        ),
-                        SizedBox(width: context.getResponsiveSize(2)),
-                        ValueListenableBuilder<double>(
-                          valueListenable: progress,
-                          builder: (context, value, _) => Text(
-                            '${(value * 100).toInt()}%',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(5),
-                              fontWeight: FontWeight.w700,
-                              color: context.colorPalette.gold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (onCancel != null) ...[
-                      SizedBox(height: context.heightPercent(2.5)),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          onCancel();
-                        },
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: context.getResponsiveSize(3.5),
-                            fontWeight: FontWeight.w600,
-                            color: context.colorPalette.subTitleColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-        ),
-      ),
-    );
   }
 
   Widget _shimmerCard(BuildContext context) {

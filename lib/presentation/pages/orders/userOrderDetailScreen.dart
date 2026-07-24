@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -17,6 +18,7 @@ import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -569,7 +571,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () => _downloadOrderPdf(context, order),
+              onPressed: () => _openWhatsAppWithPdf(context, order),
               child: Text(
                 'Enquire',
                 style: TextStyle(
@@ -593,16 +595,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () async {
-                final orderHashtag = order.orderToken != null
-                    ? '#${order.orderToken}'
-                    : '#${order.id.substring(0, 8).toUpperCase()}';
-                final url = WhatsAppUtil.buildUrl(
-                  AdminConstants.adminPhone,
-                  message: 'Hello, I need help with my order $orderHashtag',
-                );
-                await launchUrl(url, mode: LaunchMode.externalApplication);
-              },
+              onPressed: () => _openWhatsAppWithPdf(context, order),
               icon: const FaIcon(FontAwesomeIcons.whatsapp,
                   color: Colors.white, size: 16),
               label: Text(
@@ -620,11 +613,15 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Future<void> _downloadOrderPdf(BuildContext context, UserOrderModel order) async {
-    final ctx = context;
+  Future<void> _openWhatsAppWithPdf(BuildContext context, UserOrderModel order) async {
+    final displayId = order.orderToken != null
+        ? '#${order.orderToken}'
+        : '#${order.id.substring(0, 8).toUpperCase()}';
+    final message = 'Hello, I need help with my order $displayId';
+
     _shareWithLoading(
-      ctx,
-      () async {
+      context,
+      (progress, cancelled) async {
         final items = order.items.map((item) {
           final name = item.product.name;
           String? karat;
@@ -643,143 +640,65 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           };
         }).toList();
 
-        await ShareService.saveOrderPdfToDownloads(
+        final success = await ShareService.shareOrderPdfToWhatsApp(
           orderId: order.id,
           orderToken: order.orderToken,
           status: order.status,
           createdAt: order.createdAt,
           items: items,
           totalAmount: order.totalAmount,
+          message: message,
+          phone: AdminConstants.adminPhone,
+          progress: progress,
+          cancelled: cancelled,
         );
+
+        if (!success && !cancelled.value && mounted) {
+          final url = WhatsAppUtil.buildUrl(
+            AdminConstants.adminPhone,
+            message: message,
+          );
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+          } else {
+            ToastUtils.showError('Could not open WhatsApp');
+          }
+        }
       },
-      'Generating order PDF...',
-      onComplete: () => _showSharePdfHint(ctx, order),
+      'Preparing PDF...',
     );
   }
 
+
   void _shareWithLoading(
     BuildContext context,
-    Future<void> Function() shareFn,
+    Future<void> Function(ValueNotifier<double> progress, ValueNotifier<bool> cancelled) shareFn,
     String message, {
     VoidCallback? onComplete,
   }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: Center(
-          child: Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(6)),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: AppColors.primaryGold,
-                  ),
-                ),
-                SizedBox(height: context.heightPercent(1.5)),
-                Text(
-                  message,
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.5),
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textDark,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    final progress = ValueNotifier<double>(0.0);
+    final cancelled = ValueNotifier<bool>(false);
+
+    PdfLoadingDialog.show(
+      context,
+      message: message,
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
     );
 
-    final navigator = Navigator.of(context);
-
-    shareFn().whenComplete(() {
-      if (mounted) {
-        navigator.pop();
+    shareFn(progress, cancelled).whenComplete(() {
+      progress.dispose();
+      cancelled.dispose();
+      if (mounted && !cancelled.value) {
+        Navigator.of(context).pop();
         onComplete?.call();
       }
     });
   }
 
-  void _showSharePdfHint(BuildContext context, UserOrderModel order) {
-    final displayId = order.orderToken != null
-        ? '#${order.orderToken}'
-        : '#${order.id.substring(0, 8).toUpperCase()}';
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 24),
-            SizedBox(width: 8),
-            Text(
-              'PDF Ready',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4.5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Order $displayId PDF has been saved to your Downloads folder. Share it with us on WhatsApp for any queries.',
-          style: TextStyle(
-            fontSize: context.getResponsiveSize(3.8),
-            color: AppColors.textMuted,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Later',
-              style: TextStyle(color: AppColors.textMuted),
-            ),
-          ),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF25D366),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () async {
-              Navigator.pop(context);
-              final uri = WhatsAppUtil.buildUrl(
-                AdminConstants.adminPhone,
-                message: 'Hi, I would like to enquire about my order $displayId. Please find the attached PDF for details.',
-              );
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri,
-                    mode: LaunchMode.externalApplication);
-              }
-            },
-            icon: FaIcon(FontAwesomeIcons.whatsapp, size: 16),
-            label: Text(
-              'Open WhatsApp',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   static String? _cleanText(String? value) {
     final cleaned = value?.trim();
