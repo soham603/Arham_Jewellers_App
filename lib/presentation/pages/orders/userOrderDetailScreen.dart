@@ -335,8 +335,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           _customDetailRow(context, "Purity", order.purity ?? '-'),
           _customDetailRow(context, "Style", order.style ?? '-'),
           _customDetailRow(context, "Marking", order.marking ?? '-'),
-          if (order.assignedKarigar != null)
-            _customDetailRow(context, "Assigned To", order.assignedKarigar!),
+
           if (order.talkedToStaffName != null)
             _customDetailRow(context, "Contact Person", order.talkedToStaffName!),
           if (order.deliveryDate != null)
@@ -387,6 +386,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     return Padding(
       padding: EdgeInsets.only(bottom: context.heightPercent(0.8)),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: context.getResponsiveSize(24),
@@ -399,12 +399,15 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: context.getResponsiveSize(3.5),
-              color: AppColors.textDark,
+          SizedBox(width: context.getResponsiveSize(2)),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: context.getResponsiveSize(3.5),
+                color: AppColors.textDark,
+              ),
             ),
           ),
         ],
