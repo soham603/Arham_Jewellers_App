@@ -636,8 +636,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             : () => _showCompleteDialog(order),
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: const Color(0xFF2D9D59),
-          disabledBackgroundColor: const Color(0xFF2D9D59).withValues(alpha: 0.5),
+          backgroundColor: AppColors.primaryGold,
+          disabledBackgroundColor: AppColors.primaryGold.withValues(alpha: 0.5),
           padding: EdgeInsets.symmetric(
             vertical: context.heightPercent(1.5),
           ),
@@ -875,18 +875,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           vertical: context.heightPercent(1.5),
         ),
         decoration: BoxDecoration(
-          color: const Color(0xFFE9F9EE),
+          color: const Color(0xFF25D366),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
+            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
             SizedBox(width: context.getResponsiveSize(2)),
             Text(
-              "Connect on WhatsApp",
+              "Contact Customer",
               style: TextStyle(
-                color: Colors.green,
+                color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: context.getResponsiveSize(3.8),
               ),

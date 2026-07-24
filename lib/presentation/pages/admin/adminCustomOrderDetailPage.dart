@@ -449,7 +449,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: const Color(0xFF2D9D59),
+                      backgroundColor: AppColors.primaryGold,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
@@ -482,40 +482,18 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
   // ── Send to Karigar Button ──
   Widget _buildSendToKarigarButton(BuildContext context) {
-    return GestureDetector(
-      onTap: _isSharing ? null : () => _showShareOptionsBottomSheet(context),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
-        decoration: BoxDecoration(
-          color: _isSharing ? const Color(0xFFF5F5F5) : const Color(0xFFE9F9EE),
-          borderRadius: BorderRadius.circular(18),
+    return SizedBox(
+      width: double.infinity,
+      height: context.heightPercent(5.5),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: AppColors.primaryGold),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_isSharing)
-              SizedBox(
-                width: context.getResponsiveSize(4),
-                height: context.getResponsiveSize(4),
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.grey.shade400,
-                ),
-              )
-            else
-              Icon(Icons.share_rounded, color: Colors.green, size: context.getResponsiveSize(4.5)),
-            SizedBox(width: context.getResponsiveSize(2)),
-            Text(
-              _isSharing ? "Preparing..." : "Send to Karigar",
-              style: TextStyle(
-                color: _isSharing ? Colors.grey.shade500 : Colors.green,
-                fontWeight: FontWeight.w700,
-                fontSize: context.getResponsiveSize(3.8),
-              ),
-            ),
-          ],
-        ),
+        onPressed: _isSharing ? null : () => _showShareOptionsBottomSheet(context),
+        child: _isSharing
+            ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryGold))
+            : Text("Send to Karigar", style: TextStyle(fontSize: context.getResponsiveSize(4), fontWeight: FontWeight.w700, color: AppColors.primaryGold)),
       ),
     );
   }
@@ -1079,18 +1057,18 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
         decoration: BoxDecoration(
-          color: const Color(0xFFE9F9EE),
+          color: const Color(0xFF25D366),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
+            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white),
             SizedBox(width: context.getResponsiveSize(2)),
             Text(
-              "Connect on WhatsApp",
+              "Contact Customer",
               style: TextStyle(
-                color: Colors.green,
+                color: Colors.white,
                 fontWeight: FontWeight.w700,
                 fontSize: context.getResponsiveSize(3.8),
               ),
