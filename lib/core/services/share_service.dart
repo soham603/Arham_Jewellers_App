@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
+import 'package:ratnesh_gold_app/core/services/pdf_cache.dart';
 
 class ShareService {
   static const String _brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
@@ -453,77 +454,12 @@ class ShareService {
     }
   }
 
-  static Future<String?> saveOrderPdfToDownloads({
-    required String orderId,
-    int? orderToken,
-    required String status,
-    required DateTime createdAt,
-    required List<Map<String, dynamic>> items,
-    double? totalAmount,
-    ValueNotifier<double>? progress,
-    ValueNotifier<bool>? cancelled,
-  }) async {
-    progress?.value = 0.0;
-
-    final imageUrls = items.map((item) {
-      final url = item['imageUrl'] as String?;
-      return (url != null && url.isNotEmpty) ? url : null;
-    }).toList();
-
-    final rawBytesList = await _downloadImageUrls(
-      urls: imageUrls,
-      progress: progress,
-      cancelled: cancelled,
-      rangeStart: 0.0,
-      rangeEnd: 0.4,
-    );
-
-    if (cancelled?.value == true) return null;
-
-    final imageBytesList = await compute(_compressImageBatchInIsolate, {
-      'imageBytes': rawBytesList,
-      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
-      'quality': ImageCompressionConstants.pdfThumbnailQuality,
-    });
-
-    progress?.value = 0.5;
-    if (cancelled?.value == true) return null;
-
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
-    final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'orderId': orderId,
-      'orderToken': orderToken,
-      'status': status,
-      'createdAt': createdAt.toIso8601String(),
-      'items': items,
-      'totalAmount': totalAmount,
-      'imageBytesList': imageBytesList,
-    });
-
-    progress?.value = 0.8;
-    if (cancelled?.value == true) return null;
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final displayId = orderToken != null ? '$orderToken' : orderId.substring(0, 8).toUpperCase();
-    final fileName = 'Order_${displayId}_$timestamp.pdf';
-
-    final result = await _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
-
-    progress?.value = 0.95;
-    progress?.value = 1.0;
-
-    return result;
-  }
-
   static Future<bool> shareOrderPdfToWhatsApp({
     required String orderId,
     int? orderToken,
     required String status,
     required DateTime createdAt,
+    DateTime? updatedAt,
     required List<Map<String, dynamic>> items,
     double? totalAmount,
     required String message,
@@ -533,47 +469,60 @@ class ShareService {
   }) async {
     progress?.value = 0.0;
 
-    final imageUrls = items.map((item) {
-      final url = item['imageUrl'] as String?;
-      return (url != null && url.isNotEmpty) ? url : null;
-    }).toList();
+    final ts = (updatedAt ?? createdAt).millisecondsSinceEpoch;
+    final cacheKey = 'order:$orderId:$status:$ts';
+    final cachedFile = await PdfCache.get(cacheKey);
+    
+    List<int> pdfBytes;
+    
+    if (cachedFile != null) {
+      pdfBytes = await cachedFile.readAsBytes();
+      progress?.value = 1.0;
+    } else {
+      final imageUrls = items.map((item) {
+        final url = item['imageUrl'] as String?;
+        return (url != null && url.isNotEmpty) ? url : null;
+      }).toList();
 
-    final rawBytesList = await _downloadImageUrls(
-      urls: imageUrls,
-      progress: progress,
-      cancelled: cancelled,
-      rangeStart: 0.0,
-      rangeEnd: 0.4,
-    );
+      final rawBytesList = await _downloadImageUrls(
+        urls: imageUrls,
+        progress: progress,
+        cancelled: cancelled,
+        rangeStart: 0.0,
+        rangeEnd: 0.4,
+      );
 
-    if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return false;
 
-    final imageBytesList = await compute(_compressImageBatchInIsolate, {
-      'imageBytes': rawBytesList,
-      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
-      'quality': ImageCompressionConstants.pdfThumbnailQuality,
-    });
+      final imageBytesList = await compute(_compressImageBatchInIsolate, {
+        'imageBytes': rawBytesList,
+        'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
+        'quality': ImageCompressionConstants.pdfThumbnailQuality,
+      });
 
-    progress?.value = 0.5;
-    if (cancelled?.value == true) return false;
+      progress?.value = 0.5;
+      if (cancelled?.value == true) return false;
 
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+      final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+      final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
 
-    final pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'orderId': orderId,
-      'orderToken': orderToken,
-      'status': status,
-      'createdAt': createdAt.toIso8601String(),
-      'items': items,
-      'totalAmount': totalAmount,
-      'imageBytesList': imageBytesList,
-    });
+      pdfBytes = await compute(_buildOrderDetailsPdfInIsolate, {
+        'arhamLogoBytes': arhamLogoBytes,
+        'ratneshLogoBytes': ratneshLogoBytes,
+        'orderId': orderId,
+        'orderToken': orderToken,
+        'status': status,
+        'createdAt': createdAt.toIso8601String(),
+        'items': items,
+        'totalAmount': totalAmount,
+        'imageBytesList': imageBytesList,
+      });
 
-    progress?.value = 0.8;
-    if (cancelled?.value == true) return false;
+      progress?.value = 0.8;
+      if (cancelled?.value == true) return false;
+
+      await PdfCache.put(cacheKey, pdfBytes);
+    }
 
     final tempDir = await getTemporaryDirectory();
     final sharedDir = Directory('${tempDir.path}/shared_pdfs');
@@ -684,55 +633,74 @@ class ShareService {
   }) async {
     progress?.value = 0.0;
 
-    final imageUrls = products.map((p) {
-      final url = p.displayImageUrl;
-      return (url != null && url.isNotEmpty) ? url : null;
-    }).toList();
-
-    final rawBytesList = await _downloadImageUrls(
-      urls: imageUrls,
-      progress: progress,
-      cancelled: cancelled,
-      rangeStart: 0.0,
-      rangeEnd: 0.4,
-    );
-
-    if (cancelled?.value == true) return false;
-
-    final imageBytesList = await compute(_compressImageBatchInIsolate, {
-      'imageBytes': rawBytesList,
-      'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
-      'quality': ImageCompressionConstants.pdfThumbnailQuality,
-    });
-
-    progress?.value = 0.5;
-    if (cancelled?.value == true) return false;
-
-    final rows = <Map<String, dynamic>>[];
+    final sortedPairs = <String>[];
     for (var i = 0; i < products.length; i++) {
       final p = products[i];
-      rows.add({
-        'index': i + 1,
-        'name': p.name,
-        'category': p.category?.name ?? '-',
-        'karat': p.touch ?? p.karat ?? '-',
-        'netWt': p.karigarNetWt,
-        'qty': quantities[i],
-      });
+      sortedPairs.add('${p.id}:${quantities[i]}:${p.name}:${p.displayImageUrl ?? ''}');
     }
+    sortedPairs.sort();
+    final cacheKey = 'cart:${sortedPairs.join('|')}';
+    
+    final cachedFile = await PdfCache.get(cacheKey);
+    
+    List<int> pdfBytes;
+    
+    if (cachedFile != null) {
+      pdfBytes = await cachedFile.readAsBytes();
+      progress?.value = 1.0;
+    } else {
+      final imageUrls = products.map((p) {
+        final url = p.displayImageUrl;
+        return (url != null && url.isNotEmpty) ? url : null;
+      }).toList();
 
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+      final rawBytesList = await _downloadImageUrls(
+        urls: imageUrls,
+        progress: progress,
+        cancelled: cancelled,
+        rangeStart: 0.0,
+        rangeEnd: 0.4,
+      );
 
-    final pdfBytes = await compute(_buildCartEnquiryPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'rows': rows,
-      'imageBytesList': imageBytesList,
-    });
+      if (cancelled?.value == true) return false;
 
-    progress?.value = 0.8;
-    if (cancelled?.value == true) return false;
+      final imageBytesList = await compute(_compressImageBatchInIsolate, {
+        'imageBytes': rawBytesList,
+        'maxLongestEdge': ImageCompressionConstants.pdfThumbnailMaxEdge,
+        'quality': ImageCompressionConstants.pdfThumbnailQuality,
+      });
+
+      progress?.value = 0.5;
+      if (cancelled?.value == true) return false;
+
+      final rows = <Map<String, dynamic>>[];
+      for (var i = 0; i < products.length; i++) {
+        final p = products[i];
+        rows.add({
+          'index': i + 1,
+          'name': p.name,
+          'category': p.category?.name ?? '-',
+          'karat': p.touch ?? p.karat ?? '-',
+          'netWt': p.karigarNetWt,
+          'qty': quantities[i],
+        });
+      }
+
+      final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+      final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+      pdfBytes = await compute(_buildCartEnquiryPdfInIsolate, {
+        'arhamLogoBytes': arhamLogoBytes,
+        'ratneshLogoBytes': ratneshLogoBytes,
+        'rows': rows,
+        'imageBytesList': imageBytesList,
+      });
+
+      progress?.value = 0.8;
+      if (cancelled?.value == true) return false;
+
+      await PdfCache.put(cacheKey, pdfBytes);
+    }
 
     final tempDir = await getTemporaryDirectory();
     final sharedDir = Directory('${tempDir.path}/shared_pdfs');
@@ -781,58 +749,69 @@ class ShareService {
     ValueNotifier<double>? progress,
   }) async {
     try {
-    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
-    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
-
-    progress?.value = 0.1;
-
-    final refImageFutures = order.referenceImages.map((url) {
-      if (url.isEmpty) return Future<Uint8List?>.value(null);
-      return _downloadAndCompressImage(
-        url,
-        maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
-        quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
-      );
-    }).toList();
-
-    final productImageFutures = order.orderItems.map((item) {
-      final url = item.product.displayImageUrl;
-      if (url == null || url.isEmpty) return Future<Uint8List?>.value(null);
-      return _downloadAndCompressImage(
-        url,
-        maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
-        quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
-      );
-    }).toList();
-
-    final List<Uint8List?> refImageBytesList;
-    final List<Uint8List?> productImageBytesList;
-    final results = await Future.wait([
-      Future.wait(refImageFutures),
-      Future.wait(productImageFutures),
-    ]);
-    refImageBytesList = List<Uint8List?>.from(results[0]);
-    productImageBytesList = List<Uint8List?>.from(results[1]);
-
-    progress?.value = 0.6;
-
+    final cacheKey = 'custom_order:${order.id}:${order.updatedAt.millisecondsSinceEpoch}';
+    final cachedFile = await PdfCache.get(cacheKey);
+    
+    List<int> pdfBytes;
     final displayId = order.id.substring(0, 8).toUpperCase();
+    
+    if (cachedFile != null) {
+      pdfBytes = await cachedFile.readAsBytes();
+      progress?.value = 1.0;
+    } else {
+      final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+      final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
 
-    final pdfBytes = await compute(_buildCustomOrderPdfInIsolate, {
-      'arhamLogoBytes': arhamLogoBytes,
-      'ratneshLogoBytes': ratneshLogoBytes,
-      'orderId': displayId,
-      'itemName': order.itemName ?? '-',
-      'weight': order.weight ?? '-',
-      'purity': order.purity ?? '-',
-      'pieces': order.noOfPieces ?? '-',
-      'marking': order.marking ?? '-',
-      'deliveryDate': order.deliveryDate ?? '-',
-      'refImageBytesList': refImageBytesList,
-      'productImageBytesList': productImageBytesList,
-    });
+      progress?.value = 0.1;
 
-    progress?.value = 0.9;
+      final refImageFutures = order.referenceImages.map((url) {
+        if (url.isEmpty) return Future<Uint8List?>.value(null);
+        return _downloadAndCompressImage(
+          url,
+          maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
+          quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
+        );
+      }).toList();
+
+      final productImageFutures = order.orderItems.map((item) {
+        final url = item.product.displayImageUrl;
+        if (url == null || url.isEmpty) return Future<Uint8List?>.value(null);
+        return _downloadAndCompressImage(
+          url,
+          maxLongestEdge: ImageCompressionConstants.pdfCustomOrderImageMaxEdge,
+          quality: ImageCompressionConstants.pdfCustomOrderImageQuality,
+        );
+      }).toList();
+
+      final List<Uint8List?> refImageBytesList;
+      final List<Uint8List?> productImageBytesList;
+      final results = await Future.wait([
+        Future.wait(refImageFutures),
+        Future.wait(productImageFutures),
+      ]);
+      refImageBytesList = List<Uint8List?>.from(results[0]);
+      productImageBytesList = List<Uint8List?>.from(results[1]);
+
+      progress?.value = 0.6;
+
+      pdfBytes = await compute(_buildCustomOrderPdfInIsolate, {
+        'arhamLogoBytes': arhamLogoBytes,
+        'ratneshLogoBytes': ratneshLogoBytes,
+        'orderId': displayId,
+        'itemName': order.itemName ?? '-',
+        'weight': order.weight ?? '-',
+        'purity': order.purity ?? '-',
+        'pieces': order.noOfPieces ?? '-',
+        'marking': order.marking ?? '-',
+        'deliveryDate': order.deliveryDate ?? '-',
+        'refImageBytesList': refImageBytesList,
+        'productImageBytesList': productImageBytesList,
+      });
+
+      progress?.value = 0.9;
+
+      await PdfCache.put(cacheKey, pdfBytes);
+    }
 
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;

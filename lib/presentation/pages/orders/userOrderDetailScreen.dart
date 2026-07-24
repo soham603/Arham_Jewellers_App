@@ -648,6 +648,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           orderToken: order.orderToken,
           status: order.status,
           createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
           items: items,
           totalAmount: order.totalAmount,
           message: message,

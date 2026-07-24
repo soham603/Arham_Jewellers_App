@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart' as painting;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/services/pdf_cache.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
@@ -56,6 +57,8 @@ Future<void> main() async {
       }
 
       painting.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
+
+      PdfCache.clearStale();
 
       runApp(RatneshGoldApp());
     },
