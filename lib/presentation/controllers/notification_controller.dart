@@ -32,15 +32,7 @@ class NotificationController extends GetxController {
   final Rx<CurrentAppState> state = CurrentAppState.INITIAL.obs;
   final RxString errorMessage = ''.obs;
   final RxString loadMoreError = ''.obs;
-  final RxInt filterIndex = 0.obs;
   final Set<String> _deletedIds = {};
-
-  RxList<NotificationModel> get filteredNotifications {
-    if (filterIndex.value == 1) {
-      return notifications.where((n) => !n.isRead).toList().obs;
-    }
-    return notifications;
-  }
 
   final RxBool _hasMore = true.obs;
   bool get hasMore => _hasMore.value;

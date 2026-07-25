@@ -96,12 +96,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
         child: Column(
           children: [
             Container(height: 3, color: AppColors.divider),
-            _FilterBar(controller: _controller),
             Expanded(
               child: Obx(() {
                 // Subscribe Obx to loadMoreError so list rebuilds when pagination fails
                 _controller.loadMoreError.value;
-                _controller.filterIndex.value;
                 switch (_controller.state.value) {
                   case CurrentAppState.INITIAL:
                   case CurrentAppState.LOADING:
@@ -123,10 +121,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       scrollController: _scrollController,
                     );
                   case CurrentAppState.SUCCESS:
-                    if (_controller.filteredNotifications.isEmpty) {
-                      return _EmptyState(
-                        isFiltered: _controller.filterIndex.value == 1,
-                      );
+                    if (_controller.notifications.isEmpty) {
+                      return _EmptyState();
                     }
                     return _NotificationList(
                       controller: _controller,
@@ -200,92 +196,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   }
 }
 
-class _FilterBar extends StatelessWidget {
-  final NotificationController controller;
 
-  const _FilterBar({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      if (controller.notifications.isEmpty) return const SizedBox.shrink();
-      return Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(4),
-          vertical: context.heightPercent(1),
-        ),
-        child: Row(
-          children: [
-            _FilterChip(
-              label: 'All',
-              isSelected: controller.filterIndex.value == 0,
-              onTap: () => controller.filterIndex.value = 0,
-            ),
-            SizedBox(width: context.getResponsiveSize(2)),
-            _FilterChip(
-              label: 'Unread',
-              isSelected: controller.filterIndex.value == 1,
-              onTap: () => controller.filterIndex.value = 1,
-              count: controller.unreadCount.value,
-            ),
-          ],
-        ),
-      );
-    });
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  final int? count;
-
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-    this.count,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: context.getResponsiveSize(4),
-          vertical: context.getResponsiveSize(2),
-        ),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryGold
-              : AppColors.white,
-          borderRadius: BorderRadius.circular(context.getResponsiveSize(5)),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.primaryGold
-                : AppColors.divider,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              count != null && count! > 0 ? '$label ($count)' : label,
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(3.2),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textDark,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _LoadingShimmer extends StatelessWidget {
   @override
@@ -427,9 +338,7 @@ class _ErrorState extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  final bool isFiltered;
-
-  const _EmptyState({this.isFiltered = false});
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
@@ -438,13 +347,13 @@ class _EmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            isFiltered ? Icons.mark_email_read_rounded : Icons.notifications_none_rounded,
+            Icons.notifications_none_rounded,
             size: context.getResponsiveSize(20),
             color: AppColors.textMuted.withValues(alpha: 0.5),
           ),
           SizedBox(height: context.heightPercent(2)),
           Text(
-            isFiltered ? 'No unread notifications' : 'No notifications yet',
+            'No notifications yet',
             style: TextStyle(
               fontSize: context.getResponsiveSize(4.5),
               fontWeight: FontWeight.w600,
@@ -453,9 +362,7 @@ class _EmptyState extends StatelessWidget {
           ),
           SizedBox(height: context.heightPercent(1)),
           Text(
-            isFiltered
-                ? 'All caught up! New notifications\nwill appear here.'
-                : 'You\'ll receive notifications about\norders, offers, and updates',
+            'You\'ll receive notifications about\norders, offers, and updates',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: context.getResponsiveSize(3.5),
@@ -488,7 +395,7 @@ class _NotificationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = controller.filteredNotifications;
+    final items = controller.notifications;
     return RefreshIndicator(
       color: AppColors.primaryGold,
       onRefresh: () => controller.refreshNotifications(),
