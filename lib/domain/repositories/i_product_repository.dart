@@ -9,6 +9,7 @@ abstract class IProductRepository {
     required String query,
     Map<String, dynamic>? queryParams,
   });
+  Future<ProductModel?> fetchProductByTagNo(String tagNo);
   Future<Map<String, dynamic>> updateProduct({
     required String id,
     required dynamic data,

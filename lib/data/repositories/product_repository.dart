@@ -43,6 +43,21 @@ class ProductRepository extends BaseRepository implements IProductRepository {
   }
 
   @override
+  Future<ProductModel?> fetchProductByTagNo(String tagNo) async {
+    final response = await dio.get(
+      ApiUrlConstants.PRODUCTS_SEARCH,
+      queryParameters: {"tagNo": tagNo},
+    );
+    checkApiError(response.data);
+    requireData(response.data);
+    final data = response.data['data'];
+    if (data is Map<String, dynamic>) {
+      return ProductModel.fromJson(data);
+    }
+    return null;
+  }
+
+  @override
   Future<Map<String, dynamic>> updateProduct({
     required String id,
     required dynamic data,

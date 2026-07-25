@@ -563,7 +563,9 @@ class ShareService {
       Logger.error("ShareService", "Failed to share order PDF to WhatsApp: $e");
       return false;
     } finally {
-      try { await file.delete(); } catch (_) {}
+      Future.delayed(const Duration(seconds: 30), () async {
+        try { await file.delete(); } catch (_) {}
+      });
     }
   }
 
@@ -740,7 +742,9 @@ class ShareService {
       Logger.error("ShareService", "Failed to share cart enquiry PDF to WhatsApp: $e");
       return false;
     } finally {
-      try { await file.delete(); } catch (_) {}
+      Future.delayed(const Duration(seconds: 30), () async {
+        try { await file.delete(); } catch (_) {}
+      });
     }
   }
 

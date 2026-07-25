@@ -50,6 +50,13 @@ class AncillaryController extends GetxController {
 
   AncillaryPageModel? getPage(String key) => _pages[key];
 
+  static String _sanitizePhone(String raw) {
+    final stripped = raw.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+    final cleaned = stripped.replaceAll(RegExp(r'[^0-9+]'), '');
+    final match = RegExp(r'(\+?\d{10,13})').firstMatch(cleaned);
+    return match?.group(1) ?? '';
+  }
+
   Future<void>? _adminContactReady;
 
   /// Awaits the initial ADMIN_CONTACT fetch, then returns the phone.
@@ -73,7 +80,10 @@ class AncillaryController extends GetxController {
       if (page != null) {
         _pages[pageKey] = page;
         if (pageKey == 'ADMIN_CONTACT') {
-          adminPhone.value = page.content;
+          final sanitized = _sanitizePhone(page.content);
+          if (sanitized.isNotEmpty) {
+            adminPhone.value = sanitized;
+          }
         }
       }
       _state.value = CurrentAppState.SUCCESS;

@@ -114,6 +114,8 @@ class MainActivity : FlutterActivity() {
             )
 
             val cleanPhone = phone.replace("[^0-9]".toRegex(), "")
+            val fallbackPhone = "919408451986"
+            val jid = if (cleanPhone.isNotEmpty()) cleanPhone else fallbackPhone
 
             val whatsAppPackage = when {
                 isPackageInstalled("com.whatsapp.w4b") -> "com.whatsapp.w4b"
@@ -128,9 +130,7 @@ class MainActivity : FlutterActivity() {
                 if (message.isNotEmpty()) {
                     putExtra(Intent.EXTRA_TEXT, message)
                 }
-                if (cleanPhone.isNotEmpty()) {
-                    putExtra("jid", "${cleanPhone}@s.whatsapp.net")
-                }
+                putExtra("jid", "${jid}@s.whatsapp.net")
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

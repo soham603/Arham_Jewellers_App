@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
@@ -18,7 +17,10 @@ import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
-import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart' show ToastUtils;
+import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
+import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -344,6 +346,104 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               "Delivery Date",
               DateFormat("dd MMM yyyy").format(order.deliveryDate!.toLocal()),
             ),
+
+          if (order.items.isNotEmpty) ...[
+            SizedBox(height: context.heightPercent(1.5)),
+            Text(
+              "Catalog Items",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: context.getResponsiveSize(3.8),
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: context.heightPercent(1)),
+            ...order.items.map((item) {
+              final hasImage =
+                  item.product.imageUrl != null &&
+                  item.product.imageUrl!.isNotEmpty;
+              return Padding(
+                padding: EdgeInsets.only(bottom: context.heightPercent(1)),
+                child: GestureDetector(
+                  onTap: () => _navigateToProduct(context, item.product),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: hasImage
+                            ? () => showImageZoomDialog(
+                                context,
+                                item.product.imageUrl!,
+                              )
+                            : null,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            width: context.getResponsiveSize(12),
+                            height: context.getResponsiveSize(12),
+                            child: hasImage
+                                ? CachedNetworkImage(
+                                    imageUrl: item.product.imageUrl!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, _) =>
+                                        const Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                    errorWidget: (_, _, _) =>
+                                        const RatneshFallback.xs(),
+                                  )
+                                : const RatneshFallback.xs(),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: context.getResponsiveSize(3)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.product.name,
+                              style: TextStyle(
+                                fontSize: context.getResponsiveSize(3.6),
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            SizedBox(height: context.heightPercent(0.3)),
+                            Wrap(
+                              spacing: context.getResponsiveSize(2),
+                              runSpacing: context.heightPercent(0.3),
+                              children: [
+                                if (item.product.tagNo != null &&
+                                    item.product.tagNo!.isNotEmpty)
+                                  _buildItemChip(
+                                    context,
+                                    label: item.product.tagNo!,
+                                  ),
+                                if (item.quantity > 0)
+                                  _buildItemChip(
+                                    context,
+                                    label: 'x${item.quantity}',
+                                  ),
+                                if (item.price > 0)
+                                  _buildItemChip(
+                                    context,
+                                    label:
+                                        '₹${item.price.toStringAsFixed(2)}',
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+
           if (order.referenceImages.isNotEmpty) ...[
             SizedBox(height: context.heightPercent(1.5)),
             Text(
@@ -380,6 +480,77 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildItemChip(BuildContext context, {required String label}) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: context.getResponsiveSize(2),
+        vertical: context.heightPercent(0.2),
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.pageBg,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: context.getResponsiveSize(2.8),
+          fontWeight: FontWeight.w600,
+          color: AppColors.textMuted,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _navigateToProduct(
+    BuildContext context,
+    UserOrderProductModel product,
+  ) async {
+    if (product.tagNo == null || product.tagNo!.isEmpty) {
+      ProductNavigationUtil.navigateToProductDetails(
+        id: product.id,
+        name: product.name,
+        tagNo: product.tagNo,
+        karat: product.karat,
+        nameSlug: product.slug,
+        imageUrl: product.imageUrl,
+        isActive: product.isActive,
+        rawData: {
+          if (product.karigarNetWt != null)
+            'KarigarNetWt': product.karigarNetWt,
+          if (product.karigarFineWt != null)
+            'KarigarFineWt': product.karigarFineWt,
+          if (product.size1 != null) 'Size1': product.size1,
+        },
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final repo = ProductRepository();
+      final fullProduct = await repo.fetchProductByTagNo(product.tagNo!);
+
+      if (mounted) Navigator.of(context).pop();
+
+      if (fullProduct != null && mounted) {
+        Get.to(() => ProductDetailsPage(product: fullProduct));
+      } else if (mounted) {
+        ToastUtils.showError('Product not found');
+      }
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      Logger.error('UserOrderDetail', 'Failed to fetch product: $e');
+      if (mounted) {
+        ToastUtils.showError('Failed to load product');
+      }
+    }
   }
 
   Widget _customDetailRow(BuildContext context, String label, String value) {
@@ -562,57 +733,26 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   }
 
   Widget _buildActionButtons(BuildContext context, UserOrderModel order) {
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: context.heightPercent(5),
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.primaryGold),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              onPressed: () => _openWhatsAppWithPdf(context, order),
-              child: Text(
-                'Enquire',
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(4),
-                  color: AppColors.primaryGold,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+    return SizedBox(
+      width: double.infinity,
+      height: context.heightPercent(5),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: AppColors.primaryGold),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
-        SizedBox(width: context.getResponsiveSize(3)),
-        Expanded(
-          child: SizedBox(
-            height: context.heightPercent(5),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: const Color(0xFF25D366),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              onPressed: () => _openWhatsAppWithPdf(context, order),
-              icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                  color: Colors.white, size: 16),
-              label: Text(
-                'WhatsApp',
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(4),
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
+        onPressed: () => _openWhatsAppWithPdf(context, order),
+        child: Text(
+          'Enquire',
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(4),
+            color: AppColors.primaryGold,
+            fontWeight: FontWeight.w600,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -628,9 +768,40 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         final items = order.items.map((item) {
           final name = item.product.name;
           String? karat;
-          final karatMatch = RegExp(r'(\d{2})\s*[Kk]').firstMatch(name);
-          if (karatMatch != null) {
-            karat = '${karatMatch.group(1)}K';
+
+          // 1. Explicit karat field from server
+          if (item.product.karat != null && item.product.karat!.isNotEmpty) {
+            final n = KaratConstants.karatNumber(item.product.karat!);
+            if (n != null) {
+              final purity = KaratConstants.touchValueFor('${n}K');
+              karat = purity > 0 ? '${n}K ($purity)' : '${n}K';
+            }
+          }
+
+          // 2. Tag number prefix (e.g. "76GR-303" → 76 → 18K)
+          if (karat == null && item.product.tagNo != null && item.product.tagNo!.length >= 2) {
+            final prefix = item.product.tagNo!.substring(0, 2);
+            final n = int.tryParse(prefix);
+            if (n != null) {
+              final touch = n < 100 ? n * 10 : n;
+              final karatNum = KaratConstants.karatFromTouchValue(touch);
+              if (karatNum != null) {
+                final purity = KaratConstants.touchValueFor('${karatNum}K');
+                karat = purity > 0 ? '${karatNum}K ($purity)' : '${karatNum}K';
+              }
+            }
+          }
+
+          // 3. Product name — validate against known karat values only
+          if (karat == null) {
+            final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(name);
+            if (match != null) {
+              final n = int.tryParse(match.group(1)!);
+              if (n != null && [9, 14, 18, 20, 22, 24].contains(n)) {
+                final purity = KaratConstants.touchValueFor('${n}K');
+                karat = purity > 0 ? '${n}K ($purity)' : '${n}K';
+              }
+            }
           }
           return {
             'name': name,
