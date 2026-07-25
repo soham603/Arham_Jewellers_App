@@ -11,6 +11,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/complete_order_dialog.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key, required this.order});
@@ -632,7 +633,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: ElevatedButton(
         onPressed: controller.isActionLoading
             ? null
-            : () => _showCompleteDialog(order),
+            : () => CompleteOrderDialog.show(
+                  subtitle: order.partyName?.isNotEmpty == true
+                      ? order.partyName!
+                      : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
+                  onConfirm: (deliveryDate, completeAdminNotes) async {
+                    await controller.performOrderAction(
+                      orderId: order.id,
+                      action: "COMPLETE",
+                      allocations: [],
+                      deliveryDate: deliveryDate,
+                      completeAdminNotes: completeAdminNotes,
+                    );
+                    ToastUtils.showSuccess("Order marked as completed");
+                    if (context.mounted) Navigator.of(context).pop();
+                    return true;
+                  },
+                ),
         style: ElevatedButton.styleFrom(
           elevation: 0,
           backgroundColor: AppColors.primaryGold,
@@ -662,203 +679,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               )),
       ),
-    );
-  }
-
-  void _showCompleteDialog(AdminOrderModel order) {
-    final dateController = TextEditingController();
-    final notesController = TextEditingController();
-    DateTime? selectedDate;
-
-    Get.dialog(
-      StatefulBuilder(
-        builder: (context, setDialogState) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Mark as Completed",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: context.getResponsiveSize(5),
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(0.8)),
-                  Text(
-                    order.partyName?.isNotEmpty == true
-                        ? order.partyName!
-                        : "Order #${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}",
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: context.getResponsiveSize(3.4),
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(2)),
-                  Text(
-                    "Delivery Date",
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.3),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(0.8)),
-                  GestureDetector(
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
-                      );
-                      if (date != null) {
-                        setDialogState(() {
-                          selectedDate = date;
-                          dateController.text = '${date.day}/${date.month}/${date.year}';
-                        });
-                      }
-                    },
-                    child: AbsorbPointer(
-                      child: TextField(
-                        controller: dateController,
-                        style: TextStyle(
-                          fontSize: context.getResponsiveSize(3.6),
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Select delivery date (optional)",
-                          hintStyle: TextStyle(
-                            fontSize: context.getResponsiveSize(3.4),
-                            color: Colors.grey.shade400,
-                          ),
-                          filled: true,
-                          fillColor: const Color(0xFFF9FAFB),
-                          suffixIcon: Icon(
-                            Icons.calendar_today_rounded,
-                            color: AppColors.primaryGold,
-                            size: 20,
-                          ),
-                          contentPadding: EdgeInsets.all(context.getResponsiveSize(3)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF2563EB),
-                              width: 1.2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(2)),
-                  Text(
-                    "Completion Notes",
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.3),
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(0.8)),
-                  TextField(
-                    controller: notesController,
-                    maxLines: 3,
-                    textInputAction: TextInputAction.done,
-                    style: TextStyle(
-                      fontSize: context.getResponsiveSize(3.6),
-                    ),
-                    decoration: InputDecoration(
-                      hintText: "Optional notes",
-                      hintStyle: TextStyle(
-                        fontSize: context.getResponsiveSize(3.4),
-                        color: Colors.grey.shade400,
-                      ),
-                      filled: true,
-                      fillColor: const Color(0xFFF9FAFB),
-                      contentPadding: EdgeInsets.all(context.getResponsiveSize(3)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF2563EB),
-                          width: 1.2,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.heightPercent(2)),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          child: Text(
-                            "Cancel",
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(3.6),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: context.getResponsiveSize(3)),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            Get.back();
-                            await controller.performOrderAction(
-                              orderId: order.id,
-                              action: "COMPLETE",
-                              allocations: [],
-                              deliveryDate: selectedDate?.toIso8601String().split('T').first,
-                              completeAdminNotes: notesController.text.trim(),
-                            );
-                            if (context.mounted) Get.back();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            backgroundColor: const Color(0xFF2D9D59),
-                            padding: EdgeInsets.symmetric(
-                              vertical: context.heightPercent(1.2),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Text(
-                            "Confirm Complete",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: context.getResponsiveSize(3.6),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-      barrierDismissible: false,
     );
   }
 

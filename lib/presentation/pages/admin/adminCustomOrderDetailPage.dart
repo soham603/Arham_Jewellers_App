@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/complete_order_dialog.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -452,7 +453,22 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    onPressed: () => _showCompleteDialog(context),
+                    onPressed: () => CompleteOrderDialog.show(
+                      subtitle: "Order #${widget.order.id.length >= 8 ? widget.order.id.substring(0, 8).toUpperCase() : widget.order.id.toUpperCase()}",
+                      showCancel: false,
+                      onConfirm: (deliveryDate, completeAdminNotes) async {
+                        final success = await _controller.performCustomOrderAction(
+                          orderId: widget.order.id,
+                          action: 'COMPLETE',
+                          deliveryDate: deliveryDate,
+                          completeAdminNotes: completeAdminNotes,
+                        );
+                        if (success == true && context.mounted) {
+                          Get.back();
+                        }
+                        return success ?? false;
+                      },
+                    ),
                     child: Obx(() {
                       return _controller.isActionLoading
                           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
@@ -937,107 +953,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // ── Complete Dialog ──
-  void _showCompleteDialog(BuildContext context) {
-    final dateCtrl = TextEditingController();
-    final notesCtrl = TextEditingController();
-    DateTime? selectedDate;
-
-    Get.dialog(
-      StatefulBuilder(
-        builder: (context, setDialogState) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
-            child: Container(
-              padding: EdgeInsets.all(context.getResponsiveSize(5)),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Mark as Completed", style: TextStyle(fontSize: context.getResponsiveSize(5), fontWeight: FontWeight.w700, color: AppColors.textDark)),
-                    SizedBox(height: context.heightPercent(2)),
-
-                    Text("Delivery Date", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.heightPercent(0.8)),
-                    GestureDetector(
-                      onTap: () async {
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                          lastDate: DateTime.now().add(const Duration(days: 365)),
-                        );
-                        if (date != null) {
-                          setDialogState(() {
-                            selectedDate = date;
-                            dateCtrl.text = '${date.day}/${date.month}/${date.year}';
-                          });
-                        }
-                      },
-                      child: AbsorbPointer(
-                        child: TextField(
-                          controller: dateCtrl,
-                          decoration: InputDecoration(
-                            hintText: 'Select delivery date',
-                            hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getResponsiveSize(3.3)),
-                            filled: true,
-                            fillColor: AppColors.pageBg,
-                            suffixIcon: Icon(Icons.calendar_today_rounded, color: AppColors.primaryGold, size: 20),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: context.heightPercent(2)),
-                    Text("Completion Notes", style: TextStyle(fontSize: context.getResponsiveSize(3.3), fontWeight: FontWeight.w600, color: AppColors.textMuted)),
-                    SizedBox(height: context.heightPercent(0.8)),
-                    TextField(
-                      controller: notesCtrl,
-                      maxLines: 2,
-                      decoration: InputDecoration(
-                        hintText: 'Optional notes',
-                        hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getResponsiveSize(3.3)),
-                        filled: true,
-                        fillColor: AppColors.pageBg,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      ),
-                    ),
-
-                    SizedBox(height: context.heightPercent(3)),
-                    SizedBox(
-                      width: double.infinity,
-                      height: context.heightPercent(5.5),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2D9D59),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        onPressed: () async {
-                          Get.back();
-                          await _controller.performCustomOrderAction(
-                            orderId: widget.order.id,
-                            action: 'COMPLETE',
-                            deliveryDate: selectedDate?.toIso8601String().split('T').first,
-                            completeAdminNotes: notesCtrl.text.trim(),
-                          );
-                        },
-                        child: Text("Confirm Complete", style: TextStyle(fontSize: context.getResponsiveSize(4), fontWeight: FontWeight.w700, color: Colors.white)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
