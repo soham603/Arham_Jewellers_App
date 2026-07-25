@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class GoldRateController extends GetxController {
   static GoldRateController get instance => Get.find();
+  static final _historyCutoffDate = DateTime(2026, 6, 1);
 
   final _goldRateRepo = GoldRateRepository();
 
@@ -157,7 +158,10 @@ class GoldRateController extends GetxController {
         queryParams: queryParams,
       );
 
-      _history.assignAll(result.items);
+      final filteredItems = result.items
+          .where((item) => item.timestamp.isAfter(_historyCutoffDate))
+          .toList();
+      _history.assignAll(filteredItems);
 
       if (result.statistics != null) {
         _statistics.value = result.statistics;
