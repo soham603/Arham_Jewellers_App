@@ -793,16 +793,17 @@ class _ContactAdminCard extends StatelessWidget {
   const _ContactAdminCard({required this.orderId});
 
   Future<void> _launchCall() async {
-    final uri =
-        Uri(scheme: 'tel', path: AdminConstants.adminPhone);
+    final phone = await AdminConstants.adminPhoneAsync;
+    final uri = Uri(scheme: 'tel', path: phone);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
   }
 
   Future<void> _launchWhatsApp() async {
+    final phone = await AdminConstants.adminPhoneAsync;
     final uri = WhatsAppUtil.buildUrl(
-      AdminConstants.adminPhone,
+      phone,
       message: 'Hi, I need help with my order #$orderId',
     );
     if (await canLaunchUrl(uri)) {

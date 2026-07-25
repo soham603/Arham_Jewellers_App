@@ -2,22 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryController.dart';
 import 'ancillary_editor_screen.dart';
 
 class AncillarySelectionScreen extends StatelessWidget {
   const AncillarySelectionScreen({super.key});
 
-  final List<String> categories = const [
-    "TERMS",
-    "ABOUT",
-    "CONTACT",
-    "PRIVACY",
-    "REFUND",
-    "CITY_POLICY",
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final categories = AncillaryController.pageKeys;
+    final labels = AncillaryController.pageLabels;
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       appBar: AppBar(
@@ -57,7 +52,7 @@ class AncillarySelectionScreen extends StatelessWidget {
                 vertical: context.heightPercent(0.5),
               ),
               title: Text(
-                category.replaceAll('_', ' '),
+                labels[category] ?? category,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textDark,

@@ -551,11 +551,13 @@ class _CartPageState extends State<CartPage> {
       final message = 'Cart Enquiry\n\nProducts: $productNames\n\n'
           'Please find the attached PDF for details.';
 
+      final phone = await AdminConstants.adminPhoneAsync;
+
       final success = await ShareService.shareCartEnquiryPdfToWhatsApp(
         products: products,
         quantities: quantities,
         message: message,
-        phone: AdminConstants.adminPhone,
+        phone: phone,
         progress: progress,
         cancelled: cancelled,
       );
@@ -567,7 +569,7 @@ class _CartPageState extends State<CartPage> {
 
       if (!success && !cancelled.value && mounted) {
         final url = WhatsAppUtil.buildUrl(
-          AdminConstants.adminPhone,
+          phone,
           message: message,
         );
         if (await canLaunchUrl(url)) {

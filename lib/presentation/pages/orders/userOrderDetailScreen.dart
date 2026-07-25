@@ -643,6 +643,8 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           };
         }).toList();
 
+        final phone = await AdminConstants.adminPhoneAsync;
+
         final success = await ShareService.shareOrderPdfToWhatsApp(
           orderId: order.id,
           orderToken: order.orderToken,
@@ -652,14 +654,14 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           items: items,
           totalAmount: order.totalAmount,
           message: message,
-          phone: AdminConstants.adminPhone,
+          phone: phone,
           progress: progress,
           cancelled: cancelled,
         );
 
         if (!success && !cancelled.value && mounted) {
           final url = WhatsAppUtil.buildUrl(
-            AdminConstants.adminPhone,
+            phone,
             message: message,
           );
           if (await canLaunchUrl(url)) {

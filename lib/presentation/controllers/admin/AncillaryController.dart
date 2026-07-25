@@ -9,6 +9,9 @@ import 'package:ratnesh_gold_app/utils/Logger.dart';
 class AncillaryController extends GetxController {
   static AncillaryController get instance => Get.find();
 
+  static const String _fallbackPhone = '+919408451986';
+  static String get fallbackPhone => _fallbackPhone;
+
   final _ancillaryRepo = AncillaryRepository();
 
   static const List<String> pageKeys = [
@@ -18,6 +21,7 @@ class AncillaryController extends GetxController {
     'PRIVACY',
     'REFUND',
     'CITY_POLICY',
+    'ADMIN_CONTACT',
   ];
 
   static const Map<String, String> pageLabels = {
@@ -27,10 +31,13 @@ class AncillaryController extends GetxController {
     'PRIVACY': 'Privacy Policy',
     'REFUND': 'Refund Policy',
     'CITY_POLICY': 'City Policy',
+    'ADMIN_CONTACT': 'Admin Contact',
   };
 
   final _pages = <String, AncillaryPageModel>{}.obs;
   Map<String, AncillaryPageModel> get pages => _pages;
+
+  final adminPhone = _fallbackPhone.obs;
 
   final _state = CurrentAppState.INITIAL.obs;
   CurrentAppState get state => _state.value;
@@ -43,6 +50,21 @@ class AncillaryController extends GetxController {
 
   AncillaryPageModel? getPage(String key) => _pages[key];
 
+  Future<void>? _adminContactReady;
+
+  /// Awaits the initial ADMIN_CONTACT fetch, then returns the phone.
+  /// Use this in tap handlers to guarantee the real number is loaded.
+  Future<String> get adminPhoneAsync async {
+    if (_adminContactReady != null) await _adminContactReady;
+    return adminPhone.value;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    _adminContactReady = fetchPage('ADMIN_CONTACT');
+  }
+
   Future<void> fetchPage(String pageKey) async {
     try {
       _state.value = CurrentAppState.LOADING;
@@ -50,6 +72,9 @@ class AncillaryController extends GetxController {
       final page = await _ancillaryRepo.fetchPage(pageKey: pageKey);
       if (page != null) {
         _pages[pageKey] = page;
+        if (pageKey == 'ADMIN_CONTACT') {
+          adminPhone.value = page.content;
+        }
       }
       _state.value = CurrentAppState.SUCCESS;
     } on DioException catch (e, st) {

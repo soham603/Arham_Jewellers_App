@@ -47,8 +47,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   Future<void> _launchWhatsApp() async {
+    final phone = await AdminConstants.adminPhoneAsync;
     final uri = WhatsAppUtil.buildUrl(
-      AdminConstants.adminPhone,
+      phone,
       message: 'Hi, I have forgotten my password. Please help me reset it.',
     );
     if (await canLaunchUrl(uri)) {

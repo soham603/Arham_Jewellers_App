@@ -57,8 +57,9 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
   }
 
   Future<void> _launchWhatsApp() async {
+    final phone = await AdminConstants.adminPhoneAsync;
     final uri = WhatsAppUtil.buildUrl(
-      AdminConstants.adminPhone,
+      phone,
       message: 'Hi, I need help changing my handset. Please assist me.',
     );
     if (await canLaunchUrl(uri)) {
