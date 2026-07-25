@@ -512,8 +512,8 @@ class _ProductImage extends StatelessWidget {
               child: ClipRect(
                 child: ImageFiltered(
                   imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                  child: ColoredBox(
-                    color: AppColors.cardBgLight,
+                  child: Transform.scale(
+                    scale: 1.1,
                     child: Image(
                       image: imageProvider,
                       fit: BoxFit.cover,
