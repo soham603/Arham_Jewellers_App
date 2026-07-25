@@ -800,15 +800,13 @@ class _ContactAdminCard extends StatelessWidget {
     }
   }
 
-  Future<void> _launchWhatsApp() async {
+  Future<void> _launchWhatsApp(BuildContext context) async {
     final phone = await AdminConstants.adminPhoneAsync;
-    final uri = WhatsAppUtil.buildUrl(
+    await WhatsAppUtil.launchWhatsApp(
+      context,
       phone,
       message: 'Hi, I need help with my order #$orderId',
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 
   @override
@@ -886,7 +884,7 @@ class _ContactAdminCard extends StatelessWidget {
                       color: const Color(0xFF25D366)),
                   label: 'WhatsApp',
                   color: const Color(0xFF25D366),
-                  onTap: _launchWhatsApp,
+                  onTap: () => _launchWhatsApp(context),
                 ),
               ),
             ],

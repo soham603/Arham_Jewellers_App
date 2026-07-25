@@ -15,8 +15,8 @@ import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -532,6 +532,20 @@ class _CartPageState extends State<CartPage> {
     List<ProductModel> products,
     List<int> quantities,
   ) async {
+    final packages = await ShareService.getAvailableWhatsAppPackages();
+    if (packages.isEmpty) {
+      if (mounted) ToastUtils.showError('WhatsApp is not installed');
+      return;
+    }
+
+    String? selectedPackage;
+    if (packages.length > 1) {
+      selectedPackage = await _showWhatsAppPicker(context);
+      if (selectedPackage == null) return;
+    } else {
+      selectedPackage = packages.first;
+    }
+
     final progress = ValueNotifier<double>(0.0);
     final cancelled = ValueNotifier<bool>(false);
 
@@ -553,11 +567,12 @@ class _CartPageState extends State<CartPage> {
 
       final phone = await AdminConstants.adminPhoneAsync;
 
-      final success = await ShareService.shareCartEnquiryPdfToWhatsApp(
+      final result = await ShareService.shareCartEnquiryPdfToWhatsApp(
         products: products,
         quantities: quantities,
         message: message,
         phone: phone,
+        packageName: selectedPackage,
         progress: progress,
         cancelled: cancelled,
       );
@@ -567,15 +582,18 @@ class _CartPageState extends State<CartPage> {
         dialogDismissed = true;
       }
 
-      if (!success && !cancelled.value && mounted) {
-        final url = WhatsAppUtil.buildUrl(
-          phone,
-          message: message,
-        );
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (!result.success && !cancelled.value && mounted) {
+        if (result.filePath != null) {
+          await Share.shareXFiles(
+            [XFile(result.filePath!, name: result.fileName)],
+            text: message,
+          );
         } else {
-          ToastUtils.showError('Could not open WhatsApp');
+          await WhatsAppUtil.launchWhatsApp(
+            context,
+            phone,
+            message: message,
+          );
         }
       }
     } catch (e) {
@@ -585,6 +603,39 @@ class _CartPageState extends State<CartPage> {
       progress.dispose();
       cancelled.dispose();
     }
+  }
+
+  Future<String?> _showWhatsAppPicker(BuildContext context) {
+    return showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Share via',
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat, color: Color(0xFF25D366)),
+              title: const Text('WhatsApp'),
+              onTap: () => Navigator.pop(ctx, 'com.whatsapp'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.business, color: Color(0xFF25D366)),
+              title: const Text('WhatsApp Business'),
+              onTap: () => Navigator.pop(ctx, 'com.whatsapp.w4b'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _emptyCart(BuildContext context) {

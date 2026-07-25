@@ -42,16 +42,21 @@ class MainActivity : FlutterActivity() {
                         val filePath = call.argument<String>("filePath")
                         val message = call.argument<String>("message") ?: ""
                         val phone = call.argument<String>("phone") ?: ""
+                        val packageName = call.argument<String>("packageName")
                         if (filePath == null) {
                             result.error("INVALID_ARGS", "filePath is required", null)
                             return@setMethodCallHandler
                         }
-                        val success = shareToWhatsApp(filePath, message, phone)
+                        val success = shareToWhatsApp(filePath, message, phone, packageName)
                         if (success) {
                             result.success(true)
                         } else {
                             result.error("WHATSAPP_NOT_FOUND", "WhatsApp is not installed", null)
                         }
+                    }
+                    "getAvailableWhatsAppPackages" -> {
+                        val packages = getAvailableWhatsAppPackages()
+                        result.success(packages)
                     }
                     else -> result.notImplemented()
                 }
@@ -102,7 +107,14 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun shareToWhatsApp(filePath: String, message: String, phone: String): Boolean {
+    private fun getAvailableWhatsAppPackages(): List<String> {
+        val packages = mutableListOf<String>()
+        if (isPackageInstalled("com.whatsapp")) packages.add("com.whatsapp")
+        if (isPackageInstalled("com.whatsapp.w4b")) packages.add("com.whatsapp.w4b")
+        return packages
+    }
+
+    private fun shareToWhatsApp(filePath: String, message: String, phone: String, targetPackage: String? = null): Boolean {
         try {
             val file = File(filePath)
             if (!file.exists()) return false
@@ -117,15 +129,21 @@ class MainActivity : FlutterActivity() {
             val fallbackPhone = "919408451986"
             val jid = if (cleanPhone.isNotEmpty()) cleanPhone else fallbackPhone
 
-            val whatsAppPackage = when {
-                isPackageInstalled("com.whatsapp.w4b") -> "com.whatsapp.w4b"
-                isPackageInstalled("com.whatsapp") -> "com.whatsapp"
+            val hasWhatsApp = isPackageInstalled("com.whatsapp")
+            val hasWhatsAppBusiness = isPackageInstalled("com.whatsapp.w4b")
+
+            if (!hasWhatsApp && !hasWhatsAppBusiness) return false
+
+            val resolvedPackage = when {
+                targetPackage != null && isPackageInstalled(targetPackage) -> targetPackage
+                hasWhatsApp -> "com.whatsapp"
+                hasWhatsAppBusiness -> "com.whatsapp.w4b"
                 else -> return false
             }
 
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                setPackage(whatsAppPackage)
+            val sendIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "application/pdf"
+                setPackage(resolvedPackage)
                 putExtra(Intent.EXTRA_STREAM, uri)
                 if (message.isNotEmpty()) {
                     putExtra(Intent.EXTRA_TEXT, message)
@@ -136,7 +154,7 @@ class MainActivity : FlutterActivity() {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
 
-            startActivity(intent)
+            startActivity(sendIntent)
             return true
         } catch (e: Exception) {
             Log.e("MainActivity", "shareToWhatsApp failed", e)

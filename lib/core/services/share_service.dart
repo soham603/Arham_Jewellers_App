@@ -15,6 +15,18 @@ import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/core/services/pdf_cache.dart';
 
+class ShareToWhatsAppResult {
+  final bool success;
+  final String? filePath;
+  final String? fileName;
+
+  const ShareToWhatsAppResult({
+    required this.success,
+    this.filePath,
+    this.fileName,
+  });
+}
+
 class ShareService {
   static const String _brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
   static const String _brandSubtitle = 'Purity - Quality - Trust';
@@ -438,6 +450,19 @@ class ShareService {
 
   static const MethodChannel _channel = MethodChannel('com.shreearhamgold.ratneshgold/file_saver');
 
+  static Future<List<String>> getAvailableWhatsAppPackages() async {
+    try {
+      final result = await _channel.invokeMethod('getAvailableWhatsAppPackages');
+      if (result is List) {
+        return result.map((e) => e.toString()).toList();
+      }
+      return [];
+    } catch (e) {
+      Logger.error('ShareService', 'getAvailableWhatsAppPackages failed: $e');
+      return [];
+    }
+  }
+
   static Future<String?> _saveBytesToDownloads({
     required List<int> bytes,
     required String fileName,
@@ -454,7 +479,7 @@ class ShareService {
     }
   }
 
-  static Future<bool> shareOrderPdfToWhatsApp({
+  static Future<ShareToWhatsAppResult> shareOrderPdfToWhatsApp({
     required String orderId,
     int? orderToken,
     required String status,
@@ -464,6 +489,7 @@ class ShareService {
     double? totalAmount,
     required String message,
     required String phone,
+    String? packageName,
     ValueNotifier<double>? progress,
     ValueNotifier<bool>? cancelled,
   }) async {
@@ -492,7 +518,7 @@ class ShareService {
         rangeEnd: 0.4,
       );
 
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       final imageBytesList = await compute(_compressImageBatchInIsolate, {
         'imageBytes': rawBytesList,
@@ -501,7 +527,7 @@ class ShareService {
       });
 
       progress?.value = 0.5;
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
       final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
@@ -519,7 +545,7 @@ class ShareService {
       });
 
       progress?.value = 0.8;
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       await PdfCache.put(cacheKey, pdfBytes);
     }
@@ -539,7 +565,7 @@ class ShareService {
     progress?.value = 0.95;
     if (cancelled?.value == true) {
       try { await file.delete(); } catch (_) {}
-      return false;
+      return const ShareToWhatsAppResult(success: false);
     }
 
     try {
@@ -548,20 +574,32 @@ class ShareService {
           'filePath': file.path,
           'message': message,
           'phone': phone,
+          'packageName': packageName,
         });
         progress?.value = 1.0;
-        return result ?? false;
+        if (result == true) {
+          return const ShareToWhatsAppResult(success: true);
+        }
+        return ShareToWhatsAppResult(
+          success: false,
+          filePath: file.path,
+          fileName: fileName,
+        );
       } else {
         await Share.shareXFiles(
           [XFile(file.path, name: fileName)],
           text: message,
         );
         progress?.value = 1.0;
-        return true;
+        return const ShareToWhatsAppResult(success: true);
       }
     } catch (e) {
       Logger.error("ShareService", "Failed to share order PDF to WhatsApp: $e");
-      return false;
+      return ShareToWhatsAppResult(
+        success: false,
+        filePath: file.path,
+        fileName: fileName,
+      );
     } finally {
       Future.delayed(const Duration(seconds: 30), () async {
         try { await file.delete(); } catch (_) {}
@@ -625,11 +663,12 @@ class ShareService {
     return _saveBytesToDownloads(bytes: pdfBytes, fileName: fileName);
   }
 
-  static Future<bool> shareCartEnquiryPdfToWhatsApp({
+  static Future<ShareToWhatsAppResult> shareCartEnquiryPdfToWhatsApp({
     required List<ProductModel> products,
     required List<int> quantities,
     required String message,
     required String phone,
+    String? packageName,
     ValueNotifier<double>? progress,
     ValueNotifier<bool>? cancelled,
   }) async {
@@ -664,7 +703,7 @@ class ShareService {
         rangeEnd: 0.4,
       );
 
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       final imageBytesList = await compute(_compressImageBatchInIsolate, {
         'imageBytes': rawBytesList,
@@ -673,7 +712,7 @@ class ShareService {
       });
 
       progress?.value = 0.5;
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       final rows = <Map<String, dynamic>>[];
       for (var i = 0; i < products.length; i++) {
@@ -699,7 +738,7 @@ class ShareService {
       });
 
       progress?.value = 0.8;
-      if (cancelled?.value == true) return false;
+      if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
 
       await PdfCache.put(cacheKey, pdfBytes);
     }
@@ -718,7 +757,7 @@ class ShareService {
     progress?.value = 0.95;
     if (cancelled?.value == true) {
       try { await file.delete(); } catch (_) {}
-      return false;
+      return const ShareToWhatsAppResult(success: false);
     }
 
     try {
@@ -727,20 +766,32 @@ class ShareService {
           'filePath': file.path,
           'message': message,
           'phone': phone,
+          'packageName': packageName,
         });
         progress?.value = 1.0;
-        return result ?? false;
+        if (result == true) {
+          return const ShareToWhatsAppResult(success: true);
+        }
+        return ShareToWhatsAppResult(
+          success: false,
+          filePath: file.path,
+          fileName: fileName,
+        );
       } else {
         await Share.shareXFiles(
           [XFile(file.path, name: fileName)],
           text: message,
         );
         progress?.value = 1.0;
-        return true;
+        return const ShareToWhatsAppResult(success: true);
       }
     } catch (e) {
       Logger.error("ShareService", "Failed to share cart enquiry PDF to WhatsApp: $e");
-      return false;
+      return ShareToWhatsAppResult(
+        success: false,
+        filePath: file.path,
+        fileName: fileName,
+      );
     } finally {
       Future.delayed(const Duration(seconds: 30), () async {
         try { await file.delete(); } catch (_) {}

@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -58,13 +57,11 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
   Future<void> _launchWhatsApp() async {
     final phone = await AdminConstants.adminPhoneAsync;
-    final uri = WhatsAppUtil.buildUrl(
+    await WhatsAppUtil.launchWhatsApp(
+      context,
       phone,
       message: 'Hi, I need help changing my handset. Please assist me.',
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 
   @override

@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
@@ -866,8 +865,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildWhatsAppButton(BuildContext context, AdminOrderModel order) {
     return GestureDetector(
       onTap: () async {
-        final url = WhatsAppUtil.buildUrl(order.user.phoneNumber);
-        await launchUrl(url);
+        await WhatsAppUtil.launchWhatsApp(context, order.user.phoneNumber);
       },
       child: Container(
         width: double.infinity,

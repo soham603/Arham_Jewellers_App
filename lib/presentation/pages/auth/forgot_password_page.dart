@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../../app/routes/app_routes.dart';
@@ -48,13 +47,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Future<void> _launchWhatsApp() async {
     final phone = await AdminConstants.adminPhoneAsync;
-    final uri = WhatsAppUtil.buildUrl(
+    await WhatsAppUtil.launchWhatsApp(
+      context,
       phone,
       message: 'Hi, I have forgotten my password. Please help me reset it.',
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 
   @override

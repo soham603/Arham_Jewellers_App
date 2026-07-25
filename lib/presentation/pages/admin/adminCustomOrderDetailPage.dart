@@ -9,7 +9,6 @@ import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
@@ -1050,8 +1049,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
     return GestureDetector(
       onTap: () async {
-        final url = WhatsAppUtil.buildUrl(phone);
-        await launchUrl(url);
+        await WhatsAppUtil.launchWhatsApp(context, phone);
       },
       child: Container(
         width: double.infinity,
