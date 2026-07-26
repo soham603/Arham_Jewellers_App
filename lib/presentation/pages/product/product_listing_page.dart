@@ -50,7 +50,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   final ScrollController _scrollController = ScrollController();
 
   String _stockFilter = 'ready';
-  int? _approvalFilter; // null = All, 1 = Approved, 0 = Not Approved, -1 = N/A
+  int? _approvalFilter;
   double _weightMin = 0;
   double _weightMax = 500;
   double _priceMin = 0;
@@ -204,12 +204,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (!_hasMore || _currentStockState == CurrentAppState.LOADING) return;
     setState(() => _isLoadingMore = true);
     final stockFilter = _stockFilter;
+    final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
-      _controller.loadMoreMultipleCategories(stockFilter: stockFilter);
+      _controller.loadMoreMultipleCategories(stockFilter: stockFilter, approvalFilter: approvalFilter);
     } else if (_isCategoryFilter) {
-      _controller.loadMoreFilteredProducts(stockFilter: stockFilter);
+      _controller.loadMoreFilteredProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
     } else {
-      _controller.loadMoreKaratProducts(stockFilter: stockFilter);
+      _controller.loadMoreKaratProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
     }
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted && _currentStockState == CurrentAppState.LOADING) {
@@ -219,21 +220,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   Future<void> _onRefresh() async {
     _clearCategoryCaches();
+    final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
       await Future.wait([
-        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready'),
+        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready', approvalFilter: approvalFilter),
         _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out'),
         _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all'),
       ]);
     } else if (_isCategoryFilter && _hasKarat) {
       await Future.wait([
-        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready'),
+        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready', approvalFilter: approvalFilter),
         _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out'),
         _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all'),
       ]);
     } else if (_isCategoryFilter) {
       await Future.wait([
-        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready'),
+        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready', approvalFilter: approvalFilter),
         _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out'),
         _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all'),
       ]);
@@ -242,7 +244,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           widget.karats ??
           (widget.karat != null ? [widget.karat!] : <String>[]);
       await Future.wait([
-        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready'),
+        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready', approvalFilter: approvalFilter),
         _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out'),
         _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all'),
       ]);
@@ -554,16 +556,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
+                          final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
                           if (_isMultiCategory) {
-                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready');
+                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready', approvalFilter: approvalFilter);
                             _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out');
                             _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all');
                           } else if (_isCategoryOnly) {
-                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready');
+                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready', approvalFilter: approvalFilter);
                             _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out');
                             _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all');
                           } else if (_isCategoryFilter) {
-                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready');
+                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready', approvalFilter: approvalFilter);
                             _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out');
                             _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all');
                           } else {
@@ -572,7 +575,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                 (widget.karat != null
                                     ? [widget.karat!]
                                     : <String>[]);
-                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready');
+                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready', approvalFilter: approvalFilter);
                             _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out');
                             _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all');
                           }
@@ -1050,6 +1053,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           if (_scrollController.hasClients) {
             _scrollController.jumpTo(0);
           }
+          _reloadStockFilter(value);
         }
       },
       child: Container(
@@ -1107,6 +1111,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           setState(() {
             _approvalFilter = value;
           });
+          _reloadWithApprovalFilter(value);
         }
       },
       child: Container(
@@ -1137,6 +1142,33 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ),
       ),
     );
+  }
+
+  void _reloadWithApprovalFilter(int? approvalFilter) {
+    if (_isMultiCategory) {
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+    } else if (_isCategoryOnly) {
+      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+    } else if (_isCategoryFilter) {
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+    } else {
+      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+      _controller.loadProductsByKarats(karatsToLoad, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+    }
+  }
+
+  void _reloadStockFilter(String stockFilter) {
+    final approvalFilter = stockFilter == 'ready' ? _approvalFilter : null;
+    if (_isMultiCategory) {
+      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+    } else if (_isCategoryOnly) {
+      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+    } else if (_isCategoryFilter) {
+      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+    } else {
+      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
+      _controller.loadProductsByKarats(karatsToLoad, stockFilter: stockFilter, approvalFilter: approvalFilter);
+    }
   }
 
   bool get _hasActiveFilter =>
@@ -1186,10 +1218,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
         if (s == null) return false;
         return _selectedSizes.contains(s);
       }).toList();
-    }
-
-    if (_approvalFilter != null) {
-      result = result.where((p) => p.approvalStockTag == _approvalFilter).toList();
     }
 
     return result;

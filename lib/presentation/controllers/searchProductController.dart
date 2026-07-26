@@ -317,16 +317,19 @@ class SearchProductController extends GetxController {
     return value != 0 ? value.toString() : karat;
   }
 
-  Map<String, int>? _stockQueryParam(String? stockFilter) {
-    if (stockFilter == 'ready') return {"isStock": 1};
-    if (stockFilter == 'out') return {"isStock": 0};
-    return null;
+  Map<String, dynamic>? _stockQueryParam(String? stockFilter, {int? approvalFilter}) {
+    final params = <String, dynamic>{};
+    if (stockFilter == 'ready') params['isStock'] = 1;
+    if (stockFilter == 'out') params['isStock'] = 0;
+    if (approvalFilter != null) params['approvalStocktag'] = approvalFilter;
+    return params.isNotEmpty ? params : null;
   }
 
   Future<void> loadProductsByKarats(
     List<String> karats, {
     bool isPagination = false,
     String? stockFilter,
+    int? approvalFilter,
   }) async {
     _currentKarats = karats;
     final isReady = stockFilter == 'ready';
@@ -363,7 +366,7 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final stockParam = _stockQueryParam(stockFilter);
+      final stockParam = _stockQueryParam(stockFilter, approvalFilter: approvalFilter);
       final karatFutures = karats.map((karat) async {
         try {
           final response = await httpClient.get(
@@ -431,16 +434,16 @@ class SearchProductController extends GetxController {
     }
   }
 
-  void loadMoreKaratProducts({String? stockFilter}) {
+  void loadMoreKaratProducts({String? stockFilter, int? approvalFilter}) {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
     final hasMore = isReady ? _karatReadyHasMore : isOut ? _karatOutHasMore : _karatAllHasMore;
     final state = isReady ? _karatReadyState : isOut ? _karatOutState : _karatAllState;
     if (!hasMore || state.value == CurrentAppState.LOADING) return;
-    loadProductsByKarats(_currentKarats, isPagination: true, stockFilter: stockFilter);
+    loadProductsByKarats(_currentKarats, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
   }
 
-  Future<void> loadProductsByCategory(String categoryId, {String? stockFilter}) async {
+  Future<void> loadProductsByCategory(String categoryId, {String? stockFilter, int? approvalFilter}) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
 
@@ -451,7 +454,7 @@ class SearchProductController extends GetxController {
     existing.clear();
 
     try {
-      final stockParam = _stockQueryParam(stockFilter);
+      final stockParam = _stockQueryParam(stockFilter, approvalFilter: approvalFilter);
       final response = await httpClient.get(
         ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
@@ -489,6 +492,7 @@ class SearchProductController extends GetxController {
     List<String> categoryIds, {
     bool isPagination = false,
     String? stockFilter,
+    int? approvalFilter,
   }) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
@@ -525,7 +529,7 @@ class SearchProductController extends GetxController {
     state.value = CurrentAppState.LOADING;
 
     try {
-      final stockParam = _stockQueryParam(stockFilter);
+      final stockParam = _stockQueryParam(stockFilter, approvalFilter: approvalFilter);
       final futures = categoryIds.map((catId) async {
         try {
           final response = await httpClient.get(
@@ -590,16 +594,16 @@ class SearchProductController extends GetxController {
     }
   }
 
-  void loadMoreMultipleCategories({String? stockFilter}) {
+  void loadMoreMultipleCategories({String? stockFilter, int? approvalFilter}) {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
     final hasMore = isReady ? _categoryReadyHasMore : isOut ? _categoryOutHasMore : _categoryAllHasMore;
     final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
     if (!hasMore || state.value == CurrentAppState.LOADING) return;
-    loadProductsByMultipleCategories(_currentMultiCategoryIds, isPagination: true, stockFilter: stockFilter);
+    loadProductsByMultipleCategories(_currentMultiCategoryIds, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
   }
 
-  void loadMoreFilteredProducts({String? stockFilter}) {
+  void loadMoreFilteredProducts({String? stockFilter, int? approvalFilter}) {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
     final hasMore = isReady ? _filteredReadyHasMore : isOut ? _filteredOutHasMore : _filteredAllHasMore;
@@ -619,7 +623,7 @@ class SearchProductController extends GetxController {
       Logger.warning("SearchProductController", "loadMoreFilteredProducts called before initial load");
       return;
     }
-    loadByCategoryWithKaratFilter(catId, karat, isPagination: true, stockFilter: stockFilter);
+    loadByCategoryWithKaratFilter(catId, karat, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
   }
 
   Future<void> loadByCategoryWithKaratFilter(
@@ -627,6 +631,7 @@ class SearchProductController extends GetxController {
     String targetKarat, {
     bool isPagination = false,
     String? stockFilter,
+    int? approvalFilter,
   }) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
@@ -672,7 +677,7 @@ class SearchProductController extends GetxController {
     }
 
     try {
-      final stockParam = _stockQueryParam(stockFilter);
+      final stockParam = _stockQueryParam(stockFilter, approvalFilter: approvalFilter);
       final response = await httpClient.get(
         ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
