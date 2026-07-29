@@ -952,7 +952,7 @@ class _Level3Sheet extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      ' (${cat.count})',
+                                      ' (${cat.countOfIsStockOne})',
                                       style: TextStyle(
                                         fontSize: context.responsiveFont(9),
                                         fontWeight: FontWeight.w600,

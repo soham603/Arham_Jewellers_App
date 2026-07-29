@@ -38,6 +38,8 @@ class CategoryModel {
 
   final int count;
 
+  final int countOfIsStockOne;
+
   CategoryModel({
     required this.id,
     required this.name,
@@ -60,6 +62,7 @@ class CategoryModel {
     this.level,
     this.images,
     this.count = 0,
+    this.countOfIsStockOne = 0,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
@@ -112,6 +115,8 @@ class CategoryModel {
       images: json['images'],
 
       count: json['count'] ?? 0,
+
+      countOfIsStockOne: json['countOfIsStockOne'] ?? 0,
     );
   }
 
