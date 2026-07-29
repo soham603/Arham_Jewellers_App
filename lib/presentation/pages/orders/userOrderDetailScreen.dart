@@ -463,15 +463,18 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 separatorBuilder: (_, _) => SizedBox(
                   width: context.getResponsiveSize(2),
                 ),
-                itemBuilder: (_, i) => ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: order.referenceImages[i],
-                    width: context.getResponsiveSize(20),
-                    height: context.getResponsiveSize(20),
-                    fit: BoxFit.cover,
-                    placeholder: (_, _) => const RatneshFallback.xs(),
-                    errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                itemBuilder: (_, i) => GestureDetector(
+                  onTap: () => showImageZoomDialog(context, order.referenceImages[i]),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: order.referenceImages[i],
+                      width: context.getResponsiveSize(20),
+                      height: context.getResponsiveSize(20),
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const RatneshFallback.xs(),
+                      errorWidget: (_, _, _) => const RatneshFallback.xs(),
+                    ),
                   ),
                 ),
               ),
