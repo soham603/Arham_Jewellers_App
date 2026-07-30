@@ -251,12 +251,26 @@ class _SharePageState extends State<SharePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            '${cleanCategoryName(cat.name)} (${cat.count})',
-                            style: TextStyle(
-                              fontSize: context.getResponsiveSize(3.8),
-                              fontWeight: FontWeight.w600,
-                              color: context.colorPalette.textColor,
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: cleanCategoryName(cat.name),
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(3.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.textColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' (${cat.count})',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(3.8),
+                                    fontWeight: FontWeight.w400,
+                                    color: context.colorPalette.textColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           if (selectedCount > 0) ...[

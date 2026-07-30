@@ -78,6 +78,7 @@ class _ProductCardState extends State<ProductCard>
             _cleanText(product.name) ?? 'Untitled Product';
         final imageUrl = _cleanText(product.displayImageUrl);
         final categoryName = _cleanText(product.category?.name);
+        final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.karigarNetWt);
         final touchData = _parseTouch(product.touch);
         final size = _cleanText(product.size);
@@ -195,11 +196,30 @@ class _ProductCardState extends State<ProductCard>
                                         ),
                                       ),
                                     ),
-                                  if (showWeight)
+                                  if (tagNo != null)
                                     Padding(
                                       padding: EdgeInsets.fromLTRB(
                                         hPad,
                                         categoryName != null ? gap3 : vPad,
+                                        hPad,
+                                        gap3,
+                                      ),
+                                      child: Text(
+                                        tagNo,
+                                        style: TextStyle(
+                                          fontSize: metaSize,
+                                          color: AppColors.textDark.withValues(alpha: 0.7),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  if (showWeight)
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                        hPad,
+                                        tagNo != null ? gap3 : (categoryName != null ? gap3 : vPad),
                                         hPad,
                                         vPad,
                                       ),
