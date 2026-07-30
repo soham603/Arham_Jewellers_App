@@ -1458,12 +1458,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_isMultiCategory)
-            Obx(() {
-              _currentStockState;
-              _clearCategoryCaches();
-              return _buildCategoryBreakdownRow(context);
-            }),
+          Obx(() {
+            _currentStockState;
+            _clearCategoryCaches();
+            return _buildCategoryBreakdownRow(context);
+          }),
           Row(
             children: [
               Expanded(
