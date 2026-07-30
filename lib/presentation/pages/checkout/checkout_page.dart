@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -105,9 +106,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
                 ...List.generate(items.length, (index) {
                   final item = items[index];
-                  final rawData = item.product.rawData ?? {};
-                  final price = (rawData["TagSalesAmount"] ?? 0).toDouble();
-                  final itemTotal = price * item.quantity;
+                  final price = GoldRateController.calculatePrice(
+                    fineWeight: item.product.karigarNetWt ?? 0,
+                    ratePer10Gram: Get.find<GoldRateController>().currentRate?.rate ?? 0,
+                  );
+                  final itemTotal = (price ?? 0) * item.quantity;
                   final imageURL = item.product.displayImageUrl;
 
                   return Container(
@@ -229,7 +232,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "₹${price.toStringAsFixed(0)} × ${item.quantity}",
+                                      "₹${price?.toStringAsFixed(0) ?? '0'} × ${item.quantity}",
                                       style: TextStyle(
                                         fontSize: context.getResponsiveSize(3.2),
                                         color: AppColors.textMuted,

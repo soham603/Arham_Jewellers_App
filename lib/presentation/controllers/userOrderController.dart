@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/userOrderModel.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
@@ -169,8 +170,11 @@ class UserOrderController extends GetxController {
 
         _lastOrderItemPrices.value = cartController.items
             .map((item) =>
-                ((item.product.rawData?["TagSalesAmount"] ?? 0).toDouble() *
-                    item.quantity))
+                (GoldRateController.calculatePrice(
+                      fineWeight: item.product.karigarNetWt ?? 0,
+                      ratePer10Gram: Get.find<GoldRateController>().currentRate?.rate ?? 0,
+                    ) ?? 0) *
+                    item.quantity)
             .toList()
             .cast<double>();
 
