@@ -252,7 +252,7 @@ class _SharePageState extends State<SharePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            cleanCategoryName(cat.name),
+                            '${cleanCategoryName(cat.name)} (${cat.count})',
                             style: TextStyle(
                               fontSize: context.getResponsiveSize(3.8),
                               fontWeight: FontWeight.w600,
@@ -425,7 +425,7 @@ class _SharePageState extends State<SharePage> {
                         SizedBox(width: context.getResponsiveSize(3)),
                         Expanded(
                           child: Text(
-                            cat.name,
+                            '${cleanCategoryName(cat.name)} (${cat.countOfIsStockOne})',
                             style: TextStyle(
                               fontSize: context.getResponsiveSize(3.5),
                               fontWeight: FontWeight.w500,
