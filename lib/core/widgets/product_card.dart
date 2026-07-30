@@ -160,6 +160,7 @@ class _ProductCardState extends State<ProductCard>
                                         isHovered: _isHovered,
                                         width: width,
                                         cardRadius: radius,
+                                        isAdmin: Get.find<AuthController>().isAdmin,
                                       ),
                                     ),
                                   ),
@@ -476,6 +477,7 @@ class _ProductImage extends StatelessWidget {
     required this.isHovered,
     required this.width,
     required this.cardRadius,
+    this.isAdmin = false,
   });
 
   final String? imageUrl;
@@ -485,9 +487,12 @@ class _ProductImage extends StatelessWidget {
   final bool isHovered;
   final double width;
   final double cardRadius;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
+    final screenW = MediaQuery.sizeOf(context).width;
+    final sf = (screenW / 414).clamp(1.0, 2.5);
     final badgeSize = (width * 0.03).clamp(6.0, 10.0);
     final badgeFontSize = (width * 0.04).clamp(8.0, 11.0);
     final zoomIconSize = (width * 0.07).clamp(16.0, 22.0);
@@ -570,7 +575,7 @@ class _ProductImage extends StatelessWidget {
           const RatneshFallback.m(),
         if (isNew)
           Positioned(
-            top: badgeSize,
+            top: isAdmin ? 26 * sf : badgeSize,
             left: badgeSize,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: badgeSize * 0.8, vertical: badgeSize * 0.3),
