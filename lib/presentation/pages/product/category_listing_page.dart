@@ -13,6 +13,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 
 class CategoryListingPage extends StatefulWidget {
   final List<Karat> karats;
@@ -439,7 +440,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'No styles available under ${parent.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').trim()}',
+            'No styles available under ${cleanCategoryName(parent.name)}',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -463,13 +464,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
               builder: (_) => ProductListingPage(
                 categoryId: child.id,
                 karat: karat.displayName,
-                title: child.name
-                    .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                    .replaceAll(
-                      RegExp(r'collection', caseSensitive: false),
-                      '',
-                    )
-                    .trim(),
+                title: cleanCategoryName(child.name),
               ),
             ),
           );
@@ -791,13 +786,7 @@ class _Level3Sheet extends StatelessWidget {
                   SizedBox(width: context.responsiveWidth(8, tabletVal: 12)),
                   Expanded(
                     child: Text(
-                      parent.name
-                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                          .replaceAll(
-                            RegExp(r'collection', caseSensitive: false),
-                            '',
-                          )
-                          .trim(),
+                      cleanCategoryName(parent.name),
                       style: TextStyle(
                         fontSize: context.responsiveFont(18),
                         fontWeight: FontWeight.w700,
@@ -934,7 +923,7 @@ class _Level3Sheet extends StatelessWidget {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        cat.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim(),
+                                        cleanCategoryName(cat.name),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
@@ -1092,7 +1081,7 @@ class _CategoryCard extends StatelessWidget {
                 context.responsiveWidth(6, tabletVal: 10),
               ),
               child: Text(
-                '${category.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} (${category.count})',
+                '${cleanCategoryName(category.name)} (${category.count})',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

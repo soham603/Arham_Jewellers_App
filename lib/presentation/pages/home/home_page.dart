@@ -28,6 +28,7 @@ import 'package:ratnesh_gold_app/presentation/pages/product/chain_listing_page.d
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselIndicatorShimmer.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -1558,10 +1559,7 @@ class _CategoryQuickAccess extends StatelessWidget {
       final seen = <String>{};
       final unique = <CategoryModel>[];
       for (final cat in allCategories) {
-        final displayName = cat.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim()
+        final displayName = cleanCategoryName(cat.name)
             .toLowerCase();
         if (seen.add(displayName)) {
           unique.add(cat);
@@ -1650,10 +1648,7 @@ class _CategoryQuickAccess extends StatelessWidget {
             return GestureDetector(
               key: ValueKey(cat.id),
               onTap: () {
-                final cleanedName = cat.name
-                    .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                    .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                    .trim();
+                final cleanedName = cleanCategoryName(cat.name);
                 Get.to(() => SearchPage(
                   initialCategoryId: cat.id,
                   initialCategoryName: cleanedName,
@@ -1679,10 +1674,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                   SizedBox(
                     width: context.responsiveWidth(90, tabletVal: 170, largeTabletVal: 150),
                     child: Text(
-                      cat.name
-                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                          .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                          .trim(),
+                      cleanCategoryName(cat.name),
                       style: TextStyle(
                         fontSize: context.responsiveFont(11),
                         fontWeight: FontWeight.w600,

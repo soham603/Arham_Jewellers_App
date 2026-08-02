@@ -610,10 +610,7 @@ class _SearchPageState extends State<SearchPage> {
         final seen = <String>{};
         final unique = <CategoryModel>[];
         for (final cat in allCategories) {
-          final displayName = cat.name
-              .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-              .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-              .trim()
+          final displayName = cleanCategoryName(cat.name)
               .toLowerCase();
           if (seen.add(displayName)) {
             unique.add(cat);
@@ -659,10 +656,7 @@ class _SearchPageState extends State<SearchPage> {
                 separatorBuilder: (_, _) => SizedBox(width: context.responsiveWidth(4, tabletVal: 8, largeTabletVal: 12)),
                 itemBuilder: (_, index) {
                   final cat = unique[index];
-                  final cleanedName = cat.name
-                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                      .trim();
+                  final cleanedName = cleanCategoryName(cat.name);
                   return GestureDetector(
                     onTap: () {
                       _focusNode.unfocus();
@@ -797,10 +791,7 @@ class _SearchPageState extends State<SearchPage> {
                 spacing: context.getResponsiveSize(2),
                 runSpacing: context.heightPercent(0.6),
                 children: categories.map((cat) {
-                  final cleanedName = cat.name
-                      .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                      .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                      .trim();
+                  final cleanedName = cleanCategoryName(cat.name);
                   String? karatName;
                   String? purityLabel;
                   if (categoryController.k18Categories.any((c) => c.id == cat.parentId)) {
@@ -971,10 +962,7 @@ class _SearchPageState extends State<SearchPage> {
       filtered = fuzzyFilter(
         searchQuery,
         filtered,
-        (cat) => cat.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim(),
+        (cat) => cleanCategoryName(cat.name),
       );
     }
 
@@ -1018,10 +1006,7 @@ class _SearchPageState extends State<SearchPage> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final cat = sorted[index];
-            final cleanedName = cat.name
-                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-                .trim();
+            final cleanedName = cleanCategoryName(cat.name);
             final karatName = categoryController.getLevel3Karat(cat.id);
 
             return TweenAnimationBuilder<double>(
@@ -1136,10 +1121,7 @@ class _SearchPageState extends State<SearchPage> {
       filtered = fuzzyFilter(
         searchQuery,
         filtered,
-        (cat) => cat.name
-            .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-            .replaceAll(RegExp(r'collection', caseSensitive: false), '')
-            .trim(),
+        (cat) => cleanCategoryName(cat.name),
       );
     }
 

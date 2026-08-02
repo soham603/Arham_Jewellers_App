@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dar
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 
 class ChainListingPage extends StatefulWidget {
   const ChainListingPage({super.key});
@@ -124,7 +125,7 @@ class _ChainListingPageState extends State<ChainListingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'No styles available under ${parent.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').trim()}',
+            'No styles available under ${cleanCategoryName(parent.name)}',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -148,13 +149,7 @@ class _ChainListingPageState extends State<ChainListingPage> {
               builder: (_) => ProductListingPage(
                 categoryId: child.id,
                 karat: karat.displayName,
-                title: child.name
-                    .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                    .replaceAll(
-                      RegExp(r'collection', caseSensitive: false),
-                      '',
-                    )
-                    .trim(),
+                title: cleanCategoryName(child.name),
               ),
             ),
           );
@@ -435,13 +430,7 @@ class _ChainCategoryCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     child: Text(
-                      category.name
-                          .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                          .replaceAll(
-                            RegExp(r'collection', caseSensitive: false),
-                            '',
-                          )
-                          .trim(),
+                      cleanCategoryName(category.name),
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -661,13 +650,7 @@ class _ChainLevel3Sheet extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    parent.name
-                        .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                        .replaceAll(
-                          RegExp(r'collection', caseSensitive: false),
-                          '',
-                        )
-                        .trim(),
+                    cleanCategoryName(parent.name),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -727,13 +710,7 @@ class _ChainLevel3Sheet extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(6),
                           child: Text(
-                            cat.name
-                                .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                                .replaceAll(
-                                  RegExp(r'collection', caseSensitive: false),
-                                  '',
-                                )
-                                .trim(),
+                            cleanCategoryName(cat.name),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,

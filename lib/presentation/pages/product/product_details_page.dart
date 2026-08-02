@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/formatters.dart';
+import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -647,13 +648,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              product.name
-                                  .replaceAll(RegExp(r'[^a-zA-Z\s]'), '')
-                                  .replaceAll(
-                                    RegExp(r'collection', caseSensitive: false),
-                                    '',
-                                  )
-                                  .trim()
+                              cleanCategoryName(product.name)
                                   .toUpperCase(),
                               style: TextStyle(
                                 fontSize: context.getResponsiveSize(5.5),
@@ -958,7 +953,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   SizedBox(height: context.heightPercent(0.5)),
 
                   Text(
-                    "Elegant ${product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
+                    "Elegant ${cleanCategoryName(product.name)} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(3.2),
                       color: Colors.grey.shade700,
