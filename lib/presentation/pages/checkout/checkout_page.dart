@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateControll
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/image_url_validator.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -129,11 +130,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             width: context.getResponsiveSize(18),
                             height: context.getResponsiveSize(18),
                             color: const Color(0xFFF7F3EC),
-                            child: imageURL != null &&
-                                    imageURL.trim().isNotEmpty &&
-                                    Uri.tryParse(imageURL)
-                                            ?.hasAbsolutePath ==
-                                        true
+                            child: isValidImageUrl(imageURL)
                                 ? CachedNetworkImage(
                                     imageUrl: imageURL,
                                     fit: BoxFit.contain,

@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/utils/image_url_validator.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
@@ -151,11 +152,7 @@ class _CartPageState extends State<CartPage> {
                                       width: context.getResponsiveSize(20),
                                       height: context.getResponsiveSize(20),
                                       color: AppColors.warmShimmerHighlight,
-                                      child: imageURL != null &&
-                                              imageURL.trim().isNotEmpty &&
-                                              Uri.tryParse(imageURL)
-                                                      ?.hasAbsolutePath ==
-                                                  true
+                                      child: isValidImageUrl(imageURL)
                                           ? CachedNetworkImage(
                                               imageUrl: imageURL,
                                               fit: BoxFit.contain,
