@@ -154,7 +154,7 @@ class _CartPageState extends State<CartPage> {
                                       color: AppColors.warmShimmerHighlight,
                                       child: isValidImageUrl(imageURL)
                                           ? CachedNetworkImage(
-                                              imageUrl: imageURL,
+                                              imageUrl: imageURL ?? '',
                                               fit: BoxFit.contain,
                                               placeholder: (context, url) {
                                                 return Shimmer.fromColors(

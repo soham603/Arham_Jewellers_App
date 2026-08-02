@@ -132,7 +132,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             color: const Color(0xFFF7F3EC),
                             child: isValidImageUrl(imageURL)
                                 ? CachedNetworkImage(
-                                    imageUrl: imageURL,
+                                    imageUrl: imageURL ?? '',
                                     fit: BoxFit.contain,
                                     placeholder: (context, url) {
                                       return Shimmer.fromColors(
