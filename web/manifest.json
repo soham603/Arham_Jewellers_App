@@ -1,6 +1,6 @@
 {
-    "name": "ratnesh_gold_app",
-    "short_name": "ratnesh_gold_app",
+    "name": "Ratnesh Gold",
+    "short_name": "Ratnesh Gold",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
