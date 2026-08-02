@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
@@ -241,12 +239,7 @@ class ProductSearchController extends GetxController {
   }
 
   Future<void> refreshProducts() async {
-    final completer = Completer<void>();
-    _fetchProducts(isPagination: false);
-    ever(_state, (_) {
-      if (!completer.isCompleted) completer.complete();
-    });
-    return completer.future;
+    await _fetchProducts(isPagination: false);
   }
 
   Future<ProductModel?> searchByBarcode(String barcode) async {

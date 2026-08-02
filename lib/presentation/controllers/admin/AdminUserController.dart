@@ -204,10 +204,6 @@ class AdminUserController extends GetxController {
     fetchRequests();
   }
 
-  String getSelectedUserName() {
-    return '';
-  }
-
   Future<bool> approveRequest({
     required String requestId,
     required DateTime approvedTillDate,

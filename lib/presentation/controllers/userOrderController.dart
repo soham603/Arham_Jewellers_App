@@ -305,28 +305,6 @@ class UserOrderController extends GetxController {
   
   
 
-  void resetOrderState() {
-    _createOrderState.value = CurrentAppState.INITIAL;
-
-    _isCreatingOrder.value = false;
-
-    _orderMessage.value = '';
-
-    _createdOrderId.value = '';
-
-    _lastOrderImages.clear();
-
-    _lastOrderItemNames.clear();
-
-    _lastOrderItemQuantities.clear();
-
-    _lastOrderItemPrices.clear();
-
-    _lastOrderTotal = 0;
-
-    _lastOrderCreatedAt = DateTime.now();
-  }
-
   @override
   void onClose() {
     _userOrders.clear();

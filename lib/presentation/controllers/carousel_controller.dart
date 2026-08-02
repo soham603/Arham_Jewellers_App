@@ -140,7 +140,6 @@ class CarouselsController extends GetxController {
   Future<bool> createCarousel({
     String? title,
     String? description,
-    String? descHtml,
     String? linkUrl,
     String? mobileImageUrl,
     bool? isActive,
@@ -153,7 +152,6 @@ class CarouselsController extends GetxController {
       final Map<String, dynamic> map = {
         "title": ?title,
         "description": ?description,
-        "descHtml": ?descHtml,
         "linkUrl": ?linkUrl,
         "mobileImageUrl": ?mobileImageUrl,
         "image": await MultipartFile.fromFile(imageFile.path),
@@ -191,7 +189,6 @@ class CarouselsController extends GetxController {
     required String id,
     String? title,
     String? description,
-    String? descHtml,
     String? linkUrl,
     String? mobileImageUrl,
     int? position,
@@ -207,7 +204,6 @@ class CarouselsController extends GetxController {
       final Map<String, dynamic> map = {
         "title": ?title,
         "description": ?description,
-        "descHtml": ?descHtml,
         "linkUrl": ?linkUrl,
         "mobileImageUrl": ?mobileImageUrl,
         "position": ?position,
