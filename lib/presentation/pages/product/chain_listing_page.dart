@@ -430,7 +430,7 @@ class _ChainCategoryCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     child: Text(
-                      cleanCategoryName(category.name),
+                      '${cleanCategoryName(category.name)} (${category.count})',
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -709,16 +709,32 @@ class _ChainLevel3Sheet extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(6),
-                          child: Text(
-                            cleanCategoryName(cat.name),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: context.colorPalette.goldDeep,
-                            ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  cleanCategoryName(cat.name),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: context.colorPalette.goldDeep,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                ' (${cat.countOfIsStockOne})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.colorPalette.goldDeep,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
