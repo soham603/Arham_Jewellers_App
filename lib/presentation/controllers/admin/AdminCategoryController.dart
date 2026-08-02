@@ -39,30 +39,25 @@ class CategoryManagerController extends GetxController {
   static CategoryManagerController get instance => Get.find();
   final _categoryRepo = CategoryRepository();
 
-  // ── All categories cache ──
   final _allCategories = <CategoryModel>[].obs;
   List<CategoryModel> get allCategories => _allCategories;
 
   final _loading = false.obs;
   bool get loading => _loading.value;
 
-  // ── Action states 
   final _actionLoadingId = ''.obs;
   String get actionLoadingId => _actionLoadingId.value;
 
-  // ── Image picker 
   final _pickedImage = Rxn<File>();
   File? get pickedImage => _pickedImage.value;
   final ImagePicker _picker = ImagePicker();
 
 
-  // ── Fetch ALL categories — reuses tree from CategoryController
   Future<void> fetchAll({bool force = false}) async {
     if (!force && _allCategories.isNotEmpty) return;
     _loading.value = true;
     try {
       if (!force) {
-        // Reuse tree already fetched on app build
         final catCtrl = Get.isRegistered<CategoryController>()
             ? CategoryController.instance
             : null;
@@ -71,7 +66,6 @@ class CategoryManagerController extends GetxController {
           return;
         }
       }
-      // Force refresh or tree not available: fetch directly
       final result = await _categoryRepo.fetchCategories(
         queryParams: {"full": true},
       );
@@ -82,7 +76,6 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Filtered views (client-side)
   List<CategoryModel> byLevel(
     int level, {
     String? parentId,
@@ -105,7 +98,6 @@ class CategoryManagerController extends GetxController {
 
   List<CategoryModel> get level1Categories => byLevel(1, includeDeleted: true);
 
-  // Grouped L1: merge duplicates by name, return one entry per unique name
   List<CategoryModel> get level1Grouped {
     final seen = <String, CategoryModel>{};
     for (final c in level1Categories) {
@@ -117,14 +109,12 @@ class CategoryManagerController extends GetxController {
     return seen.values.toList();
   }
 
-  // Count of L1 parents sharing this group's name
   int level1GroupCount(String name) {
     return level1Categories
         .where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase())
         .length;
   }
 
-  // All L1 parent IDs sharing this group's name
   List<String> level1GroupIds(String name) {
     return level1Categories
         .where((c) => c.name.trim().toLowerCase() == name.trim().toLowerCase())
@@ -132,7 +122,6 @@ class CategoryManagerController extends GetxController {
         .toList();
   }
 
-  // All L2 children from all L1 parents in this group (merged)
   List<CategoryModel> level2ForGroup(String l1Name) {
     final ids = level1GroupIds(l1Name);
     return _allCategories.where((c) {
@@ -159,7 +148,6 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Image picker 
   Future<void> pickImage() async {
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -181,7 +169,6 @@ class CategoryManagerController extends GetxController {
     return compressedFile;
   }
 
-  // ── Create 
   Future<(String? error, String? successMessage)> createCategory({
     required String name,
     required String boxName,
@@ -212,7 +199,6 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Edit
   Future<(String? error, String? successMessage)> editCategory({
     required String id,
     String? name,
@@ -254,7 +240,6 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Delete 
   Future<(String? error, String? successMessage)> deleteCategory(String id) async {
     _actionLoadingId.value = id;
 
@@ -286,7 +271,6 @@ class CategoryManagerController extends GetxController {
     }
   }
 
-  // ── Restore 
   Future<(String? error, String? successMessage)> restoreCategory(String id) async {
     _actionLoadingId.value = id;
 

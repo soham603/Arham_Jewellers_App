@@ -34,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    // UserOrderController is registered as permanent in main.dart.
     orderController = Get.isRegistered<UserOrderController>()
         ? Get.find<UserOrderController>()
         : Get.put(UserOrderController(), permanent: true);
@@ -81,7 +80,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         toolbarHeight: MediaQuery.of(context).size.width >= 600
             ? context.heightPercent(8)
             : null,
-        // 🔥 The Nuclear Option to permanently remove the back arrow:
         automaticallyImplyLeading: false,
         leading: const SizedBox.shrink(),
         leadingWidth: 0,
@@ -237,7 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // PROFILE CARD
                     Container(
                       width: double.infinity,
 
@@ -404,7 +401,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.heightPercent(1)),
 
-                    // MY ORDERS CARD
                     GestureDetector(
                       onTap: () => Get.to(() => const MyOrdersPage()),
                       child: Container(
@@ -479,7 +475,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     SizedBox(height: context.heightPercent(2)),
 
-                    // USER DETAILS CARD
                     _buildUserDetailsCard(context),
 
                     SizedBox(height: context.heightPercent(2)),

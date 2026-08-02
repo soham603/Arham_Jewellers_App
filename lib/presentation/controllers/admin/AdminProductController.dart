@@ -94,8 +94,6 @@ class AdminProductController extends GetxController {
     _imageMeta = meta;
   }
 
-  /// Updates a product via PATCH multipart form-data.
-  /// Returns (errorMessage, successMessage) tuple. null error = success.
   Future<(String? error, String? successMessage)> updateProduct({
     required String id,
     String? name,

@@ -23,7 +23,6 @@ class ToastConfig {
 class ToastUtils {
   ToastUtils._();
 
-  // ─── Default Configurations 
 
   static const Map<ToastType, ToastConfig> _defaultConfigs = {
     ToastType.success: ToastConfig(
@@ -48,7 +47,6 @@ class ToastUtils {
     ),
   };
 
-  // ─── Public API 
 
   static void showSuccess(
     String message, {
@@ -116,7 +114,6 @@ class ToastUtils {
     }
   }
 
-  // ─── Core 
 
   static void _show({
     required ToastType type,
@@ -162,7 +159,6 @@ class ToastUtils {
     );
   }
 
-  // ─── Widget Builders 
 
   static Widget _buildContent(BuildContext ctx, String? title, String message, IconData icon) {
     final hPad = ctx.responsiveWidth(16, tabletVal: 24);
@@ -220,7 +216,6 @@ class ToastUtils {
     );
   }
 
-  // ─── Helpers 
 
   static bool _isGetContextAvailable() {
     try {

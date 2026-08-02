@@ -34,8 +34,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   @override
   void initState() {
     super.initState();
-    // Both controllers are registered as permanent by AdminPanelScreen
-    // and ApproveOrdersScreen respectively, so they survive route pops.
     _controller = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController(), permanent: true);
@@ -106,7 +104,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Order Info ──
               _buildInfoCard(
                 context,
                 children: [
@@ -120,7 +117,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
               SizedBox(height: context.heightPercent(2)),
 
-              // ── Customer Details ──
               if (order.partyName != null || order.contactNumber != null || order.user.name.isNotEmpty || order.user.phoneNumber.isNotEmpty || order.user.companyName.isNotEmpty || order.user.city.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Customer Details'),
                 SizedBox(height: context.heightPercent(1)),
@@ -156,7 +152,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.heightPercent(2)),
               ],
 
-              // ── Item Details ──
               if (order.itemName != null || order.orderItems.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Item Details'),
                 SizedBox(height: context.heightPercent(1)),
@@ -194,7 +189,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.heightPercent(2)),
               ],
 
-              // ── Catalog Items ──
               if (order.orderItems.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Catalog Items'),
                 SizedBox(height: context.heightPercent(1)),
@@ -285,7 +279,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.heightPercent(2)),
               ],
 
-              // ── Reference Images ──
               if (order.referenceImages.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Reference Images'),
                 SizedBox(height: context.heightPercent(1)),
@@ -323,7 +316,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.heightPercent(2)),
               ],
 
-              // ── Admin Message ──
               if (order.adminMessage != null && order.adminMessage!.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Admin Message'),
                 SizedBox(height: context.heightPercent(1)),
@@ -349,7 +341,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 SizedBox(height: context.heightPercent(2)),
               ],
 
-              // ── Assigned Craftsman ──
               if (isAssigned || order.status.toUpperCase() == 'COMPLETED') ...[
                 if (order.assignedKarigarId != null && order.assignedKarigarId!.isNotEmpty) ...[
                   _buildSectionTitle(context, 'Assigned Craftsman'),
@@ -404,7 +395,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ],
               ],
 
-              // ── Action Buttons ──
               if (isPending) ...[
                 SizedBox(
                   width: double.infinity,
@@ -483,7 +473,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 _buildSendToKarigarButton(context),
               ],
 
-              // ── WhatsApp Button ──
               SizedBox(height: context.heightPercent(2)),
               _buildWhatsAppButton(context, order),
 
@@ -495,7 +484,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Send to Karigar Button ──
   Widget _buildSendToKarigarButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -513,7 +501,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Share Options Bottom Sheet ──
   void _showShareOptionsBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -649,7 +636,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Share Order as Images ──
   void _shareOrderAsImages(BuildContext context) async {
     if (_isSharing) return;
     setState(() => _isSharing = true);
@@ -686,7 +672,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     }
   }
 
-  // ── Share Order as PDF ──
   void _shareOrderAsPdf(BuildContext context) async {
     if (_isSharing) return;
     setState(() => _isSharing = true);
@@ -715,7 +700,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     }
   }
 
-  // ── Progress Loading Dialog ──
   void _showProgressLoadingDialog(BuildContext context, ValueNotifier<double> progress) {
     showDialog(
       context: context,
@@ -765,7 +749,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Approve & Assign Dialog ──
   void _showApproveAssignDialog(BuildContext context) {
     CraftsmanModel? selectedCraftsman;
     final staffNameCtrl = TextEditingController();
@@ -881,7 +864,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Reject Dialog ──
   void _showRejectDialog(BuildContext context) {
     final reasonCtrl = TextEditingController();
 
@@ -957,7 +939,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── WhatsApp Button ──
   Widget _buildWhatsAppButton(BuildContext context, AdminOrderModel order) {
     final phone = order.contactNumber ?? order.user.phoneNumber;
     if (phone.isEmpty) return const SizedBox.shrink();
@@ -992,7 +973,6 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  // ── Helpers ──
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Row(
       children: [

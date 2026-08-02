@@ -12,7 +12,6 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
-/// Tracks original file + edit state for re-edit support.
 class _CategoryImageMeta {
   File originalFile;
   CropResult lastResult;
@@ -109,9 +108,6 @@ class _CategoryManagerScreenState extends State<CategoryManagerScreen>
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Level 2 Tab — L1 picker → L2 list
-// ══════════════════════════════════════════════════════════════════════════════
 class _Level2Tab extends StatefulWidget {
   final CategoryManagerController ctrl;
   const _Level2Tab({required this.ctrl});
@@ -127,7 +123,6 @@ class _Level2TabState extends State<_Level2Tab> {
   Widget build(BuildContext context) {
     final ctrl = widget.ctrl;
 
-    // Step 1: pick L1 group
     if (_selectedL1 == null) {
       return Obx(() {
         final parents = ctrl.level1Grouped;
@@ -136,7 +131,6 @@ class _Level2TabState extends State<_Level2Tab> {
       });
     }
 
-    // Step 2: show merged L2 under selected L1 group
     return Obx(() {
       final items = ctrl.level2ForGroup(_selectedL1!.name);
       return _DrillDownList(
@@ -155,9 +149,6 @@ class _Level2TabState extends State<_Level2Tab> {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Level 3 Tab — L1 picker → L2 picker → L3 list
-// ══════════════════════════════════════════════════════════════════════════════
 class _Level3Tab extends StatefulWidget {
   final CategoryManagerController ctrl;
   const _Level3Tab({required this.ctrl});
@@ -174,7 +165,6 @@ class _Level3TabState extends State<_Level3Tab> {
   Widget build(BuildContext context) {
     final ctrl = widget.ctrl;
 
-    // Step 1: pick L1 group
     if (_selectedL1 == null) {
       return Obx(() {
         final parents = ctrl.level1Grouped;
@@ -183,7 +173,6 @@ class _Level3TabState extends State<_Level3Tab> {
       });
     }
 
-    // Step 2: pick L2 from merged group
     if (_selectedL2 == null) {
       return Obx(() {
         final items = ctrl.level2ForGroup(_selectedL1!.name);
@@ -200,7 +189,6 @@ class _Level3TabState extends State<_Level3Tab> {
       });
     }
 
-    // Step 3: show L3 under selected L2
     return Obx(() {
       final items = ctrl.level3For(_selectedL2!.id);
       final availableL2 = ctrl.level2All;
@@ -220,9 +208,6 @@ class _Level3TabState extends State<_Level3Tab> {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Shared: Parent picker list
-// ══════════════════════════════════════════════════════════════════════════════
 class _ParentPickerList extends StatelessWidget {
   final List<CategoryModel> parents;
   final ValueChanged<CategoryModel> onSelect;
@@ -245,9 +230,6 @@ class _ParentPickerList extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Shared: Drill-down list
-// ══════════════════════════════════════════════════════════════════════════════
 class _DrillDownList extends StatelessWidget {
   final String breadcrumb;
   final VoidCallback onBack;
@@ -281,7 +263,6 @@ class _DrillDownList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Breadcrumb bar
         Container(
           width: double.infinity,
           padding: EdgeInsets.symmetric(
@@ -331,7 +312,6 @@ class _DrillDownList extends StatelessWidget {
           ),
         ),
         Divider(height: 1, color: context.colorPalette.boxColor),
-        // Content
         Expanded(
           child: items.isEmpty
               ? _empty(emptyMsg, onBack)
@@ -365,9 +345,6 @@ class _DrillDownList extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Shared tiles
-// ══════════════════════════════════════════════════════════════════════════════
 
 class _ParentTile extends StatelessWidget {
   final CategoryModel cat;
@@ -547,9 +524,6 @@ class _CategoryTile extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Shared widgets
-// ══════════════════════════════════════════════════════════════════════════════
 class _Thumb extends StatelessWidget {
   final CategoryModel cat;
   final double size;
@@ -688,9 +662,6 @@ Widget _empty(String msg, VoidCallback? onBack) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Create / Edit form sheet
-// ══════════════════════════════════════════════════════════════════════════════
 void _showCreateSheet(BuildContext context, CategoryManagerController ctrl, {required int level, String? parentId}) {
   _showFormSheet(context, ctrl, isCreate: true, level: level, parentId: parentId);
 }
@@ -1003,7 +974,6 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                               context,
                               onEdit: () async {
                                 if (hasPickedImage) {
-                                  // Local image — re-edit from original with previous state
                                   final meta = _imageMeta;
                                   final originalFile = meta?.originalFile ?? _pickedImage!;
                                   final initialState = meta != null
@@ -1029,7 +999,6 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                                     });
                                   }
                                 } else if (hasExistingImage) {
-                                  // Network image — download then crop
                                   final localFile =
                                       await downloadNetworkImageToFile(
                                           widget.existing!.imageUrl);
@@ -1152,9 +1121,6 @@ InputDecoration _inputDec(BuildContext context, String hint) {
   );
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// Confirm dialogs
-// ══════════════════════════════════════════════════════════════════════════════
 void _confirmDelete(BuildContext context, CategoryManagerController ctrl, CategoryModel cat) {
   showDialog(
     context: context,

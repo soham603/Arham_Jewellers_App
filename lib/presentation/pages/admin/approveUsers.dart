@@ -24,14 +24,11 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
 
   static const _filters = ['PENDING', 'APPROVED', 'REJECTED'];
 
-  // Store selected user info for display
   UserSearchModel? _selectedUser;
 
   @override
   void initState() {
     super.initState();
-    // AdminUserController is shared with AdminPanelScreen and
-    // StaffPanelScreen, so do not delete it on dispose.
     controller = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());
@@ -148,7 +145,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Search Bar 
   Widget _searchBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -158,7 +154,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
         context.heightPercent(1),
       ),
       child: Obx(() {
-        // Show selected user chip if in USER mode and user selected
         if (controller.searchMode == SearchMode.USER && controller.selectedUserId != null && _selectedUser != null) {
           return Container(
             padding: EdgeInsets.symmetric(
@@ -227,7 +222,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
           );
         }
 
-        // Search input field
         return Column(
           children: [
             Container(
@@ -256,7 +250,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                     ),
                   ),
                   SizedBox(width: context.getResponsiveSize(1.5)),
-                  // Mode toggle button (Circle)
                   GestureDetector(
                     onTap: () {
                       controller.toggleSearchMode();
@@ -284,7 +277,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
                 ],
               ),
             ),
-            // Search results dropdown (only in USER mode)
             if (controller.searchMode == SearchMode.USER && 
                 _searchController.text.trim().isNotEmpty)
               _searchResultsDropdown(context),
@@ -394,7 +386,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     });
   }
 
-  // ── Filter Bar 
   Widget _filterBar(BuildContext context) {
     return Obx(
       () => Container(
@@ -442,7 +433,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Date Picker for Approve 
   Future<void> _showDatePicker(
     BuildContext context,
     AccessRequestModel req,
@@ -753,7 +743,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Footer (load more / end) 
   Widget _listFooter(BuildContext context) {
     return Obx(() {
       if (controller.state == CurrentAppState.LOADING &&
@@ -790,7 +779,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     });
   }
 
-  // ── Shimmer 
   Widget _shimmerList(BuildContext context) {
     return ListView.separated(
       padding: EdgeInsets.all(context.getResponsiveSize(4)),
@@ -852,7 +840,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
     );
   }
 
-  // ── Error / Empty 
   Widget _errorView(BuildContext context) {
     return Center(
       child: Column(
@@ -953,7 +940,6 @@ class _ApproveUsersScreenState extends State<ApproveUsersScreen> {
   }
 }
 
-// ── Request Card Widget 
 class _RequestCard extends StatefulWidget {
   final AccessRequestModel request;
   final AdminUserController controller;
@@ -1020,7 +1006,6 @@ class _RequestCardState extends State<_RequestCard> {
       ),
       child: Column(
         children: [
-          // ── Header row (always visible) 
           InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             borderRadius: BorderRadius.circular(16),
@@ -1028,7 +1013,6 @@ class _RequestCardState extends State<_RequestCard> {
               padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Row(
                 children: [
-                  // Avatar
                   Container(
                     width: context.getResponsiveSize(11),
                     height: context.getResponsiveSize(11),
@@ -1050,7 +1034,6 @@ class _RequestCardState extends State<_RequestCard> {
                   ),
                   SizedBox(width: context.getResponsiveSize(3)),
 
-                  // Name + phone
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1075,7 +1058,6 @@ class _RequestCardState extends State<_RequestCard> {
                     ),
                   ),
 
-                  // Status badge + expand icon
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -1127,7 +1109,6 @@ class _RequestCardState extends State<_RequestCard> {
             ),
           ),
 
-          // ── Expanded detail 
           if (_expanded) ...[
             Divider(
               height: 1,
@@ -1139,7 +1120,6 @@ class _RequestCardState extends State<_RequestCard> {
               padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Column(
                 children: [
-                  // Info rows
                   _infoRow(
                     context,
                     Icons.email_rounded,
@@ -1163,7 +1143,6 @@ class _RequestCardState extends State<_RequestCard> {
                     ).format(req.requestedAt.toLocal()),
                   ),
 
-                  // Approved till (if applicable)
                   if (req.approvedTill != null) ...[
                     SizedBox(height: context.heightPercent(0.8)),
                     Container(
@@ -1203,7 +1182,6 @@ class _RequestCardState extends State<_RequestCard> {
                                   color: AppColors.primaryGold,
                                 ),
                               ),
-                              // Days remaining
                               Builder(
                                 builder: (_) {
                                   final remaining = req.approvedTill!
@@ -1637,7 +1615,6 @@ class _RequestCardState extends State<_RequestCard> {
   }
 }
 
-// ── Search Result Tile 
 class _SearchResultTile extends StatelessWidget {
   final UserSearchModel user;
   final VoidCallback onTap;

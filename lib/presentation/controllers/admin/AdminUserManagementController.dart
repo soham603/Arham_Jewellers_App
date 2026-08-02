@@ -59,7 +59,6 @@ class AdminUserManagementController extends GetxController {
     super.onClose();
   }
 
-  // ── Fetch users 
   Future<void> fetchUsers({bool isPagination = false}) async {
     if (!_hasMore && isPagination) return;
 
@@ -114,7 +113,6 @@ class AdminUserManagementController extends GetxController {
     }
   }
 
-  // ── Search 
   void onSearchChanged(String query) {
     _searchQuery.value = query;
     _debounce?.cancel();
@@ -159,7 +157,6 @@ class AdminUserManagementController extends GetxController {
     return _users.where((u) => u.role.toUpperCase() == _activeFilter.value.toUpperCase()).toList();
   }
 
-  // ── Pagination 
   Future<void> loadMore() async {
     if (!_hasMore || _state.value == CurrentAppState.LOADING) return;
     await fetchUsers(isPagination: true);
@@ -172,9 +169,7 @@ class AdminUserManagementController extends GetxController {
     await fetchUsers();
   }
 
-  // ── Actions 
 
-  /// Toggle user activation status (ACTIVE / DEACTIVATED)
   Future<bool> toggleUserActivation({
     required String userId,
     required String action,
@@ -187,7 +182,6 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  /// Create a new admin via /create-admin
   Future<bool> createAdmin({
     required String userId,
     required String phoneNumber,
@@ -201,7 +195,6 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  /// Toggle retailer status for a user
   Future<bool> toggleRetailer({
     required String userId,
     required bool isRetailer,
@@ -214,7 +207,6 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  /// Admin reset password for a user with pending forgot password status
   Future<bool> adminResetPassword({
     required String userId,
     required String newPassword,
@@ -227,7 +219,6 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
-  // ── Generic action handler 
   Future<bool> _handleAction({
     required String userId,
     required AdminAction actionType,

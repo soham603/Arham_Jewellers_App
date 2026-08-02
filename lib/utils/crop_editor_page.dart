@@ -52,12 +52,10 @@ class _CropEditorPageState extends State<CropEditorPage> {
     final initial = widget.initialState;
     if (initial == null) return;
 
-    // Apply flip if needed
     if (initial.flipY) {
       _editorController.flip(animation: false);
     }
 
-    // Apply rotation if non-zero
     if (initial.rotationDegrees != 0) {
       _editorController.rotate(degree: initial.rotationDegrees, animation: false);
       _syncAngleFromController();

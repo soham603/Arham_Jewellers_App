@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/utils/crop_editor_page.dart';
 
-/// Initial state for the crop editor (rotation + flip).
-/// Optionally carries an initial crop rect.
 class CropInitialState {
   final double rotationDegrees;
   final bool flipY;
@@ -17,7 +15,6 @@ class CropInitialState {
   });
 }
 
-/// Result returned by the crop editor: the edited file + edit state.
 class CropResult {
   final File file;
   final double rotationDegrees;
@@ -30,8 +27,6 @@ class CropResult {
   });
 }
 
-/// Opens a crop/rotate/flip editor and returns the edited [CropResult],
-/// or `null` if the user cancelled.
 Future<CropResult?> cropImage(
   BuildContext context, {
   required File imageFile,

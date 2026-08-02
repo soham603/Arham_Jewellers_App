@@ -783,7 +783,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           final name = item.product.name;
           String? karat;
 
-          // 1. Explicit karat field from server
           if (item.product.karat != null && item.product.karat!.isNotEmpty) {
             final n = KaratConstants.karatNumber(item.product.karat!);
             if (n != null) {
@@ -792,7 +791,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             }
           }
 
-          // 2. Tag number prefix (e.g. "76GR-303" → 76 → 18K)
           if (karat == null && item.product.tagNo != null && item.product.tagNo!.length >= 2) {
             final prefix = item.product.tagNo!.substring(0, 2);
             final n = int.tryParse(prefix);
@@ -806,7 +804,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             }
           }
 
-          // 3. Product name — validate against known karat values only
           if (karat == null) {
             final match = RegExp(r'(\d+)\s*K', caseSensitive: false).firstMatch(name);
             if (match != null) {

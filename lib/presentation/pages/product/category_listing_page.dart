@@ -517,7 +517,6 @@ class _CategoryListingPageState extends State<CategoryListingPage>
   }
 }
 
-// ── _CategoryListingImage 
 class _CategoryListingImage extends StatefulWidget {
   final CategoryModel cat;
 
@@ -553,7 +552,6 @@ class _CategoryListingImageState extends State<_CategoryListingImage>
   }
 }
 
-// ── _KaratSectionHeader 
 class _KaratSectionHeader extends StatelessWidget {
   final Karat karat;
   final bool isExpanded;
@@ -682,7 +680,6 @@ class _KaratSectionHeader extends StatelessWidget {
   }
 }
 
-// ── _CategoryGrid 
 class _CategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
   final Karat karat;
@@ -734,7 +731,6 @@ class _CategoryGrid extends StatelessWidget {
   }
 }
 
-// ── _Level3Sheet 
 class _Level3Sheet extends StatelessWidget {
   final CategoryModel parent;
   final List<CategoryModel> children;
@@ -974,7 +970,6 @@ class _Level3Sheet extends StatelessWidget {
   }
 }
 
-// ── _CategoryCard 
 class _CategoryCard extends StatelessWidget {
   final CategoryModel category;
   final Karat karat;

@@ -40,7 +40,6 @@ class AdminUserController extends GetxController {
   final _error = ''.obs;
   String get error => _error.value;
 
-  // Search related
   final _searchMode = SearchMode.PHONE.obs;
   SearchMode get searchMode => _searchMode.value;
   
@@ -87,7 +86,6 @@ class AdminUserController extends GetxController {
         'status': _activeFilter.value,
       };
 
-      // Add search params
       if (_searchQuery.value.trim().isNotEmpty && _searchMode.value == SearchMode.PHONE) {
         queryParams['phoneNumbers'] = _searchQuery.value.trim();
       } else if (_selectedUserId.value != null) {
@@ -137,12 +135,10 @@ class AdminUserController extends GetxController {
     await fetchRequests();
   }
 
-  // Search Methods
   void toggleSearchMode() {
     _searchMode.value = _searchMode.value == SearchMode.PHONE 
         ? SearchMode.USER 
         : SearchMode.PHONE;
-    // Clear search when toggling
     _searchQuery.value = '';
     _searchResults.clear();
     _selectedUserId.value = null;
@@ -163,7 +159,6 @@ class AdminUserController extends GetxController {
         });
       }
     } else {
-      // User mode - search users and show dropdown
       if (query.trim().isEmpty) {
         _searchResults.clear();
         _searchState.value = CurrentAppState.INITIAL;
@@ -194,7 +189,6 @@ class AdminUserController extends GetxController {
     _searchQuery.value = '';
     _searchResults.clear();
     _searchState.value = CurrentAppState.INITIAL;
-    // Refresh requests with new userId filter
     _page = 1;
     _hasMore = true;
     fetchRequests();

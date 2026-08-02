@@ -90,10 +90,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
     _selectedCategoryId = productCategory.id;
 
-    // Find parent level2 from the cached tree instead of relying on productCategory.parentId
     _selectedLevel2Id = _catCtrl.getParentLevel2Id(productCategory.id);
 
-    // Determine karat from the category hierarchy
     final karatFromCategory = _catCtrl.getLevel3Karat(productCategory.id);
     if (karatFromCategory != null) {
       _selectedKarat = karatFromCategory.toUpperCase();
@@ -234,7 +232,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   context.heightPercent(1),
                 ),
                 children: [
-                  // Image Section
                   _label('Product Image'),
                   SizedBox(height: context.heightPercent(0.8)),
                   Center(
@@ -264,7 +261,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2.5)),
 
-                  // Name
                   _label('Name'),
                   SizedBox(height: context.heightPercent(0.6)),
                   TextFormField(
@@ -278,7 +274,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2)),
 
-                  // Karat
                   _label('Karat'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
@@ -304,7 +299,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2)),
 
-                  // Collection (Level 2)
                   _label('Collection'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
@@ -340,7 +334,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2)),
 
-                  // Style (Level 3)
                   _label('Style'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
@@ -373,7 +366,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2)),
 
-                  // Active Status
                   _label('Status'),
                   SizedBox(height: context.heightPercent(0.6)),
                   Container(
@@ -433,7 +425,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   ),
                   SizedBox(height: context.heightPercent(2)),
 
-                  // Raw Data
                   GestureDetector(
                     onTap: () async {
                       final result = await Navigator.push<Map<String, dynamic>>(
@@ -484,7 +475,6 @@ class _ProductEditPageState extends State<ProductEditPage> {
               ),
             ),
 
-            // Save Button - fixed at bottom
             Padding(
               padding: EdgeInsets.fromLTRB(
                 context.getResponsiveSize(5),

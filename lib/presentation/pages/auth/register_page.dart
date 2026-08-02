@@ -40,7 +40,6 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isFormValid = false;
   bool _isSubmitting = false;
 
-  //  India States & Cities 
   static const Map<String, List<String>> _indiaData = {
     'Andhra Pradesh': [
       'Visakhapatnam',
@@ -131,7 +130,6 @@ class _RegisterPageState extends State<RegisterPage> {
     'West Bengal': ['Kolkata', 'Howrah', 'Darjeeling', 'Siliguri', 'Asansol'],
   };
 
-  //  Validators 
   static final RegExp _emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
   );
@@ -192,7 +190,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
-  //  Form State Helpers 
   void _onFieldChanged() {
     final valid =
         emailController.text.trim().isNotEmpty &&
@@ -257,7 +254,6 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  //  Submit (UPDATED FIX) 
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) {
       ToastUtils.showError('Please fix the errors');
@@ -268,11 +264,9 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isSubmitting = true);
 
     try {
-      // safely fetch as dynamic so the compiler doesn't enforce List vs String
       dynamic rawId = await getDeviceId();
       dynamic rawName = await getDeviceName();
 
-      // Safely convert to a pure String whether it returned a String or a List<String>
       final String finalDeviceId = rawId is List
           ? rawId.join(' ')
           : rawId.toString();
@@ -312,7 +306,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  //  Modern Bottom Sheet with Search 
   void _showSearchSelectionBottomSheet({
     required String title,
     required List<String> items,
@@ -415,7 +408,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  //  Compact Card Dropdown 
   Widget _buildCompactDropdownCard({
     required String hintText,
     required String? value,
@@ -460,7 +452,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  //  Build 
   @override
   Widget build(BuildContext context) {
     final safeHeight =
@@ -511,7 +502,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               children: [
                                 SizedBox(height: context.heightPercent(2)),
 
-                                // ── Header ──
                                 Text(
                                   'Register',
                                   style: TextStyle(

@@ -11,7 +11,6 @@ class CustomOrderController extends GetxController {
 
   final _customOrderRepo = CustomOrderRepository();
 
-  // ── Create state ──
   final _createState = CurrentAppState.INITIAL.obs;
   CurrentAppState get createState => _createState.value;
 
@@ -21,19 +20,16 @@ class CustomOrderController extends GetxController {
   final _createdOrderId = ''.obs;
   String get createdOrderId => _createdOrderId.value;
 
-  // ── Modify state ──
   final _modifyState = CurrentAppState.INITIAL.obs;
   CurrentAppState get modifyState => _modifyState.value;
 
   final _isModifying = false.obs;
   bool get isModifying => _isModifying.value;
 
-  // ── Delete state ──
   final _isDeleting = false.obs;
   bool get isDeleting => _isDeleting.value;
 
   
-  // CREATE CUSTOM ORDER
   
 
   Future<bool> createCustomOrder({
@@ -113,7 +109,6 @@ class CustomOrderController extends GetxController {
   }
 
   
-  // MODIFY CUSTOM ORDER
   
 
   Future<bool> modifyCustomOrder({
@@ -193,7 +188,6 @@ class CustomOrderController extends GetxController {
   }
 
   
-  // DELETE CUSTOM ORDER
   
 
   Future<bool> deleteCustomOrder(String orderId) async {
@@ -223,7 +217,6 @@ class CustomOrderController extends GetxController {
   }
 
   
-  // RESET
   
 
   void resetCreateState() {

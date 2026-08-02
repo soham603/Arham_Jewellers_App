@@ -58,7 +58,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
   List<String> _selectedSizes = [];
   bool? _isActiveFilter;
 
-  // ── Selection state
   final Set<String> _selectedProductIds = {};
   bool _isSelectModeEnabled = false;
   bool get _isSelectMode => _isSelectModeEnabled || _selectedProductIds.isNotEmpty;
@@ -1435,7 +1434,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  // ── Selection bottom bar
   Widget _buildSelectionBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1580,7 +1578,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  // ── Share options dialog 
   void _showShareOptionsDialog(BuildContext context) {
     final selectedProducts = _getSelectedProducts();
     if (selectedProducts.isEmpty) return;

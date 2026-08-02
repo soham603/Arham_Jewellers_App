@@ -81,10 +81,6 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    // AppLifecycleState.detached is only emitted when the engine itself is
-    // being torn down (rare on iOS/Android where the OS typically kills the
-    // process without emitting this event). This is a best-effort cleanup
-    // path for desktop/web/engine-shutdown scenarios.
     if (state == AppLifecycleState.detached) {
       _disposeGlobalControllers();
     }
@@ -138,11 +134,6 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObse
   }
 }
 
-/// Disposes all globally-registered GetX controllers. Each disposal is
-/// wrapped independently so a single failure does not prevent the rest from
-/// being cleaned up. `force: true` is required to dispose controllers that
-/// were registered with `permanent: true` — without it, GetX logs a warning
-/// and skips the deletion.
 void _disposeGlobalControllers() {
   void safeDispose<T extends GetxController>() {
     try {

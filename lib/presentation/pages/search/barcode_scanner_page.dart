@@ -108,7 +108,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     try {
       await _controller.stop();
     } catch (_) {
-      // Ignore stop errors during lifecycle changes.
     } finally {
       _isScannerRunning = false;
     }
@@ -166,7 +165,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
     if (!mounted) return;
 
-    // For one-time scan, pop the value and close
     Navigator.of(context).pop(value);
   }
 
@@ -391,7 +389,6 @@ class _ScannerOverlayPainter extends CustomPainter {
 
     const cornerLength = 24.0;
 
-    // Top-left
     canvas.drawLine(
       Offset(scanWindow.left, scanWindow.top + cornerLength),
       Offset(scanWindow.left, scanWindow.top),
@@ -403,7 +400,6 @@ class _ScannerOverlayPainter extends CustomPainter {
       cornerPaint,
     );
 
-    // Top-right
     canvas.drawLine(
       Offset(scanWindow.right - cornerLength, scanWindow.top),
       Offset(scanWindow.right, scanWindow.top),
@@ -415,7 +411,6 @@ class _ScannerOverlayPainter extends CustomPainter {
       cornerPaint,
     );
 
-    // Bottom-left
     canvas.drawLine(
       Offset(scanWindow.left, scanWindow.bottom - cornerLength),
       Offset(scanWindow.left, scanWindow.bottom),
@@ -427,7 +422,6 @@ class _ScannerOverlayPainter extends CustomPainter {
       cornerPaint,
     );
 
-    // Bottom-right
     canvas.drawLine(
       Offset(scanWindow.right - cornerLength, scanWindow.bottom),
       Offset(scanWindow.right, scanWindow.bottom),

@@ -25,7 +25,6 @@ class CategoryModel {
 
   final String? updatedBy;
 
-  // NEW
   final String? parentId;
 
   final CategoryModel? parent;
@@ -55,7 +54,6 @@ class CategoryModel {
     this.createdBy,
     this.updatedBy,
 
-    // NEW
     this.parentId,
     this.parent,
     this.children,
@@ -97,7 +95,6 @@ class CategoryModel {
 
       updatedBy: json['updatedBy'],
 
-      // NEW
       parentId: json['parentId'],
 
       parent: json['parent'] != null

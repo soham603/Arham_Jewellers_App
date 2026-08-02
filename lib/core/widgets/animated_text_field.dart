@@ -85,7 +85,6 @@ class _AnimatedTextFieldState extends State<AnimatedTextField> {
         ? '${widget.hintText} *'
         : widget.hintText;
 
-    // Dynamically insert eye button if it's an obscure field without a custom suffix
     Widget? dynamicSuffixIcon = widget.suffixIcon;
     if (widget.obscureText && widget.suffixIcon == null) {
       dynamicSuffixIcon = IconButton(

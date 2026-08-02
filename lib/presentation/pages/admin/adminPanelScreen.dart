@@ -44,16 +44,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
   void initState() {
     super.initState();
     _loadScreenshotProtectionSetting();
-    // Registered as permanent so its fetched orders survive route pops back
-    // here from ApproveOrdersScreen and the admin order detail pages.
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController(), permanent: true);
     _adminUserController = Get.isRegistered<AdminUserController>()
         ? Get.find<AdminUserController>()
         : Get.put(AdminUserController());
-    // Registered as permanent by UserManagementScreen so its fetched
-    // user list survives a route pop back here.
     _userManagementController = Get.isRegistered<AdminUserManagementController>()
         ? Get.find<AdminUserManagementController>()
         : Get.put(AdminUserManagementController(), permanent: true);
@@ -85,7 +81,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           
-          // ADMIN HEADER CARD
           
           Container(
             width: double.infinity,
@@ -200,14 +195,12 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           SizedBox(height: context.heightPercent(3)),
 
           
-          // ADMIN STATS GRID
           
           Obx(() => _buildStatsRow(context)),
 
           SizedBox(height: context.heightPercent(3)),
 
           
-          // ADMIN MENU GRID / LIST
           
           Row(
             children: [
@@ -320,7 +313,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Import & manage craftsmen",
                   onTap: () => Get.to(() => const CraftsmanManagerScreen()),
                 ),
-                // ── Screenshot Protection Toggle ──
                 _screenshotProtectionTile(context),
               ],
             )

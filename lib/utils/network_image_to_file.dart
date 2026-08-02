@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// Downloads a network image to a temporary local [File].
-/// Returns `null` if the download fails.
 Future<File?> downloadNetworkImageToFile(String imageUrl) async {
   try {
     final dio = Dio();

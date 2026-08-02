@@ -71,7 +71,6 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
 
   @override
   Widget build(BuildContext context) {
-    // UserOrderController is registered as permanent in main.dart.
     final UserOrderController orderController =
         Get.isRegistered<UserOrderController>()
             ? Get.find<UserOrderController>()
@@ -103,7 +102,6 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
                       children: [
                         SizedBox(height: context.heightPercent(4)),
 
-                        // ── Hero: Animated success icon with gradient bg ──
                         _AnimatedHero(controller: _heroController),
 
                         SizedBox(height: context.heightPercent(2.5)),
@@ -135,7 +133,6 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
 
                         SizedBox(height: context.heightPercent(3)),
 
-                        // ── Content: Slide-up animated sections ──
                         FadeTransition(
                           opacity: _contentFade,
                           child: SlideTransition(
@@ -189,7 +186,6 @@ class _OrderSuccessPageState extends State<OrderSuccessPage>
   }
 }
 
-// ── Animated Hero Section ──
 
 class _AnimatedHero extends StatelessWidget {
   final AnimationController controller;
@@ -270,7 +266,6 @@ class _AnimatedHero extends StatelessWidget {
   }
 }
 
-// ── Order Detail Card 
 
 class _OrderDetailCard extends StatelessWidget {
   final String orderId;
@@ -581,7 +576,6 @@ class _OrderDetailCard extends StatelessWidget {
   }
 }
 
-// ── Copyable Order ID 
 
 class _CopyableOrderId extends StatefulWidget {
   final String orderId;
@@ -652,7 +646,6 @@ class _CopyableOrderIdState extends State<_CopyableOrderId> {
   }
 }
 
-// ── Next Steps Card 
 
 class _NextStepsCard extends StatelessWidget {
   @override
@@ -688,7 +681,6 @@ class _NextStepsCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Numbered step circle
                     Column(
                       children: [
                         Container(
@@ -785,7 +777,6 @@ class _NextStepsCard extends StatelessWidget {
   }
 }
 
-// ── Contact Admin Card 
 
 class _ContactAdminCard extends StatelessWidget {
   final String orderId;
@@ -895,7 +886,6 @@ class _ContactAdminCard extends StatelessWidget {
   }
 }
 
-// ── Reusable Contact Button ─
 
 class _ContactButton extends StatelessWidget {
   final Widget icon;
@@ -956,7 +946,6 @@ class _ContactButton extends StatelessWidget {
   }
 }
 
-// ── Primary Button 
 
 class _PrimaryButton extends StatelessWidget {
   final String label;
@@ -1011,7 +1000,6 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-// ── Secondary Button 
 
 class _SecondaryButton extends StatelessWidget {
   final String label;
@@ -1048,7 +1036,6 @@ class _SecondaryButton extends StatelessWidget {
   }
 }
 
-// ── Shared Card Container ───
 
 class _CardContainer extends StatelessWidget {
   final Widget child;
@@ -1082,7 +1069,6 @@ class _CardContainer extends StatelessWidget {
   }
 }
 
-// ── Shared Divider 
 
 class _Divider extends StatelessWidget {
   @override
@@ -1102,7 +1088,6 @@ class _Divider extends StatelessWidget {
   }
 }
 
-// ── Status Badge 
 
 class _StatusBadge extends StatelessWidget {
   final String label;

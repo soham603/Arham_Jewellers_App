@@ -315,7 +315,6 @@ class _SharePageState extends State<SharePage> {
 
     return Column(
       children: [
-        // Level 2 name + Select all button
         Container(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),
@@ -382,7 +381,6 @@ class _SharePageState extends State<SharePage> {
             ],
           ),
         ),
-        // Level 3 items
         Expanded(
           child: ListView.builder(
             padding: EdgeInsets.fromLTRB(0, context.heightPercent(0.3), 0, NavBarSpacer.heightOf(context)),

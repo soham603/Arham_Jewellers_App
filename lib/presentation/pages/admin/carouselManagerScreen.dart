@@ -18,7 +18,6 @@ import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// Tracks original file + edit state for re-edit support.
 class _CarouselImageMeta {
   File originalFile;
   CropResult lastResult;
@@ -43,8 +42,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
   @override
   void initState() {
     super.initState();
-    // CarouselsController is registered globally in main.dart and kept
-    // alive for the lifetime of the app (shared with HomePage).
     controller = Get.isRegistered<CarouselsController>()
         ? Get.find<CarouselsController>()
         : Get.put(CarouselsController(), permanent: true);
@@ -333,7 +330,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Active Tab 
   Widget _activeTab(BuildContext context) {
     return Obx(() {
       final state = controller.adminState;
@@ -379,7 +375,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     });
   }
 
-  // ── Deleted Tab 
   Widget _deletedTab(BuildContext context) {
     return Obx(() {
       final state = controller.deletedState;
@@ -448,7 +443,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   height: context.heightPercent(20),
                 ),
               ),
-              // Position badge
               Positioned(
                 top: context.heightPercent(1),
                 left: context.getResponsiveSize(3),
@@ -471,7 +465,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   ),
                 ),
               ),
-              // Active badge
               Positioned(
                 top: context.heightPercent(1),
                 right: context.getResponsiveSize(3),
@@ -496,7 +489,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                   ),
                 ),
               ),
-              // Drag handle
               Positioned(
                 bottom: context.heightPercent(1),
                 right: context.getResponsiveSize(3),
@@ -516,7 +508,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ],
           ),
 
-          // ── Info 
           Padding(
             padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
             child: Column(
@@ -545,10 +536,8 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                 ],
                 SizedBox(height: context.heightPercent(1.2)),
 
-                // ── Action Row 
                 Row(
                   children: [
-                    // Toggle active
                     Obx(
                       () => _actionChip(
                         context,
@@ -587,7 +576,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     ),
                     SizedBox(width: context.getResponsiveSize(2)),
 
-                    // Edit
                     _actionChip(
                       context,
                       icon: Icons.edit_rounded,
@@ -597,7 +585,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
                     ),
                     SizedBox(width: context.getResponsiveSize(2)),
 
-                    // Delete
                     Obx(
                       () => _actionChip(
                         context,
@@ -619,7 +606,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Deleted Carousel Card ─
   Widget _deletedCarouselCard(BuildContext context, CarouselModel item) {
     return Container(
       decoration: BoxDecoration(
@@ -629,7 +615,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
       ),
       child: Row(
         children: [
-          // Thumbnail
           ClipRRect(
             borderRadius: const BorderRadius.horizontal(
               left: Radius.circular(16),
@@ -646,7 +631,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
             ),
           ),
 
-          // Info
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -784,7 +768,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Create Bottom Sheet ───
   void _showCreateSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -826,7 +809,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Edit Bottom Sheet 
   void _showEditSheet(BuildContext context, CarouselModel item) {
     showModalBottomSheet(
       context: context,
@@ -863,7 +845,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Restore + Re-upload Image Sheet 
   void _showRestoreWithImageSheet(BuildContext context, CarouselModel item) {
     File? newImage;
     showModalBottomSheet(
@@ -1041,7 +1022,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Confirm Delete Dialog ─
   void _confirmDelete(BuildContext context, CarouselModel item) {
     showDialog(
       context: context,
@@ -1107,7 +1087,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     );
   }
 
-  // ── Helpers 
   Widget _actionChip(
     BuildContext context, {
     required IconData icon,
@@ -1240,7 +1219,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
   }
 }
 
-// ── Reusable Form Sheet ────
 class _CarouselFormSheet extends StatefulWidget {
   final CarouselModel? existing;
   final Future<void> Function({
@@ -1667,7 +1645,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: context.getResponsiveSize(10),
@@ -1689,7 +1666,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(2)),
 
-              // ── Media Picker 
               AspectRatio(
                 aspectRatio: 2.0,
                 child: GestureDetector(
@@ -1711,7 +1687,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                         isVideo: isVideo,
                         onEdit: () async {
                           if (isVideo) {
-                            // Video — open video picker to replace
                             final picked = await ImagePicker().pickVideo(
                               source: ImageSource.gallery,
                               maxDuration: const Duration(seconds: 60),
@@ -1728,9 +1703,7 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                               });
                             }
                           } else {
-                            // Image — download then crop
                             if (hasPickedMedia) {
-                              // Local image already picked — re-edit from original
                               final meta = _imageMeta;
                               final originalFile = meta?.originalFile ?? _pickedImage!;
                               final initialState = meta != null
@@ -1757,7 +1730,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                                 });
                               }
                             } else {
-                              // Network image — download then crop
                               final localFile =
                                   await downloadNetworkImageToFile(
                                       widget.existing!.imageUrl);
@@ -1834,7 +1806,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(1)),
 
-              // ── Title 
               _buildField(
                 context,
                 'Title (optional)',
@@ -1842,7 +1813,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(1.5)),
 
-              // ── Description 
               _buildField(
                 context,
                 'Description (optional)',
@@ -1851,7 +1821,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(1.5)),
 
-              // ── Link URL ─
               _buildField(
                 context,
                 'Link URL (optional)',
@@ -1860,7 +1829,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(1.5)),
 
-              // ── Inline Error 
               Obx(
                 () => _formError.value.isNotEmpty
                     ? Container(
@@ -1902,7 +1870,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
                     : const SizedBox.shrink(),
               ),
 
-              // ── isActive toggle ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1923,7 +1890,6 @@ class _CarouselFormSheetState extends State<_CarouselFormSheet> {
               ),
               SizedBox(height: context.heightPercent(1.5)),
 
-              // ── Submit ───
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

@@ -41,7 +41,6 @@ class NotificationService {
   Function(String)? onTokenRefreshed;
 
   Future<void> init() async {
-    // Local notifications are independent of Firebase — always initialize them.
     try {
       await _setupLocalNotifications();
       await _loadNotificationIdCounter();
@@ -49,7 +48,6 @@ class NotificationService {
       _initError = e.toString();
     }
 
-    // Firebase / FCM setup — may fail without google-services.json.
     try {
       await Firebase.initializeApp();
       _messaging = FirebaseMessaging.instance;
@@ -63,7 +61,6 @@ class NotificationService {
       _isInitialized = true;
     } catch (e) {
       _initError = e.toString();
-      // _isInitialized stays false for FCM, but local notifications are ready.
     }
   }
 
@@ -191,8 +188,6 @@ class NotificationService {
     );
   }
 
-  /// Show a system-level notification (notification shade) without needing FCM.
-  /// Used by in-app triggers such as order status changes and gold rate updates.
   Future<void> showSystemNotification({
     required String title,
     required String body,
@@ -248,7 +243,6 @@ class NotificationService {
     }
   }
 
-  /// Retry obtaining FCM token. Useful when initial retrieval failed.
   Future<String?> retryGetFcmToken() async {
     if (_fcmToken != null && _fcmToken!.isNotEmpty) {
       return _fcmToken;

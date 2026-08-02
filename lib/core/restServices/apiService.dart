@@ -65,7 +65,6 @@ class BaseHttpService {
         onError: (dio.DioException error, handler) async {
           final statusCode = error.response?.statusCode;
 
-          // Retry on 502/503/504 (server temporarily unavailable)
           if (statusCode == 502 || statusCode == 503 || statusCode == 504) {
             if (error.requestOptions.extra["retried"] != true) {
               error.requestOptions.extra["retried"] = true;
@@ -74,7 +73,6 @@ class BaseHttpService {
                 final retryResponse = await _dio.fetch(error.requestOptions);
                 return handler.resolve(retryResponse);
               } on dio.DioException catch (retryError) {
-                // Fall through to normal error handling
                 final errorMessage = _extractErrorMessage(retryError.response);
                 return handler.reject(
                   dio.DioException(
@@ -250,8 +248,6 @@ class BaseHttpService {
     Get.offAllNamed(AppRoutes.login);
   }
 
-  /// Proactively refresh the access token before it expires.
-  /// Returns true if refresh succeeded, false otherwise.
   Future<bool> proactiveTokenRefresh() async {
     final isAccessExpired = await sessionManager.isAccessTokenExpired();
     if (!isAccessExpired) return true;

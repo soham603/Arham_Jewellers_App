@@ -31,9 +31,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   @override
   void initState() {
     super.initState();
-    // UserOrderController is registered globally in main.dart and kept
-    // alive for the lifetime of the app (it's also needed by the
-    // _resolveUserOrderDetail route resolver).
     _orderController = Get.isRegistered<UserOrderController>()
         ? Get.find<UserOrderController>()
         : Get.put(UserOrderController(), permanent: true);
@@ -185,7 +182,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           ),
         ),
         actions: [
-          // Refresh button
           IconButton(
             onPressed: () => _orderController.refreshOrders(),
             icon: Icon(
@@ -200,7 +196,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
       body: ResponsiveWrapper(
         child: Column(
         children: [
-          // ── Filter buttons 
           Padding(
             padding: EdgeInsets.fromLTRB(
               context.getResponsiveSize(4),
@@ -261,7 +256,6 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   }
 }
 
-// ── Order Card 
 
 class _OrderCard extends StatelessWidget {
   final UserOrderModel order;
@@ -294,7 +288,6 @@ class _OrderCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Header row: order token + status badge 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -359,7 +352,6 @@ class _OrderCard extends StatelessWidget {
                   Container(height: 1, color: AppColors.divider),
                   SizedBox(height: context.heightPercent(1.5)),
 
-                  // ── Product thumbnail + items list 
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -426,7 +418,6 @@ class _OrderCard extends StatelessWidget {
                     ],
                   ),
 
-                  // ── Admin message if present 
                   if (order.adminMessage != null &&
                       order.adminMessage!.isNotEmpty) ...[
                     SizedBox(height: context.heightPercent(1.5)),
@@ -461,7 +452,6 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ],
 
-                  // ── Total amount if present ─
                   if (order.totalAmount != null) ...[
                     SizedBox(height: context.heightPercent(1.5)),
                     Container(height: 1, color: AppColors.divider),
@@ -521,7 +511,6 @@ class _OrderCard extends StatelessWidget {
   }
 }
 
-// ── Loading Shimmer 
 
 class _OrdersShimmer extends StatelessWidget {
   final BuildContext context;
@@ -669,7 +658,6 @@ class _ShimmerBlock extends StatelessWidget {
   }
 }
 
-// ── Empty State 
 
 class _EmptyOrdersView extends StatelessWidget {
   final BuildContext context;
@@ -745,7 +733,6 @@ class _EmptyOrdersView extends StatelessWidget {
   }
 }
 
-// ── Error State 
 
 class _ErrorView extends StatelessWidget {
   final BuildContext context;
@@ -823,7 +810,6 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-// ── Order Images Stack 
 
 class _OrderImagesStack extends StatelessWidget {
   const _OrderImagesStack({required this.order});
@@ -921,7 +907,6 @@ class _OrderImagesStack extends StatelessWidget {
   }
 }
 
-// ── Product Image Widget 
 
 class _ProductImage extends StatelessWidget {
   final String? url;

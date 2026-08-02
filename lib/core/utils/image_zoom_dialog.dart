@@ -2,10 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// Shows a full-screen zoomable image dialog.
-///
-/// Usage from anywhere:
-/// showImageZoomDialog(context, imageUrl);
 
 void showImageZoomDialog(BuildContext context, String imageUrl) {
   showGeneralDialog(
@@ -32,7 +28,6 @@ void showImageZoomDialog(BuildContext context, String imageUrl) {
   );
 }
 
-// ── Private dialog widget ────
 
 class _ImageZoomDialog extends StatefulWidget {
   const _ImageZoomDialog({required this.imageUrl});
@@ -165,14 +160,12 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // ── Background overlay that fades with drag 
           IgnorePointer(
             child: Container(
               color: Color.lerp(Colors.transparent, Colors.black, dragProgress),
             ),
           ),
 
-          // ── Draggable content 
           Transform.translate(
             offset: Offset(0, _dragOffset),
             child: Listener(
@@ -184,7 +177,6 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // ── Zoomable image 
                     GestureDetector(
                       onDoubleTapDown: _onDoubleTapDown,
                       onDoubleTap: _onDoubleTap,
@@ -250,7 +242,6 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
             ),
           ),
 
-          // ── Top bar 
           Positioned(
             top: 0,
             left: 0,
@@ -268,7 +259,6 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
             ),
           ),
 
-          // ── Hint overlay 
           Positioned(
             bottom: 32,
             left: 0,
@@ -284,7 +274,6 @@ class _ImageZoomDialogState extends State<_ImageZoomDialog>
   }
 }
 
-// ── Top bar 
 
 class _TopBar extends StatelessWidget {
   const _TopBar({
@@ -304,7 +293,6 @@ class _TopBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Row(
           children: [
-            // Close button
             _IconButton(
               icon: Icons.close_rounded,
               tooltip: 'Close',
@@ -313,7 +301,6 @@ class _TopBar extends StatelessWidget {
 
             const Spacer(),
 
-            // Reset zoom — only visible when zoomed
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: isZoomed
@@ -364,7 +351,6 @@ class _IconButton extends StatelessWidget {
   }
 }
 
-// ── Zoom hint 
 
 class _ZoomHint extends StatefulWidget {
   const _ZoomHint();
@@ -387,7 +373,6 @@ class _ZoomHintState extends State<_ZoomHint>
     );
     _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    // Show hint for 2 seconds then fade out
     _controller.forward();
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) _controller.reverse();

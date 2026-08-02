@@ -10,7 +10,6 @@ class AdminOrderModel {
   final AdminOrderUserModel user;
   final List<AdminOrderItemModel> orderItems;
 
-  // Custom order fields
   final String? productId;
   final String? partyCode;
   final String? partyName;
@@ -110,7 +109,6 @@ class AdminOrderModel {
               )
               : [],
 
-      // Custom order fields
       productId: json["productId"]?.toString(),
       partyCode: json["partyCode"]?.toString(),
       partyName: json["partyName"]?.toString(),
@@ -140,7 +138,6 @@ class AdminOrderModel {
 }
 
 
-// USER MODEL
 
 
 class AdminOrderUserModel {
@@ -178,7 +175,6 @@ class AdminOrderUserModel {
 }
 
 
-// ORDER ITEM MODEL
 
 
 class AdminOrderItemModel {

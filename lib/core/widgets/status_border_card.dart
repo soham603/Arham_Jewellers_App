@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
-// ── Status Info Model 
 
 class StatusInfo {
   final String label;
@@ -16,7 +15,6 @@ class StatusInfo {
   });
 }
 
-// ── Status Resolver 
 
 StatusInfo getStatusInfo(String status) {
   switch (status.toLowerCase()) {
@@ -80,7 +78,6 @@ StatusInfo getStatusInfo(String status) {
   }
 }
 
-// ── Status Badge Widget 
 
 class StatusBadge extends StatelessWidget {
   final String label;
@@ -114,7 +111,6 @@ class StatusBadge extends StatelessWidget {
   }
 }
 
-// ── Status Border Card 
 
 class StatusBorderCard extends StatelessWidget {
   final String status;

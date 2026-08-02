@@ -166,7 +166,6 @@ class JewelleryDivider extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // --- Left Fading Line ---
           Expanded(
             child: Container(
               height: 1.0,
@@ -183,9 +182,7 @@ class JewelleryDivider extends StatelessWidget {
             ),
           ),
 
-          // --- Central Element ---
           if (label != null && label!.isNotEmpty) ...[
-            // 1. Label Mode (Centered)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: labelSpacing),
               child: Text(
@@ -199,7 +196,6 @@ class JewelleryDivider extends StatelessWidget {
               ),
             ),
           ] else ...[
-            // 2. Icon Mode
             Padding(
               padding: EdgeInsets.symmetric(horizontal: iconSpacing),
               child: Row(
@@ -219,7 +215,6 @@ class JewelleryDivider extends StatelessWidget {
             ),
           ],
 
-          // --- Right Fading Line ---
           Expanded(
             child: Container(
               height: 1.0,
@@ -240,7 +235,6 @@ class JewelleryDivider extends StatelessWidget {
     );
   }
 
-  // Helper widget to create a tiny rotated square (diamond shape)
   Widget _buildTinyDiamond(BuildContext context) {
     final size = context.responsiveWidth(4.5, tabletVal: 6, largeTabletVal: 9);
     return Transform.rotate(

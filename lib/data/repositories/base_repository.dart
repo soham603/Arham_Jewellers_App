@@ -24,8 +24,6 @@ class BaseRepository {
     }
   }
 
-  /// Parses standard pagination fields from a data map.
-  /// Returns a record with total, totalPages, and currentPage.
   ({int total, int totalPages, int currentPage}) parsePagination(
     Map<String, dynamic> data,
   ) {
@@ -44,8 +42,6 @@ class BaseRepository {
     return (total: total, totalPages: totalPages, currentPage: currentPage);
   }
 
-  /// Throws [ApiException] if `responseData['data']` is null.
-  /// Use this to enforce that the API must return a non-null data field.
   void requireData(Map<String, dynamic> responseData) {
     if (responseData['data'] == null) {
       throw ApiException(
@@ -55,9 +51,6 @@ class BaseRepository {
     }
   }
 
-  /// Parses a paginated list from API response data.
-  /// [listKey] is the key containing the items list within the data map.
-  /// [fromJson] converts each raw item to the typed model.
   PaginatedResult<T> parsePaginatedList<T>(
     Map<String, dynamic> responseData, {
     String listKey = 'data',

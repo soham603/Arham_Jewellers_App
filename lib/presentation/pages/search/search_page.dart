@@ -212,8 +212,6 @@ class _SearchPageState extends State<SearchPage> {
                 _focusNode.unfocus();
                 final barcode = await Get.to(() => BarcodeScannerPage(
                   onDetect: (barcode) async {
-                    // The barcode scanner page will now close itself and return the value
-                    // We don't need to do anything here since the page handles closing
                   },
                 )) as String?;
                 
@@ -285,25 +283,21 @@ class _SearchPageState extends State<SearchPage> {
 
                 return CustomScrollView(
                   slivers: [
-                    // ── Latest Level-3 Categories 
                     if (!isSearching &&
                         !controller.hasActiveFilters &&
                         controller.searchResults.isEmpty)
                       _latestLevel3CategoriesSliver(context),
 
-                    // ── Recent Searches 
                     if (!isSearching &&
                         !controller.hasActiveFilters &&
                         controller.recentSearches.isNotEmpty)
                       _recentSearchesSliver(context),
 
-                    // ── Browse Categories 
                     if (!isSearching &&
                         !controller.hasActiveFilters &&
                         controller.searchResults.isEmpty)
                       _browseCategoriesSliver(context),
 
-                    // ── Section Header 
                     if (isSearching || controller.hasActiveFilters)
                       SliverToBoxAdapter(
                         child: Padding(
@@ -369,7 +363,6 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
 
-                    // ── Category Results 
                     if (isSearching || controller.hasActiveFilters)
                       _level3CategoryResultsSliver(context),
 
@@ -607,7 +600,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Browse Categories Sliver 
   Widget _browseCategoriesSliver(BuildContext context) {
     return SliverToBoxAdapter(
       child: Obx(() {
@@ -736,7 +728,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Latest Level-3 Categories Sliver 
   Widget _latestLevel3CategoriesSliver(BuildContext context) {
     return SliverToBoxAdapter(
       child: Obx(() {
@@ -869,7 +860,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Recent Searches Sliver 
   SliverToBoxAdapter _recentSearchesSliver(BuildContext context) {
     final all = controller.recentSearches;
     final visible = all.take(5).toList();
@@ -972,7 +962,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Level-3 Category Results Sliver 
   Widget _level3CategoryResultsSliver(BuildContext context) {
     final allCategories = categoryController.allLevel3Categories;
     final searchQuery = controller.searchQuery.toLowerCase().trim();
@@ -1021,8 +1010,6 @@ class _SearchPageState extends State<SearchPage> {
       );
     }
 
-    // When searching, results are already sorted by fuzzy score from fuzzyFilter.
-    // Otherwise apply the chosen sort option.
     final sorted = searchQuery.isNotEmpty
         ? filtered
         : _sortCategories(filtered, controller.sortBy);
@@ -1194,7 +1181,6 @@ class _SearchPageState extends State<SearchPage> {
     return sorted;
   }
 
-  // ── Shimmer Placeholder ───
   Widget _gridShimmer(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(4)),
@@ -1265,7 +1251,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // ── Empty Widget 
   Widget _emptyWidget(BuildContext context, String message) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: context.heightPercent(6)),

@@ -40,7 +40,6 @@ import '../../../core/widgets/home_search_bar.dart';
 import '../../../core/widgets/nav_bar_spacer.dart';
 import '../../controllers/AuthController.dart';
 
-// Imported the Customise Order Page
 import 'package:ratnesh_gold_app/presentation/pages/product/customise_order_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/profile/goldRateDetailScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
@@ -70,8 +69,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // CarouselsController is registered globally in main.dart and kept
-    // alive for the lifetime of the app (shared with CarouselManagerScreen).
     carouselController = Get.isRegistered<CarouselsController>()
         ? Get.find<CarouselsController>()
         : Get.put(CarouselsController(), permanent: true);
@@ -79,9 +76,6 @@ class _HomePageState extends State<HomePage> {
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());
 
-    // Ensure data is loaded — controllers may have been initialized before
-    // login (in main.dart) when no auth token existed, causing their initial
-    // fetches to fail. Re-trigger here if data is still empty.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (carouselController.list.isEmpty) {
@@ -135,7 +129,6 @@ class _HomePageState extends State<HomePage> {
       ...categoryController.k22Categories,
     ];
     if (allCategories.isEmpty) {
-      // Categories not loaded yet; retry on next frame
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _preloadCategoryImages();
@@ -173,7 +166,6 @@ class _HomePageState extends State<HomePage> {
     try {
       await Future.wait([
         carouselController.getAllCarousels(),
-        // On pull-to-refresh, refresh tree data
         categoryController.fetchCategoryTree(force: true),
         carouselController.loadLatestProducts(),
       ]);
@@ -206,8 +198,6 @@ class _HomePageState extends State<HomePage> {
   void _openScanner() async {
      final barcode = await Get.to(() => BarcodeScannerPage(
            onDetect: (barcode) async {
-             // The barcode scanner page will now close itself and return the value
-             // We don't need to do anything here since the page handles closing
            },
          )) as String?;
 
@@ -1550,7 +1540,6 @@ class _SectionTitle extends StatelessWidget {
 }
 
 
-// 🔥 CUSTOMISE ORDER BANNER COMPONENT
 
 class _CategoryQuickAccess extends StatelessWidget {
   final CategoryController controller;

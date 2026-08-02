@@ -1,13 +1,3 @@
-/// Returns a match score between [query] and [target].
-///
-/// 1.00 - exact match
-/// 0.97 - starts with whole word
-/// 0.95 - contains whole word
-/// 0.75 - starts with (partial word)
-/// 0.70 - ends with (partial word)
-/// 0.65 - contains (partial word)
-/// 0.35–0.60 - subsequence
-/// 0.20–0.40 - typo tolerance
 double fuzzyMatchScore(String query, String target) {
   if (query.trim().isEmpty) return 1.0;
 
@@ -16,10 +6,8 @@ double fuzzyMatchScore(String query, String target) {
 
   if (t.isEmpty) return 0.0;
 
-  // Exact
   if (t == q) return 1.0;
 
-  // Whole-word match
   final words = t.split(RegExp(r'\s+'));
 
   final wordIndex = words.indexOf(q);
@@ -27,20 +15,17 @@ double fuzzyMatchScore(String query, String target) {
     return wordIndex == 0 ? 0.97 : 0.95;
   }
 
-  // Partial substring match
   if (t.contains(q)) {
     if (t.startsWith(q)) return 0.75;
     if (t.endsWith(q)) return 0.70;
     return 0.65;
   }
 
-  // Subsequence
   if (_isSubsequence(q, t)) {
     final coverage = q.length / t.length;
     return 0.35 + coverage * 0.25;
   }
 
-  // Levenshtein
   final dist = _levenshtein(q, t);
   final maxLen = q.length > t.length ? q.length : t.length;
 
@@ -95,7 +80,6 @@ int _levenshtein(String a, String b) {
   return prev[b.length];
 }
 
-/// Filters and ranks items.
 List<T> fuzzyFilter<T>(
   String query,
   List<T> items,
@@ -117,14 +101,12 @@ List<T> fuzzyFilter<T>(
   }
 
   scored.sort((a, b) {
-    // Higher score first.
     final scoreCmp = b.value.compareTo(a.value);
     if (scoreCmp != 0) return scoreCmp;
 
     final aText = getText(a.key).toLowerCase();
     final bText = getText(b.key).toLowerCase();
 
-    // Earlier occurrence wins.
     final aPos = aText.indexOf(q);
     final bPos = bText.indexOf(q);
 
@@ -132,12 +114,10 @@ List<T> fuzzyFilter<T>(
       return aPos.compareTo(bPos);
     }
 
-    // Shorter string wins.
     if (aText.length != bText.length) {
       return aText.length.compareTo(bText.length);
     }
 
-    // Alphabetical for deterministic ordering.
     return aText.compareTo(bText);
   });
 

@@ -13,7 +13,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/searchProductControlle
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
 
-// Import your new Customise Order Page here
 import 'customise_order_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/product_edit_page.dart';
 
@@ -181,7 +180,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       return '$karat K Gold';
     }
 
-    // Fallback: extract from product name
     if (name != null && name.isNotEmpty) {
       final resolved = _resolvePurityValue(name);
       if (resolved != null) return resolved;
@@ -199,7 +197,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     var value = double.tryParse(numStr);
     if (value == null) return null;
 
-    // Normalize to parts-per-thousand scale
     if (value < 1) {
       value *= 1000; // Decimal fraction (0.916 → 916)
     } else if (value < 100) {
@@ -274,7 +271,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
 
-      // PREMIUM BOTTOM ACTION BAR
       
       bottomNavigationBar: Get.find<AuthController>().isAdmin
           ? const SizedBox.shrink()
@@ -381,7 +377,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             }),
 
       
-      // MODERN CURVED BODY LAYOUT
       
       body: _canSwipe
           ? (() {
@@ -439,7 +434,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // --- 1. Image Section (scrolls with content) ---
             SizedBox(
               height: context.heightPercent(65),
               width: double.infinity,
@@ -478,7 +472,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                  // Top Left: Back Button
                   Positioned(
                     top: context.heightPercent(2),
                     left: context.getResponsiveSize(4),
@@ -505,7 +498,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     ),
                   ),
 
-                  // Top Right: Wishlist Heart
                   if (!Get.find<AuthController>().isAdmin)
                     Positioned(
                       top: context.heightPercent(2),
@@ -563,7 +555,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       }),
                     ),
 
-                  // Top Right: Active/Inactive Badge (admin only)
                   if (Get.find<AuthController>().isAdmin)
                     Positioned(
                       top: context.heightPercent(2),
@@ -612,7 +603,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ),
                     ),
 
-                  // Bottom Right: Zoom Icon
                   if (product.imageUrl != null)
                     Positioned(
                       bottom: context.heightPercent(4),
@@ -646,7 +636,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ),
             ),
 
-            // --- 2. Product Details (curved top, scrolls after image) ---
             Container(
               width: double.infinity,
               decoration: const BoxDecoration(
@@ -662,7 +651,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Product Title & Price Row
                   Row(
                     children: [
                       Expanded(
@@ -772,7 +760,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(1.5)),
 
-                  // Specifications Header & Customize Button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -868,7 +855,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(1)),
 
-                  // 2x2 Specifications Grid
                   if (grossWeight != null || netWeight != null) ...[
                     Row(
                       children: [
@@ -946,7 +932,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(1)),
 
-                  // Size (Full Width)
                   if (size != null && size.isNotEmpty) ...[
                     SizedBox(
                       width: double.infinity,
@@ -960,7 +945,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                     SizedBox(height: context.heightPercent(1)),
                   ],
 
-                  // 5th Specification (Full Width Collection Name)
                   SizedBox(
                     width: double.infinity,
                     child: _buildSpecBox(
@@ -973,7 +957,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(1.5)),
 
-                  // Description Header
                   Text(
                     "Description",
                     style: TextStyle(
@@ -985,7 +968,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(0.5)),
 
-                  // Dynamic Description Text
                   Text(
                     "Elegant ${product.name.replaceAll(RegExp(r'[^a-zA-Z\s]'), '').replaceAll(RegExp(r'collection', caseSensitive: false), '').trim()} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.",
                     style: TextStyle(
@@ -997,7 +979,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                   SizedBox(height: context.heightPercent(1.5)),
 
-                  // Trust Badges Box
                   Container(
                     padding: EdgeInsets.symmetric(
                       vertical: context.heightPercent(1.2),
@@ -1044,7 +1025,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  // --- Enhanced Helper Widget for Grid and Full-Width Spec Boxes ---
   Widget _buildSpecBox(
     BuildContext context,
     IconData icon,
@@ -1111,7 +1091,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  // --- Helper Widget for Trust Badges ---
   Widget _buildTrustBadge(BuildContext context, IconData icon, String text) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

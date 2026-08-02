@@ -180,7 +180,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     }
   }
 
-  //  Helpers 
 
   Map<String, List<CategoryModel>> _getDeduplicatedCategories() {
     final Map<String, List<CategoryModel>> grouped = {};
@@ -263,7 +262,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     return count;
   }
 
-  //  Actions 
 
   void _toggleKarat(String karat) {
     setState(() {
@@ -316,7 +314,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context);
   }
 
-  //  Build 
 
   @override
   Widget build(BuildContext context) {

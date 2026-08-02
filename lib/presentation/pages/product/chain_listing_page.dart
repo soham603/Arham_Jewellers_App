@@ -48,8 +48,6 @@ class _ChainListingPageState extends State<ChainListingPage> {
         _stateForKarat(k) == CurrentAppState.SUCCESS &&
         _filteredCategories(k).isNotEmpty);
 
-    // CategoryController fetches tree eagerly in onInit()
-    // Only fetch if data is not yet available
     if (!allHaveData) {
       try {
         await controller.fetchCategoryTree().timeout(
@@ -311,7 +309,6 @@ class _ChainListingPageState extends State<ChainListingPage> {
   }
 }
 
-// ── _ChainCategoryGrid 
 class _ChainCategoryGrid extends StatelessWidget {
   final List<CategoryModel> categories;
   final Karat karat;
@@ -365,7 +362,6 @@ class _ChainCategoryGrid extends StatelessWidget {
   }
 }
 
-// ── _ChainCategoryCard 
 class _ChainCategoryCard extends StatelessWidget {
   final CategoryModel category;
   final Karat karat;
@@ -466,7 +462,6 @@ class _ChainCategoryCard extends StatelessWidget {
   }
 }
 
-// ── _ChainCategoryImage 
 class _ChainCategoryImage extends StatefulWidget {
   final CategoryModel cat;
 
@@ -500,7 +495,6 @@ class _ChainCategoryImageState extends State<_ChainCategoryImage>
   }
 }
 
-// ── _ChainKaratSectionHeader ──
 class _ChainKaratSectionHeader extends StatelessWidget {
   final Karat karat;
   final bool isExpanded;
@@ -620,7 +614,6 @@ class _ChainKaratSectionHeader extends StatelessWidget {
   }
 }
 
-// ── _ChainLevel3Sheet 
 class _ChainLevel3Sheet extends StatelessWidget {
   final CategoryModel parent;
   final List<CategoryModel> children;

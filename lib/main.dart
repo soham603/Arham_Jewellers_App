@@ -37,13 +37,8 @@ Future<void> main() async {
       Get.put(GoldRateController());
       Get.put(NotificationController());
       Get.put(CategoryController(), permanent: true);
-      // Permanent: shared by HomePage and CarouselManagerScreen, and
-      // referenced by _resolveUserOrderDetail in app_pages.dart.
       Get.put(CarouselsController(), permanent: true);
       Get.put(UserOrderController(), permanent: true);
-      // Permanent: shared by AncillaryPageScreen (read) and
-      // AncillaryEditorScreen (write) so fetched page content survives
-      // navigation between the two.
       Get.put(AncillaryController(), permanent: true);
 
       if (!kIsWeb) {

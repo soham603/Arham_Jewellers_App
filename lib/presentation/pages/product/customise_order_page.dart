@@ -18,7 +18,6 @@ import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 
-/// Tracks the original file + edit state per image slot for re-edit support.
 class _RefImageMeta {
   File originalFile;
   CropResult lastResult;
@@ -36,39 +35,31 @@ class CustomiseOrderPage extends StatefulWidget {
 }
 
 class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
-  // Form key
   final _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
-  // Edit mode
   bool get _isEditMode => widget.existingOrder != null;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
 
-  // State variables for visually selectable chips
   String selectedCarat = '22K (92%)';
   String selectedMarking = 'HUID';
   String selectedStyle = 'Bhungdi';
 
   static const _caratOptions = KaratConstants.caratChipOptions;
 
-  // Image Picker Variables
   List<File?> referenceImages = [null, null, null, null];
   final List<_RefImageMeta?> _imageMeta = [null, null, null, null];
   final ValueNotifier<bool> _networkImageFailed = ValueNotifier(false);
   final ImagePicker _picker = ImagePicker();
 
-  // Edit mode: track existing network images and removal
   List<String> _existingImageUrls = [];
   bool _removeOldImages = false;
 
-  // Per-slot loading states
   final List<bool> _isDownloadingForEdit = [false, false, false, false];
   final List<bool> _isMigratingImages = [false, false, false, false];
 
-  // Controller
   late final CustomOrderController _customOrderController;
 
-  // Form Controllers
   final TextEditingController partyNameCtrl = TextEditingController();
   final TextEditingController partyCodeCtrl = TextEditingController();
   final TextEditingController areaCtrl = TextEditingController();
@@ -85,7 +76,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
       value.trim().isNotEmpty &&
       value.trim().toLowerCase() != 'nan';
 
-  // --- Validators ---
 
   String? _requiredValidator(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
@@ -220,10 +210,8 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     super.dispose();
   }
 
-  // --- Validate & Submit ---
 
   Future<void> _handleSubmit() async {
-    // Enable inline errors on all fields after first submit attempt
     setState(() => _autovalidateMode = AutovalidateMode.onUserInteraction);
 
     if (!_formKey.currentState!.validate()) {
@@ -281,7 +269,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     }
   }
 
-  // --- Image Picking Logic ---
 
   void _showImageSourceActionSheet(BuildContext context, int index) {
     showModalBottomSheet(
@@ -340,10 +327,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     }
   }
 
-  /// When an old image is removed, download the remaining old images to local
-  /// files so they're preserved as "new" images on submit. The API only supports
-  /// a boolean [removeOldImages] flag, so we must re-upload any images we want
-  /// to keep.
   Future<void> _migrateRemainingOldImages({int? excludeIndex}) async {
     final remaining = <int>[];
     for (var i = 0; i < _existingImageUrls.length; i++) {
@@ -373,13 +356,11 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           });
         }
       } catch (_) {
-        // If download fails, slot stays empty — user can re-add manually
       } finally {
         if (mounted) setState(() => _isMigratingImages[slot] = false);
       }
     }
 
-    // Clear all existing URLs and flag for server-side removal
     _existingImageUrls = List.filled(_existingImageUrls.length, '');
     _removeOldImages = true;
   }
@@ -411,7 +392,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         ),
       ),
 
-      // BOTTOM ACTION BAR
       bottomNavigationBar: _isAdmin ? const SizedBox.shrink() : Container(
         padding: EdgeInsets.fromLTRB(
           context.getResponsiveSize(4),
@@ -509,7 +489,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. CUSTOMER INFORMATION
               _buildSectionHeader("Customer Information"),
               _buildCard(
                 child: Column(
@@ -527,7 +506,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.heightPercent(0.5)),
 
-              // 2. PRODUCT SPECIFICATIONS
               _buildSectionHeader("Product Specifications"),
               _buildCard(
                 child: Column(
@@ -635,7 +613,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                     ),
                     const SizedBox(height: 18),
 
-                    // Upload Reference Images
                     _buildLabel("Upload Reference Images (Max 4)"),
                     const SizedBox(height: 10),
                     Row(
@@ -657,7 +634,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.heightPercent(0.5)),
 
-              // 3. CUSTOMIZATION OPTIONS
               _buildSectionHeader("Customization Options"),
               _buildCard(
                 child: Column(
@@ -793,7 +769,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     );
   }
 
-  // --- UI HELPER METHODS ---
 
   Widget _buildMainImageDisplay() {
     return ClipRRect(
@@ -916,7 +891,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
     bool readOnly = false,
-    // Validator is optional — null means no validation on this field
     String? Function(String?)? validator,
   }) {
     if (readOnly) {
@@ -973,7 +947,6 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                 width: 1.5,
               ),
             ),
-            // Red border + error text when invalid
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(color: Colors.red, width: 1.5),

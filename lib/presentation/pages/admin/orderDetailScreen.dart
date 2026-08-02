@@ -28,7 +28,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // AdminOrderController is registered as permanent by AdminPanelScreen.
     controller = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController(), permanent: true);

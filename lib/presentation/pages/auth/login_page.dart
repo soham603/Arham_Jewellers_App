@@ -100,12 +100,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: Column(
                         children: [
-                          // 1. Logo & Header
                           _buildTopSection(context, hasKeyboard: hasKeyboard),
 
                           SizedBox(height: context.heightPercent(2)),
 
-                          // 2. Form
                           Expanded(
                             child: Center(
                               child: Form(
@@ -117,7 +115,6 @@ class _LoginPageState extends State<LoginPage> {
 
                           SizedBox(height: context.heightPercent(2)),
 
-                          // 3. Bottom Links & Terms
                           _buildBottomSection(context),
                         ],
                       ),
@@ -387,7 +384,6 @@ class _LoginPageState extends State<LoginPage> {
 
           SizedBox(height: context.heightPercent(1.5)),
 
-          // ── Create Account Section ──
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -414,7 +410,6 @@ class _LoginPageState extends State<LoginPage> {
 
           SizedBox(height: context.heightPercent(1.5)),
 
-          // 🔥 Removed underline and added space before the question mark
           Center(
             child: GestureDetector(
               onTap: () {

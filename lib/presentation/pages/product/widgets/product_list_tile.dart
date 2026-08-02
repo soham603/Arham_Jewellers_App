@@ -62,7 +62,6 @@ class ProductListTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Image
             Stack(
               children: [
                 ClipRRect(
@@ -134,7 +133,6 @@ class ProductListTile extends StatelessWidget {
               ],
             ),
             SizedBox(width: 12 * sf),
-            // Details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

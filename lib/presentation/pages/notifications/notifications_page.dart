@@ -98,7 +98,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
             Container(height: 3, color: AppColors.divider),
             Expanded(
               child: Obx(() {
-                // Subscribe Obx to loadMoreError so list rebuilds when pagination fails
                 _controller.loadMoreError.value;
                 switch (_controller.state.value) {
                   case CurrentAppState.INITIAL:

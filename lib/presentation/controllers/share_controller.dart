@@ -27,21 +27,16 @@ class ShareController extends GetxController {
 
   final _categoryController = Get.find<CategoryController>();
 
-  // ── Karat selection 
   final _selectedKarat = RxnString();
   String? get selectedKarat => _selectedKarat.value;
 
-  // ── Drill-down level: 2 = collections, 3 = styles 
   final _drillLevel = 2.obs;
   int get drillLevel => _drillLevel.value;
 
-  // ── Current level-2 being drilled into 
   final _currentLevel2 = Rxn<CategoryModel>();
   CategoryModel? get currentLevel2 => _currentLevel2.value;
 
 
-  // ── Selected level-3 categories (persist across navigation) ─
-  // Key format: "${karatName}_${level3Id}" to avoid cross-karat collisions
   final _selectedLevel3 = <String, SelectedLevel3Category>{}.obs;
   Map<String, SelectedLevel3Category> get selectedLevel3 => _selectedLevel3;
   int get selectedCount => _selectedLevel3.length;
@@ -55,7 +50,6 @@ class ShareController extends GetxController {
     return _selectedLevel3.containsKey(_selectionKey(karat, id));
   }
 
-  // ── Current level-2 list based on selected karat 
   List<CategoryModel> get currentLevel2Categories {
     final karat = _selectedKarat.value;
     if (karat == null) return [];
@@ -71,20 +65,17 @@ class ShareController extends GetxController {
     }
   }
 
-  // ── Current level-3 list from cache 
   List<CategoryModel> get currentLevel3Categories {
     final level2 = _currentLevel2.value;
     if (level2 == null) return [];
     return _categoryController.level3Cache[level2.id] ?? [];
   }
 
-  // ── Selected categories info for share message 
   String get selectedCategoriesInfo {
     if (_selectedLevel3.isEmpty) return '';
     return _selectedLevel3.values.map((s) => s.displayName).join('\n');
   }
 
-  // ── Product count for selected categories 
   final _productCount = 0.obs;
   int get productCount => _productCount.value;
 
@@ -97,10 +88,8 @@ class ShareController extends GetxController {
     _productCount.value = await ShareService.fetchProductCount(ids);
   }
 
-  // ── Touch value mapping ──
   static int _touchValueForKarat(String karat) => KaratConstants.touchValueFor(karat);
 
-  // ── Actions ─
 
   Future<void> selectKarat(String karat) async {
     if (_selectedKarat.value == karat) return;
@@ -108,7 +97,6 @@ class ShareController extends GetxController {
     _drillLevel.value = 2;
     _currentLevel2.value = null;
 
-    // Ensure category tree is loaded
     if (_categoryController.k18Categories.isEmpty) {
       await _categoryController.fetchCategoryTree();
     }

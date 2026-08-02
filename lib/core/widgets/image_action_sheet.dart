@@ -2,12 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
-/// Shows a bottom sheet with "Edit", "Upload", and "Remove" options for an existing image.
-///
-/// - [onEdit]: called when the user taps "Edit" (open crop editor).
-/// - [onUpload]: called when the user taps "Upload" (open file picker).
-/// - [onRemove]: called when the user taps "Remove" (delete the image).
-/// - [isVideo]: when true, the edit icon changes to a video icon.
 void showImageActionSheet(
   BuildContext context, {
   required VoidCallback onEdit,
@@ -46,7 +40,6 @@ void showImageActionSheet(
               ),
             ),
             SizedBox(height: context.heightPercent(0.6)),
-            // Edit option
             ListTile(
               contentPadding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(5),
@@ -95,7 +88,6 @@ void showImageActionSheet(
               endIndent: context.getResponsiveSize(5),
               color: context.colorPalette.boxColor,
             ),
-            // Upload option
             ListTile(
               contentPadding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(5),
@@ -144,7 +136,6 @@ void showImageActionSheet(
               endIndent: context.getResponsiveSize(5),
               color: context.colorPalette.boxColor,
             ),
-            // Remove option
             ListTile(
               contentPadding: EdgeInsets.symmetric(
                 horizontal: context.getResponsiveSize(5),

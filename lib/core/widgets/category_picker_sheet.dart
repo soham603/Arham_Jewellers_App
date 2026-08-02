@@ -5,7 +5,6 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
-/// A single selected-category entry so IDs and names never go out of sync.
 class SelectedCategory {
   final String id;
   final String displayName;
@@ -23,7 +22,6 @@ class SelectedCategory {
   int get hashCode => id.hashCode;
 }
 
-/// A reusable bottom sheet for picking categories with expandable level-3 subcategories.
 class CategoryPickerSheet extends StatefulWidget {
   final List<CategoryModel> categories;
   final Map<String, List<CategoryModel>> categoryVariants;

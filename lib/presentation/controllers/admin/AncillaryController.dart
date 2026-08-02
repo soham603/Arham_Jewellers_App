@@ -58,8 +58,6 @@ class AncillaryController extends GetxController {
 
   Future<void>? _adminContactReady;
 
-  /// Awaits the initial ADMIN_CONTACT fetch, then returns the phone.
-  /// Use this in tap handlers to guarantee the real number is loaded.
   Future<String> get adminPhoneAsync async {
     if (_adminContactReady != null) await _adminContactReady;
     return adminPhone.value;

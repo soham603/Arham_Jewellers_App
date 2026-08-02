@@ -47,10 +47,6 @@ class ShareService {
     return '$_brandName\n$_brandSubtitle\n\n$filterInfo';
   }
 
-  /// Downloads an image and optionally compresses it.
-  /// [maxLongestEdge] — if the image's longest side exceeds this, it is scaled
-  /// down proportionally. No cropping is done.
-  /// [quality] — JPEG encoding quality (1–100). Higher = better quality.
   static Future<Uint8List?> _downloadAndCompressImage(
     String imageUrl, {
     int? maxLongestEdge,
@@ -71,8 +67,6 @@ class ShareService {
     return null;
   }
 
-  /// Compresses image bytes: resizes if longest edge exceeds [maxLongestEdge],
-  /// re-encodes as JPEG at given [quality]. No cropping — aspect ratio preserved.
   static Uint8List? _compressImage(
     Uint8List bytes, {
     int maxLongestEdge = ImageCompressionConstants.shareMaxEdge,
@@ -138,8 +132,6 @@ class ShareService {
     return result;
   }
 
-  /// Downloads and compresses all product images in batches with progress tracking.
-  /// Returns the list of compressed image bytes (same length as [products]).
   static Future<List<Uint8List?>> _downloadAndCompressAllImages({
     required List<ProductModel> products,
     required int maxLongestEdge,
@@ -157,7 +149,6 @@ class ShareService {
       final batch = products.skip(i).take(batchSize);
       final batchCount = batch.length;
 
-      // Download raw bytes first (async I/O — non-blocking)
       final downloadFutures = batch.map((product) async {
         final imageUrl = product.displayImageUrl;
         if (imageUrl == null || imageUrl.isEmpty) return null;
@@ -179,7 +170,6 @@ class ShareService {
       if (cancelled?.value == true) return imageBytesList;
 
       if (compressImages) {
-        // Compress in background isolate (CPU-bound — doesn't block UI)
         final compressedBatch = await compute(_compressImageBatchInIsolate, {
           'imageBytes': rawBytesList,
           'maxLongestEdge': maxLongestEdge,
@@ -188,13 +178,11 @@ class ShareService {
 
         imageBytesList.addAll(compressedBatch);
 
-        // Compression fills the full batch contribution
         final compressProgress = (i + batchCount) / products.length;
         progress?.value = compressProgress;
       } else {
         imageBytesList.addAll(rawBytesList);
 
-        // Download fills the full batch contribution when not compressing
         final downloadProgress = (i + batchCount) / products.length;
         progress?.value = downloadProgress;
       }
@@ -324,7 +312,6 @@ class ShareService {
     }
   }
 
-  /// Fetches products for the given category IDs, deduplicates, and shares as images.
   static Future<void> shareImagesFromCategories({
     required List<String> categoryIds,
     required String filterInfo,
@@ -346,7 +333,6 @@ class ShareService {
     );
   }
 
-  /// Fetches products for the given category IDs, deduplicates, and shares as PDF.
   static Future<void> sharePdfFromCategories({
     required List<String> categoryIds,
     required String filterInfo,
@@ -370,7 +356,6 @@ class ShareService {
     );
   }
 
-  /// Fetches the total product count for the given category IDs (lightweight — uses limit=1 per category).
   static Future<int> fetchProductCount(List<String> categoryIds) async {
     int totalCount = 0;
 
@@ -397,7 +382,6 @@ class ShareService {
     return totalCount;
   }
 
-  /// Fetches products for multiple category IDs (one request per category) and deduplicates.
   static Future<List<ProductModel>> fetchProductsForCategories(List<String> categoryIds) async {
     final allProducts = <ProductModel>[];
     final seen = <String>{};
@@ -1041,7 +1025,6 @@ Future<List<int>> _buildPdfInIsolate(Map<String, dynamic> params) async {
   final brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
   final brandSubtitle = 'Purity - Quality - Trust';
 
-  // High-contrast header page: dark background, light text
   final headerContent = pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.center,
     mainAxisAlignment: pw.MainAxisAlignment.center,
@@ -1257,8 +1240,6 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
     ),
   );
 
-  // Column widths for A4 (usable width ≈ 523 pts with 30pt margins)
-  // Image(40) + #(28) + Name(155) + Category(95) + Karat(70) + NetWt(68) + Qty(42) ≈ 498
   final colWidths = <double>[40, 28, 155, 95, 70, 68, 42];
 
   final tableHeaderStyle = pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColor.fromHex('#FFFFFF'));
@@ -1267,7 +1248,6 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
   pw.TableRow buildRow(List<String> cells, {bool isHeader = false, pw.MemoryImage? image}) {
     final children = <pw.Widget>[];
 
-    // Image cell
     if (isHeader) {
       children.add(
         pw.Container(
@@ -1311,7 +1291,6 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
       );
     }
 
-    // Text cells
     for (var ci = 0; ci < cells.length; ci++) {
       children.add(
         pw.Container(

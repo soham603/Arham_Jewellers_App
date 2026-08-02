@@ -83,7 +83,6 @@ class UserOrderController extends GetxController {
 
 
 
-  // ── Status filter 
 
   final _selectedFilter = 'all'.obs;
   String get selectedFilter => _selectedFilter.value;
@@ -280,7 +279,6 @@ class UserOrderController extends GetxController {
   }
 
   
-  // LOAD MORE ORDERS
   
 
   Future<void> loadMoreOrders() async {
@@ -292,7 +290,6 @@ class UserOrderController extends GetxController {
   }
 
   
-  // REFRESH ORDERS
   
 
   Future<void> refreshOrders() async {
@@ -306,7 +303,6 @@ class UserOrderController extends GetxController {
   }
 
   
-  // RESET ORDER STATE
   
 
   void resetOrderState() {

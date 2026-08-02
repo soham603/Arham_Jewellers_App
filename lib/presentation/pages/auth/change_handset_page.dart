@@ -98,7 +98,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
                     children: [
                       SizedBox(height: context.heightPercent(0.2)),
 
-                      // ── Logo ──
                       Center(
                         child: LogoWidget(
                           logoSize: context.getResponsiveSize(16),
@@ -115,7 +114,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(5)),
 
-                      // ── Title ──
                       Text(
                         'Change Handset',
                         style: TextStyle(
@@ -127,7 +125,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(1)),
 
-                      // ── Subtitle ──
                       Text(
                         'Verify your identity to link this new device to your account securely.',
                         style: TextStyle(
@@ -139,7 +136,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(4)),
 
-                      // ── Mobile Number Label ──
                       Text(
                         'Registered Mobile Number',
                         style: TextStyle(
@@ -151,7 +147,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(0.8)),
 
-                      // ── Phone Input ──
                       AnimatedTextField(
                         controller: phoneController,
                         hintText: 'Registered Mobile Number',
@@ -171,7 +166,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(1)),
 
-                      // ── Password Label ──
                       Text(
                         'Password',
                         style: TextStyle(
@@ -183,7 +177,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(0.8)),
 
-                      // ── Password Input ──
                       AnimatedTextField(
                         controller: passwordController,
                         hintText: 'Enter Password',
@@ -215,7 +208,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(1.5)),
 
-                      // ── Verify & Change Handset Button ──
                       SizedBox(
                         width: double.infinity,
                         height: context.heightPercent(6),
@@ -324,7 +316,6 @@ class _ChangeHandsetPageState extends State<ChangeHandsetPage> {
 
                       SizedBox(height: context.heightPercent(6)),
 
-                      // ── Support Section ──
                       Center(
                         child: Text.rich(
                           TextSpan(

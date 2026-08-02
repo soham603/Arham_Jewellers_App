@@ -86,7 +86,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   children: [
                     SizedBox(height: context.heightPercent(0.2)),
 
-                    // ── Logo ──
                     Center(
                       child: LogoWidget(
                         logoSize: context.getResponsiveSize(16),
@@ -103,7 +102,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(5)),
 
-                    // ── Title ──
                     Text(
                       'Forgot Password?',
                       style: TextStyle(
@@ -115,7 +113,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(1)),
 
-                    // ── Subtitle ──
                     Text(
                       "No worries! Enter your registered mobile number and we'll contact you with new password.",
                       style: TextStyle(
@@ -127,7 +124,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(4)),
 
-                    // ── Phone Input ──
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -161,7 +157,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(1.5)),
 
-                    // ── Send Reset Link Button ──
                     Obx(() {
                       final isLoading =
                           authController.forgotPasswordState == CurrentAppState.LOADING;
@@ -228,7 +223,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(2.5)),
 
-                    // ── OR Divider ──
                     Row(
                       children: [
                         Expanded(
@@ -275,7 +269,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(2.5)),
 
-                    // ── Back to Sign In ──
                     SizedBox(
                       width: double.infinity,
                       height: context.heightPercent(6),
@@ -307,7 +300,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     SizedBox(height: context.heightPercent(6)),
 
-                    // ── Support Section ──
                     Center(
                       child: Text.rich(
                         TextSpan(

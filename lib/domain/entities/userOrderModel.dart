@@ -1,4 +1,3 @@
-// lib/domain/entities/userOrderModel.dart
 
 class UserOrderModel {
   final String id;

@@ -32,7 +32,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
   @override
   void initState() {
     super.initState();
-    // AdminOrderController is registered as permanent by AdminPanelScreen.
     _adminOrderController = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController(), permanent: true);
@@ -59,7 +58,6 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           
-          // STAFF HEADER CARD
           
           Container(
             width: double.infinity,
@@ -227,14 +225,12 @@ class _StaffPanelScreenState extends State<StaffPanelScreen> {
           SizedBox(height: context.heightPercent(3)),
 
           
-          // QUICK STATS ROW
           
           Obx(() => _buildStatsRow(context)),
 
           SizedBox(height: context.heightPercent(3)),
 
           
-          // STAFF MENU GRID / LIST
           
           Row(
             children: [

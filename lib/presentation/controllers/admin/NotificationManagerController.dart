@@ -11,7 +11,6 @@ class NotificationManagerController extends GetxController {
 
   final _notificationRepo = NotificationRepository();
 
-  // ── Form fields
   final _title = ''.obs;
   String get title => _title.value;
 
@@ -24,11 +23,9 @@ class NotificationManagerController extends GetxController {
   final _targetValue = ''.obs;
   String get targetValue => _targetValue.value;
 
-  // ── Send state
   final _sendState = CurrentAppState.INITIAL.obs;
   CurrentAppState get sendState => _sendState.value;
 
-  // ── History
   final _history = <SentNotification>[].obs;
   List<SentNotification> get history => _history;
 
@@ -49,7 +46,6 @@ class NotificationManagerController extends GetxController {
     fetchHistory();
   }
 
-  // ── Form setters
   void setTitle(String value) => _title.value = value;
   void setBody(String value) => _body.value = value;
   void setTargetType(String value) {
@@ -58,7 +54,6 @@ class NotificationManagerController extends GetxController {
   }
   void setTargetValue(String value) => _targetValue.value = value;
 
-  // ── Send notification
   Future<bool> sendNotification() async {
     if (_title.value.trim().isEmpty) {
       ToastUtils.showWarning('Please enter a notification title');
@@ -128,7 +123,6 @@ class NotificationManagerController extends GetxController {
     }
   }
 
-  // ── Fetch history
   Future<void> fetchHistory({bool isPagination = false}) async {
     if (!_hasMore && isPagination) return;
 

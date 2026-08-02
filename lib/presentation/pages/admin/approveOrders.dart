@@ -29,16 +29,10 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
   void initState() {
     super.initState();
 
-    // AdminOrderController is registered as permanent by AdminPanelScreen
-    // (and StaffPanelScreen as a fallback), so its fetched orders survive
-    // route pops between admin order screens.
     controller = Get.isRegistered<AdminOrderController>()
         ? Get.find<AdminOrderController>()
         : Get.put(AdminOrderController(), permanent: true);
 
-    // CraftsmanController is shared with AdminCustomOrderDetailPage.
-    // Registered as permanent to keep the craftsman list cached across
-    // navigation between admin order screens.
     if (!Get.isRegistered<CraftsmanController>()) {
       Get.put(CraftsmanController(), permanent: true);
     }
@@ -97,7 +91,6 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
           padding: EdgeInsets.all(context.getResponsiveSize(4)),
           child: Column(
             children: [
-              // SEARCH BAR
               SearchBarWidget(
                 controller: controller.searchController,
                 onChanged: controller.onSearchChanged,
@@ -111,7 +104,6 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
 
               SizedBox(height: context.heightPercent(1.5)),
 
-              // STATUS FILTER DROPDOWN
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -202,10 +194,8 @@ class _ApproveOrdersScreenState extends State<ApproveOrdersScreen> {
                   );
                 }),
 
-              // PAGINATION SHIMMER
               if (controller.isPaginationLoading)
                 const AdminOrderShimmer(showPagination: true)
-              // LOAD MORE
               else if (controller.hasMore)
                 Padding(
                   padding: EdgeInsets.only(

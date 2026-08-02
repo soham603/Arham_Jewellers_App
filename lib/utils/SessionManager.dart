@@ -22,7 +22,6 @@ class SessionManager {
 
   final _storage = const FlutterSecureStorage();
 
-  // ── Token persistence 
   Future<bool> saveTokens({
     required String accessToken,
     required String refreshToken,
@@ -95,7 +94,6 @@ class SessionManager {
     }
   }
 
-  // ── Admin flag persistence 
   static const _isAdminKey = 'IS_ADMIN';
 
   Future<void> saveIsAdmin(bool isAdmin) async {
@@ -107,7 +105,6 @@ class SessionManager {
     return value == 'true';
   }
 
-  // ── User data persistence 
   Future<bool> saveUserData(UserModel user) async {
     try {
       String userJson = jsonEncode(user.toJson());
@@ -133,7 +130,6 @@ class SessionManager {
     await _storage.delete(key: DatabaseKeyConstants.USER);
   }
 
-  // ── FCM token persistence 
   Future<bool> saveFcmToken(String token) async {
     try {
       await _storage.write(key: DatabaseKeyConstants.FCM_TOKEN, value: token);

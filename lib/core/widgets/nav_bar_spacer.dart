@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 class NavBarSpacer extends StatelessWidget {
   const NavBarSpacer({super.key});
 
-  /// Returns the exact total visual height of [AppBottomNav],
-  /// including the center logo overflow above the bar.
   static double heightOf(BuildContext context) {
     final isLargeScreen = MediaQuery.of(context).size.shortestSide >= 600;
     final barHeight = isLargeScreen ? 100.0 : 68.0;

@@ -288,7 +288,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
       final minY = rates.reduce((a, b) => a < b ? a : b);
       final maxY = rates.reduce((a, b) => a > b ? a : b);
       
-      // Clean graph math: Force exactly 4 horizontal lines max to prevent squishing
       final rangeY = maxY - minY;
       final stepY = rangeY > 0 ? (rangeY / 3).ceilToDouble() : 500.0;
       final padding = stepY * 0.15;
@@ -352,7 +351,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                         reservedSize: context.getResponsiveSize(13), // Expanded to prevent clipping
                         interval: stepY,
                         getTitlesWidget: (value, meta) {
-                          // Format cleanly (e.g. 152k instead of 152.0k)
                           return Padding(
                             padding: const EdgeInsets.only(right: 6),
                             child: Text(
@@ -479,7 +477,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
   }
 
   Widget _periodFilter(BuildContext context) {
-    // Hardcoded text to prevent spelling errors like "DAYay"
     final Map<String, String> periodLabels = {
       'day': 'Day',
       'week': 'Week',
@@ -490,7 +487,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Wrapped in Horizontal Scroller to prevent Overflow warnings
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -537,7 +533,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                   );
                 });
               }),
-              // Custom Range Chip
               Obx(() {
                 final isCustom = controller.activeFilterType == 'custom';
                 return GestureDetector(
@@ -612,7 +607,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
             ],
           ),
         ),
-        // Date Range Label
         Obx(() {
           if (controller.activeFilterType != 'custom' ||
               controller.dateRangeLabel.isEmpty) {
@@ -705,7 +699,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
     });
   }
 
-  // Redesigned Attractive Stats Summary
   Widget _statisticsSummary(BuildContext context) {
     return Obx(() {
       final stats = controller.statistics;
@@ -747,7 +740,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Market Trend & Percentage Pill
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -812,7 +804,6 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
               ),
             ),
             
-            // Bottom Row: Min, Avg, Max
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

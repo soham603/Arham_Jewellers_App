@@ -20,7 +20,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   final _adminLoginState = CurrentAppState.INITIAL.obs;
   CurrentAppState get adminLoginState => _adminLoginState.value;
 
-  // New states for Registration flow
   final _userRegisterState = CurrentAppState.INITIAL.obs;
   CurrentAppState get userRegisterState => _userRegisterState.value;
 
@@ -30,11 +29,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   final RxString _adminLoginErrorMsg = "".obs;
   String get adminLoginErrorMsg => _adminLoginErrorMsg.value;
 
-  // New error message state for Registration flow
   final RxString _userRegisterErrorMsg = "".obs;
   String get userRegisterErrorMsg => _userRegisterErrorMsg.value;
 
-  // Forgot Password state
   final _forgotPasswordState = CurrentAppState.INITIAL.obs;
   CurrentAppState get forgotPasswordState => _forgotPasswordState.value;
 
@@ -305,7 +302,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  // NAMAN - Register Function Implementation
   Future<bool> registerUser({
     required String email,
     required String password,
