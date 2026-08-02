@@ -199,9 +199,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     if (value == null) return null;
 
     if (value < 1) {
-      value *= 1000; // Decimal fraction (0.916 → 916)
+      value *= 1000; 
     } else if (value < 100) {
-      value *= 10; // Percentage (91.6 → 916)
+      value *= 10; 
     }
     value = value.roundToDouble();
 

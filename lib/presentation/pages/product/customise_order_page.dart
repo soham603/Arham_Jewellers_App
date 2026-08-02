@@ -85,7 +85,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   }
 
   String? _weightValidator(String? value) {
-    if (value == null || value.trim().isEmpty) return null; // optional
+    if (value == null || value.trim().isEmpty) return null; 
     final parsed = double.tryParse(value.trim());
     if (parsed == null || parsed <= 0) {
       return 'Enter a valid weight';
@@ -94,7 +94,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   }
 
   String? _numericOptionalValidator(String? value, String fieldName) {
-    if (value == null || value.trim().isEmpty) return null; // optional
+    if (value == null || value.trim().isEmpty) return null; 
     final parsed = int.tryParse(value.trim());
     if (parsed == null || parsed <= 0) {
       return 'Enter a valid $fieldName';

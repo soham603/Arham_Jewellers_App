@@ -39,7 +39,7 @@ class AnimatedTextField extends StatefulWidget {
 class _AnimatedTextFieldState extends State<AnimatedTextField> {
   late FocusNode _focusNode;
   bool _isLocalFocusNode = false;
-  late bool _obscureText; // Toggle state
+  late bool _obscureText; 
 
   @override
   void initState() {

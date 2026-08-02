@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         leading: const SizedBox.shrink(),
         leadingWidth: 0,
-        centerTitle: false, // 🔥 Forces title to the left
+        centerTitle: false, 
         titleSpacing: context.getResponsiveSize(4),
         title: Text(
           isAdmin

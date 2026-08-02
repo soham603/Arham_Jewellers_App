@@ -283,8 +283,8 @@ class _RegisterPageState extends State<RegisterPage> {
         password: passwordController.text.trim(),
         name: nameController.text.trim(),
         phoneNumber: fullPhoneNumber,
-        deviceId: finalDeviceId, // Guaranteed to be a valid String now
-        deviceName: finalDeviceName, // Guaranteed to be a valid String now
+        deviceId: finalDeviceId, 
+        deviceName: finalDeviceName, 
         gstNumber: gstController.text.trim().toUpperCase(),
         state: stateController.text.trim(),
         city: cityController.text.trim(),

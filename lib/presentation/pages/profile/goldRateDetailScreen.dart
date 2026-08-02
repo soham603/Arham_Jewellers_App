@@ -348,7 +348,7 @@ class _GoldRateDetailScreenState extends State<GoldRateDetailScreen> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: context.getResponsiveSize(13), // Expanded to prevent clipping
+                        reservedSize: context.getResponsiveSize(13), 
                         interval: stepY,
                         getTitlesWidget: (value, meta) {
                           return Padding(

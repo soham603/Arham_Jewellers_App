@@ -27,7 +27,7 @@ class AccessRequestUser {
 class AccessRequestModel {
   final String id;
   final String userId;
-  final String status; // PENDING | APPROVED | REJECTED
+  final String status; 
   final DateTime requestedAt;
   final DateTime? approvedTill;
   final DateTime createdAt;
