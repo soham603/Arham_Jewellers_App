@@ -1254,23 +1254,15 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (karatLabel.contains(',')) {
       final parts = karatLabel.split(',').map((k) {
         final trimmed = k.trim();
-        final purity = _purityForKarat(trimmed);
+        final purity = KaratConstants.purityValueFor(trimmed);
         return purity != null ? '$trimmed·$purity%' : trimmed;
       }).join(', ');
       return parts;
     }
 
-    final purity = _purityForKarat(karatLabel);
+    final purity = KaratConstants.purityValueFor(karatLabel);
     if (purity == null) return null;
     return '$karatLabel · $purity%';
-  }
-
-  String? _purityForKarat(String karat) {
-    if (karat.isEmpty) return null;
-    if (karat.contains('18')) return '76';
-    if (karat.contains('20')) return '84';
-    if (karat.contains('22')) return '92';
-    return null;
   }
 
   void _showFilterSheet(BuildContext context) {

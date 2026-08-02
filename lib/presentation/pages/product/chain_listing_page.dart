@@ -495,17 +495,6 @@ class _ChainKaratSectionHeader extends StatelessWidget {
     required this.onToggle,
   });
 
-  String _purity(Karat k) {
-    switch (k) {
-      case Karat.k18:
-        return '76%';
-      case Karat.k20:
-        return '84%';
-      case Karat.k22:
-        return '92%';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -579,7 +568,7 @@ class _ChainKaratSectionHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${_purity(karat)} Pure Gold',
+                  '${karat.purityPercent} Pure Gold',
                   style: TextStyle(
                     fontSize: 10,
                     color: context.colorPalette.goldDark,

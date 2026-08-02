@@ -24,6 +24,8 @@ extension KaratExtension on Karat {
   }
 
   int get touchValue => KaratConstants.touchValueFor(displayName);
+
+  String get purityPercent => KaratConstants.percentLabel(displayName);
 }
 
 abstract class KaratConstants {
@@ -40,6 +42,11 @@ abstract class KaratConstants {
   static const List<String> common = ['18K', '20K', '22K'];
 
   static int touchValueFor(String karat) => touchValues[karat] ?? 0;
+
+  static String? purityValueFor(String karat) {
+    final value = touchValues[karat];
+    return value != null ? value.toString() : null;
+  }
 
   static String percentLabel(String karat) => '${touchValueFor(karat)}%';
 

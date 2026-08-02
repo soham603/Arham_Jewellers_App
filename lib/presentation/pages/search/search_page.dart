@@ -136,9 +136,6 @@ class _SearchPageState extends State<SearchPage> {
     return expanded;
   }
 
-  String _getKaratPurity(String? karat) =>
-      karat != null ? KaratConstants.percentLabel(karat) : '';
-
   @override
   void dispose() {
     _tabWorker.dispose();
@@ -1082,7 +1079,7 @@ class _SearchPageState extends State<SearchPage> {
                               if (karatName != null) ...[
                                 SizedBox(height: context.heightPercent(0.1)),
                                 Text(
-                                  '$karatName • ${_getKaratPurity(karatName)}',
+                                  '$karatName • ${KaratConstants.percentLabel(karatName)}',
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(2.2),
                                     fontWeight: FontWeight.w500,
