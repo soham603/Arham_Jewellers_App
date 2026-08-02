@@ -10,7 +10,6 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 
 class ChainListingPage extends StatefulWidget {
@@ -57,7 +56,6 @@ class _ChainListingPageState extends State<ChainListingPage> {
               const Duration(seconds: 15),
             );
       } catch (e) {
-        Logger.warning("ChainListingPage", "Failed to fetch categories: $e");
       }
     }
 

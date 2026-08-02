@@ -6,7 +6,6 @@ import 'package:get/get.dart' hide Response;
 import 'package:ratnesh_gold_app/data/repositories/admin_access_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AdminUserManagementController extends GetxController {
   static AdminUserManagementController get instance => Get.find();
@@ -112,7 +111,6 @@ class AdminUserManagementController extends GetxController {
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      Logger.error('AdminUserManagementController', 'fetchUsers: $e\n$st');
     }
   }
 
@@ -272,7 +270,6 @@ class AdminUserManagementController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
-      Logger.error('AdminUserManagementController', 'action Dio: $e\n$st');
 
       String message = 'Something went wrong';
       if (e.response?.data is Map) {
@@ -287,7 +284,6 @@ class AdminUserManagementController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } catch (e, st) {
-      Logger.error('AdminUserManagementController', 'action: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(e.toString());

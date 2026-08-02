@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateControll
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class UserOrderController extends GetxController {
   static UserOrderController get instance => Get.find();
@@ -141,7 +140,6 @@ class UserOrderController extends GetxController {
         return {"productId": item.product.id, "quantity": item.quantity};
       }).toList();
 
-      Logger.info("UserOrderController", "Creating order payload: $products");
 
       final responseData = await _orderRepo.createOrder(orderData: {"products": products});
 
@@ -184,7 +182,6 @@ class UserOrderController extends GetxController {
 
         cartController.clearCart();
 
-        Logger.info("UserOrderController", "Order created successfully");
 
         if (Get.isRegistered<NotificationController>()) {
           Get.find<NotificationController>().addLocalNotification(
@@ -201,7 +198,6 @@ class UserOrderController extends GetxController {
     } catch (e, st) {
       _createOrderState.value = CurrentAppState.ERROR;
 
-      Logger.error("UserOrderController", "createOrder error: $e\n$st");
 
       String errorMessage = "Failed to place order";
 
@@ -241,7 +237,6 @@ class UserOrderController extends GetxController {
         _userOrders.clear();
       }
 
-      Logger.info("UserOrderController", "Fetching orders page: $_ordersPage");
 
       final result = await _orderRepo.fetchUserOrders(
         queryParams: {"page": _ordersPage, "limit": _ordersLimit},
@@ -265,11 +260,9 @@ class UserOrderController extends GetxController {
 
       _updateFilteredOrders();
 
-      Logger.info("UserOrderController", "Orders fetched successfully");
     } catch (e, st) {
       _ordersState.value = CurrentAppState.ERROR;
 
-      Logger.error("UserOrderController", "fetchUserOrders error: $e\n$st");
 
       String errorMessage = "Failed to fetch orders";
 

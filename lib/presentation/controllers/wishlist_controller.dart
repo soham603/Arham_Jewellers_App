@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WishlistController extends GetxController {
@@ -69,7 +68,6 @@ class WishlistController extends GetxController {
             .toList();
         _items.addAll(loadedItems);
       } catch (e, st) {
-        Logger.error("WishlistController", "Failed to load wishlist from SharedPreferences", stackTrace: st);
         await prefs.remove(_wishlistKey);
       }
     }

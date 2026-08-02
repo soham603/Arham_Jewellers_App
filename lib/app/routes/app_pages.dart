@@ -26,7 +26,6 @@ import '../../presentation/pages/splash/splash_page.dart';
 import '../../presentation/pages/wishlist/wishlist_page.dart';
 import '../../presentation/pages/profile/goldRateDetailScreen.dart';
 import 'app_routes.dart';
-import '../../utils/Logger.dart';
 import '../../utils/ToastUtil.dart';
 
 class _MainShellBinding extends Bindings {
@@ -80,14 +79,8 @@ Widget _resolveUserOrderDetail() {
     }
   }
   if (orderId == null) {
-    Logger.warning('AppPages', 'userOrderDetail requested without orderId');
   } else if (!Get.isRegistered<UserOrderController>()) {
-    Logger.warning(
-      'AppPages',
-      'userOrderDetail requested but UserOrderController is not registered',
-    );
   } else {
-    Logger.warning('AppPages', 'userOrderDetail: order $orderId not in cache');
   }
   ToastUtils.showError('Order not found');
   return MyOrdersPage();
@@ -110,14 +103,8 @@ Widget _resolveAdminOrderDetail() {
     }
   }
   if (orderId == null) {
-    Logger.warning('AppPages', 'adminOrderDetail requested without orderId');
   } else if (!Get.isRegistered<AdminOrderController>()) {
-    Logger.warning(
-      'AppPages',
-      'adminOrderDetail requested but AdminOrderController is not registered',
-    );
   } else {
-    Logger.warning('AppPages', 'adminOrderDetail: order $orderId not in cache');
   }
   ToastUtils.showError('Order not found');
   return ApproveOrdersScreen();

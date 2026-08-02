@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DatabaseKeyConstants {
@@ -43,26 +42,19 @@ class SessionManager {
       await _storage.write(
           key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, value: refreshExpiry.toString());
 
-      Logger.info("SessionManager", "Tokens saved");
       return true;
     } catch (e, st) {
-      Logger.error("SessionManager", "Error saving tokens → $e",
-          stackTrace: st);
       return false;
     }
   }
 
   Future<String?> getAccessToken() async {
     final token = await _storage.read(key: DatabaseKeyConstants.ACCESS_TOKEN);
-    Logger.info("SessionManager",
-        "getAccessToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
   Future<String?> getRefreshToken() async {
     final token = await _storage.read(key: DatabaseKeyConstants.REFRESH_TOKEN);
-    Logger.info("SessionManager",
-        "getRefreshToken: ${token != null ? 'present' : 'null'}");
     return token;
   }
 
@@ -80,10 +72,6 @@ class SessionManager {
     final expiry = await getAccessTokenExpiry();
     if (expiry == null) return true;
     final now = DateTime.now().toUtc().millisecondsSinceEpoch;
-    Logger.info(
-      "SessionManager",
-      "Checking access token expiry : ${now >= expiry}",
-    );
     return now >= expiry;
   }
 
@@ -101,11 +89,8 @@ class SessionManager {
       await _storage.delete(key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
       await _storage.delete(key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
 
-      Logger.info("SessionManager", "Tokens cleared");
       return true;
     } catch (e, st) {
-      Logger.error("SessionManager", "Error clearing tokens → $e",
-          stackTrace: st);
       return false;
     }
   }
@@ -127,11 +112,8 @@ class SessionManager {
     try {
       String userJson = jsonEncode(user.toJson());
       await _storage.write(key: DatabaseKeyConstants.USER, value: userJson);
-      Logger.info("SessionManager", "User saved");
       return true;
     } catch (e, st) {
-      Logger.error("SessionManager", "Error saving user → $e",
-          stackTrace: st);
       return false;
     }
   }
@@ -143,25 +125,20 @@ class SessionManager {
     try {
       return UserModel.fromJson(jsonDecode(jsonString));
     } catch (e, st) {
-      Logger.error("SessionManager", "Failed to parse user data from secure storage", stackTrace: st);
       return null;
     }
   }
 
   Future<void> clearUser() async {
     await _storage.delete(key: DatabaseKeyConstants.USER);
-    Logger.info("SessionManager", "User cleared");
   }
 
   // ── FCM token persistence 
   Future<bool> saveFcmToken(String token) async {
     try {
       await _storage.write(key: DatabaseKeyConstants.FCM_TOKEN, value: token);
-      Logger.info("SessionManager", "FCM token saved");
       return true;
     } catch (e, st) {
-      Logger.error("SessionManager", "Error saving FCM token → $e",
-          stackTrace: st);
       return false;
     }
   }
@@ -172,7 +149,6 @@ class SessionManager {
 
   Future<void> clearFcmToken() async {
     await _storage.delete(key: DatabaseKeyConstants.FCM_TOKEN);
-    Logger.info("SessionManager", "FCM token cleared");
   }
 
   Future<void> clearAll() async {

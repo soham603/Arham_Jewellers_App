@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../../../core/widgets/logo_widget.dart';
 
 import '../../../app/routes/app_routes.dart';
-import '../../../utils/Logger.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -116,21 +115,12 @@ class _SplashPageState extends State<SplashPage>
       }
 
       if (refreshExpiry != null && now < refreshExpiry) {
-        Logger.info(
-          'SplashPage',
-          'Access token expired, proactively refreshing...',
-        );
         final refreshed = await baseHttpService.proactiveTokenRefresh();
         return refreshed ? AppRoutes.home : AppRoutes.login;
       }
 
       return AppRoutes.login;
     } catch (e, stackTrace) {
-      Logger.error(
-        'SplashPage',
-        'Initialization flow failed',
-        stackTrace: stackTrace,
-      );
       return AppRoutes.login;
     }
   }

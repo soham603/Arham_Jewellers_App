@@ -4,7 +4,6 @@ import 'package:get/get.dart' hide Response;
 import 'package:ratnesh_gold_app/data/repositories/ancillary_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/ancillary_page_model.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AncillaryController extends GetxController {
   static AncillaryController get instance => Get.find();
@@ -88,11 +87,9 @@ class AncillaryController extends GetxController {
       }
       _state.value = CurrentAppState.SUCCESS;
     } on DioException catch (e, st) {
-      Logger.error('AncillaryController', 'fetchPage Dio: $e\n$st');
       _state.value = CurrentAppState.ERROR;
       _error.value = e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
     } catch (e, st) {
-      Logger.error('AncillaryController', 'fetchPage: $e\n$st');
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();
     }
@@ -141,13 +138,11 @@ class AncillaryController extends GetxController {
         return false;
       }
     } on DioException catch (e, st) {
-      Logger.error('AncillaryController', 'updatePage Dio: $e\n$st');
       _updateState.value = CurrentAppState.ERROR;
       _error.value = e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
       ToastUtils.showError(_error.value);
       return false;
     } catch (e, st) {
-      Logger.error('AncillaryController', 'updatePage: $e\n$st');
       _updateState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(_error.value);

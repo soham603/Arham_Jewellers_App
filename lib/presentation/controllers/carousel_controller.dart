@@ -6,7 +6,6 @@ import 'package:ratnesh_gold_app/data/repositories/carousel_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CarouselsController extends GetxController {
   static CarouselsController get instance => Get.find();
@@ -103,10 +102,6 @@ class CarouselsController extends GetxController {
       _getCarouselState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 
-      Logger.error(
-        "CarouselsController",
-        "getAllCarousels: $e",
-      );
     }
   }
 
@@ -123,10 +118,6 @@ class CarouselsController extends GetxController {
       _adminState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 
-      Logger.error(
-        "CarouselsController",
-        "fetchAdminCarousels: $e",
-      );
     }
   }
 
@@ -143,10 +134,6 @@ class CarouselsController extends GetxController {
       _deletedState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
 
-      Logger.error(
-        "CarouselsController",
-        "fetchDeletedCarousels: $e",
-      );
     }
   }
 
@@ -195,10 +182,6 @@ class CarouselsController extends GetxController {
         _error.value = 'Create failed';
       }
 
-      Logger.error(
-        "CarouselsController",
-        "createCarousel: $e",
-      );
     }
 
     return false;
@@ -301,10 +284,6 @@ class CarouselsController extends GetxController {
         _error.value = 'Edit failed';
       }
 
-      Logger.error(
-        "CarouselsController",
-        "editCarousel: $e",
-      );
     }
 
     return false;
@@ -345,10 +324,6 @@ class CarouselsController extends GetxController {
         _error.value = 'Delete failed';
       }
 
-      Logger.error(
-        "CarouselsController",
-        "deleteCarousel: $e",
-      );
     }
 
     return false;
@@ -385,10 +360,6 @@ class CarouselsController extends GetxController {
         _error.value = 'Restore failed';
       }
 
-      Logger.error(
-        "CarouselsController",
-        "restoreCarousel: $e",
-      );
     }
 
     return false;
@@ -468,10 +439,6 @@ class CarouselsController extends GetxController {
         _productState.value = CurrentAppState.ERROR;
       }
 
-      Logger.error(
-        "CarouselsController",
-        "loadLatestProducts error: $e\n$st",
-      );
     } finally {
       _productLoadingMore.value = false;
     }

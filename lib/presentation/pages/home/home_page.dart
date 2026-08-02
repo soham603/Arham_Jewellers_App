@@ -1,5 +1,4 @@
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -179,7 +178,6 @@ class _HomePageState extends State<HomePage> {
         carouselController.loadLatestProducts(),
       ]);
     } catch (e, stackTrace) {
-      Logger.error('HomePage', 'Refresh failed', stackTrace: stackTrace);
     }
   }
 
@@ -1101,7 +1099,6 @@ class _CarouselSectionState extends State<_CarouselSection> {
     } catch (e) {
       ctrl?.dispose();
       _videoControllers.remove(index);
-      Logger.warning("HomePage", "Network video failed for index $index, trying download fallback...");
 
       try {
         final dir = await getTemporaryDirectory();
@@ -1113,7 +1110,6 @@ class _CarouselSectionState extends State<_CarouselSection> {
         _videoControllers[index] = ctrl;
         await ctrl.initialize();
       } catch (e2, st2) {
-        Logger.error("HomePage", "All video playback methods failed for carousel index $index", stackTrace: st2);
         _failedVideoUrls.add(url);
         _pendingVideoUrls.remove(url);
         _videoControllers.remove(index);
@@ -1132,7 +1128,6 @@ class _CarouselSectionState extends State<_CarouselSection> {
         setState(() {});
       }
     } catch (e, st) {
-      Logger.error("HomePage", "Failed to setup video for carousel index $index", stackTrace: st);
       _failedVideoUrls.add(url);
       _videoControllers.remove(index);
       ctrl.dispose();
@@ -1160,15 +1155,6 @@ class _CarouselSectionState extends State<_CarouselSection> {
         quality: ImageCompressionConstants.videoThumbnailQuality,
       );
     } catch (e, st) {
-      Logger.warning(
-        "HomePage",
-        "thumbnailData (URL) failed for index $index, falling back to download. Error: $e",
-      );
-      Logger.error(
-        "HomePage",
-        "Stacktrace for failed thumbnail (URL)",
-        stackTrace: st,
-      );
     }
 
     File? tempFile;
@@ -1190,15 +1176,6 @@ class _CarouselSectionState extends State<_CarouselSection> {
           quality: ImageCompressionConstants.videoThumbnailQuality,
         );
       } catch (e, st) {
-        Logger.warning(
-          "HomePage",
-          "thumbnailData (local) failed for index $index ($url): $e",
-        );
-        Logger.error(
-          "HomePage",
-          "Stacktrace for failed thumbnail (local)",
-          stackTrace: st,
-        );
       } finally {
         if (tempFile != null) {
           try {

@@ -8,7 +8,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.da
 import 'package:ratnesh_gold_app/presentation/controllers/search/recent_searches.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class SearchProductController extends GetxController {
   static SearchProductController get instance =>
@@ -385,10 +384,6 @@ class SearchProductController extends GetxController {
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
         } catch (e) {
-          Logger.error(
-            "SearchProductController",
-            "Failed to fetch karat $karat: $e",
-          );
         }
         return <ProductModel>[];
       });
@@ -427,10 +422,6 @@ class SearchProductController extends GetxController {
       state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadProductsByKarats error: $e\n$st",
-      );
     }
   }
 
@@ -476,10 +467,6 @@ class SearchProductController extends GetxController {
       }
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadProductsByCategory error: $e\n$st",
-      );
     }
   }
 
@@ -549,10 +536,6 @@ class SearchProductController extends GetxController {
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
         } catch (e) {
-          Logger.error(
-            "SearchProductController",
-            "Failed to fetch category $catId: $e",
-          );
         }
         return <ProductModel>[];
       });
@@ -587,10 +570,6 @@ class SearchProductController extends GetxController {
       state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadProductsByMultipleCategories error: $e\n$st",
-      );
     }
   }
 
@@ -620,7 +599,6 @@ class SearchProductController extends GetxController {
             : _currentFilterKaratForAll;
     if (!hasMore || state.value == CurrentAppState.LOADING) return;
     if (catId == null || karat == null) {
-      Logger.warning("SearchProductController", "loadMoreFilteredProducts called before initial load");
       return;
     }
     loadByCategoryWithKaratFilter(catId, karat, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
@@ -723,10 +701,6 @@ class SearchProductController extends GetxController {
       }
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
-      Logger.error(
-        "SearchProductController",
-        "loadByCategoryWithKaratFilter error: $e\n$st",
-      );
     }
   }
 
@@ -826,7 +800,6 @@ class SearchProductController extends GetxController {
       }
     } catch (e, st) {
       _searchState.value = CurrentAppState.ERROR;
-      Logger.error("SearchProductController", "searchByBarcode error: $e\n$st");
       return null;
     }
   }

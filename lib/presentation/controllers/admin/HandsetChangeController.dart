@@ -6,7 +6,6 @@ import 'package:ratnesh_gold_app/data/repositories/auth_repository.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/handsetChangeModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:flutter/material.dart';
 
@@ -100,7 +99,6 @@ class HandsetChangeController extends GetxController {
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      Logger.error('HandsetChangeController', 'fetchRequests: $e\n$st');
     }
   }
 
@@ -197,14 +195,12 @@ class HandsetChangeController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
-      Logger.error('HandsetChangeController', '_handleAction Dio: $e\n$st');
       final message = DioErrorHelper.getMessage(e);
       _actionState.value = CurrentAppState.ERROR;
       _error.value = message;
       ToastUtils.showError(message);
       return false;
     } catch (e, st) {
-      Logger.error('HandsetChangeController', '_handleAction: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(e.toString());

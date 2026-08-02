@@ -10,7 +10,6 @@ import 'package:ratnesh_gold_app/data/repositories/category_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
@@ -78,7 +77,6 @@ class CategoryManagerController extends GetxController {
       );
       _allCategories.value = result.items;
     } catch (e) {
-      Logger.error("CategoryManagerController", "fetchAll error: $e");
     } finally {
       _loading.value = false;
     }
@@ -208,13 +206,8 @@ class CategoryManagerController extends GetxController {
       final created = CategoryModel.fromJson(response['data']);
       _allCategories.insert(0, created);
       _pickedImage.value = null;
-      Logger.info(
-        "CategoryManagerController",
-        "Category created: ${created.name}",
-      );
       return (null, response['message']?.toString());
     } catch (e) {
-      Logger.error("CategoryManagerController", "create error: $e");
       return (DioErrorHelper.getMessage(e), null);
     }
   }
@@ -253,10 +246,8 @@ class CategoryManagerController extends GetxController {
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
       _pickedImage.value = null;
-      Logger.info("CategoryManagerController", "Category $id updated");
       return (null, response['message']?.toString());
     } catch (e) {
-      Logger.error("CategoryManagerController", "edit error: $e");
       return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';
@@ -287,10 +278,8 @@ class CategoryManagerController extends GetxController {
           updatedAt: cat.updatedAt,
         );
       }
-      Logger.info("CategoryManagerController", "Category $id deleted");
       return (null, response['message']?.toString());
     } catch (e) {
-      Logger.error("CategoryManagerController", "delete error: $e");
       return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';
@@ -307,10 +296,8 @@ class CategoryManagerController extends GetxController {
       final updated = CategoryModel.fromJson(response['data']);
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
-      Logger.info("CategoryManagerController", "Category $id restored");
       return (null, response['message']?.toString());
     } catch (e) {
-      Logger.error("CategoryManagerController", "restore error: $e");
       return (DioErrorHelper.getMessage(e), null);
     } finally {
       _actionLoadingId.value = '';

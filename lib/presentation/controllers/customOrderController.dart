@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:ratnesh_gold_app/data/repositories/custom_order_repository.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CustomOrderController extends GetxController {
   static CustomOrderController get instance => Get.find();
@@ -80,7 +79,6 @@ class CustomOrderController extends GetxController {
           ],
       });
 
-      Logger.info("CustomOrderController", "Creating custom order...");
 
       final responseData = await _customOrderRepo.createCustomOrder(data: formData);
 
@@ -91,8 +89,6 @@ class CustomOrderController extends GetxController {
 
         ToastUtils.showSuccess(responseData['message']?.toString() ?? 'Custom order created');
 
-        Logger.info("CustomOrderController",
-            "Custom order created: ${_createdOrderId.value}");
 
         return true;
       }
@@ -102,7 +98,6 @@ class CustomOrderController extends GetxController {
       return false;
     } catch (e, st) {
       _createState.value = CurrentAppState.ERROR;
-      Logger.error("CustomOrderController", "createCustomOrder error: $e\n$st");
 
       String errorMessage = "Failed to create custom order";
       if (e is DioException) {
@@ -179,12 +174,10 @@ class CustomOrderController extends GetxController {
 
       _modifyState.value = CurrentAppState.SUCCESS;
 
-      Logger.info("CustomOrderController", "Custom order modified: $orderId");
 
       return true;
     } catch (e, st) {
       _modifyState.value = CurrentAppState.ERROR;
-      Logger.error("CustomOrderController", "modifyCustomOrder error: $e\n$st");
 
       String errorMessage = "Failed to update custom order";
       if (e is DioException) {
@@ -213,10 +206,8 @@ class CustomOrderController extends GetxController {
 
       ToastUtils.showSuccess(response['message']?.toString() ?? 'Custom order deleted');
 
-      Logger.info("CustomOrderController", "Custom order deleted: $orderId");
       return true;
     } catch (e, st) {
-      Logger.error("CustomOrderController", "deleteCustomOrder error: $e\n$st");
 
       String errorMessage = "Failed to delete custom order";
       if (e is DioException) {

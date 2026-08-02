@@ -16,7 +16,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/notification_controlle
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'app/app.dart';
 
 Future<void> main() async {
@@ -30,7 +29,6 @@ Future<void> main() async {
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FlutterError.presentError(details);
-        Logger.error('FlutterError', details.exception.toString());
       };
 
       Get.put(CartController());
@@ -52,7 +50,6 @@ Future<void> main() async {
         try {
           await NotificationService().init();
         } catch (e) {
-          Logger.error('Main', 'NotificationService init failed: $e');
         }
       }
 
@@ -63,7 +60,6 @@ Future<void> main() async {
       runApp(RatneshGoldApp());
     },
     (error, stackTrace) {
-      Logger.error('Uncaught Error', '$error\n$stackTrace');
     },
   );
 }

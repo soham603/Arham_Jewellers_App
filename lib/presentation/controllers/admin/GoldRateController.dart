@@ -9,7 +9,6 @@ import 'package:ratnesh_gold_app/data/repositories/gold_rate_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/goldRateModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class GoldRateController extends GetxController {
   static GoldRateController get instance => Get.find();
@@ -99,16 +98,13 @@ class GoldRateController extends GetxController {
       _currentRate.value = await _goldRateRepo.fetchCurrentRate();
       _currentRateState.value = CurrentAppState.SUCCESS;
     } on ApiException catch (e) {
-      Logger.error('GoldRateController', 'fetchCurrentRate Api: ${e.message}');
       _currentRateState.value = CurrentAppState.ERROR;
       _error.value = e.message;
     } on DioException catch (e, st) {
-      Logger.error('GoldRateController', 'fetchCurrentRate Dio: $e\n$st');
       _currentRateState.value = CurrentAppState.ERROR;
       _error.value =
           e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
     } catch (e, st) {
-      Logger.error('GoldRateController', 'fetchCurrentRate: $e\n$st');
       _currentRateState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
     }
@@ -171,10 +167,6 @@ class GoldRateController extends GetxController {
       _historyState.value = CurrentAppState.SUCCESS;
     } on ApiException catch (e) {
       if (e.code == 'NOT_FOUND' && !_isRetryingFallback) {
-        Logger.info(
-          'GoldRateController',
-          'fetchHistory NOT_FOUND with params, retrying without params',
-        );
         _fallbackMessage.value = e.message;
         _isRetryingFallback = true;
         _historyState.value = CurrentAppState.SUCCESS;
@@ -184,7 +176,6 @@ class GoldRateController extends GetxController {
         return;
       }
 
-      Logger.error('GoldRateController', 'fetchHistory Api: ${e.message}');
       _historyState.value = CurrentAppState.ERROR;
       _error.value = e.message;
     } on DioException catch (e, st) {
@@ -195,10 +186,6 @@ class GoldRateController extends GetxController {
           'Something went wrong';
 
       if (e.response?.statusCode == 404 && !_isRetryingFallback) {
-        Logger.info(
-          'GoldRateController',
-          'fetchHistory 404 with params, retrying without params',
-        );
         _fallbackMessage.value = errorMsg;
         _isRetryingFallback = true;
         _historyState.value = CurrentAppState.SUCCESS;
@@ -208,11 +195,9 @@ class GoldRateController extends GetxController {
         return;
       }
 
-      Logger.error('GoldRateController', 'fetchHistory Dio: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
       _error.value = errorMsg;
     } catch (e, st) {
-      Logger.error('GoldRateController', 'fetchHistory: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
     }
@@ -251,7 +236,6 @@ class GoldRateController extends GetxController {
       }
       _statisticsState.value = CurrentAppState.SUCCESS;
     } on ApiException catch (e) {
-      Logger.error('GoldRateController', 'fetchStatistics Api: ${e.message}');
       _statisticsState.value = CurrentAppState.ERROR;
       _error.value = e.message;
     } on DioException catch (e, st) {
@@ -260,10 +244,8 @@ class GoldRateController extends GetxController {
         _statisticsState.value = CurrentAppState.SUCCESS;
         return;
       }
-      Logger.error('GoldRateController', 'fetchStatistics Dio: $e\n$st');
       _statisticsState.value = CurrentAppState.ERROR;
     } catch (e, st) {
-      Logger.error('GoldRateController', 'fetchStatistics: $e\n$st');
       _statisticsState.value = CurrentAppState.ERROR;
     }
   }
@@ -315,14 +297,12 @@ class GoldRateController extends GetxController {
         return false;
       }
     } on DioException catch (e, st) {
-      Logger.error('GoldRateController', 'setRate Dio: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       ToastUtils.showError(
         e.response?.data?['message'] ?? e.message ?? 'Failed to update rate',
       );
       return false;
     } catch (e, st) {
-      Logger.error('GoldRateController', 'setRate: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       ToastUtils.showError(e.toString());
       return false;

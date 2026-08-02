@@ -9,7 +9,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateControll
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -474,7 +473,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       Get.offAllNamed(AppRoutes.orderSuccess);
                     }
                   } catch (e, stackTrace) {
-                    Logger.error('CheckoutPage', 'Order creation failed', stackTrace: stackTrace);
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Failed to place order. Please try again.')),

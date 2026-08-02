@@ -12,7 +12,6 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 Uint8List _compressBytes(Uint8List bytes) {
   final decoded = img.decodeImage(bytes);
@@ -263,7 +262,6 @@ class CategoryController extends GetxController {
       _k18State.value = CurrentAppState.ERROR;
       _k20State.value = CurrentAppState.ERROR;
       _k22State.value = CurrentAppState.ERROR;
-      Logger.error('CategoryController', 'fetchCategoryTree error: $e\n$st');
     }
   }
 
@@ -408,7 +406,6 @@ class CategoryController extends GetxController {
       _adminState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _adminState.value = CurrentAppState.ERROR;
-      Logger.error('CategoryController', 'fetchAdminCategories error: $e\n$st');
     }
   }
 
@@ -549,7 +546,6 @@ class CategoryController extends GetxController {
       });
       return result.items;
     } catch (e) {
-      Logger.error('CategoryController', '_fetchLevelFlat error: $e');
     }
     return [];
   }

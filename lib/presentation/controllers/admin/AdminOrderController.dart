@@ -7,7 +7,6 @@ import 'package:ratnesh_gold_app/data/repositories/order_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class AdminOrderController extends GetxController {
@@ -148,7 +147,6 @@ class AdminOrderController extends GetxController {
 
       _orderState.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
-      Logger.error("AdminOrderController", "$e\n$st");
 
       _orderState.value = CurrentAppState.ERROR;
     } finally {
@@ -183,7 +181,6 @@ class AdminOrderController extends GetxController {
             _productRawDataCache[entry.key] = Map<String, dynamic>.from(match.rawData!);
           }
         } catch (e) {
-          Logger.error("AdminOrderController", "Product detail fetch failed for ${entry.key}: $e");
         }
       });
       await Future.wait(futures);
@@ -333,7 +330,6 @@ class AdminOrderController extends GetxController {
       ToastUtils.showSuccess(responseData['message'] ?? "Order updated");
       return true;
     } catch (e, st) {
-      Logger.error("AdminOrderController", "performCustomOrderAction error: $e\n$st");
 
       String errorMessage = "Something went wrong";
       if (e is DioException) {

@@ -7,7 +7,6 @@ import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
@@ -76,17 +75,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     try {
       final isAccessExpired = await SessionManager().isAccessTokenExpired();
       if (isAccessExpired) {
-        Logger.info(
-          'AuthController',
-          'App resumed with expired access token, refreshing...',
-        );
         await baseHttpService.proactiveTokenRefresh();
       }
     } catch (e) {
-      Logger.error(
-        'AuthController',
-        'Error during app resume token refresh: $e',
-      );
     }
   }
 

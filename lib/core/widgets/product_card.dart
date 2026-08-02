@@ -11,7 +11,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCard extends StatefulWidget {
@@ -468,7 +467,6 @@ class _ProductCardState extends State<ProductCard>
       final goldRate = Get.find<GoldRateController>().currentRate;
       return goldRate != null;
     } catch (e, st) {
-      Logger.error("ProductCard", "Failed to check retailer price visibility", stackTrace: st);
       return false;
     }
   }

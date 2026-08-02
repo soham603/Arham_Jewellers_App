@@ -4,7 +4,6 @@ import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/sent_notification_model.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 class NotificationManagerController extends GetxController {
@@ -108,7 +107,6 @@ class NotificationManagerController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
-      Logger.error('NotificationManagerController', 'sendNotification Dio: $e\n$st');
 
       String message = 'Something went wrong';
       if (e.response?.data is Map) {
@@ -123,7 +121,6 @@ class NotificationManagerController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } catch (e, st) {
-      Logger.error('NotificationManagerController', 'sendNotification: $e\n$st');
       _sendState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(e.toString());
@@ -165,16 +162,13 @@ class NotificationManagerController extends GetxController {
 
       _historyState.value = CurrentAppState.SUCCESS;
     } on ApiException catch (e) {
-      Logger.error('NotificationManagerController', 'fetchHistory Api: ${e.message}');
       _historyState.value = CurrentAppState.ERROR;
       _error.value = e.message;
     } on DioException catch (e, st) {
-      Logger.error('NotificationManagerController', 'fetchHistory Dio: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
       _error.value =
           e.response?.data?['message'] ?? e.message ?? 'Something went wrong';
     } catch (e, st) {
-      Logger.error('NotificationManagerController', 'fetchHistory: $e\n$st');
       _historyState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
     }

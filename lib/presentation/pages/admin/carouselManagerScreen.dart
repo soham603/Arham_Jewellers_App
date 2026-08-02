@@ -14,7 +14,6 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 import 'package:ratnesh_gold_app/utils/network_image_to_file.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -85,10 +84,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
     } catch (e) {
       ctrl?.dispose();
       _videoControllers.remove(id);
-      Logger.warning(
-        "CarouselManagerScreen",
-        "Network video failed for $id, trying download fallback...",
-      );
 
       try {
         final dir = await getTemporaryDirectory();
@@ -104,11 +99,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         _videoControllers[id] = ctrl;
         await ctrl.initialize();
       } catch (e2, st2) {
-        Logger.error(
-          "CarouselManagerScreen",
-          "All video playback methods failed for carousel $id",
-          stackTrace: st2,
-        );
         _failedVideoUrls.add(url);
         _pendingVideoUrls.remove(url);
         _videoControllers.remove(id);
@@ -133,11 +123,6 @@ class _CarouselManagerScreenState extends State<CarouselManagerScreen>
         });
       }
     } catch (e, st) {
-      Logger.error(
-        "CarouselManagerScreen",
-        "Failed to setup video for carousel $id",
-        stackTrace: st,
-      );
       _failedVideoUrls.add(url);
       _videoControllers.remove(id);
       ctrl.dispose();

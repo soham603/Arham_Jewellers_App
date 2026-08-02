@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecentSearchesController extends GetxController {
@@ -21,7 +20,6 @@ class RecentSearchesController extends GetxController {
       final saved = prefs.getStringList(_recentSearchesKey) ?? [];
       recentSearches.value = saved;
     } catch (e) {
-      Logger.error("RecentSearchesController", "loadRecentSearches error: $e");
     }
   }
 
@@ -37,7 +35,6 @@ class RecentSearchesController extends GetxController {
       recentSearches.value = updated;
       await prefs.setStringList(_recentSearchesKey, updated);
     } catch (e) {
-      Logger.error("RecentSearchesController", "_saveRecentSearch error: $e");
     }
   }
 

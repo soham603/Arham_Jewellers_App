@@ -6,7 +6,6 @@ import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart'
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -149,10 +148,6 @@ class NotificationController extends GetxController {
       state.value = CurrentAppState.SUCCESS;
     } catch (e) {
       if (generation != _fetchGeneration) return;
-      Logger.error(
-        "NotificationController",
-        "Failed to fetch notifications: $e",
-      );
       errorMessage.value = e.toString();
       if (append) {
         loadMoreError.value = 'Failed to load more notifications';
@@ -200,10 +195,6 @@ class NotificationController extends GetxController {
         'notificationIds': [id],
       },
     ).catchError((e) {
-      Logger.error(
-        "NotificationController",
-        "Failed to mark notification as read on backend: $e",
-      );
       return <String, dynamic>{};
     });
   }
@@ -237,10 +228,6 @@ class NotificationController extends GetxController {
     _notificationRepo.markNotificationsAsRead(
       data: {'notificationIds': unreadIds},
     ).catchError((e) {
-      Logger.error(
-        "NotificationController",
-        "Failed to mark all as read on backend: $e",
-      );
       return <String, dynamic>{};
     });
   }
@@ -291,10 +278,6 @@ class NotificationController extends GetxController {
       try {
         Get.toNamed(route, arguments: data);
       } catch (e) {
-        Logger.error(
-          "NotificationController",
-          "Failed to navigate to route '$route': $e",
-        );
       }
     }
   }
@@ -315,10 +298,6 @@ class NotificationController extends GetxController {
         _deletedIds.addAll(deletedJson);
       }
     } catch (e) {
-      Logger.error(
-        "NotificationController",
-        "Failed to load notifications: $e",
-      );
     }
   }
 
@@ -329,10 +308,6 @@ class NotificationController extends GetxController {
       await prefs.setString(_storageKey, jsonEncode(jsonList));
       await prefs.setStringList(_deletedIdsKey, _deletedIds.toList());
     } catch (e) {
-      Logger.error(
-        "NotificationController",
-        "Failed to save notifications: $e",
-      );
     }
   }
 
@@ -341,27 +316,14 @@ class NotificationController extends GetxController {
       try {
         final accessToken = await SessionManager().getAccessToken();
         if (accessToken == null || accessToken.isEmpty) {
-          Logger.info(
-            "NotificationController",
-            "Skipping FCM token update — user not logged in",
-          );
           return;
         }
         await _notificationRepo.updateFcmToken(data: {'fcmToken': token});
-        Logger.info("NotificationController", "FCM token updated on backend");
         return;
       } catch (e) {
         if (attempt == 0) {
-          Logger.warning(
-            "NotificationController",
-            "FCM token update failed, retrying in 5s: $e",
-          );
           await Future.delayed(const Duration(seconds: 5));
         } else {
-          Logger.error(
-            "NotificationController",
-            "Failed to update FCM token after retry: $e",
-          );
         }
       }
     }

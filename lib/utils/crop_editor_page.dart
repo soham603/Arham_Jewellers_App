@@ -121,7 +121,6 @@ class _CropEditorPageState extends State<CropEditorPage> {
   Future<void> _done() async {
     final state = _editorController.state;
     if (state == null) {
-      debugPrint('[CropEditor] state is null, aborting');
       if (mounted) Navigator.pop(context, null);
       return;
     }
@@ -130,17 +129,11 @@ class _CropEditorPageState extends State<CropEditorPage> {
     final editAction = state.editAction;
     final rawBytes = state.rawImageData;
 
-    debugPrint('[CropEditor] cropRect=$cropRect');
-    debugPrint('[CropEditor] hasRotateDegrees=${editAction?.hasRotateDegrees}');
-    debugPrint('[CropEditor] rotateDegrees=${editAction?.rotateDegrees}');
-    debugPrint('[CropEditor] flipY=${editAction?.flipY}');
-    debugPrint('[CropEditor] needCrop=${editAction?.needCrop}');
 
     final bool noRotation = !(editAction?.hasRotateDegrees ?? false);
     final bool noFlip = !(editAction?.flipY ?? false);
     final bool noCrop = !(editAction?.needCrop ?? false);
     if (noRotation && noFlip && noCrop) {
-      debugPrint('[CropEditor] No changes detected, returning original');
       if (mounted) {
         Navigator.pop(
           context,
@@ -169,11 +162,6 @@ class _CropEditorPageState extends State<CropEditorPage> {
         cropRect.right * widthRatio,
         cropRect.bottom * heightRatio,
       );
-      debugPrint(
-        '[CropEditor] Rescaled cropRect $cropRect -> $effectiveCropRect '
-        '(descriptor=${descriptor.width}x${descriptor.height}, '
-        'ui.Image=${state.image!.width}x${state.image!.height})',
-      );
     }
 
     if (mounted) {
@@ -200,7 +188,6 @@ class _CropEditorPageState extends State<CropEditorPage> {
         tempPath: tempPath,
       ));
 
-      debugPrint('[CropEditor] processing result=$result');
 
       if (mounted) Navigator.pop(context);
       if (!mounted) return;
@@ -218,7 +205,6 @@ class _CropEditorPageState extends State<CropEditorPage> {
         Navigator.pop(context, null);
       }
     } catch (e, st) {
-      debugPrint('[CropEditor] processing error: $e\n$st');
       if (mounted) Navigator.pop(context);
       if (mounted) Navigator.pop(context, null);
     }

@@ -6,7 +6,6 @@ import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class ProductSearchController extends GetxController {
   static ProductSearchController get instance =>
@@ -185,7 +184,6 @@ class ProductSearchController extends GetxController {
       _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
-      Logger.error("ProductSearchController", "_fetchProducts error: $e\n$st");
     }
   }
 
@@ -282,7 +280,6 @@ class ProductSearchController extends GetxController {
       }
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
-      Logger.error("ProductSearchController", "searchByBarcode error: $e\n$st");
       return null;
     }
   }

@@ -5,7 +5,6 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
 class BaseHttpService {
@@ -54,10 +53,6 @@ class BaseHttpService {
               }
             }
           } catch (e) {
-            Logger.error(
-              "BaseHttpService",
-              "onRequest interceptor error: $e",
-            );
           }
 
           return handler.next(options);
@@ -69,15 +64,10 @@ class BaseHttpService {
 
         onError: (dio.DioException error, handler) async {
           final statusCode = error.response?.statusCode;
-          Logger.error(
-            "BaseHttpService",
-            "Error [$statusCode]: ${error.message}",
-          );
 
           // Retry on 502/503/504 (server temporarily unavailable)
           if (statusCode == 502 || statusCode == 503 || statusCode == 504) {
             if (error.requestOptions.extra["retried"] != true) {
-              Logger.info("BaseHttpService", "Retrying request due to server error $statusCode...");
               error.requestOptions.extra["retried"] = true;
               await Future.delayed(const Duration(seconds: 2));
               try {
@@ -169,19 +159,16 @@ class BaseHttpService {
       final refreshToken = await sessionManager.getRefreshToken();
 
       if (refreshToken == null || refreshToken.isEmpty) {
-        Logger.warning("BaseHttpService", "No refresh token available.");
         _refreshCompleter!.complete(false);
         return false;
       }
 
       final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
       if (isRefreshExpired) {
-        Logger.warning("BaseHttpService", "Refresh token is expired.");
         _refreshCompleter!.complete(false);
         return false;
       }
 
-      Logger.info("BaseHttpService", "Attempting token refresh...");
 
       final deviceId = await getDeviceId();
 
@@ -214,20 +201,14 @@ class BaseHttpService {
             refreshTokenExpiry: refreshExpiry,
           );
 
-          Logger.info("BaseHttpService", "Token refresh successful.");
           _refreshCompleter!.complete(true);
           return true;
         }
       }
 
-      Logger.warning(
-        "BaseHttpService",
-        "Token refresh failed: unexpected response.",
-      );
       _refreshCompleter!.complete(false);
       return false;
     } catch (e) {
-      Logger.error("BaseHttpService", "Token refresh error: $e");
       _refreshCompleter!.complete(false);
       return false;
     } finally {
@@ -264,7 +245,6 @@ class BaseHttpService {
   }
 
   Future<void> _handleTokenExpiration() async {
-    Logger.warning("BaseHttpService", "Token expired. Redirecting to SignIn.");
     await sessionManager.clearTokens();
 
     Get.offAllNamed(AppRoutes.login);

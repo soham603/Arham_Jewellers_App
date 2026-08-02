@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 enum ToastType { success, error, warning, info }
 
@@ -127,12 +126,10 @@ class ToastUtils {
     SnackPosition? position,
   }) {
     if (!_isGetContextAvailable()) {
-      debugPrint('[ToastUtils] GetMaterialApp context is not available.');
       return;
     }
 
     if (message.trim().isEmpty) {
-      debugPrint('[ToastUtils] Attempted to show a toast with an empty message.');
       return;
     }
 
@@ -229,7 +226,6 @@ class ToastUtils {
     try {
       return Get.context != null;
     } catch (e, st) {
-      Logger.error("ToastUtils", "Failed to check Get context availability", stackTrace: st);
       return false;
     }
   }

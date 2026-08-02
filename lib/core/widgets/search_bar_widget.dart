@@ -5,7 +5,6 @@ import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 import '../../presentation/controllers/CategoryController.dart';
 import '../utils/string_utils.dart';
@@ -136,7 +135,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
       _startTimer(names);
     } catch (e, st) {
-      Logger.error("SearchBarWidget", "Failed to load category names for search hints", stackTrace: st);
       _timer?.cancel();
     }
   }
@@ -380,7 +378,6 @@ class _AnimatedHintState extends State<_AnimatedHint> {
         widget.onNamesReady(names);
       }
     } catch (e) {
-      Logger.warning("SearchBarWidget", "Failed to load categories: $e");
     }
   }
 
@@ -447,7 +444,6 @@ class _AnimatedHintState extends State<_AnimatedHint> {
         ),
       );
     } catch (e, st) {
-      Logger.error("SearchBarWidget", "Failed to build animated hint from categories", stackTrace: st);
       return _buildStaticHint();
     }
   }

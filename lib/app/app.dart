@@ -15,7 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app/routes/app_pages.dart';
 import '../core/theme/app_theme.dart';
-import '../utils/Logger.dart';
 
 class RatneshGoldApp extends StatefulWidget {
   const RatneshGoldApp({super.key});
@@ -149,7 +148,6 @@ void _disposeGlobalControllers() {
     try {
       if (Get.isRegistered<T>()) Get.delete<T>(force: true);
     } catch (e) {
-      Logger.error('App', 'Error disposing ${T.toString()}: $e');
     }
   }
 
@@ -162,5 +160,4 @@ void _disposeGlobalControllers() {
   safeDispose<CarouselsController>();
   safeDispose<UserOrderController>();
   safeDispose<AncillaryController>();
-  Logger.info('App', 'All global controllers disposed');
 }

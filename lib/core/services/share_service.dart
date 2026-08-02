@@ -12,7 +12,6 @@ import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/core/services/pdf_cache.dart';
 
 class ShareToWhatsAppResult {
@@ -68,7 +67,6 @@ class ShareService {
         return _compressImage(bytes, maxLongestEdge: maxLongestEdge, quality: quality);
       }
     } catch (e) {
-      Logger.error("ShareService", "Failed to download image: $imageUrl\n$e");
     }
     return null;
   }
@@ -126,7 +124,6 @@ class ShareService {
             return Uint8List.fromList(response.data!);
           }
         } catch (e) {
-          Logger.error("ShareService", "Failed to download image: $url\n$e");
         }
         return null;
       }).toList();
@@ -173,7 +170,6 @@ class ShareService {
             return Uint8List.fromList(response.data!);
           }
         } catch (e) {
-          Logger.error("ShareService", "Failed to download image: $imageUrl\n$e");
         }
         return null;
       }).toList();
@@ -203,7 +199,6 @@ class ShareService {
         progress?.value = downloadProgress;
       }
 
-      Logger.info("ShareService", "Processed ${imageBytesList.length}/${products.length} images");
     }
 
     return imageBytesList;
@@ -396,7 +391,6 @@ class ShareService {
           totalCount += (data['totalCount'] ?? 0) as int;
         }
       } catch (e) {
-        Logger.error("ShareService", "Failed to fetch product count for category $categoryId: $e");
       }
     }
 
@@ -441,7 +435,6 @@ class ShareService {
           }
         }
       } catch (e) {
-        Logger.error("ShareService", "Failed to fetch products for category $categoryId: $e");
       }
     }
 
@@ -458,7 +451,6 @@ class ShareService {
       }
       return [];
     } catch (e) {
-      Logger.error('ShareService', 'getAvailableWhatsAppPackages failed: $e');
       return [];
     }
   }
@@ -474,7 +466,6 @@ class ShareService {
       });
       return result;
     } on PlatformException catch (e) {
-      Logger.error('ShareService', 'Failed to save to downloads: ${e.message}');
       return null;
     }
   }
@@ -594,7 +585,6 @@ class ShareService {
         return const ShareToWhatsAppResult(success: true);
       }
     } catch (e) {
-      Logger.error("ShareService", "Failed to share order PDF to WhatsApp: $e");
       return ShareToWhatsAppResult(
         success: false,
         filePath: file.path,
@@ -786,7 +776,6 @@ class ShareService {
         return const ShareToWhatsAppResult(success: true);
       }
     } catch (e) {
-      Logger.error("ShareService", "Failed to share cart enquiry PDF to WhatsApp: $e");
       return ShareToWhatsAppResult(
         success: false,
         filePath: file.path,
@@ -890,7 +879,6 @@ class ShareService {
       } catch (_) {}
     }
     } catch (e) {
-      Logger.error("ShareService", "Failed to share custom order as PDF: $e");
       return false;
     }
   }
@@ -1000,7 +988,6 @@ class ShareService {
       }
     }
     } catch (e) {
-      Logger.error("ShareService", "Failed to share custom order as images: $e");
       return false;
     }
   }

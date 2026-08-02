@@ -90,7 +90,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       await _controller.start();
       _isScannerRunning = true;
     } catch (e, stackTrace) {
-      debugPrint('Failed to start scanner: $e\n$stackTrace');
 
       if (!mounted) return;
 
@@ -121,7 +120,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       if (!mounted) return;
       setState(() => _torchOn = !_torchOn);
     } catch (e) {
-      debugPrint('Failed to toggle torch: $e');
     }
   }
 
@@ -129,7 +127,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     try {
       await _controller.switchCamera();
     } catch (e) {
-      debugPrint('Failed to switch camera: $e');
     }
   }
 
@@ -154,7 +151,6 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     try {
       await widget.onDetect(value);
     } catch (e, stackTrace) {
-      debugPrint('Barcode processing failed: $e\n$stackTrace');
 
       if (!mounted) return;
 

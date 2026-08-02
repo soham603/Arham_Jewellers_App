@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/domain/entities/cart_item.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CartController extends GetxController {
@@ -134,7 +133,6 @@ class CartController extends GetxController {
             .toList();
         _items.addAll(loadedItems);
       } catch (e, st) {
-        Logger.error("CartController", "Failed to load cart from SharedPreferences, clearing corrupted data", stackTrace: st);
         await prefs.remove(_cartKey);
       }
     }

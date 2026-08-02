@@ -11,7 +11,6 @@ import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -108,7 +107,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
   }
 
   Widget _buildOrderItems(BuildContext context, UserOrderModel order) {
-    Logger.info("OrderDetail", "isCustomOrder=${order.isCustomOrder} purity=${order.purity} items=${order.items.length}");
     if (order.isCustomOrder) {
       return _buildCustomOrderDetails(context, order);
     }
@@ -549,7 +547,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
       }
     } catch (e) {
       if (mounted) Navigator.of(context).pop();
-      Logger.error('UserOrderDetail', 'Failed to fetch product: $e');
       if (mounted) {
         ToastUtils.showError('Failed to load product');
       }

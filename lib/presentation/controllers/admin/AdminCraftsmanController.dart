@@ -5,7 +5,6 @@ import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/data/repositories/craftsman_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:ratnesh_gold_app/utils/fuzzy_match.dart';
 
@@ -77,7 +76,6 @@ class AdminCraftsmanController extends GetxController {
       _error.value = null;
       _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
-      Logger.error("AdminCraftsmanController", "fetchCraftsmen error: $e\n$st");
       _error.value = DioErrorHelper.getMessage(e);
       _state.value = CurrentAppState.ERROR;
       if (isInitialLoad) {
@@ -110,14 +108,12 @@ class AdminCraftsmanController extends GetxController {
       final summary = 'Created: $created, Updated: $updated, Skipped: $skipped, Failed: $failed';
       final message = response['message']?.toString() ?? summary;
 
-      Logger.info("AdminCraftsmanController", "Import result: $summary");
       ToastUtils.showSuccess(message);
 
       await fetchCraftsmen();
 
       return (null, message);
     } catch (e, st) {
-      Logger.error("AdminCraftsmanController", "importCraftsmen error: $e\n$st");
       final errorMsg = DioErrorHelper.getMessage(e);
       ToastUtils.showError(errorMsg);
       return (errorMsg, null);
@@ -142,13 +138,11 @@ class AdminCraftsmanController extends GetxController {
         );
       }
 
-      Logger.info("AdminCraftsmanController", "Craftsman $id deleted");
       final msg = response['message']?.toString();
       if (msg != null) ToastUtils.showSuccess(msg);
       await fetchCraftsmen();
       return (null, msg);
     } catch (e, st) {
-      Logger.error("AdminCraftsmanController", "deleteCraftsman error: $e\n$st");
       final errorMsg = DioErrorHelper.getMessage(e);
       ToastUtils.showError(errorMsg);
       return (errorMsg, null);
@@ -172,13 +166,11 @@ class AdminCraftsmanController extends GetxController {
         _craftsmen[idx] = restored;
       }
 
-      Logger.info("AdminCraftsmanController", "Craftsman $id restored");
       final msg = response['message']?.toString();
       if (msg != null) ToastUtils.showSuccess(msg);
       await fetchCraftsmen();
       return (null, msg);
     } catch (e, st) {
-      Logger.error("AdminCraftsmanController", "restoreCraftsman error: $e\n$st");
       final errorMsg = DioErrorHelper.getMessage(e);
       ToastUtils.showError(errorMsg);
       return (errorMsg, null);

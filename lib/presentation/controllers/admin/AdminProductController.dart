@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
 
 class ProductImageMeta {
@@ -133,10 +132,8 @@ class AdminProductController extends GetxController {
       );
 
       _pickedImage.value = null;
-      Logger.info("AdminProductController", "Product $id updated");
       return (null, response['message']?.toString());
     } catch (e) {
-      Logger.error("AdminProductController", "updateProduct error: $e");
       String errorMsg = 'Something went wrong';
       if (e is DioException) {
         errorMsg = e.response?.data?['message']?.toString() ?? e.message ?? errorMsg;

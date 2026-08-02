@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/craftsman_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class CraftsmanController extends GetxController {
   static CraftsmanController get instance => Get.find();
@@ -43,7 +42,6 @@ class CraftsmanController extends GetxController {
       _craftsmen.value = result.items;
       _state.value = CurrentAppState.SUCCESS;
     } catch (e, st) {
-      Logger.error("CraftsmanController", "fetchCraftsmen error: $e\n$st");
       _state.value = CurrentAppState.ERROR;
     } finally {
       _isLoading.value = false;
@@ -54,7 +52,6 @@ class CraftsmanController extends GetxController {
     try {
       return _craftsmen.firstWhere((c) => c.id == id);
     } catch (e) {
-      Logger.warning("CraftsmanController", "getById: craftsman not found for id=$id");
       return null;
     }
   }

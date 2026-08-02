@@ -7,7 +7,6 @@ import 'package:ratnesh_gold_app/data/repositories/admin_access_repository.dart'
 import 'package:ratnesh_gold_app/domain/entities/admin/adminAccessModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/Logger.dart';
 
 class AdminUserController extends GetxController {
   static AdminUserController get instance => Get.find();
@@ -117,7 +116,6 @@ class AdminUserController extends GetxController {
     } catch (e, st) {
       _state.value = CurrentAppState.ERROR;
       _error.value = e.toString();
-      Logger.error('AdminUserController', 'fetchRequests: $e\n$st');
     }
   }
 
@@ -188,7 +186,6 @@ class AdminUserController extends GetxController {
     } catch (e, st) {
       _searchState.value = CurrentAppState.ERROR;
       _searchResults.clear();
-      Logger.error('AdminUserController', '_searchUsers: $e\n$st');
     }
   }
 
@@ -289,7 +286,6 @@ class AdminUserController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
-      Logger.error('AdminUserController', 'updateRetailer Dio: $e\n$st');
 
       String message = e.response?.data?["error"]?["message"] ??
           e.response?.data?["message"] ??
@@ -301,7 +297,6 @@ class AdminUserController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } catch (e, st) {
-      Logger.error('AdminUserController', 'updateRetailer: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(e.toString());
@@ -353,7 +348,6 @@ class AdminUserController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } on DioException catch (e, st) {
-      Logger.error('AdminUserController', '_handleAction Dio: $e\n$st');
       
       String message = e.response?.data?["error"]?["message"] ??
           e.response?.data?["message"] ??
@@ -365,7 +359,6 @@ class AdminUserController extends GetxController {
       ToastUtils.showError(message);
       return false;
     } catch (e, st) {
-      Logger.error('AdminUserController', '_handleAction: $e\n$st');
       _actionState.value = CurrentAppState.ERROR;
       _error.value = e.toString();
       ToastUtils.showError(e.toString());
