@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
@@ -109,7 +110,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 children: [
                   _buildInfoRow(context, 'Order ID', '#${order.id.length >= 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase()}'),
                   _buildInfoDivider(),
-                  _buildInfoRow(context, 'Date', _formatDate(order.createdAt)),
+                  _buildInfoRow(context, 'Date', formatOrderDate(order.createdAt)),
                   _buildInfoDivider(),
                   _buildInfoRow(context, 'Status', order.status.toUpperCase()),
                 ],
@@ -1040,9 +1041,5 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  String _formatDate(DateTime date) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
 }
 

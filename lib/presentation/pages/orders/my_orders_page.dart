@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
@@ -297,7 +298,7 @@ class _OrderCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            _formatDate(order.createdAt),
+                            formatOrderDate(order.createdAt),
                             style: TextStyle(
                               fontSize: context.getResponsiveSize(3.6),
                               color: AppColors.textMuted,
@@ -468,7 +469,7 @@ class _OrderCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '₹${_formatAmount(order.totalAmount!)}',
+                          '₹${formatCompactAmount(order.totalAmount!)}',
                           style: TextStyle(
                             fontSize: context.getResponsiveSize(4.2),
                             fontWeight: FontWeight.w700,
@@ -485,30 +486,6 @@ class _OrderCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  String _formatAmount(double amount) {
-    if (amount >= 100000) {
-      return '${(amount / 100000).toStringAsFixed(1)}L';
-    } else if (amount >= 1000) {
-      final formatted = amount.toStringAsFixed(0);
-      final parts = <String>[];
-      var s = formatted;
-      while (s.length > 3) {
-        parts.insert(0, s.substring(s.length - 3));
-        s = s.substring(0, s.length - 3);
-      }
-      parts.insert(0, s);
-      return parts.join(',');
-    }
-    return amount.toStringAsFixed(0);
-  }
 }
 
 

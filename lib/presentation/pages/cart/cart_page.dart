@@ -5,6 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -29,18 +30,6 @@ class _CartPageState extends State<CartPage> {
   final CartController cartController = Get.find<CartController>();
 
   bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
-
-  String _formatPrice(double price) {
-    final rounded = price.round();
-    final parts = rounded.toStringAsFixed(0).split('.');
-    final intPart = parts[0];
-    final buffer = StringBuffer();
-    for (int i = 0; i < intPart.length; i++) {
-      if (i > 0 && (intPart.length - i) % 3 == 0) buffer.write(',');
-      buffer.write(intPart[i]);
-    }
-    return buffer.toString();
-  }
 
   double? _calculateItemPrice(ProductModel product) {
     final goldRate = Get.find<GoldRateController>().currentRate;
@@ -283,7 +272,7 @@ class _CartPageState extends State<CartPage> {
                                               height:
                                                   context.heightPercent(0.5)),
                                           Text(
-                                            "₹${_formatPrice(price)}",
+                                            "₹${formatIndianPrice(price)}",
                                             style: TextStyle(
                                               fontSize:
                                                   context.getResponsiveSize(4.2),
@@ -427,12 +416,12 @@ class _CartPageState extends State<CartPage> {
             _breakdownRow(
               context,
               "Gold Value",
-              "₹${_formatPrice(subtotal)}",
+              "₹${formatIndianPrice(subtotal)}",
             ),
             _breakdownRow(
               context,
               "GST (3%)",
-              "₹${_formatPrice(gst)}",
+              "₹${formatIndianPrice(gst)}",
             ),
             Padding(
               padding: EdgeInsets.symmetric(
@@ -443,7 +432,7 @@ class _CartPageState extends State<CartPage> {
             _breakdownRow(
               context,
               "TOTAL",
-              "₹${_formatPrice(total)}",
+              "₹${formatIndianPrice(total)}",
               bold: true,
             ),
           ],

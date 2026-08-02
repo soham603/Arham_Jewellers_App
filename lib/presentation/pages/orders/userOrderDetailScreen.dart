@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
@@ -598,7 +599,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     return Padding(
       padding: EdgeInsets.only(bottom: context.heightPercent(0.3)),
       child: Text(
-        'Price: ${_formatPrice(price)}',
+        'Price: \u20B9${formatIndianPrice(price)}',
         style: TextStyle(
           fontSize: context.getResponsiveSize(3.0),
           color: AppColors.primaryGold,
@@ -606,20 +607,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         ),
       ),
     );
-  }
-
-  String _formatPrice(double value) {
-    final intVal = value.toInt();
-    final str = intVal.toString();
-    if (str.length <= 3) return '\u20B9$intVal';
-    String result = str.substring(str.length - 3);
-    int i = str.length - 3;
-    while (i > 0) {
-      final chunk = str.substring(i - 2 < 0 ? 0 : i - 2, i);
-      result = '$chunk,$result';
-      i -= 2;
-    }
-    return '\u20B9$result';
   }
 
   Widget _buildTotalAmount(BuildContext context, UserOrderModel order) {
@@ -660,7 +647,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             ),
           ),
           Text(
-            "₹${_formatAmount(total)}",
+            "₹${formatCompactAmount(total)}",
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: context.getResponsiveSize(5),
@@ -934,25 +921,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     }
     return cleaned;
   }
-
-  String _formatAmount(double amount) {
-    if (amount >= 100000) {
-      return '${(amount / 100000).toStringAsFixed(1)}L';
-    } else if (amount >= 1000) {
-      final formatted = amount.toStringAsFixed(0);
-      final parts = <String>[];
-      var s = formatted;
-      while (s.length > 3) {
-        parts.insert(0, s.substring(s.length - 3));
-        s = s.substring(0, s.length - 3);
-      }
-      parts.insert(0, s);
-      return parts.join(',');
-    }
-    return amount.toStringAsFixed(0);
-  }
-
-
 
 }
 

@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -736,7 +737,7 @@ class _RetailerPrice extends StatelessWidget {
       ratePer10Gram: goldRate.rate,
     )!;
 
-    final formatted = _formatPrice(total);
+    final formatted = formatIndianPrice(total);
 
     return Row(
       children: [
@@ -752,17 +753,6 @@ class _RetailerPrice extends StatelessWidget {
     );
   }
 
-  static String _formatPrice(double price) {
-    final rounded = price.round();
-    final parts = rounded.toStringAsFixed(0).split('.');
-    final intPart = parts[0];
-    final buffer = StringBuffer();
-    for (int i = 0; i < intPart.length; i++) {
-      if (i > 0 && (intPart.length - i) % 3 == 0) buffer.write(',');
-      buffer.write(intPart[i]);
-    }
-    return buffer.toString();
-  }
 }
 
 class _ViewButton extends StatelessWidget {

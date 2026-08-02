@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -252,19 +253,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     );
   }
 
-  String _formatPrice(double value) {
-    final intVal = value.toInt();
-    final str = intVal.toString();
-    if (str.length <= 3) return '\u20B9$intVal';
-    String result = str.substring(str.length - 3);
-    int i = str.length - 3;
-    while (i > 0) {
-      final chunk = str.substring(i - 2 < 0 ? 0 : i - 2, i);
-      result = '$chunk,$result';
-      i -= 2;
-    }
-    return '\u20B9$result';
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -745,7 +734,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                               ),
                               Text(
-                                _formatPrice(price),
+                                '\u20B9${formatIndianPrice(price)}',
                                 style: TextStyle(
                                   fontSize: context.getResponsiveSize(5),
                                   color: AppColors.primaryGold,
