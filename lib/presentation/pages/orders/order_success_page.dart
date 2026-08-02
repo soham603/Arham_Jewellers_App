@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -374,7 +374,7 @@ class _OrderDetailCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '₹${itemPrices[i].toStringAsFixed(0)}',
+                    '₹${formatAmount(itemPrices[i])}',
                     style: TextStyle(
                       fontSize: context.getResponsiveSize(3.6),
                       color: AppColors.textDark,
@@ -403,7 +403,7 @@ class _OrderDetailCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '₹${total.toStringAsFixed(0)}',
+                  '₹${formatAmount(total)}',
                   style: TextStyle(
                     fontSize: context.getResponsiveSize(4.5),
                     fontWeight: FontWeight.w800,
@@ -421,8 +421,7 @@ class _OrderDetailCard extends StatelessWidget {
           _infoRow(
             context,
             label: 'Booked On',
-            value: DateFormat('dd MMM yyyy • hh:mm a')
-                .format(createdAt.toLocal()),
+            value: formatOrderDateTime(createdAt.toLocal()),
           ),
         ],
       ),

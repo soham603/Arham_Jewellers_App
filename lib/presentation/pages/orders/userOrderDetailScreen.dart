@@ -1,8 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
@@ -343,7 +342,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             _customDetailRow(
               context,
               "Delivery Date",
-              DateFormat("dd MMM yyyy").format(order.deliveryDate!.toLocal()),
+              formatOrderDate(order.deliveryDate!.toLocal()),
             ),
 
           if (order.items.isNotEmpty) ...[
@@ -752,7 +751,7 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
 
     String? selectedPackage;
     if (packages.length > 1) {
-      selectedPackage = await _showWhatsAppPicker(context);
+      selectedPackage = await WhatsAppUtil.showPackagePicker(context);
       if (selectedPackage == null) return;
     } else {
       selectedPackage = packages.first;
@@ -848,38 +847,6 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Future<String?> _showWhatsAppPicker(BuildContext context) {
-    return showModalBottomSheet<String>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Share via',
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.chat, color: Color(0xFF25D366)),
-              title: const Text('WhatsApp'),
-              onTap: () => Navigator.pop(ctx, 'com.whatsapp'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.business, color: Color(0xFF25D366)),
-              title: const Text('WhatsApp Business'),
-              onTap: () => Navigator.pop(ctx, 'com.whatsapp.w4b'),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
 
 
   void _shareWithLoading(

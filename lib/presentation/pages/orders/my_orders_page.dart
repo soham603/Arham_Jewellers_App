@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';

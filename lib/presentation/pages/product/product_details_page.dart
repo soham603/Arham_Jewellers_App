@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
-import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -734,7 +734,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                               ),
                               Text(
-                                '\u20B9${formatIndianPrice(price)}',
+                                formatPrice(price),
                                 style: TextStyle(
                                   fontSize: context.getResponsiveSize(5),
                                   color: AppColors.primaryGold,

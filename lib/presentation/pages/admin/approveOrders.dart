@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
@@ -280,7 +280,7 @@ class _AdminOrderCard extends StatelessWidget {
                   _OrderTitle(order: order),
                   SizedBox(height: context.heightPercent(0.6)),
                   Text(
-                    DateFormat("dd MMM yyyy • hh:mm a").format(order.createdAt.toLocal()),
+                    formatOrderDateTime(order.createdAt.toLocal()),
                     style: TextStyle(
                       color: AppColors.textMuted,
                       fontSize: context.getResponsiveSize(3.4),

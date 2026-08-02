@@ -53,6 +53,39 @@ class WhatsAppUtil {
     }
   }
 
+  static Future<String?> showPackagePicker(BuildContext context) {
+    return showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Share via',
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat, color: Color(0xFF25D366)),
+              title: const Text('WhatsApp'),
+              onTap: () => Navigator.pop(ctx, 'com.whatsapp'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.business, color: Color(0xFF25D366)),
+              title: const Text('WhatsApp Business'),
+              onTap: () => Navigator.pop(ctx, 'com.whatsapp.w4b'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   static Future<void> _showWhatsAppPicker(
     BuildContext context, {
     required Uri whatsappUri,

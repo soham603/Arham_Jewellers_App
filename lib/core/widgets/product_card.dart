@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
-import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -428,18 +428,7 @@ class _ProductCardState extends State<ProductCard>
     return cleaned;
   }
 
-  static String? _formatValue(Object? value) {
-    final raw = value?.toString().trim();
-    if (raw == null || raw.isEmpty || raw.toLowerCase() == 'null') {
-      return null;
-    }
-    final parsed = num.tryParse(raw);
-    if (parsed == null) return raw;
-    if (parsed == parsed.roundToDouble()) return parsed.toInt().toString();
-    return parsed
-        .toStringAsFixed(2)
-        .replaceFirst(RegExp(r'\.?0+$'), '');
-  }
+  static String? _formatValue(Object? value) => formatWeight(value);
 
   static _TouchData? _parseTouch(String? touch) {
     if (touch == null || touch.isEmpty) return null;
@@ -737,12 +726,12 @@ class _RetailerPrice extends StatelessWidget {
       ratePer10Gram: goldRate.rate,
     )!;
 
-    final formatted = formatIndianPrice(total);
+    final formatted = formatPrice(total);
 
     return Row(
       children: [
         Text(
-          '₹$formatted',
+          formatted,
           style: TextStyle(
             fontSize: fontSize + 4,
             color: AppColors.primaryGold,

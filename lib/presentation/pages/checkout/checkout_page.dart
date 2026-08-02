@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
@@ -229,14 +230,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      "₹${price?.toStringAsFixed(0) ?? '0'} × ${item.quantity}",
+                                      "${formatPrice(price ?? 0)} × ${item.quantity}",
                                       style: TextStyle(
                                         fontSize: context.getResponsiveSize(3.2),
                                         color: AppColors.textMuted,
                                       ),
                                     ),
                                     Text(
-                                      "₹${itemTotal.toStringAsFixed(0)}",
+                                      "₹${formatAmount(itemTotal)}",
                                       style: TextStyle(
                                         fontSize: context.getResponsiveSize(3.8),
                                         fontWeight: FontWeight.w700,
@@ -267,13 +268,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         _summaryRow(
                           context,
                           "Subtotal",
-                          "₹${subtotal.toStringAsFixed(0)}",
+                          "₹${formatAmount(subtotal)}",
                         ),
                         SizedBox(height: context.heightPercent(0.5)),
                         _summaryRow(
                           context,
                           "GST (3%)",
-                          "₹${gst.toStringAsFixed(0)}",
+                          "₹${formatAmount(gst)}",
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(
@@ -287,7 +288,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         _summaryRow(
                           context,
                           "Total",
-                          "₹${total.toStringAsFixed(0)}",
+                          "₹${formatAmount(total)}",
                         ),
                       ],
                     ),

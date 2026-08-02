@@ -5,7 +5,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
-import 'package:ratnesh_gold_app/core/utils/currency_utils.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -529,7 +529,7 @@ class _CartPageState extends State<CartPage> {
 
     String? selectedPackage;
     if (packages.length > 1) {
-      selectedPackage = await _showWhatsAppPicker(context);
+      selectedPackage = await WhatsAppUtil.showPackagePicker(context);
       if (selectedPackage == null) return;
     } else {
       selectedPackage = packages.first;
@@ -592,39 +592,6 @@ class _CartPageState extends State<CartPage> {
       progress.dispose();
       cancelled.dispose();
     }
-  }
-
-  Future<String?> _showWhatsAppPicker(BuildContext context) {
-    return showModalBottomSheet<String>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Share via',
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.chat, color: Color(0xFF25D366)),
-              title: const Text('WhatsApp'),
-              onTap: () => Navigator.pop(ctx, 'com.whatsapp'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.business, color: Color(0xFF25D366)),
-              title: const Text('WhatsApp Business'),
-              onTap: () => Navigator.pop(ctx, 'com.whatsapp.w4b'),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _emptyCart(BuildContext context) {

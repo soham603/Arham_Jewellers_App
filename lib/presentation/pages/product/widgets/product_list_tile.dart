@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
@@ -267,16 +268,7 @@ class ProductListTile extends StatelessWidget {
     return cleaned;
   }
 
-  static String? _formatValue(Object? value) {
-    final raw = value?.toString().trim();
-    if (raw == null || raw.isEmpty || raw.toLowerCase() == 'null') return null;
-    final parsed = num.tryParse(raw);
-    if (parsed == null) return raw;
-    if (parsed == parsed.roundToDouble()) return parsed.toInt().toString();
-    return parsed
-        .toStringAsFixed(2)
-        .replaceFirst(RegExp(r'\.?0+$'), '');
-  }
+  static String? _formatValue(Object? value) => formatWeight(value);
 
   static String? _parseTouch(String? touch) {
     if (touch == null || touch.isEmpty) return null;
