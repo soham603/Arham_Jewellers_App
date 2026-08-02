@@ -426,8 +426,6 @@ class _SearchPageState extends State<SearchPage> {
             pMax: controller.priceMax,
             sizes: controller.selectedSizes,
           );
-        } else if (controller.hasActiveFilters) {
-          controller.loadFilteredProducts();
         }
       },
       child: AnimatedContainer(

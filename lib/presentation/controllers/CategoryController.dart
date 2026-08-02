@@ -329,7 +329,6 @@ class CategoryController extends GetxController {
   void clearSelectedLevel3() {
     _selectedLevel3.value = null;
     _showProductSection.value = false;
-    SearchProductController.instance.clearCategoryProducts();
   }
 
   Future<void> fetchAdminCategories({

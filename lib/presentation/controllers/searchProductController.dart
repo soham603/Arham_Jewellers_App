@@ -29,15 +29,6 @@ class SearchProductController extends GetxController {
   Rx<LayoutType> get layoutTypeObs => _layoutType;
   bool get isGrid => _layoutType.value == LayoutType.grid;
 
-  final _initialProducts = <ProductModel>[].obs;
-  List<ProductModel> get initialProducts => _initialProducts;
-
-  final _initialState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get initialState => _initialState.value;
-
-  bool _initialHasMore = true;
-  bool get initialHasMore => _initialHasMore;
-
   final _searchResults = <ProductModel>[].obs;
   List<ProductModel> get searchResults => _searchResults;
 
@@ -53,24 +44,7 @@ class SearchProductController extends GetxController {
 
   List<String> get recentSearches => recentSearchesController.recentSearchesList;
 
-  final _filteredInitialProducts = <ProductModel>[].obs;
-  List<ProductModel> get filteredInitialProducts => _filteredInitialProducts;
-
-  final _filteredInitialState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get filteredInitialState => _filteredInitialState.value;
-
-  bool _filteredInitialHasMore = true;
-  bool get filteredInitialHasMore => _filteredInitialHasMore;
-
-  final _karatProducts = <ProductModel>[].obs;
-  List<ProductModel> get karatProducts => _karatProducts;
-
-  final _karatState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get karatState => _karatState.value;
-
   List<String> _currentKarats = [];
-  final bool _karatHasMore = true;
-  bool get karatHasMore => _karatHasMore;
 
   final _karatReadyProducts = <ProductModel>[].obs;
   final _karatOutProducts = <ProductModel>[].obs;
@@ -100,11 +74,11 @@ class SearchProductController extends GetxController {
   bool get karatOutHasMore => _karatOutHasMore;
   bool get karatAllHasMore => _karatAllHasMore;
 
-  final _categoryProducts = <ProductModel>[].obs;
-  List<ProductModel> get categoryProducts => _categoryProducts;
+  List<ProductModel> get categoryProducts => _categoryAllProducts;
+  CurrentAppState get categoryState => _categoryAllState.value;
 
-  final _categoryState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get categoryState => _categoryState.value;
+  List<ProductModel> get filteredProducts => _filteredAllProducts;
+  List<ProductModel> get karatProducts => _karatAllProducts;
 
   final _categoryReadyProducts = <ProductModel>[].obs;
   final _categoryOutProducts = <ProductModel>[].obs;
@@ -135,15 +109,6 @@ class SearchProductController extends GetxController {
   bool get categoryReadyHasMore => _categoryReadyHasMore;
   bool get categoryOutHasMore => _categoryOutHasMore;
   bool get categoryAllHasMore => _categoryAllHasMore;
-
-  final _filteredProducts = <ProductModel>[].obs;
-  List<ProductModel> get filteredProducts => _filteredProducts;
-
-  final _filteredState = CurrentAppState.INITIAL.obs;
-  CurrentAppState get filteredState => _filteredState.value;
-
-  bool _filteredHasMore = true;
-  bool get filteredHasMore => _filteredHasMore;
 
   final _filteredReadyProducts = <ProductModel>[].obs;
   final _filteredOutProducts = <ProductModel>[].obs;
@@ -199,10 +164,8 @@ class SearchProductController extends GetxController {
 
   List<ProductModel> get allProducts {
     if (isSearching) return _searchResults;
-    if (hasActiveFilters) return _filteredInitialProducts;
-    if (_karatProducts.isNotEmpty) return _karatProducts;
-    if (_categoryProducts.isNotEmpty) return _categoryProducts;
-    return _initialProducts;
+    if (hasActiveFilters) return _filteredReadyProducts;
+    return [];
   }
 
   @override
@@ -230,10 +193,6 @@ class SearchProductController extends GetxController {
     final current = _sortBy.value;
     if (isSearching) {
       _searchResults.value = sortProducts(_searchResults, current);
-    } else if (hasActiveFilters) {
-      _filteredInitialProducts.value = sortProducts(_filteredInitialProducts, current);
-    } else {
-      _initialProducts.value = sortProducts(_initialProducts, current);
     }
   }
 
@@ -288,12 +247,6 @@ class SearchProductController extends GetxController {
     return list;
   }
 
-  void ensureProductsLoaded() {}
-
-  Future<void> loadInitialProducts({bool isPagination = false}) async {}
-
-  Future<void> loadFilteredProducts({bool isPagination = false}) async {}
-
   void onSearchChanged(String query) {
     _searchQuery.value = query;
 
@@ -308,8 +261,6 @@ class SearchProductController extends GetxController {
     _searchQuery.value = query.trim();
     recentSearchesController.addToRecentSearches(query.trim());
   }
-
-  Future<void> loadMoreSearchResults() async {}
 
   String _karatToSearchValue(String karat) {
     final value = KaratConstants.touchValueFor(karat);
@@ -468,11 +419,6 @@ class SearchProductController extends GetxController {
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
     }
-  }
-
-  void clearCategoryProducts() {
-    _categoryProducts.clear();
-    _categoryState.value = CurrentAppState.INITIAL;
   }
 
   Future<void> loadProductsByMultipleCategories(
@@ -705,9 +651,6 @@ class SearchProductController extends GetxController {
   }
 
   void clearFilteredProducts() {
-    _filteredProducts.clear();
-    _filteredState.value = CurrentAppState.INITIAL;
-    _filteredHasMore = true;
     _filteredReadyProducts.clear();
     _filteredReadyState.value = CurrentAppState.INITIAL;
     _filteredReadyHasMore = true;
@@ -729,9 +672,7 @@ class SearchProductController extends GetxController {
 
   void clearAllFilters() {
     filterState.resetFilters();
-    _filteredInitialProducts.clear();
-    _filteredInitialState.value = CurrentAppState.INITIAL;
-    _filteredInitialHasMore = true;
+    clearFilteredProducts();
   }
 
   void applyFilters({
