@@ -772,6 +772,7 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
             id: widget.existing!.id,
             name: _nameCtrl.text.trim(),
             parentId: _selectedParentId,
+            originalParentId: widget.existing!.parentId,
             imageFile: _pickedImage,
             isDeleteImage: _isDeleteImage,
             isActive: _isActive,

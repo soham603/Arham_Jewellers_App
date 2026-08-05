@@ -203,6 +203,7 @@ class CategoryManagerController extends GetxController {
     required String id,
     String? name,
     String? parentId,
+    String? originalParentId,
     File? imageFile,
     bool isDeleteImage = false,
     bool? isActive,
@@ -217,9 +218,12 @@ class CategoryManagerController extends GetxController {
               : await _compressImageFile(imageFile)
           : null;
 
+      final parentIdChanged =
+          parentId != null && parentId != originalParentId;
+
       final formData = FormData.fromMap({
         if (name != null && name.isNotEmpty) "name": name,
-        "parentId": ?parentId,
+        if (parentIdChanged) "parentId": parentId,
         if (isDeleteImage) "isDeleteImage": true,
         if (isActive != null) "isActive": isActive.toString(),
         if (fileToUpload != null)
