@@ -774,6 +774,118 @@ class ShareService {
     }
   }
 
+  static Future<ShareToWhatsAppResult> shareProductEnquiryPdfToWhatsApp({
+    required ProductModel product,
+    required String purity,
+    required String collectionName,
+    required String description,
+    required String message,
+    required String phone,
+    String? packageName,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
+  }) async {
+    progress?.value = 0.0;
+
+    Uint8List? imageBytes;
+    final imageUrl = product.displayImageUrl;
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      imageBytes = await _downloadAndCompressImage(
+        imageUrl,
+        maxLongestEdge: ImageCompressionConstants.pdfThumbnailMaxEdge,
+        quality: ImageCompressionConstants.pdfThumbnailQuality,
+      );
+    }
+
+    progress?.value = 0.4;
+    if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
+
+    final arhamLogoBytes = await _loadLogoBytes('assets/images/arham-logo-gold.png');
+    final ratneshLogoBytes = await _loadLogoBytes('assets/images/ratnesh-logo-gold.png');
+
+    progress?.value = 0.5;
+    if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
+
+    final rawData = product.rawData ?? {};
+    final grossWtRaw = rawData['GrossWt'];
+    final grossWt = grossWtRaw != null ? double.tryParse(grossWtRaw.toString()) : null;
+
+    final pdfBytes = await compute(_buildProductEnquiryPdfInIsolate, {
+      'arhamLogoBytes': arhamLogoBytes,
+      'ratneshLogoBytes': ratneshLogoBytes,
+      'imageBytes': imageBytes,
+      'productName': product.name,
+      'tagNo': product.tagNo ?? rawData['Barcode'] ?? '-',
+      'karat': product.touch ?? product.karat ?? '-',
+      'category': product.category?.name ?? '-',
+      'netWt': product.karigarNetWt,
+      'grossWt': grossWt,
+      'purity': purity,
+      'pieces': rawData['Pieces']?.toString() ?? '1',
+      'size': product.size?.toString(),
+      'collectionName': collectionName,
+      'description': description,
+    });
+
+    progress?.value = 0.8;
+    if (cancelled?.value == true) return const ShareToWhatsAppResult(success: false);
+
+    final tempDir = await getTemporaryDirectory();
+    final sharedDir = Directory('${tempDir.path}/shared_pdfs');
+    if (!await sharedDir.exists()) {
+      await sharedDir.create(recursive: true);
+    }
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final safeName = product.name.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+    final fileName = 'Product_Enquiry_${safeName}_$timestamp.pdf';
+    final file = File('${sharedDir.path}/$fileName');
+    await file.writeAsBytes(pdfBytes);
+
+    progress?.value = 0.95;
+    if (cancelled?.value == true) {
+      try { await file.delete(); } catch (_) {}
+      return const ShareToWhatsAppResult(success: false);
+    }
+
+    try {
+      if (Platform.isAndroid) {
+        final result = await _channel.invokeMethod<bool>('shareToWhatsApp', {
+          'filePath': file.path,
+          'message': message,
+          'phone': phone,
+          'packageName': packageName,
+        });
+        progress?.value = 1.0;
+        if (result == true) {
+          return const ShareToWhatsAppResult(success: true);
+        }
+        return ShareToWhatsAppResult(
+          success: false,
+          filePath: file.path,
+          fileName: fileName,
+        );
+      } else {
+        await Share.shareXFiles(
+          [XFile(file.path, name: fileName)],
+          text: message,
+        );
+        progress?.value = 1.0;
+        return const ShareToWhatsAppResult(success: true);
+      }
+    } catch (e) {
+      return ShareToWhatsAppResult(
+        success: false,
+        filePath: file.path,
+        fileName: fileName,
+      );
+    } finally {
+      Future.delayed(const Duration(seconds: 30), () async {
+        try { await file.delete(); } catch (_) {}
+      });
+    }
+  }
+
   static Future<bool?> shareCustomOrderAsPdf({
     required AdminOrderModel order,
     ValueNotifier<double>? progress,
@@ -1770,6 +1882,230 @@ Future<List<int>> _buildCustomOrderPdfInIsolate(Map<String, dynamic> params) asy
       ),
     );
   }
+
+  return await pdf.save();
+}
+
+Future<List<int>> _buildProductEnquiryPdfInIsolate(Map<String, dynamic> params) async {
+  final arhamLogoBytes = params['arhamLogoBytes'] as Uint8List;
+  final ratneshLogoBytes = params['ratneshLogoBytes'] as Uint8List;
+  final imageBytes = params['imageBytes'] as Uint8List?;
+  final productName = params['productName'] as String;
+  final tagNo = params['tagNo'] as String;
+  final karat = params['karat'] as String;
+  final netWt = params['netWt'] as double?;
+  final grossWt = params['grossWt'] as double?;
+  final purity = params['purity'] as String;
+  final pieces = params['pieces'] as String;
+  final size = params['size'] as String?;
+  final collectionName = params['collectionName'] as String;
+  final description = params['description'] as String;
+
+  final brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
+  final brandSubtitle = 'Purity - Quality - Trust';
+
+  final pdf = pw.Document();
+
+  final regularFont = pw.Font.helvetica();
+  final boldFont = pw.Font.helveticaBold();
+
+  final arhamLogo = pw.MemoryImage(arhamLogoBytes);
+  final ratneshLogo = pw.MemoryImage(ratneshLogoBytes);
+
+  final goldColor = PdfColor.fromHex('#A57A36');
+  final darkColor = PdfColor.fromHex('#2D2118');
+  final mutedColor = PdfColor.fromHex('#7E756C');
+  final borderColor = PdfColor.fromHex('#D4C9B8');
+  final labelColor = PdfColor.fromHex('#5C534A');
+  final redColor = PdfColor.fromHex('#DC2626');
+  final lightRedBg = PdfColor.fromHex('#FFF5F5');
+  final lightRedBorder = PdfColor.fromHex('#FCA5A5');
+
+  final header = pw.Container(
+    padding: const pw.EdgeInsets.only(bottom: 16),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.center,
+          children: [
+            pw.Image(arhamLogo, width: 90, height: 36),
+            pw.SizedBox(width: 16),
+            pw.Image(ratneshLogo, width: 36, height: 36),
+          ],
+        ),
+        pw.SizedBox(height: 8),
+        pw.Text(
+          brandName,
+          style: pw.TextStyle(font: boldFont, fontSize: 18, color: goldColor),
+        ),
+        pw.SizedBox(height: 2),
+        pw.Text(
+          brandSubtitle,
+          style: pw.TextStyle(font: regularFont, fontSize: 9, color: mutedColor),
+        ),
+        pw.SizedBox(height: 10),
+        pw.Divider(color: goldColor, thickness: 1),
+        pw.SizedBox(height: 6),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              'Product Enquiry',
+              style: pw.TextStyle(font: boldFont, fontSize: 14, color: darkColor),
+            ),
+            pw.Text(
+              'Date: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+              style: pw.TextStyle(font: regularFont, fontSize: 9, color: mutedColor),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+
+  pw.TableRow buildDetailRow(String label, String value) {
+    return pw.TableRow(
+      children: [
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: pw.BoxDecoration(color: PdfColor.fromHex('#F9F3E8')),
+          child: pw.Text(
+            label,
+            style: pw.TextStyle(font: boldFont, fontSize: 9.5, color: labelColor),
+          ),
+        ),
+        pw.Container(
+          padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: pw.Text(
+            value,
+            style: pw.TextStyle(font: regularFont, fontSize: 9.5, color: darkColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  final productSection = pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+    children: [
+      if (imageBytes != null) ...[
+        pw.Center(
+          child: pw.Container(
+            width: 280,
+            height: 280,
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: borderColor, width: 1),
+              borderRadius: pw.BorderRadius.circular(8),
+            ),
+            child: pw.ClipRRect(
+              horizontalRadius: 8,
+              verticalRadius: 8,
+              child: pw.Image(pw.MemoryImage(imageBytes), fit: pw.BoxFit.contain),
+            ),
+          ),
+        ),
+        pw.SizedBox(height: 16),
+      ],
+      pw.Table(
+        columnWidths: const {
+          0: pw.FixedColumnWidth(160),
+          1: pw.FlexColumnWidth(),
+        },
+        border: pw.TableBorder(
+          top: pw.BorderSide(color: borderColor, width: 0.5),
+          bottom: pw.BorderSide(color: borderColor, width: 0.5),
+          left: pw.BorderSide(color: borderColor, width: 0.5),
+          right: pw.BorderSide(color: borderColor, width: 0.5),
+          horizontalInside: pw.BorderSide(color: borderColor, width: 0.5),
+          verticalInside: pw.BorderSide(color: borderColor, width: 0.5),
+        ),
+        children: [
+          buildDetailRow('Product Name', productName),
+          buildDetailRow('Tag No', tagNo),
+          buildDetailRow('Karat', karat),
+          buildDetailRow('Purity', purity),
+          if (netWt != null) buildDetailRow('Net Wt', '${netWt.toStringAsFixed(2)} g'),
+          if (grossWt != null) buildDetailRow('Gross Wt', '${grossWt.toStringAsFixed(2)} g'),
+          buildDetailRow('Pieces', pieces),
+          if (size != null && size.isNotEmpty) buildDetailRow('Size', size),
+          buildDetailRow('Collection', collectionName),
+        ],
+      ),
+    ],
+  );
+
+  final descriptionSection = pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text(
+        'Description',
+        style: pw.TextStyle(font: boldFont, fontSize: 12, color: goldColor),
+      ),
+      pw.SizedBox(height: 8),
+      pw.Text(
+        description,
+        style: pw.TextStyle(font: regularFont, fontSize: 10, color: darkColor),
+      ),
+    ],
+  );
+
+  final outOfStockNote = pw.Container(
+    padding: const pw.EdgeInsets.all(12),
+    decoration: pw.BoxDecoration(
+      color: lightRedBg,
+      borderRadius: pw.BorderRadius.circular(8),
+      border: pw.Border.all(color: lightRedBorder, width: 1),
+    ),
+    child: pw.Row(
+      children: [
+        pw.Container(
+          width: 24,
+          height: 24,
+          decoration: pw.BoxDecoration(
+            color: redColor,
+            shape: pw.BoxShape.circle,
+          ),
+          child: pw.Center(
+            child: pw.Text(
+              '!',
+              style: pw.TextStyle(font: boldFont, fontSize: 14, color: PdfColors.white),
+            ),
+          ),
+        ),
+        pw.SizedBox(width: 12),
+        pw.Expanded(
+          child: pw.Text(
+            'This item is currently out of stock. Please share your interest via this enquiry.',
+            style: pw.TextStyle(font: regularFont, fontSize: 10, color: redColor),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(30),
+      build: (context) => [
+        header,
+        pw.SizedBox(height: 16),
+        productSection,
+        pw.SizedBox(height: 16),
+        descriptionSection,
+        pw.SizedBox(height: 16),
+        outOfStockNote,
+      ],
+      footer: (context) => pw.Container(
+        alignment: pw.Alignment.centerRight,
+        child: pw.Text(
+          'Page ${context.pageNumber} of ${context.pagesCount}',
+          style: pw.TextStyle(font: regularFont, fontSize: 8, color: mutedColor),
+        ),
+      ),
+    ),
+  );
 
   return await pdf.save();
 }

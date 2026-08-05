@@ -14,6 +14,13 @@ import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.da
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:share_plus/share_plus.dart';
+
+import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
+import 'package:ratnesh_gold_app/core/constants/admin_constants.dart';
+import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
 import 'customise_order_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/product_edit_page.dart';
@@ -155,6 +162,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       return products[_currentIndex];
     }
     return widget.product;
+  }
+
+  bool get _isInStock {
+    final isStockField = _currentProduct.rawData?['IsStock'];
+    if (isStockField != null) {
+      return isStockField == 1 || isStockField == true || isStockField == '1';
+    }
+    return _currentProduct.isActive;
   }
 
   String _getConvertedPurity(
@@ -310,17 +325,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                               ),
                             ),
-                            onPressed: isInCart
-                                ? () {
-                                    cartController.removeFromCart(
-                                      _currentProduct.id,
-                                    );
-                                  }
+                            onPressed: _isInStock
+                                ? (isInCart
+                                    ? () {
+                                        cartController.removeFromCart(
+                                          _currentProduct.id,
+                                        );
+                                      }
+                                    : () {
+                                        cartController.addToCart(_currentProduct);
+                                      })
                                 : () {
-                                    cartController.addToCart(_currentProduct);
+                                    _sendEnquiryPdfToWhatsApp(
+                                      context,
+                                      _currentProduct,
+                                    );
                                   },
                             child: Text(
-                              isInCart ? 'Remove from Cart' : 'Add to Cart',
+                              _isInStock
+                                  ? (isInCart
+                                      ? 'Remove from Cart'
+                                      : 'Add to Cart')
+                                  : 'Enquire',
                               style: TextStyle(
                                 fontSize: context.getResponsiveSize(3.5),
                                 fontWeight: FontWeight.w700,
@@ -1160,5 +1186,96 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       ],
     );
+  }
+
+  Future<void> _sendEnquiryPdfToWhatsApp(
+    BuildContext context,
+    ProductModel product,
+  ) async {
+    final packages = await ShareService.getAvailableWhatsAppPackages();
+    if (packages.isEmpty) {
+      if (mounted) ToastUtils.showError('WhatsApp is not installed');
+      return;
+    }
+
+    String? selectedPackage;
+    if (packages.length > 1) {
+      selectedPackage = await WhatsAppUtil.showPackagePicker(context);
+      if (selectedPackage == null) return;
+    } else {
+      selectedPackage = packages.first;
+    }
+
+    final progress = ValueNotifier<double>(0.0);
+    final cancelled = ValueNotifier<bool>(false);
+
+    PdfLoadingDialog.show(
+      context,
+      message: 'Preparing PDF...',
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
+    );
+
+    final navigator = Navigator.of(context);
+    bool dialogDismissed = false;
+
+    try {
+      final rawData = product.rawData ?? {};
+      final purity = _getConvertedPurity(
+        rawData,
+        product.karat,
+        tagNo: product.tagNo,
+        name: product.name,
+      );
+      final collectionName = product.category?.name ?? '—';
+      final description =
+          "Elegant ${cleanCategoryName(product.name)} with fine craftsmanship, $purity purity, and a timeless design—perfect for pairing with traditional Indian ensembles or adding everyday elegance.";
+
+      final tagNo = product.tagNo ?? rawData['Barcode'] ?? '-';
+      final message =
+          'Product Enquiry\n\nProduct: ${product.name} (Tag: $tagNo)\n\nPlease find the attached PDF for details.';
+
+      final phone = await AdminConstants.adminPhoneAsync;
+
+      final result = await ShareService.shareProductEnquiryPdfToWhatsApp(
+        product: product,
+        purity: purity,
+        collectionName: collectionName,
+        description: description,
+        message: message,
+        phone: phone,
+        packageName: selectedPackage,
+        progress: progress,
+        cancelled: cancelled,
+      );
+
+      if (!cancelled.value) {
+        navigator.pop();
+        dialogDismissed = true;
+      }
+
+      if (!result.success && !cancelled.value && mounted) {
+        if (result.filePath != null) {
+          await Share.shareXFiles(
+            [XFile(result.filePath!, name: result.fileName)],
+            text: message,
+          );
+        } else {
+          await WhatsAppUtil.launchWhatsApp(
+            context,
+            phone,
+            message: message,
+          );
+        }
+      }
+    } catch (e) {
+      if (!dialogDismissed && mounted) navigator.pop();
+      if (mounted) ToastUtils.showError('Failed to prepare or share PDF');
+    } finally {
+      progress.dispose();
+      cancelled.dispose();
+    }
   }
 }
