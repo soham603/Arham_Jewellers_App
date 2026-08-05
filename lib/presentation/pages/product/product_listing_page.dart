@@ -52,9 +52,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   String _stockFilter = 'ready';
   int? _approvalFilter;
   double _weightMin = 0;
-  double _weightMax = 500;
+  double _weightMax = double.infinity;
   double _priceMin = 0;
-  double _priceMax = 5000000;
+  double _priceMax = double.infinity;
   List<String> _selectedSizes = [];
   bool? _isActiveFilter;
 
@@ -1189,8 +1189,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
     var result = products;
-
-    result = result.where((p) => !p.isOld22kReadyStock).toList();
 
     if (_weightMin > 0 || _weightMax < _displayedWeightMax) {
       result = result.where((p) {
