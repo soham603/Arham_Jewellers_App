@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -42,15 +44,14 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   bool get isAdmin => _isAdmin.value;
   RxBool get isAdminRx => _isAdmin;
 
-  Future<String?> _getFcmToken() async {
-    final inMemory = NotificationService().fcmToken;
-    if (inMemory != null && inMemory.isNotEmpty) return inMemory;
+  Future<void> _getFcmTokenInBackground() async {
     try {
-      return await SessionManager()
+      final inMemory = NotificationService().fcmToken;
+      if (inMemory != null && inMemory.isNotEmpty) return;
+      await SessionManager()
           .getFcmToken()
           .timeout(const Duration(seconds: 5));
     } catch (e) {
-      return null;
     }
   }
 
@@ -121,13 +122,13 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _userLoginState.value = CurrentAppState.LOADING;
       _userLoginErrorMsg.value = "";
 
-      final fcmToken = await _getFcmToken();
+      unawaited(_getFcmTokenInBackground());
 
       final response = await _authRepo.loginUser(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: fcmToken,
+        fcmToken: null,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -144,7 +145,7 @@ class AuthController extends GetxController with WidgetsBindingObserver {
             accessToken: data['accessToken'],
             refreshToken: data['refreshToken'],
             accessTokenExpiry: data['accessTokenValidTill'],
-            refreshTokenExpiry: data['enableAccessTill'],
+            refreshTokenExpiry: data['refreshTokenValidTill'],
           ),
         );
 
@@ -191,13 +192,13 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _adminLoginState.value = CurrentAppState.LOADING;
       _adminLoginErrorMsg.value = "";
 
-      final fcmToken = await _getFcmToken();
+      unawaited(_getFcmTokenInBackground());
 
       final response = await _authRepo.loginAdmin(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: fcmToken,
+        fcmToken: null,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {

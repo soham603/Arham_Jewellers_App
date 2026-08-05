@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -40,25 +41,37 @@ class NotificationService {
   Function(RemoteMessage)? onMessageOpenedApp;
   Function(String)? onTokenRefreshed;
 
+  static const Duration _criticalStepTimeout = Duration(seconds: 3);
+
   Future<void> init() async {
     try {
-      await _setupLocalNotifications();
-      await _loadNotificationIdCounter();
-    } catch (e, st) {
+      await _setupLocalNotifications()
+          .timeout(_criticalStepTimeout);
+      await _loadNotificationIdCounter()
+          .timeout(_criticalStepTimeout);
+    } catch (e) {
       _initError = e.toString();
     }
 
     try {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp().timeout(_criticalStepTimeout);
       _messaging = FirebaseMessaging.instance;
+    } catch (e) {
+      _initError = e.toString();
+    }
 
+    _isInitialized = true;
+
+    unawaited(_backgroundInit());
+  }
+
+  Future<void> _backgroundInit() async {
+    if (_messaging == null) return;
+    try {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
       await _requestPermission();
       await _getFcmToken();
       _setupMessageListeners();
-
-      _isInitialized = true;
     } catch (e) {
       _initError = e.toString();
     }

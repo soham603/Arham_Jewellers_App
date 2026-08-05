@@ -250,50 +250,48 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
   }
 
-  List<ProductModel> get _displayedProducts {
-    List<ProductModel> base;
+  List<ProductModel> get _rawStockProducts {
     switch (_stockFilter) {
       case 'ready':
-        if (_isMultiCategory) {
-          base = _controller.categoryReadyProducts;
-        } else if (_isCategoryOnly) {
-          base = _controller.categoryReadyProducts;
-        } else if (_isCategoryFilter) {
-          base = _controller.filteredReadyProducts;
-        } else {
-          base = _controller.karatReadyProducts;
+        if (_isMultiCategory || _isCategoryOnly) {
+          return _controller.categoryReadyProducts;
         }
-        break;
+        if (_isCategoryFilter) {
+          return _controller.filteredReadyProducts;
+        }
+        return _controller.karatReadyProducts;
       case 'out':
-        if (_isMultiCategory) {
-          base = _controller.categoryOutProducts;
-        } else if (_isCategoryOnly) {
-          base = _controller.categoryOutProducts;
-        } else if (_isCategoryFilter) {
-          base = _controller.filteredOutProducts;
-        } else {
-          base = _controller.karatOutProducts;
+        if (_isMultiCategory || _isCategoryOnly) {
+          return _controller.categoryOutProducts;
         }
-        break;
+        if (_isCategoryFilter) {
+          return _controller.filteredOutProducts;
+        }
+        return _controller.karatOutProducts;
       default:
-        if (_isMultiCategory) {
-          base = _controller.categoryAllProducts;
-        } else if (_isCategoryOnly) {
-          base = _controller.categoryAllProducts;
-        } else if (_isCategoryFilter) {
-          base = _controller.filteredAllProducts;
-        } else {
-          base = _controller.karatAllProducts;
+        if (_isMultiCategory || _isCategoryOnly) {
+          return _controller.categoryAllProducts;
         }
-        break;
+        if (_isCategoryFilter) {
+          return _controller.filteredAllProducts;
+        }
+        return _controller.karatAllProducts;
     }
+  }
+
+  List<ProductModel> _applyIsActiveFilter(List<ProductModel> products) {
     if (!_isAdmin) {
-      base = base.where((p) => p.isActive).toList();
-    } else if (_isActiveFilter != null) {
-      base = base.where((p) => p.isActive == _isActiveFilter).toList();
+      return products.where((p) => p.isActive).toList();
     }
-    if (!_isMultiCategory) return base;
-    var result = base;
+    if (_isActiveFilter != null) {
+      return products.where((p) => p.isActive == _isActiveFilter).toList();
+    }
+    return products;
+  }
+
+  List<ProductModel> _applyMultiCategoryFilters(List<ProductModel> products) {
+    if (!_isMultiCategory) return products;
+    var result = products;
     if (_filteredCategoryIds.length != (widget.categoryIds?.length ?? 0)) {
       result = result.where((p) {
         final catId = p.category?.id;
@@ -311,6 +309,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
       }
     }
     return result;
+  }
+
+  List<ProductModel> get _displayedProducts {
+    return _applyMultiCategoryFilters(_applyIsActiveFilter(_rawStockProducts));
   }
 
   double get _displayedWeightMax {
@@ -1188,36 +1190,43 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
-    var result = products;
+    return _applySizeFilter(_applyPriceFilter(_applyWeightFilter(products)));
+  }
 
+  List<ProductModel> _applyWeightFilter(List<ProductModel> products) {
     if (_weightMin > 0 || _weightMax < _displayedWeightMax) {
-      result = result.where((p) {
+      return products.where((p) {
         final gw = p.fineWeight;
         if (gw == null) return true;
         return gw >= _weightMin && gw <= _weightMax;
       }).toList();
     }
+    return products;
+  }
 
+  List<ProductModel> _applyPriceFilter(List<ProductModel> products) {
     if (_priceMin > 0 || _priceMax < 5000000) {
       final goldRate = Get.find<GoldRateController>().currentRate;
       if (goldRate != null) {
-        result = result.where((p) {
+        return products.where((p) {
           final price = _calculatePrice(p, goldRate.rate);
           if (price == null) return true;
           return price >= _priceMin && price <= _priceMax;
         }).toList();
       }
     }
+    return products;
+  }
 
+  List<ProductModel> _applySizeFilter(List<ProductModel> products) {
     if (_selectedSizes.isNotEmpty) {
-      result = result.where((p) {
+      return products.where((p) {
         final s = p.size;
         if (s == null) return false;
         return _selectedSizes.contains(s);
       }).toList();
     }
-
-    return result;
+    return products;
   }
 
   double? _calculatePrice(ProductModel product, double ratePer10Gram) {

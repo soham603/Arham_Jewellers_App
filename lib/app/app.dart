@@ -32,9 +32,13 @@ class RatneshGoldApp extends StatefulWidget {
     await prefs.setBool(screenshotProtectionKey, enabled);
     if (enabled) {
       await prefs.remove(screenshotProtectionExpiryKey);
-      await NoScreenshot.instance.screenshotOff();
+      try {
+        await NoScreenshot.instance.screenshotOff();
+      } catch (_) {}
     } else {
-      await NoScreenshot.instance.screenshotOn();
+      try {
+        await NoScreenshot.instance.screenshotOn();
+      } catch (_) {}
     }
   }
 
@@ -43,7 +47,9 @@ class RatneshGoldApp extends StatefulWidget {
     final expiryTime = DateTime.now().add(duration).millisecondsSinceEpoch;
     await prefs.setBool(screenshotProtectionKey, false);
     await prefs.setInt(screenshotProtectionExpiryKey, expiryTime);
-    await NoScreenshot.instance.screenshotOn();
+    try {
+      await NoScreenshot.instance.screenshotOn();
+    } catch (_) {}
   }
 
   static Future<void> checkAndReenableScreenshotProtection() async {
@@ -69,7 +75,9 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initScreenshotProtection();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initScreenshotProtection();
+    });
   }
 
   @override
@@ -95,11 +103,13 @@ class _RatneshGoldAppState extends State<RatneshGoldApp> with WidgetsBindingObse
   Future<void> _initScreenshotProtection() async {
     await RatneshGoldApp.checkAndReenableScreenshotProtection();
     final enabled = await RatneshGoldApp.isScreenshotProtectionEnabled();
-    if (enabled) {
-      await NoScreenshot.instance.screenshotOff();
-    } else {
-      await NoScreenshot.instance.screenshotOn();
-    }
+    try {
+      if (enabled) {
+        await NoScreenshot.instance.screenshotOff();
+      } else {
+        await NoScreenshot.instance.screenshotOn();
+      }
+    } catch (_) {}
   }
 
   @override

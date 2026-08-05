@@ -31,6 +31,10 @@ class SessionManager {
     required String refreshTokenExpiry,
   }) async {
     try {
+      if (accessToken.isEmpty || refreshToken.isEmpty ||
+          accessTokenExpiry.isEmpty || refreshTokenExpiry.isEmpty) {
+        return false;
+      }
       final accessExpiry =
           DateTime.parse(accessTokenExpiry).millisecondsSinceEpoch;
       final refreshExpiry =
@@ -134,6 +138,7 @@ class SessionManager {
 
   Future<bool> saveFcmToken(String token) async {
     try {
+      if (token.isEmpty) return false;
       await _storage.write(key: DatabaseKeyConstants.FCM_TOKEN, value: token);
       return true;
     } catch (e, st) {

@@ -41,14 +41,7 @@ Future<void> main() async {
       runApp(RatneshGoldApp());
 
       if (!kIsWeb) {
-        unawaited(
-          NotificationService().init().timeout(
-            const Duration(seconds: 20),
-            onTimeout: () {
-              debugPrint('NotificationService.init timed out');
-            },
-          ),
-        );
+        unawaited(NotificationService().init());
       }
 
       unawaited(
