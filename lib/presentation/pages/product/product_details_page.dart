@@ -421,7 +421,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         : Colors.red.shade600;
 
     return SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         child: Column(
           children: [
             SizedBox(
@@ -1000,7 +1000,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       ],
                     ),
                   ),
-                  SizedBox(height: context.heightPercent(10)),
+                  SizedBox(height: context.heightPercent(1)),
                 ],
               ),
             ),
