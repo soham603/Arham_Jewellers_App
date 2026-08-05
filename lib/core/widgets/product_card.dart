@@ -807,30 +807,54 @@ class _CartButton extends StatelessWidget {
     return SizedBox(
       width: height,
       height: height,
-      child: ElevatedButton(
-        onPressed: () {
-          CartController.instance.addToCart(product);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${product.name} added to cart'),
-              duration: const Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
+      child: Obx(() {
+        final inCart = CartController.instance.isInCart(product.id);
+
+        return ElevatedButton(
+          onPressed: () {
+            if (inCart) {
+              CartController.instance.removeFromCart(product.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${product.name} removed from cart'),
+                  duration: const Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            } else {
+              CartController.instance.addToCart(product);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${product.name} added to cart'),
+                  duration: const Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: inCart ? Colors.white : AppColors.primaryGold,
+            foregroundColor: inCart ? AppColors.primaryGold : Colors.white,
+            padding: EdgeInsets.zero,
+            shadowColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            side: inCart
+                ? BorderSide(
+                    color: AppColors.primaryGold.withValues(alpha: 0.6),
+                    width: 1.2,
+                  )
+                : null,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: AppColors.primaryGold,
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.zero,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
           ),
-        ),
-        child: Icon(Icons.shopping_cart_outlined, size: height * 0.45),
-      ),
+          child: Icon(
+            inCart ? Icons.remove_shopping_cart_outlined : Icons.shopping_cart_outlined,
+            size: height * 0.45,
+          ),
+        );
+      }),
     );
   }
 }
