@@ -20,7 +20,9 @@ class SessionManager {
 
   SessionManager._internal();
 
-  final _storage = const FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(resetOnError: true),
+  );
 
   Future<bool> saveTokens({
     required String accessToken,

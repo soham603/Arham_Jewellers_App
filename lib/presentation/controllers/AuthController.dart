@@ -45,7 +45,20 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   Future<String?> _getFcmToken() async {
     final inMemory = NotificationService().fcmToken;
     if (inMemory != null && inMemory.isNotEmpty) return inMemory;
-    return SessionManager().getFcmToken();
+    try {
+      return await SessionManager()
+          .getFcmToken()
+          .timeout(const Duration(seconds: 5));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> _safePersist(Future<void> Function() op) async {
+    try {
+      await op().timeout(const Duration(seconds: 5));
+    } catch (e) {
+    }
   }
 
   @override
@@ -123,14 +136,16 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         final user = UserModel.fromJson(data['user']);
         _user.value = user;
         _isAdmin.value = false;
-        await SessionManager().saveUserData(user);
-        await SessionManager().saveIsAdmin(false);
+        await _safePersist(() => SessionManager().saveUserData(user));
+        await _safePersist(() => SessionManager().saveIsAdmin(false));
 
-        await SessionManager().saveTokens(
-          accessToken: data['accessToken'],
-          refreshToken: data['refreshToken'],
-          accessTokenExpiry: data['accessTokenValidTill'],
-          refreshTokenExpiry: data['enableAccessTill'],
+        await _safePersist(
+          () => SessionManager().saveTokens(
+            accessToken: data['accessToken'],
+            refreshToken: data['refreshToken'],
+            accessTokenExpiry: data['accessTokenValidTill'],
+            refreshTokenExpiry: data['enableAccessTill'],
+          ),
         );
 
         _userLoginState.value = CurrentAppState.SUCCESS;
@@ -191,14 +206,16 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         final user = UserModel.fromJson(data['admin']);
         _user.value = user;
         _isAdmin.value = true;
-        await SessionManager().saveUserData(user);
-        await SessionManager().saveIsAdmin(true);
+        await _safePersist(() => SessionManager().saveUserData(user));
+        await _safePersist(() => SessionManager().saveIsAdmin(true));
 
-        await SessionManager().saveTokens(
-          accessToken: data['accessToken'],
-          refreshToken: data['refreshToken'],
-          accessTokenExpiry: data['accessTokenValidTill'],
-          refreshTokenExpiry: data['refreshTokenValidTill'],
+        await _safePersist(
+          () => SessionManager().saveTokens(
+            accessToken: data['accessToken'],
+            refreshToken: data['refreshToken'],
+            accessTokenExpiry: data['accessTokenValidTill'],
+            refreshTokenExpiry: data['refreshTokenValidTill'],
+          ),
         );
 
         _adminLoginState.value = CurrentAppState.SUCCESS;

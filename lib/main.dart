@@ -23,38 +23,62 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
 
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
+      try {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
+      } catch (e, st) {
+        debugPrint('Failed to lock orientation: $e\n$st');
+      }
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FlutterError.presentError(details);
       };
 
-      Get.put(CartController());
-      Get.put(WishlistController());
-      Get.put(AuthController());
-      Get.put(GoldRateController());
-      Get.put(NotificationController());
-      Get.put(CategoryController(), permanent: true);
-      Get.put(CarouselsController(), permanent: true);
-      Get.put(UserOrderController(), permanent: true);
-      Get.put(AncillaryController(), permanent: true);
-
-      if (!kIsWeb) {
-        try {
-          await NotificationService().init();
-        } catch (e) {
-        }
-      }
-
+      _registerControllers();
       painting.imageCache.maximumSizeBytes = 50 * 1024 * 1024;
 
-      PdfCache.clearStale();
-
       runApp(RatneshGoldApp());
+
+      if (!kIsWeb) {
+        unawaited(
+          NotificationService().init().timeout(
+            const Duration(seconds: 20),
+            onTimeout: () {
+              debugPrint('NotificationService.init timed out');
+            },
+          ),
+        );
+      }
+
+      unawaited(
+        PdfCache.clearStale().catchError((Object e, StackTrace st) {
+          debugPrint('PdfCache.clearStale failed: $e\n$st');
+        }),
+      );
     },
     (error, stackTrace) {
+      debugPrint('Unhandled zone error: $error\n$stackTrace');
     },
   );
+}
+
+void _registerControllers() {
+  void safePut<T extends GetxController>(T controller, {bool permanent = false}) {
+    try {
+      Get.put(controller, permanent: permanent);
+    } catch (e, st) {
+      debugPrint('Failed to register ${controller.runtimeType}: $e\n$st');
+    }
+  }
+
+  safePut(CartController());
+  safePut(WishlistController());
+  safePut(AuthController());
+  safePut(GoldRateController());
+  safePut(NotificationController());
+  safePut(CategoryController(), permanent: true);
+  safePut(CarouselsController(), permanent: true);
+  safePut(UserOrderController(), permanent: true);
+  safePut(AncillaryController(), permanent: true);
 }

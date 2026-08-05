@@ -18,7 +18,9 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage>
     with SingleTickerProviderStateMixin {
-  static const _storage = FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(resetOnError: true),
+  );
 
   late AnimationController _controller;
   late Animation<double> _logoFade;
@@ -80,9 +82,14 @@ class _SplashPageState extends State<SplashPage>
           const AssetImage('assets/images/ratnesh-logo-opt.webp'),
           context,
         ),
-      ]).then((_) {
-        _initFlow();
-      });
+      ]).then(
+        (_) {
+          _initFlow();
+        },
+        onError: (Object e) {
+          _initFlow();
+        },
+      );
     }
   }
 
@@ -90,7 +97,12 @@ class _SplashPageState extends State<SplashPage>
     _controller.forward();
     final routeFuture = _determineTargetRoute();
     await Future.delayed(const Duration(seconds: 4));
-    final targetRoute = await routeFuture;
+    String targetRoute;
+    try {
+      targetRoute = await routeFuture.timeout(const Duration(seconds: 25));
+    } catch (e) {
+      targetRoute = AppRoutes.login;
+    }
     Get.offNamed(targetRoute);
   }
 
@@ -120,7 +132,7 @@ class _SplashPageState extends State<SplashPage>
       }
 
       return AppRoutes.login;
-    } catch (e, stackTrace) {
+    } catch (e) {
       return AppRoutes.login;
     }
   }
