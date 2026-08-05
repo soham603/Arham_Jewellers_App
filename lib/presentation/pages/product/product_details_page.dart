@@ -350,13 +350,77 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               Navigator.of(context).popUntil((route) => route.isFirst);
                               Get.find<NavigationController>().switchTab(NavigationController.cartIndex);
                             },
-                            child: Text(
-                              'View Cart',
-                              style: TextStyle(
-                                fontSize: context.getResponsiveSize(3.5),
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.5,
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Icon(
+                                      Icons.shopping_cart,
+                                      size: context.getResponsiveSize(4.5),
+                                      color: Colors.white,
+                                    ),
+                                    if (cartController.totalItems > 0)
+                                      Positioned(
+                                        right: -context.getResponsiveSize(
+                                          2.5,
+                                          minSize: 0,
+                                        ),
+                                        top: -context.getResponsiveSize(
+                                          2.5,
+                                          minSize: 0,
+                                        ),
+                                        child: Container(
+                                          padding: EdgeInsets.all(
+                                            context.getResponsiveSize(
+                                              0.6,
+                                              minSize: 0,
+                                            ),
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          constraints: BoxConstraints(
+                                            minWidth: context
+                                                .getResponsiveSize(
+                                              3.8,
+                                              minSize: 0,
+                                            ),
+                                            minHeight: context
+                                                .getResponsiveSize(
+                                              3.8,
+                                              minSize: 0,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${cartController.totalItems}',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: context
+                                                  .getResponsiveSize(
+                                                2.5,
+                                                minSize: 0,
+                                              ),
+                                              fontWeight: FontWeight.w800,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                SizedBox(width: context.getResponsiveSize(2)),
+                                Text(
+                                  'View Cart',
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(3.5),
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
