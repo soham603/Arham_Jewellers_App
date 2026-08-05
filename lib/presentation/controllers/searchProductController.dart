@@ -403,7 +403,6 @@ class SearchProductController extends GetxController {
           "categoryId": categoryId,
           "page": 1,
           "limit": _pageLimit,
-          "showReverse": true,
           ...?stockParam,
         },
       );
@@ -471,7 +470,6 @@ class SearchProductController extends GetxController {
               "categoryId": catId,
               "page": currentPage,
               "limit": _pageLimit,
-              "showReverse": true,
               ...?stockParam,
             },
           );
@@ -608,7 +606,6 @@ class SearchProductController extends GetxController {
           "categoryId": categoryId,
           "page": currentPage,
           "limit": _pageLimit,
-          "showReverse": true,
           ...?stockParam,
         },
       );
