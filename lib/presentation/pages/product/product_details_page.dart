@@ -294,33 +294,33 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           height: context.heightPercent(6.2),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              elevation: isInCart ? 0 : 2,
+                              elevation: 2,
                               shadowColor: AppColors.primaryGold.withValues(
                                 alpha: 0.2,
                               ),
-                              backgroundColor: isInCart
-                                  ? Colors.grey.shade100
-                                  : const Color(0xFFF9F6F0),
-                              foregroundColor: isInCart
-                                  ? Colors.grey
-                                  : AppColors.primaryGold,
+                              backgroundColor: Colors.white,
+                              foregroundColor: AppColors.primaryGold,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 side: BorderSide(
-                                  color: isInCart
-                                      ? Colors.grey.shade300
-                                      : AppColors.primaryGold.withValues(alpha: 0.4),
+                                  color: AppColors.primaryGold.withValues(
+                                    alpha: isInCart ? 0.6 : 0.4,
+                                  ),
                                   width: 1.2,
                                 ),
                               ),
                             ),
                             onPressed: isInCart
-                                ? null
+                                ? () {
+                                    cartController.removeFromCart(
+                                      _currentProduct.id,
+                                    );
+                                  }
                                 : () {
                                     cartController.addToCart(_currentProduct);
                                   },
                             child: Text(
-                              isInCart ? 'Added to Cart' : 'Add to Cart',
+                              isInCart ? 'Remove from Cart' : 'Add to Cart',
                               style: TextStyle(
                                 fontSize: context.getResponsiveSize(3.5),
                                 fontWeight: FontWeight.w700,
