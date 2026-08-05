@@ -607,6 +607,7 @@ class ShareService {
         'name': p.name,
         'category': p.category?.name ?? '-',
         'karat': p.touch ?? p.karat ?? '-',
+        'tagNo': p.tagNo ?? p.barcode ?? '-',
         'netWt': p.karigarNetWt,
         'qty': quantities[i],
       });
@@ -696,6 +697,7 @@ class ShareService {
           'name': p.name,
           'category': p.category?.name ?? '-',
           'karat': p.touch ?? p.karat ?? '-',
+          'tagNo': p.tagNo ?? p.barcode ?? '-',
           'netWt': p.karigarNetWt,
           'qty': quantities[i],
         });
@@ -1240,7 +1242,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
     ),
   );
 
-  final colWidths = <double>[40, 28, 155, 95, 70, 68, 42];
+  final colWidths = <double>[54, 28, 148, 95, 70, 60, 68, 42];
 
   final tableHeaderStyle = pw.TextStyle(font: boldFont, fontSize: 9, color: PdfColor.fromHex('#FFFFFF'));
   final tableCellStyle = pw.TextStyle(font: regularFont, fontSize: 8.5, color: darkColor);
@@ -1264,7 +1266,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
           child: pw.ClipRRect(
             horizontalRadius: 3,
             verticalRadius: 3,
-            child: pw.Image(image, width: 32, height: 32, fit: pw.BoxFit.cover),
+            child: pw.Image(image, width: 48, height: 48, fit: pw.BoxFit.cover),
           ),
         ),
       );
@@ -1274,8 +1276,8 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
           padding: const pw.EdgeInsets.all(4),
           alignment: pw.Alignment.center,
           child: pw.Container(
-            width: 32,
-            height: 32,
+            width: 48,
+            height: 48,
             decoration: pw.BoxDecoration(
               color: PdfColor.fromHex('#F1EEE9'),
               borderRadius: pw.BorderRadius.circular(3),
@@ -1312,7 +1314,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
   }
 
   final tableRows = <pw.TableRow>[
-    buildRow(['#', 'Name', 'Category', 'Karat', 'Net Wt (g)', 'Qty'], isHeader: true),
+    buildRow(['#', 'Name', 'Category', 'Karat', 'Tag No', 'Net Wt (g)', 'Qty'], isHeader: true),
     ...rows.asMap().entries.map((entry) {
       final ci = entry.key;
       final r = entry.value;
@@ -1323,6 +1325,7 @@ Future<List<int>> _buildCartEnquiryPdfInIsolate(Map<String, dynamic> params) asy
         r['name'] as String,
         r['category'] as String,
         r['karat'] as String,
+        (r['tagNo'] as String?) ?? '-',
         r['netWt'] != null ? (r['netWt'] as double).toStringAsFixed(2) : '-',
         '${r['qty']}',
       ], image: img);
