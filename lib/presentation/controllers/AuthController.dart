@@ -145,7 +145,8 @@ class AuthController extends GetxController with WidgetsBindingObserver {
             accessToken: data['accessToken'],
             refreshToken: data['refreshToken'],
             accessTokenExpiry: data['accessTokenValidTill'],
-            refreshTokenExpiry: data['refreshTokenValidTill'],
+            refreshTokenExpiry:
+                data['refreshTokenValidTill'] ?? data['enableAccessTill'],
           ),
         );
 
@@ -215,7 +216,8 @@ class AuthController extends GetxController with WidgetsBindingObserver {
             accessToken: data['accessToken'],
             refreshToken: data['refreshToken'],
             accessTokenExpiry: data['accessTokenValidTill'],
-            refreshTokenExpiry: data['refreshTokenValidTill'],
+            refreshTokenExpiry:
+                data['refreshTokenValidTill'] ?? data['enableAccessTill'],
           ),
         );
 
