@@ -67,8 +67,8 @@ class _ProductCardState extends State<ProductCard>
 
         final bodySize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
         final metaSize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
-        final buttonTextSize = (width * 0.06).clamp(10.0 * sf, 15.0 * sf);
-        final buttonHeight = (width * 0.145).clamp(28.0 * sf, 44.0 * sf);
+        final buttonTextSize = (width * 0.06).clamp(10.0, 15.0);
+        final buttonHeight = (width * 0.145).clamp(28.0, 44.0);
         final iconSize = (width * 0.18).clamp(22.0 * sf, 40.0 * sf);
 
         final gap2 = (width * 0.01).clamp(1.5 * sf, 3.0 * sf);
@@ -81,9 +81,10 @@ class _ProductCardState extends State<ProductCard>
         final tagNo = _cleanText(product.tagNo);
         final fineWeight = _formatValue(product.karigarNetWt);
         final touchData = _parseTouch(product.touch);
+        final purityLabel = _formatPurity(touchData);
         final size = _cleanText(product.size);
 
-        final showWeight = fineWeight != null || touchData != null || size != null;
+        final showWeight = fineWeight != null || size != null;
 
         return MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
@@ -165,35 +166,62 @@ class _ProductCardState extends State<ProductCard>
                                       ),
                                     ),
                                   ),
-                                  if (categoryName != null)
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Container(
-                                        margin: EdgeInsets.symmetric(vertical: vPad),
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.categoryChipBg,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(100),
-                                            bottomRight: Radius.circular(100),
-                                          ),
-                                        ),
-                                        padding: EdgeInsets.only(
-                                          left: hPad,
-                                          right: vPad,
-                                          top: 1,
-                                          bottom: 1,
-                                        ),
-                                        constraints: BoxConstraints(maxWidth: width * 0.7),
-                                        child: Text(
-                                          categoryName,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: bodySize,
-                                            color: AppColors.primaryGold,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
+                                  if (categoryName != null || purityLabel != null)
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                        categoryName == null ? hPad : 0,
+                                        vPad,
+                                        hPad,
+                                        vPad,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          if (categoryName != null) ...[
+                                            Container(
+                                              decoration: const BoxDecoration(
+                                                color: AppColors.categoryChipBg,
+                                                borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(100),
+                                                  bottomRight: Radius.circular(100),
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.only(
+                                                left: hPad,
+                                                right: vPad,
+                                                top: 1,
+                                                bottom: 1,
+                                              ),
+                                              constraints: BoxConstraints(
+                                                  maxWidth: width * 0.7),
+                                              child: Text(
+                                                categoryName,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: bodySize,
+                                                  color: AppColors.primaryGold,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            if (purityLabel != null)
+                                              SizedBox(width: gap2),
+                                          ],
+                                          if (purityLabel != null)
+                                            Expanded(
+                                              child: Text(
+                                                purityLabel,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  fontSize: metaSize,
+                                                  color: AppColors.textDark
+                                                      .withValues(alpha: 0.7),
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                   if (tagNo != null)
@@ -225,7 +253,6 @@ class _ProductCardState extends State<ProductCard>
                                       ),
                                       child: _WeightInfo(
                                         fineWeight: fineWeight,
-                                        touchData: touchData,
                                         size: size,
                                         fontSize: metaSize,
                                       ),
@@ -442,6 +469,16 @@ class _ProductCardState extends State<ProductCard>
     return _TouchData(karat: null, touchValue: touch);
   }
 
+  static String? _formatPurity(_TouchData? data) {
+    if (data == null) return null;
+    final hasKarat = data.karat != null;
+    final hasTouch = data.touchValue != null;
+    if (hasKarat && hasTouch) return '${data.karat}K (${data.touchValue})';
+    if (hasKarat) return '${data.karat}K';
+    if (hasTouch) return data.touchValue;
+    return null;
+  }
+
   static bool _isRecent(ProductModel product) {
     if (product.createdAt == null) return false;
     return DateTime.now().difference(product.createdAt!).inDays < 7;
@@ -626,13 +663,11 @@ class _ProductImage extends StatelessWidget {
 class _WeightInfo extends StatelessWidget {
   const _WeightInfo({
     required this.fineWeight,
-    required this.touchData,
     required this.fontSize,
     this.size,
   });
 
   final String? fineWeight;
-  final _TouchData? touchData;
   final double fontSize;
   final String? size;
 
@@ -644,63 +679,42 @@ class _WeightInfo extends StatelessWidget {
       fontWeight: FontWeight.w500,
       height: 1.3,
     );
-    final dimSep = style.copyWith(
-      color: AppColors.textMuted.withValues(alpha: 0.4),
-    );
+
+    final weightText = fineWeight != null ? 'N.Wt: ${fineWeight}g' : null;
+    if (weightText != null && size != null) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Text(
+              weightText,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              size!,
+              style: style,
+              textAlign: TextAlign.right,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (fineWeight != null)
-          Text('Net Wt: ${fineWeight}g', style: style, maxLines: 1),
-        if (touchData != null) ...[
-          if (fineWeight != null) const SizedBox(height: 2),
-          _PurityRow(data: touchData!, style: style, dimSep: dimSep),
-        ],
-        if (size != null) ...[
-          if (fineWeight != null || touchData != null) const SizedBox(height: 2),
-          Text(size!, style: style, maxLines: 1),
-        ],
+        if (weightText != null)
+          Text(weightText, style: style, maxLines: 1),
+        if (size != null) Text(size!, style: style, maxLines: 1),
       ],
-    );
-  }
-}
-
-class _PurityRow extends StatelessWidget {
-  const _PurityRow({
-    required this.data,
-    required this.style,
-    required this.dimSep,
-  });
-
-  final _TouchData data;
-  final TextStyle style;
-  final TextStyle dimSep;
-
-  @override
-  Widget build(BuildContext context) {
-    final hasKarat = data.karat != null;
-    final hasTouch = data.touchValue != null;
-
-    final spans = <TextSpan>[];
-
-    if (hasKarat) {
-      spans.add(TextSpan(text: '${data.karat}K', style: style));
-    }
-
-    if (hasKarat && hasTouch) {
-      spans.add(TextSpan(text: '  •  ', style: dimSep));
-    }
-
-    if (hasTouch) {
-      spans.add(TextSpan(text: '${data.touchValue}', style: style));
-    }
-
-    return Text.rich(
-      TextSpan(children: spans),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
     );
   }
 }
