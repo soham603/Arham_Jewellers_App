@@ -77,6 +77,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
             final gst = subtotal * 0.03;
             final total = subtotal + gst;
 
+            final totalGrossWt = items.fold<double>(
+              0,
+              (sum, i) => sum + ((i.product.grossWeight ?? 0) * i.quantity),
+            );
+            final totalNetWt = items.fold<double>(
+              0,
+              (sum, i) => sum + ((i.product.karigarNetWt ?? 0) * i.quantity),
+            );
+            final hasGross = items.any((i) => i.product.grossWeight != null);
+            final hasNet = items.any((i) => i.product.karigarNetWt != null);
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -251,7 +262,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   );
                 }),
 
-                if (_isRetailer)
+                if (hasGross || hasNet || _isRetailer)
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -262,31 +273,57 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                     child: Column(
                       children: [
-                        _summaryRow(
-                          context,
-                          "Subtotal",
-                          "₹${formatAmount(subtotal)}",
-                        ),
-                        SizedBox(height: context.heightPercent(0.5)),
-                        _summaryRow(
-                          context,
-                          "GST (3%)",
-                          "₹${formatAmount(gst)}",
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: context.heightPercent(0.6),
+                        if (hasGross)
+                          _summaryRow(
+                            context,
+                            "Total Gross Wt",
+                            "${formatWeight(totalGrossWt)}g",
                           ),
-                          child: Container(
-                            height: 1,
-                            color: const Color(0xFFE7DED2),
+                        if (hasGross && hasNet)
+                          SizedBox(height: context.heightPercent(0.5)),
+                        if (hasNet)
+                          _summaryRow(
+                            context,
+                            "Total Net Wt",
+                            "${formatWeight(totalNetWt)}g",
                           ),
-                        ),
-                        _summaryRow(
-                          context,
-                          "Total",
-                          "₹${formatAmount(total)}",
-                        ),
+                        if ((hasGross || hasNet) && _isRetailer)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: context.heightPercent(0.6),
+                            ),
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFFE7DED2),
+                            ),
+                          ),
+                        if (_isRetailer) ...[
+                          _summaryRow(
+                            context,
+                            "Subtotal",
+                            "₹${formatAmount(subtotal)}",
+                          ),
+                          SizedBox(height: context.heightPercent(0.5)),
+                          _summaryRow(
+                            context,
+                            "GST (3%)",
+                            "₹${formatAmount(gst)}",
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: context.heightPercent(0.6),
+                            ),
+                            child: Container(
+                              height: 1,
+                              color: const Color(0xFFE7DED2),
+                            ),
+                          ),
+                          _summaryRow(
+                            context,
+                            "Total",
+                            "₹${formatAmount(total)}",
+                          ),
+                        ],
                       ],
                     ),
                   ),
