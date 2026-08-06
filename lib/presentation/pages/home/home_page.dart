@@ -1652,6 +1652,7 @@ class _CategoryQuickAccess extends StatelessWidget {
                 Get.to(() => SearchPage(
                   initialCategoryId: cat.id,
                   initialCategoryName: cleanedName,
+                  standalone: true,
                 ));
               },
               child: Column(

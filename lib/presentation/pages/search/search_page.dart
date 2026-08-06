@@ -24,12 +24,14 @@ class SearchPage extends StatefulWidget {
   final String? initialQuery;
   final String? initialCategoryId;
   final String? initialCategoryName;
+  final bool standalone;
 
   const SearchPage({
     super.key,
     this.initialQuery,
     this.initialCategoryId,
     this.initialCategoryName,
+    this.standalone = false,
   });
 
   @override
@@ -167,6 +169,8 @@ class _SearchPageState extends State<SearchPage> {
                   controller.clearSearch();
                   controller.clearAllFilters();
                   setState(() {});
+                } else if (widget.standalone) {
+                  Navigator.pop(context);
                 } else {
                   Get.find<NavigationController>().switchTab(NavigationController.homeIndex);
                 }
