@@ -142,7 +142,6 @@ class _ChainListingPageState extends State<ChainListingPage> {
         children: children,
         karat: karat,
         onSelect: (child) {
-          Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(

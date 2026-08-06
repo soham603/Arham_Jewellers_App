@@ -457,7 +457,6 @@ class _CategoryListingPageState extends State<CategoryListingPage>
         children: children,
         karat: karat,
         onSelect: (child) {
-          Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(
