@@ -67,7 +67,6 @@ class _ProductCardState extends State<ProductCard>
 
         final bodySize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
         final metaSize = (width * 0.05).clamp(8.0 * sf, 13.0 * sf);
-        final buttonTextSize = (width * 0.06).clamp(10.0, 15.0);
         final buttonHeight = (width * 0.145).clamp(28.0, 44.0);
         final iconSize = (width * 0.18).clamp(22.0 * sf, 40.0 * sf);
 
@@ -148,7 +147,6 @@ class _ProductCardState extends State<ProductCard>
                                   ? SystemMouseCursors.click
                                   : MouseCursor.defer,
                               child: Column(
-                                mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Expanded(
@@ -166,125 +164,24 @@ class _ProductCardState extends State<ProductCard>
                                       ),
                                     ),
                                   ),
-                                  if (categoryName != null || purityLabel != null)
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                        categoryName == null ? hPad : 0,
-                                        vPad,
-                                        hPad,
-                                        vPad,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          if (categoryName != null) ...[
-                                            Container(
-                                              decoration: const BoxDecoration(
-                                                color: AppColors.categoryChipBg,
-                                                borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(100),
-                                                  bottomRight: Radius.circular(100),
-                                                ),
-                                              ),
-                                              padding: EdgeInsets.only(
-                                                left: hPad,
-                                                right: vPad,
-                                                top: 1,
-                                                bottom: 1,
-                                              ),
-                                              constraints: BoxConstraints(
-                                                  maxWidth: width * 0.7),
-                                              child: Text(
-                                                categoryName,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: bodySize,
-                                                  color: AppColors.primaryGold,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ),
-                                            if (purityLabel != null)
-                                              SizedBox(width: gap2),
-                                          ],
-                                          if (purityLabel != null)
-                                            Expanded(
-                                              child: Text(
-                                                purityLabel,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontSize: metaSize,
-                                                  color: AppColors.textDark
-                                                      .withValues(alpha: 0.7),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                  if (tagNo != null)
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                        hPad,
-                                        categoryName != null ? gap3 : vPad,
-                                        hPad,
-                                        gap3,
-                                      ),
-                                      child: Text(
-                                        tagNo,
-                                        style: TextStyle(
-                                          fontSize: metaSize,
-                                          color: AppColors.textDark.withValues(alpha: 0.7),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  if (showWeight)
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                        hPad,
-                                        tagNo != null ? gap3 : (categoryName != null ? gap3 : vPad),
-                                        hPad,
-                                        vPad,
-                                      ),
-                                      child: _WeightInfo(
-                                        fineWeight: fineWeight,
-                                        size: size,
-                                        fontSize: metaSize,
-                                      ),
-                                    ),
-                                  if (!widget.compact && _showRetailerPrice(product))
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(hPad, gap3, hPad, vPad),
-                                      child: _RetailerPrice(
-                                        product: product,
-                                        fontSize: metaSize,
-                                      ),
-                                    ),
-                                  if (!widget.compact)
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(hPad, gap3, hPad, hPad),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: _ViewButton(
-                                              onPressed: widget.onTap,
-                                              height: buttonHeight,
-                                              fontSize: buttonTextSize,
-                                            ),
-                                          ),
-                                          SizedBox(width: gap2),
-                                          _CartButton(
-                                            product: widget.product,
-                                            height: buttonHeight,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  _ProductBottomSection(
+                                    product: product,
+                                    compact: widget.compact,
+                                    categoryName: categoryName,
+                                    purityLabel: purityLabel,
+                                    tagNo: tagNo,
+                                    fineWeight: fineWeight,
+                                    size: size,
+                                    showWeight: showWeight,
+                                    hPad: hPad,
+                                    vPad: vPad,
+                                    width: width,
+                                    bodySize: bodySize,
+                                    metaSize: metaSize,
+                                    gap2: gap2,
+                                    gap3: gap3,
+                                    buttonHeight: buttonHeight,
+                                  ),
                                 ],
                               ),
                             ),
@@ -484,7 +381,17 @@ class _ProductCardState extends State<ProductCard>
     return DateTime.now().difference(product.createdAt!).inDays < 7;
   }
 
-  static bool _showRetailerPrice(ProductModel product) {
+  static bool _showAdminStatusBadge() {
+    try {
+      return Get.find<AuthController>().isAdmin;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
+class ProductCardStateHelper {
+  static bool showRetailerPrice(ProductModel product) {
     if (product.karigarNetWt == null) return false;
     try {
       final auth = Get.find<AuthController>();
@@ -493,14 +400,6 @@ class _ProductCardState extends State<ProductCard>
       if (!isRetailer && !isAdmin) return false;
       final goldRate = Get.find<GoldRateController>().currentRate;
       return goldRate != null;
-    } catch (e, st) {
-      return false;
-    }
-  }
-
-  static bool _showAdminStatusBadge() {
-    try {
-      return Get.find<AuthController>().isAdmin;
     } catch (_) {
       return false;
     }
@@ -511,6 +410,199 @@ class _TouchData {
   final String? karat;
   final String? touchValue;
   const _TouchData({this.karat, this.touchValue});
+}
+
+class _ProductBottomSection extends StatelessWidget {
+  const _ProductBottomSection({
+    required this.product,
+    required this.compact,
+    required this.categoryName,
+    required this.purityLabel,
+    required this.tagNo,
+    required this.fineWeight,
+    required this.size,
+    required this.showWeight,
+    required this.hPad,
+    required this.vPad,
+    required this.width,
+    required this.bodySize,
+    required this.metaSize,
+    required this.gap2,
+    required this.gap3,
+    required this.buttonHeight,
+  });
+
+  final ProductModel product;
+  final bool compact;
+  final String? categoryName;
+  final String? purityLabel;
+  final String? tagNo;
+  final String? fineWeight;
+  final String? size;
+  final bool showWeight;
+  final double hPad;
+  final double vPad;
+  final double width;
+  final double bodySize;
+  final double metaSize;
+  final double gap2;
+  final double gap3;
+  final double buttonHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAdmin = Get.find<AuthController>().isAdmin;
+    final showPrice = !compact && ProductCardStateHelper.showRetailerPrice(product);
+    final showCart = !compact && !isAdmin;
+
+    final hasTopRow = categoryName != null || purityLabel != null;
+    final hasBottomInfo = showWeight || showPrice;
+    final showBottomRow = hasBottomInfo || showCart;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, vPad, 0, hPad),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+              if (hasTopRow)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    categoryName == null ? hPad : 0,
+                    0,
+                    hPad,
+                    vPad,
+                  ),
+                  child: Row(
+                    // mainAxisSize.min ensures the row doesn't stretch unnecessarily
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (categoryName != null)
+                        // Flexible (without flex number) defaults to FlexFit.loose.
+                        // It will take up to the maximum remaining space, and ONLY truncate 
+                        // if it actually runs out of room.
+                        Flexible(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: AppColors.categoryChipBg,
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(100),
+                                bottomRight: Radius.circular(100),
+                              ),
+                            ),
+                            padding: EdgeInsets.only(
+                              left: hPad,
+                              right: vPad,
+                              top: 1,
+                              bottom: 1,
+                            ),
+                            child: Text(
+                              categoryName!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: bodySize,
+                                color: AppColors.primaryGold,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (categoryName != null && purityLabel != null)
+                        SizedBox(width: gap2),
+                      if (purityLabel != null)
+                        // NO Flexible wrapper here! 
+                        // This forces it to hug its content perfectly and yield all extra space to the Category chip.
+                        Text(
+                          purityLabel!,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: metaSize,
+                            color: AppColors.textDark.withValues(alpha: 0.7),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+
+            if (tagNo != null)
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  hPad,
+                  hasTopRow ? gap3 : vPad,
+                  hPad,
+                  gap3,
+                ),
+                child: Text(
+                  tagNo!,
+                  style: TextStyle(
+                    fontSize: metaSize,
+                    color: AppColors.textDark.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+            if (showBottomRow)
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  hPad,
+                  tagNo != null
+                      ? gap3
+                      : (hasTopRow ? gap3 : vPad),
+                  hPad,
+                  0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (showWeight)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: showPrice ? gap3 : vPad,
+                              ),
+                              child: _WeightInfo(
+                                fineWeight: fineWeight,
+                                size: size,
+                                fontSize: metaSize,
+                              ),
+                            ),
+                          if (showPrice)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: vPad),
+                              child: _RetailerPrice(
+                                product: product,
+                                fontSize: metaSize,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (showCart) ...[
+                      SizedBox(width: gap2),
+                      _CartButton(
+                        product: product,
+                        height: buttonHeight,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _ProductImage extends StatelessWidget {
@@ -681,39 +773,28 @@ class _WeightInfo extends StatelessWidget {
     );
 
     final weightText = fineWeight != null ? 'N.Wt: ${fineWeight}g' : null;
-    if (weightText != null && size != null) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Flexible(
-            child: Text(
-              weightText,
-              style: style,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              size!,
-              style: style,
-              textAlign: TextAlign.right,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      );
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (weightText != null)
-          Text(weightText, style: style, maxLines: 1),
-        if (size != null) Text(size!, style: style, maxLines: 1),
+          Text(
+            weightText,
+            style: style,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        if (size != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              size!,
+              style: style,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
       ],
     );
   }
@@ -756,52 +837,6 @@ class _RetailerPrice extends StatelessWidget {
     );
   }
 
-}
-
-class _ViewButton extends StatelessWidget {
-  const _ViewButton({
-    required this.onPressed,
-    required this.height,
-    required this.fontSize,
-  });
-
-  final VoidCallback? onPressed;
-  final double height;
-  final double fontSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: height,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: AppColors.primaryGold,
-          disabledBackgroundColor: AppColors.primaryGold.withValues(alpha: 0.45),
-          foregroundColor: Colors.white,
-          disabledForegroundColor: Colors.white70,
-          padding: EdgeInsets.zero,
-          shadowColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(
-          'View Product',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _CartButton extends StatelessWidget {
