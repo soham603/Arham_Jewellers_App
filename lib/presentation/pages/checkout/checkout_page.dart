@@ -245,7 +245,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       ),
                                     ),
                                     Text(
-                                      "₹${formatAmount(itemTotal)}",
+                                      formatAmount(itemTotal),
                                       style: TextStyle(
                                         fontSize: context.getResponsiveSize(3.8),
                                         fontWeight: FontWeight.w700,
@@ -301,13 +301,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           _summaryRow(
                             context,
                             "Subtotal",
-                            "₹${formatAmount(subtotal)}",
+                            formatAmount(subtotal),
                           ),
                           SizedBox(height: context.heightPercent(0.5)),
                           _summaryRow(
                             context,
                             "GST (3%)",
-                            "₹${formatAmount(gst)}",
+                            formatAmount(gst),
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(
@@ -321,7 +321,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           _summaryRow(
                             context,
                             "Total",
-                            "₹${formatAmount(total)}",
+                            formatAmount(total),
                           ),
                         ],
                       ],

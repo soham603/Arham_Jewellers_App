@@ -91,6 +91,21 @@ class _CartPageState extends State<CartPage> {
                     return _emptyCart(context);
                   }
 
+                  final totalGrossWt = cartController.items.fold<double>(
+                    0,
+                    (sum, i) =>
+                        sum + ((i.product.grossWeight ?? 0) * i.quantity),
+                  );
+                  final totalNetWt = cartController.items.fold<double>(
+                    0,
+                    (sum, i) =>
+                        sum + ((i.product.karigarNetWt ?? 0) * i.quantity),
+                  );
+                  final hasGross = cartController.items
+                      .any((i) => i.product.grossWeight != null);
+                  final hasNet = cartController.items
+                      .any((i) => i.product.karigarNetWt != null);
+
                   return ListView(
                     children: [
                       ...List.generate(cartController.items.length, (index) {
@@ -303,7 +318,16 @@ class _CartPageState extends State<CartPage> {
                         );
                       }),
                       SizedBox(height: context.heightPercent(0.5)),
-                      if (_isRetailer) _priceBreakdown(context),
+                      if (hasGross ||
+                          hasNet ||
+                          _isRetailer)
+                        _priceBreakdown(
+                          context,
+                          totalGrossWt: totalGrossWt,
+                          totalNetWt: totalNetWt,
+                          hasGross: hasGross,
+                          hasNet: hasNet,
+                        ),
                       SizedBox(height: context.heightPercent(2)),
                     ],
                   );
@@ -383,7 +407,13 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  Widget _priceBreakdown(BuildContext context) {
+  Widget _priceBreakdown(
+    BuildContext context, {
+    required double totalGrossWt,
+    required double totalNetWt,
+    required bool hasGross,
+    required bool hasNet,
+  }) {
     return Obx(() {
       final subtotal = cartController.subtotal;
       final gst = subtotal * 0.03;
@@ -400,38 +430,61 @@ class _CartPageState extends State<CartPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Price Breakdown',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(5.1),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
+            if (_isRetailer) ...[
+              Text(
+                'Price Breakdown',
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(5.1),
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
               ),
-            ),
-            SizedBox(height: context.heightPercent(1)),
-            Container(height: 1, color: AppColors.divider),
-            _breakdownRow(
-              context,
-              "Gold Value",
-              "₹${formatIndianPrice(subtotal)}",
-            ),
-            _breakdownRow(
-              context,
-              "GST (3%)",
-              "₹${formatIndianPrice(gst)}",
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: context.heightPercent(1.5),
+              SizedBox(height: context.heightPercent(1)),
+              Container(height: 1, color: AppColors.divider),
+            ],
+            if (hasGross)
+              _breakdownRow(
+                context,
+                "Total Gross Wt",
+                "${formatWeight(totalGrossWt)}g",
               ),
-              child: Container(height: 1, color: AppColors.divider),
-            ),
-            _breakdownRow(
-              context,
-              "TOTAL",
-              "₹${formatIndianPrice(total)}",
-              bold: true,
-            ),
+            if (hasNet)
+              _breakdownRow(
+                context,
+                "Total Net Wt",
+                "${formatWeight(totalNetWt)}g",
+              ),
+            if ((hasGross || hasNet) && _isRetailer)
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: context.heightPercent(1.5),
+                ),
+                child: Container(height: 1, color: AppColors.divider),
+              ),
+            if (_isRetailer) ...[
+              _breakdownRow(
+                context,
+                "Gold Value",
+                "₹${formatIndianPrice(subtotal)}",
+              ),
+              _breakdownRow(
+                context,
+                "GST (3%)",
+                "₹${formatIndianPrice(gst)}",
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: context.heightPercent(1.5),
+                ),
+                child: Container(height: 1, color: AppColors.divider),
+              ),
+              _breakdownRow(
+                context,
+                "TOTAL",
+                "₹${formatIndianPrice(total)}",
+                bold: true,
+              ),
+            ],
           ],
         ),
       );
@@ -675,18 +728,18 @@ class _CartPageState extends State<CartPage> {
           Flexible(
             child: Text(
               left,
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(bold ? 4.3 : 4),
-                color: bold ? AppColors.textDark : AppColors.textMuted,
-                fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Text(
-            right,
             style: TextStyle(
-              fontSize: context.getResponsiveSize(bold ? 4.8 : 4.2),
+              fontSize: context.getResponsiveSize(bold ? 4.2 : 3.9),
+              color: bold ? AppColors.textDark : AppColors.textMuted,
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Text(
+          right,
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(bold ? 4.5 : 4.0),
               color: bold ? AppColors.primaryGold : AppColors.textDark,
               fontWeight: FontWeight.w700,
             ),
