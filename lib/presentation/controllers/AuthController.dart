@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 
 class AuthController extends GetxController with WidgetsBindingObserver {
@@ -293,6 +294,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;
+      if (Get.isRegistered<CategoryController>()) {
+        Get.find<CategoryController>().invalidateTree();
+      }
       ToastUtils.showSuccess("Logged out successfully!");
       onComplete?.call();
     } catch (e) {
@@ -315,6 +319,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       await sessionManager.clearAll();
       _user.value = null;
       _isAdmin.value = false;
+      if (Get.isRegistered<CategoryController>()) {
+        Get.find<CategoryController>().invalidateTree();
+      }
       ToastUtils.showSuccess("Admin logged out successfully!");
       onComplete?.call();
     } catch (e) {

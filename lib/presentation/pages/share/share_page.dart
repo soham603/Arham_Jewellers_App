@@ -263,7 +263,7 @@ class _SharePageState extends State<SharePage> {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: ' (${cat.count})',
+                                  text: ' (${categoryController.getLevel2Count(cat.id)})',
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(3.8),
                                     fontWeight: FontWeight.w400,

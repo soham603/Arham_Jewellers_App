@@ -429,7 +429,7 @@ class _ChainCategoryCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     child: Text(
-                      '${cleanCategoryName(category.name)} (${category.count})',
+                      '${cleanCategoryName(category.name)} (${controller.getLevel2Count(category.id)})',
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

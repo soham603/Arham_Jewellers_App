@@ -1069,7 +1069,7 @@ class _CategoryCard extends StatelessWidget {
                 context.responsiveWidth(6, tabletVal: 10),
               ),
               child: Text(
-                '${cleanCategoryName(category.name)} (${category.count})',
+                '${cleanCategoryName(category.name)} (${controller.getLevel2Count(category.id)})',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

@@ -86,6 +86,10 @@ class CategoryController extends GetxController {
   final _level3Cache = <String, List<CategoryModel>>{}.obs;
   Map<String, List<CategoryModel>> get level3Cache => _level3Cache;
 
+  int getLevel2Count(String level2Id) {
+    return _level3Cache[level2Id]?.length ?? 0;
+  }
+
   final _level3LoadingIds = <String>{}.obs;
   bool isLevel3Loading(String parentId) => _level3LoadingIds.contains(parentId);
 
@@ -130,6 +134,7 @@ class CategoryController extends GetxController {
   bool _treeHasFullData = false;
   bool _isInitialized = false;
   Timer? _autoRefreshTimer;
+  Worker? _isAdminWorker;
 
   List<CategoryModel> _allCategoriesFlat = [];
   List<CategoryModel> get allCategoriesFlat => _allCategoriesFlat;
@@ -144,12 +149,19 @@ class CategoryController extends GetxController {
         const Duration(hours: 1),
         (_) => fetchCategoryTree(force: true),
       );
+      if (Get.isRegistered<AuthController>()) {
+        _isAdminWorker = ever(
+          Get.find<AuthController>().isAdminRx,
+          (_) => fetchCategoryTree(force: true),
+        );
+      }
     }
   }
 
   @override
   void onClose() {
     _autoRefreshTimer?.cancel();
+    _isAdminWorker?.dispose();
     super.onClose();
   }
 
@@ -176,6 +188,20 @@ class CategoryController extends GetxController {
 
   bool get hasTreeData => _treeHasFullData;
 
+  void invalidateTree() {
+    _treeHasFullData = false;
+    _treeFetchFuture = null;
+    _k0Categories.clear();
+    _k18Categories.clear();
+    _k20Categories.clear();
+    _k22Categories.clear();
+    _level3Cache.clear();
+    _allLevel3Categories.clear();
+    _latestLevel3Categories.clear();
+    _allCategoriesFlat = [];
+    _level3KaratMap.clear();
+  }
+
   Future<void> _doFetchCategoryTree() async {
     try {
       final results = await _categoryRepo.fetchCategoryTree();
@@ -188,19 +214,23 @@ class CategoryController extends GetxController {
       _allCategoriesFlat = flat;
 
       for (final karatCat in results) {
+        if (karatCat.isDeleted) continue;
         final nameLower = karatCat.name.toLowerCase();
 
         if (nameLower == '0k') {
           final children = karatCat.children;
           if (children != null) {
             for (final level2 in children) {
+              if (level2.isDeleted) continue;
               if (!level2.isActive && !includeInactive) continue;
               _k0Categories.add(level2);
               final level3Children = level2.children;
               if (level3Children != null && level3Children.isNotEmpty) {
-                final filteredLevel3 = includeInactive
-                    ? level3Children.toList()
-                    : level3Children.where((c) => c.isActive).toList();
+                final filteredLevel3 = level3Children.where((c) {
+                  if (c.isDeleted) return false;
+                  if (!c.isActive && !includeInactive) return false;
+                  return true;
+                }).toList();
                 if (filteredLevel3.isNotEmpty) {
                   _level3Cache[level2.id] = filteredLevel3;
                 }
@@ -217,14 +247,17 @@ class CategoryController extends GetxController {
         final children = karatCat.children;
         if (children != null) {
           for (final level2 in children) {
+            if (level2.isDeleted) continue;
             if (!level2.isActive && !includeInactive) continue;
             level2List.add(level2);
 
             final level3Children = level2.children;
             if (level3Children != null && level3Children.isNotEmpty) {
-              final filteredLevel3 = includeInactive
-                  ? level3Children.toList()
-                  : level3Children.where((c) => c.isActive).toList();
+              final filteredLevel3 = level3Children.where((c) {
+                if (c.isDeleted) return false;
+                if (!c.isActive && !includeInactive) return false;
+                return true;
+              }).toList();
               if (filteredLevel3.isNotEmpty) {
                 _level3Cache[level2.id] = filteredLevel3;
               }
@@ -262,11 +295,13 @@ class CategoryController extends GetxController {
     final karatMap = <String, String>{};
 
     for (final karatNode in treeResults) {
+      if (karatNode.isDeleted) continue;
       final rawName = karatNode.name;
       final karatEnum = _karatNameMap[rawName];
       final karatName = karatEnum?.displayName ?? rawName;
       final children = karatNode.children ?? [];
       for (final level2 in children) {
+        if (level2.isDeleted) continue;
         if (!level2.isActive) continue;
         final level3List = level2.children ?? [];
         for (final level3 in level3List) {
