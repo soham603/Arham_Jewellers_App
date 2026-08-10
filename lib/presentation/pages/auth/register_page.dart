@@ -276,7 +276,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       final fullPhoneNumber =
           '+91${phoneController.text.trim()}';
-      final fcmToken = NotificationService().fcmToken;
+      final fcmToken = await NotificationService().getTokenWithRetry(maxRetries: 2);
 
       await authController.registerUser(
         email: emailController.text.trim(),

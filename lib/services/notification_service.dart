@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
@@ -37,11 +38,15 @@ class NotificationService {
   String? _initError;
   String? get initError => _initError;
 
+  final Completer<void> _readyCompleter = Completer<void>();
+  bool _backgroundInitDone = false;
+
   Function(RemoteMessage)? onMessageReceived;
   Function(RemoteMessage)? onMessageOpenedApp;
   Function(String)? onTokenRefreshed;
 
   static const Duration _criticalStepTimeout = Duration(seconds: 3);
+  static const Duration _readyTimeout = Duration(seconds: 10);
 
   Future<void> init() async {
     try {
@@ -66,14 +71,33 @@ class NotificationService {
   }
 
   Future<void> _backgroundInit() async {
-    if (_messaging == null) return;
     try {
+      if (_messaging == null) {
+        _backgroundInitDone = true;
+        if (!_readyCompleter.isCompleted) _readyCompleter.complete();
+        return;
+      }
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-      await _requestPermission();
       await _getFcmToken();
       _setupMessageListeners();
+      _backgroundInitDone = true;
+      if (!_readyCompleter.isCompleted) _readyCompleter.complete();
+      await _requestPermission();
     } catch (e) {
       _initError = e.toString();
+    } finally {
+      _backgroundInitDone = true;
+      if (!_readyCompleter.isCompleted) _readyCompleter.complete();
+    }
+  }
+
+  Future<void> awaitReady({Duration? timeout}) async {
+    if (_backgroundInitDone) return;
+    if (!_isInitialized) return;
+    try {
+      await _readyCompleter.future.timeout(timeout ?? _readyTimeout);
+    } on TimeoutException {
+      _initError ??= 'NotificationService awaitReady timed out';
     }
   }
 
@@ -87,6 +111,14 @@ class NotificationService {
       criticalAlert: false,
     );
 
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      final androidPlugin = _localNotifications
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        await androidPlugin.requestNotificationsPermission();
+      }
+    }
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
@@ -150,13 +182,21 @@ class NotificationService {
       return;
     }
 
-    try {
-      _fcmToken = await _messaging!.getToken();
-      if (_fcmToken != null && _fcmToken!.isNotEmpty) {
-        await SessionManager().saveFcmToken(_fcmToken!);
-      } else {
+    for (var attempt = 0; attempt < 3; attempt++) {
+      try {
+        _fcmToken = await _messaging!.getToken();
+        if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+          await SessionManager().saveFcmToken(_fcmToken!);
+          break;
+        }
+      } catch (e) {
       }
+      if (attempt < 2) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
 
+    try {
       _messaging!.onTokenRefresh.listen((newToken) async {
         _fcmToken = newToken;
         await SessionManager().saveFcmToken(newToken);
@@ -256,6 +296,39 @@ class NotificationService {
     }
   }
 
+  Future<String?> getTokenWithRetry({int maxRetries = 3}) async {
+    await awaitReady();
+    if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+      return _fcmToken;
+    }
+    String? stored;
+    try {
+      stored = await SessionManager().getFcmToken();
+    } catch (e) {
+      stored = null;
+    }
+    if (stored != null && stored.isNotEmpty) {
+      _fcmToken = stored;
+      return stored;
+    }
+    for (var attempt = 0; attempt < maxRetries; attempt++) {
+      if (_messaging == null) return null;
+      try {
+        final token = await _messaging!.getToken();
+        if (token != null && token.isNotEmpty) {
+          _fcmToken = token;
+          await SessionManager().saveFcmToken(token);
+          return token;
+        }
+      } catch (e) {
+      }
+      if (attempt < maxRetries - 1) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+    return null;
+  }
+
   Future<String?> retryGetFcmToken() async {
     if (_fcmToken != null && _fcmToken!.isNotEmpty) {
       return _fcmToken;
@@ -278,16 +351,24 @@ class NotificationService {
 
   Future<void> subscribeToTopic(String topic) async {
     if (_messaging == null) {
-      return;
+      await awaitReady();
     }
-    await _messaging!.subscribeToTopic(topic);
+    if (_messaging == null) return;
+    try {
+      await _messaging!.subscribeToTopic(topic);
+    } catch (e) {
+    }
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
     if (_messaging == null) {
-      return;
+      await awaitReady();
     }
-    await _messaging!.unsubscribeFromTopic(topic);
+    if (_messaging == null) return;
+    try {
+      await _messaging!.unsubscribeFromTopic(topic);
+    } catch (e) {
+    }
   }
 
   Future<void> subscribeUserTopics() async {
