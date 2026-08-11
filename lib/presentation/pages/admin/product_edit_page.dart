@@ -89,13 +89,22 @@ class _ProductEditPageState extends State<ProductEditPage> {
     if (productCategory == null) return;
 
     _selectedCategoryId = productCategory.id;
-
     _selectedLevel2Id = _catCtrl.getParentLevel2Id(productCategory.id);
 
     final karatFromCategory = _catCtrl.getLevel3Karat(productCategory.id);
     if (karatFromCategory != null) {
       _selectedKarat = karatFromCategory.toUpperCase();
+    } else if (_selectedLevel2Id != null) {
+      _selectedKarat = _karatForLevel2(_selectedLevel2Id!);
     }
+  }
+
+  String _karatForLevel2(String level2Id) {
+    if (_catCtrl.k18Categories.any((c) => c.id == level2Id)) return '18K';
+    if (_catCtrl.k20Categories.any((c) => c.id == level2Id)) return '20K';
+    if (_catCtrl.k22Categories.any((c) => c.id == level2Id)) return '22K';
+    if (_catCtrl.k0Categories.any((c) => c.id == level2Id)) return '0K';
+    return _selectedKarat;
   }
 
   @override
@@ -207,6 +216,13 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final availableKarats = _availableKarats;
+    final karatValue = availableKarats.contains(_selectedKarat) ? _selectedKarat : null;
+    final level2 = _level2Categories;
+    final level2Value = level2.where((c) => c.id == _selectedLevel2Id).length == 1 ? _selectedLevel2Id : null;
+    final level3 = _level3Categories;
+    final level3Value = level3.where((c) => c.id == _selectedCategoryId).length == 1 ? _selectedCategoryId : null;
+
     return Scaffold(
       backgroundColor: context.colorPalette.backgroundColor,
       appBar: AppBar(
@@ -277,11 +293,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   _label('Karat'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedKarat,
+                    initialValue: karatValue,
                     decoration: _inputDec('Select karat'),
                     style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
                     menuMaxHeight: context.heightPercent(30),
-                    items: _availableKarats.map((k) {
+                    items: availableKarats.map((k) {
                       return DropdownMenuItem(
                         value: k,
                         child: Text(k, style: TextStyle(color: context.colorPalette.textColor)),
@@ -302,22 +318,22 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   _label('Collection'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedLevel2Id,
+                    initialValue: level2Value,
                     decoration: _inputDec(
-                      _level2Categories.isEmpty
+                      level2.isEmpty
                           ? 'No collections for $_selectedKarat'
                           : 'Select collection',
                     ),
                     isExpanded: true,
                     style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
                     menuMaxHeight: context.heightPercent(30),
-                    items: _level2Categories.map((cat) {
+                    items: level2.map((cat) {
                       return DropdownMenuItem<String>(
                         value: cat.id,
                         child: Text(cat.name, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colorPalette.textColor)),
                       );
                     }).toList(),
-                    onChanged: _level2Categories.isEmpty
+                    onChanged: level2.isEmpty
                         ? null
                         : (v) {
                             setState(() {
@@ -326,7 +342,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
                             });
                           },
                     validator: (v) {
-                      if (_selectedLevel2Id == null && _level2Categories.isNotEmpty) {
+                      if (_selectedLevel2Id == null && level2.isNotEmpty) {
                         return 'Required';
                       }
                       return null;
@@ -337,27 +353,27 @@ class _ProductEditPageState extends State<ProductEditPage> {
                   _label('Style'),
                   SizedBox(height: context.heightPercent(0.6)),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedCategoryId,
+                    initialValue: level3Value,
                     decoration: _inputDec(
-                      _level3Categories.isEmpty && _selectedLevel2Id != null
+                      level3.isEmpty && _selectedLevel2Id != null
                           ? 'No styles available'
                           : 'Select style',
                     ),
                     isExpanded: true,
                     style: TextStyle(fontSize: context.getResponsiveSize(3.8), color: context.colorPalette.textColor, fontWeight: FontWeight.w400),
                     menuMaxHeight: context.heightPercent(30),
-                    items: _level3Categories.map((cat) {
+                    items: level3.map((cat) {
                       return DropdownMenuItem<String>(
                         value: cat.id,
                         child: Text(cat.name, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colorPalette.textColor)),
                       );
                     }).toList(),
-                    onChanged: _level3Categories.isEmpty
+                    onChanged: level3.isEmpty
                         ? null
                         : (v) => setState(() => _selectedCategoryId = v),
                     validator: (v) {
                       if (_selectedCategoryId == null) {
-                        return _level3Categories.isEmpty
+                        return level3.isEmpty
                             ? 'No styles available for this collection'
                             : 'Required';
                       }

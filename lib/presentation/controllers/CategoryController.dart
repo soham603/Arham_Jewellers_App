@@ -170,6 +170,10 @@ class CategoryController extends GetxController {
       if (_treeFetchFuture != null) return _treeFetchFuture!;
       if (_treeHasFullData && _k18Categories.isNotEmpty) return;
     }
+    if (_treeFetchFuture != null) {
+      await _treeFetchFuture;
+      if (!force) return;
+    }
     if (force) _treeHasFullData = false;
 
     _k18State.value = CurrentAppState.LOADING;
@@ -223,7 +227,9 @@ class CategoryController extends GetxController {
             for (final level2 in children) {
               if (level2.isDeleted) continue;
               if (!level2.isActive && !includeInactive) continue;
-              _k0Categories.add(level2);
+              if (!_k0Categories.any((c) => c.id == level2.id)) {
+                _k0Categories.add(level2);
+              }
               final level3Children = level2.children;
               if (level3Children != null && level3Children.isNotEmpty) {
                 final filteredLevel3 = level3Children.where((c) {
@@ -249,7 +255,9 @@ class CategoryController extends GetxController {
           for (final level2 in children) {
             if (level2.isDeleted) continue;
             if (!level2.isActive && !includeInactive) continue;
-            level2List.add(level2);
+            if (!level2List.any((c) => c.id == level2.id)) {
+              level2List.add(level2);
+            }
 
             final level3Children = level2.children;
             if (level3Children != null && level3Children.isNotEmpty) {
