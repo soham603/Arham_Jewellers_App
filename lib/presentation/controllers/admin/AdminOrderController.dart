@@ -155,6 +155,13 @@ class AdminOrderController extends GetxController {
   }
 
   Future<void> fetchProductDetails(List<AdminOrderItemModel> items) async {
+    for (final item in items) {
+      final id = item.product.id;
+      if (item.product.rawData != null && !_productRawDataCache.containsKey(id)) {
+        _productRawDataCache[id] = Map<String, dynamic>.from(item.product.rawData!);
+      }
+    }
+
     final uncached = <String, String>{};
     for (final item in items) {
       final id = item.product.id;

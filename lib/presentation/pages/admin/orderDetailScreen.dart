@@ -242,6 +242,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             spacing: context.getResponsiveSize(2),
                             runSpacing: context.heightPercent(0.6),
                             children: [
+                              if (item.product.tagNo != null && item.product.tagNo!.isNotEmpty)
+                                _itemDetailChip(
+                                  context,
+                                  label: item.product.tagNo!,
+                                ),
                               _itemDetailChip(
                                 context,
                                 label: "Qty: ${item.quantity}",

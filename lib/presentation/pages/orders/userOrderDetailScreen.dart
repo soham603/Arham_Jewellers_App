@@ -235,6 +235,19 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                             ],
                           ),
                           SizedBox(height: context.heightPercent(0.5)),
+                          if (item.product.tagNo != null && item.product.tagNo!.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: context.heightPercent(0.3),
+                              ),
+                              child: Text(
+                                'Tag: ${item.product.tagNo}',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.0),
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ),
                           if (item.product.karigarNetWt != null)
                             Padding(
                               padding: EdgeInsets.only(
