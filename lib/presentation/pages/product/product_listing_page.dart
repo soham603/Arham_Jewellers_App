@@ -49,6 +49,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   late final SearchProductController _controller;
   final ScrollController _scrollController = ScrollController();
 
+  Future<void>? _currentRefreshFuture;
+  SortOption? _previousSortOption;
+
   String _stockFilter = 'ready';
   int? _approvalFilter;
   double _weightMin = 0;
@@ -218,6 +221,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   Future<void> _onRefresh() async {
+    if (_currentRefreshFuture != null) {
+      await _currentRefreshFuture;
+      _currentRefreshFuture = null;
+    }
+    final future = _doRefresh();
+    _currentRefreshFuture = future;
+    await future;
+    _currentRefreshFuture = null;
+  }
+
+  Future<void> _doRefresh() async {
     _clearCategoryCaches();
     final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
@@ -345,6 +359,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     _controller = Get.put(SearchProductController(), tag: tag);
+    _previousSortOption = _controller.sortBy;
 
     if (widget.startInSelectMode && _isMultiCategory && _isAdmin) {
       _isSelectModeEnabled = true;
@@ -379,8 +394,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
       _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all');
     }
 
-    ever(_controller.sortByObs, (_) {
+    ever(_controller.sortByObs, (newSort) {
+      final oldSort = _previousSortOption;
+      _previousSortOption = newSort;
+
       setState(() {});
+
+      final oldIsServerSort = oldSort == SortOption.weightAsc ||
+          oldSort == SortOption.weightDesc ||
+          oldSort == SortOption.oldest;
+      final newIsServerSort = newSort == SortOption.weightAsc ||
+          newSort == SortOption.weightDesc ||
+          newSort == SortOption.oldest;
+
+      if (oldIsServerSort != newIsServerSort) {
+        _onRefresh();
+      }
     });
 
     _scrollController.addListener(_onScroll);
@@ -485,10 +514,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
               }
 
               final filteredProducts = _applyClientSideFilters(_displayedProducts);
-              final products = _controller.sortProducts(
-                filteredProducts,
-                _controller.sortBy,
-              );
+              final products = _controller.isWeightSort
+                  ? filteredProducts
+                  : _controller.sortProducts(
+                      filteredProducts,
+                      _controller.sortBy,
+                    );
               final layoutType = _controller.layoutType;
 
               if (state == CurrentAppState.LOADING && products.isEmpty) {

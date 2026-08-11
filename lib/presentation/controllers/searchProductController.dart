@@ -24,6 +24,23 @@ class SearchProductController extends GetxController {
   SortOption get sortBy => _sortBy.value;
   Rx<SortOption> get sortByObs => _sortBy;
 
+  bool get isWeightSort =>
+      _sortBy.value == SortOption.weightAsc ||
+      _sortBy.value == SortOption.weightDesc;
+
+  String? get sortByWeightParam {
+    switch (_sortBy.value) {
+      case SortOption.weightAsc:
+        return 'ASC';
+      case SortOption.weightDesc:
+        return 'DESC';
+      default:
+        return null;
+    }
+  }
+
+  bool get _isOldestSort => _sortBy.value == SortOption.oldest;
+
   final _layoutType = Rx<LayoutType>(LayoutType.grid);
   LayoutType get layoutType => _layoutType.value;
   Rx<LayoutType> get layoutTypeObs => _layoutType;
@@ -326,6 +343,8 @@ class SearchProductController extends GetxController {
               "page": currentPage,
               "limit": _pageLimit,
               ...?stockParam,
+              if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
+              if (_isOldestSort) "showReverse": true,
             },
           );
 
@@ -344,7 +363,11 @@ class SearchProductController extends GetxController {
           : isOut
               ? _karatOutProducts
               : _karatAllProducts;
-      final allFetched = _dedupe(results.expand((list) => list).toList(), existing);
+      var allFetched = _dedupe(results.expand((list) => list).toList(), existing);
+
+      if (isWeightSort) {
+        allFetched = sortProducts(allFetched, _sortBy.value);
+      }
 
       if (isPagination) {
         existing.addAll(allFetched);
@@ -404,6 +427,8 @@ class SearchProductController extends GetxController {
           "page": 1,
           "limit": _pageLimit,
           ...?stockParam,
+          if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
+          if (_isOldestSort) "showReverse": true,
         },
       );
 
@@ -471,6 +496,8 @@ class SearchProductController extends GetxController {
               "page": currentPage,
               "limit": _pageLimit,
               ...?stockParam,
+              if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
+              if (_isOldestSort) "showReverse": true,
             },
           );
 
@@ -485,7 +512,11 @@ class SearchProductController extends GetxController {
       });
 
       final results = await Future.wait(futures);
-      final allFetched = _dedupe(results.expand((list) => list).toList(), existing);
+      var allFetched = _dedupe(results.expand((list) => list).toList(), existing);
+
+      if (isWeightSort) {
+        allFetched = sortProducts(allFetched, _sortBy.value);
+      }
 
       if (isPagination) {
         existing.addAll(allFetched);
@@ -607,6 +638,8 @@ class SearchProductController extends GetxController {
           "page": currentPage,
           "limit": _pageLimit,
           ...?stockParam,
+          if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
+          if (_isOldestSort) "showReverse": true,
         },
       );
 
