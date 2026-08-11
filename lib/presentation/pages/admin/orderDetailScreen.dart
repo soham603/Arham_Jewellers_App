@@ -312,7 +312,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         vertical: context.heightPercent(0.2),
       ),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.1),
+        color: AppColors.pageBg,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -320,7 +320,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         style: TextStyle(
           fontWeight: FontWeight.w600,
           fontSize: context.getResponsiveSize(2.8),
-          color: Colors.black,
+          color: AppColors.textMuted,
         ),
       ),
     );
