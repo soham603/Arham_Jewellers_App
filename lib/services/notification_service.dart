@@ -32,6 +32,9 @@ class NotificationService {
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
 
+  bool _tokenNeedsSync = false;
+  bool get tokenNeedsSync => _tokenNeedsSync;
+
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
@@ -178,32 +181,49 @@ class NotificationService {
   }
 
   Future<void> _getFcmToken() async {
-    if (_messaging == null) {
-      return;
-    }
+    if (_messaging == null) return;
+
+    try {
+      final stored = await SessionManager().getFcmToken();
+      if (stored != null && stored.isNotEmpty) {
+        _fcmToken = stored;
+        _tokenNeedsSync = false;
+        _listenForTokenRefresh();
+        return;
+      }
+    } catch (e) {}
 
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
         _fcmToken = await _messaging!.getToken();
         if (_fcmToken != null && _fcmToken!.isNotEmpty) {
           await SessionManager().saveFcmToken(_fcmToken!);
+          _tokenNeedsSync = true;
           break;
         }
-      } catch (e) {
-      }
+      } catch (e) {}
       if (attempt < 2) {
         await Future.delayed(const Duration(seconds: 2));
       }
     }
 
+    _listenForTokenRefresh();
+  }
+
+  void _listenForTokenRefresh() {
+    if (_messaging == null) return;
     try {
       _messaging!.onTokenRefresh.listen((newToken) async {
         _fcmToken = newToken;
+        _tokenNeedsSync = true;
         await SessionManager().saveFcmToken(newToken);
         onTokenRefreshed?.call(newToken);
       });
-    } catch (e) {
-    }
+    } catch (e) {}
+  }
+
+  void markTokenSynced() {
+    _tokenNeedsSync = false;
   }
 
   void _setupMessageListeners() {
@@ -309,6 +329,7 @@ class NotificationService {
     }
     if (stored != null && stored.isNotEmpty) {
       _fcmToken = stored;
+      _tokenNeedsSync = false;
       return stored;
     }
     for (var attempt = 0; attempt < maxRetries; attempt++) {
@@ -317,6 +338,7 @@ class NotificationService {
         final token = await _messaging!.getToken();
         if (token != null && token.isNotEmpty) {
           _fcmToken = token;
+          _tokenNeedsSync = true;
           await SessionManager().saveFcmToken(token);
           return token;
         }
@@ -341,6 +363,7 @@ class NotificationService {
     try {
       _fcmToken = await _messaging!.getToken();
       if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+        _tokenNeedsSync = true;
         await SessionManager().saveFcmToken(_fcmToken!);
       }
     } catch (e) {

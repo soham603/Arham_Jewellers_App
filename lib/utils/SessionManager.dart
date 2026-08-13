@@ -157,6 +157,5 @@ class SessionManager {
   Future<void> clearAll() async {
     await clearTokens();
     await clearUser();
-    await clearFcmToken();
   }
 }

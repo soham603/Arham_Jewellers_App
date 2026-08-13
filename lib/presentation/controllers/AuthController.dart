@@ -113,7 +113,10 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _isAdmin.value = isAdminFlag;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final token = await _getFcmTokenWithRetry();
-        await _syncFcmTokenToBackend(token);
+        if (NotificationService().tokenNeedsSync) {
+          await _syncFcmTokenToBackend(token);
+          NotificationService().markTokenSynced();
+        }
         if (isAdminFlag) {
           await NotificationService().subscribeAdminTopics();
         } else {
@@ -137,12 +140,13 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _userLoginErrorMsg.value = "";
 
       final fcmToken = await _getFcmTokenWithRetry();
+      final needsSync = NotificationService().tokenNeedsSync;
 
       final response = await _authRepo.loginUser(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: fcmToken,
+        fcmToken: needsSync ? fcmToken : null,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -166,7 +170,10 @@ class AuthController extends GetxController with WidgetsBindingObserver {
 
         _userLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(response.data['message'] ?? "Login successful!");
-        await _syncFcmTokenToBackend(fcmToken);
+        if (needsSync) {
+          await _syncFcmTokenToBackend(fcmToken);
+          NotificationService().markTokenSynced();
+        }
         await NotificationService().subscribeUserTopics();
         onSuccess?.call();
         return true;
@@ -209,12 +216,13 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _adminLoginErrorMsg.value = "";
 
       final fcmToken = await _getFcmTokenWithRetry();
+      final needsSync = NotificationService().tokenNeedsSync;
 
       final response = await _authRepo.loginAdmin(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: fcmToken,
+        fcmToken: needsSync ? fcmToken : null,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -240,7 +248,10 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         ToastUtils.showSuccess(
           response.data['message'] ?? "Admin login successful!",
         );
-        await _syncFcmTokenToBackend(fcmToken);
+        if (needsSync) {
+          await _syncFcmTokenToBackend(fcmToken);
+          NotificationService().markTokenSynced();
+        }
         await NotificationService().subscribeAdminTopics();
         onSuccess?.call();
         return true;
