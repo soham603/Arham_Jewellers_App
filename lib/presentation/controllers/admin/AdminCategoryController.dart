@@ -96,6 +96,11 @@ class CategoryManagerController extends GetxController {
     return filtered;
   }
 
+  Future<void> _refreshAppTree() async {
+    if (!Get.isRegistered<CategoryController>()) return;
+    await CategoryController.instance.fetchCategoryTree(force: true);
+  }
+
   List<CategoryModel> get level1Categories => byLevel(1, includeDeleted: true);
 
   List<CategoryModel> get level1Grouped {
@@ -193,6 +198,7 @@ class CategoryManagerController extends GetxController {
       final created = CategoryModel.fromJson(response['data']);
       _allCategories.insert(0, created);
       _pickedImage.value = null;
+      await _refreshAppTree();
       return (null, response['message']?.toString());
     } catch (e) {
       return (DioErrorHelper.getMessage(e), null);
@@ -236,6 +242,7 @@ class CategoryManagerController extends GetxController {
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
       _pickedImage.value = null;
+      await _refreshAppTree();
       return (null, response['message']?.toString());
     } catch (e) {
       return (DioErrorHelper.getMessage(e), null);
@@ -267,6 +274,7 @@ class CategoryManagerController extends GetxController {
           updatedAt: cat.updatedAt,
         );
       }
+      await _refreshAppTree();
       return (null, response['message']?.toString());
     } catch (e) {
       return (DioErrorHelper.getMessage(e), null);
@@ -284,6 +292,7 @@ class CategoryManagerController extends GetxController {
       final updated = CategoryModel.fromJson(response['data']);
       final idx = _allCategories.indexWhere((c) => c.id == id);
       if (idx != -1) _allCategories[idx] = updated;
+      await _refreshAppTree();
       return (null, response['message']?.toString());
     } catch (e) {
       return (DioErrorHelper.getMessage(e), null);
