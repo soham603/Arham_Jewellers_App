@@ -337,26 +337,30 @@ child: Padding(
                                   clipBehavior: Clip.none,
                                   alignment: Alignment.center,
                                   children: [
-                                    Icon(
-                                      isSelected
-                                          ? item.selectedIcon
-                                          : item.icon,
-                                      size: iconSize,
-                                      color: isSelected
-                                          ? selectedIconColor
-                                          : unselectedIconColor,
-                                    ),
-                                    if (item.showBadge)
-                                      Obx(() {
-                                        final count =
-                                            CartController.instance.totalItems;
-                                        if (count <= 0) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        return Positioned(
-                                          top: -6,
-                                          right: -6,
-                                          child: Container(
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        Icon(
+                                          isSelected
+                                              ? item.selectedIcon
+                                              : item.icon,
+                                          size: iconSize,
+                                          color: isSelected
+                                              ? selectedIconColor
+                                              : unselectedIconColor,
+                                        ),
+                                        if (item.showBadge)
+                                          Obx(() {
+                                            final count = CartController
+                                                .instance
+                                                .totalItems;
+                                            if (count <= 0) {
+                                              return const SizedBox.shrink();
+                                            }
+                                            return Positioned(
+                                              top: -4,
+                                              right: -4,
+                                              child: Container(
                                             constraints:
                                                 const BoxConstraints(
                                               minWidth: 16,
@@ -389,6 +393,8 @@ child: Padding(
                                           ),
                                         );
                                       }),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
