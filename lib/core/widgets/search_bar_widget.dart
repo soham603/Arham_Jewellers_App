@@ -7,6 +7,7 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 
 import '../../presentation/controllers/CategoryController.dart';
+import 'cart_icon_button.dart';
 import '../utils/string_utils.dart';
 
 class SearchBarWidget extends StatefulWidget {
@@ -25,6 +26,7 @@ class SearchBarWidget extends StatefulWidget {
   final String? hintText;
   final bool showShadow;
   final bool showScanner;
+  final bool showCart;
 
   const SearchBarWidget({
     super.key,
@@ -43,6 +45,7 @@ class SearchBarWidget extends StatefulWidget {
     this.hintText,
     this.showShadow = true,
     this.showScanner = false,
+    this.showCart = false,
   });
 
   @override
@@ -339,6 +342,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                 ],
               ),
             ),
+          ],
+          if (widget.showCart) ...[
+            SizedBox(width: spacing * 0.8),
+            CartIconButton(size: filterIconSize, color: _goldDark),
           ],
         ],
       ),

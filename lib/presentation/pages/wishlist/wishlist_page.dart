@@ -102,7 +102,7 @@ class _WishlistPageState extends State<WishlistPage> {
             crossAxisCount: context.gridColumns(phone: 2, tablet: 3),
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: context.isTablet ? 0.55 : 0.488,
+            childAspectRatio: context.isTablet ? 0.55 : 0.52,
           ),
           itemBuilder: (_, index) {
             final product = items[index];

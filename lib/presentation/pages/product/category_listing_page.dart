@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
+import 'package:ratnesh_gold_app/core/widgets/cart_icon_button.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/logo_widget.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -256,6 +257,11 @@ class _CategoryListingPageState extends State<CategoryListingPage>
                                 color: context.colorPalette.goldDeep),
                             onPressed: () => Navigator.pop(context),
                           ),
+                        ),
+                        Positioned(
+                          right: context.responsiveWidth(4, tabletVal: 12),
+                          top: context.responsiveWidth(8, tabletVal: 16),
+                          child: CartIconButton(),
                         ),
                       ],
                     ),

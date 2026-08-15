@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
+import 'package:ratnesh_gold_app/core/widgets/cart_icon_button.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/pdf_loading_dialog.dart';
@@ -473,6 +474,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
             IconButton(
               icon: Icon(Icons.close, color: context.colorPalette.goldDeep),
               onPressed: _clearSelection,
+            )
+          else
+            Padding(
+              padding: EdgeInsets.only(
+                right: context.responsiveWidth(4, tabletVal: 8),
+              ),
+              child: CartIconButton(),
             ),
         ],
       ),
@@ -801,7 +809,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                             ? 0.62
                             : MediaQuery.of(context).size.width >= 600
                                 ? 0.55
-                                : 0.488,
+                                : 0.52,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (_, index) {

@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
+import 'package:ratnesh_gold_app/core/widgets/cart_icon_button.dart';
 import 'package:ratnesh_gold_app/core/widgets/custom_divider.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
@@ -165,13 +166,21 @@ class _ChainListingPageState extends State<ChainListingPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios_rounded,
-                      color: context.colorPalette.goldDeep),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios_rounded,
+                        color: context.colorPalette.goldDeep),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: context.responsiveWidth(8, tabletVal: 12),
+                    ),
+                    child: CartIconButton(),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               JewelleryDivider(vertical: 4),

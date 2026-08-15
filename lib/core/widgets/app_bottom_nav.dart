@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:picons/picons.dart';
 
@@ -10,6 +12,7 @@ class _NavItem {
     this.selectedIcon,
     this.assetPath,
     this.isCenter = false,
+    this.showBadge = false,
   }) : assert(
           assetPath != null || (icon != null && selectedIcon != null),
           'Provide either assetPath or both icon and selectedIcon.',
@@ -20,6 +23,7 @@ class _NavItem {
   final IconData? selectedIcon;
   final String? assetPath;
   final bool isCenter;
+  final bool showBadge;
 }
 
 class AppBottomNav extends StatelessWidget {
@@ -58,6 +62,7 @@ class AppBottomNav extends StatelessWidget {
       label: 'Cart',
       icon: PiconsRegular.shoppingCart,
       selectedIcon: PiconsRegular.shoppingCart,
+      showBadge: true,
     ),
     _NavItem(
       label: 'Profile',
@@ -328,14 +333,63 @@ child: Padding(
                                       ? selectedBubbleColor
                                       : unselectedBubbleColor,
                                 ),
-                                child: Icon(
-                                  isSelected
-                                      ? item.selectedIcon
-                                      : item.icon,
-                                  size: iconSize,
-                                  color: isSelected
-                                      ? selectedIconColor
-                                      : unselectedIconColor,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Icon(
+                                      isSelected
+                                          ? item.selectedIcon
+                                          : item.icon,
+                                      size: iconSize,
+                                      color: isSelected
+                                          ? selectedIconColor
+                                          : unselectedIconColor,
+                                    ),
+                                    if (item.showBadge)
+                                      Obx(() {
+                                        final count =
+                                            CartController.instance.totalItems;
+                                        if (count <= 0) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        return Positioned(
+                                          top: -6,
+                                          right: -6,
+                                          child: Container(
+                                            constraints:
+                                                const BoxConstraints(
+                                              minWidth: 16,
+                                              minHeight: 16,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: context
+                                                  .colorPalette
+                                                  .goldDeep,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1.5,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              count > 99
+                                                  ? '99+'
+                                                  : '$count',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w700,
+                                                height: 1,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                  ],
                                 ),
                               ),
                         ),

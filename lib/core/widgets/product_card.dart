@@ -150,18 +150,15 @@ class _ProductCardState extends State<ProductCard>
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Expanded(
-                                    child: AspectRatio(
-                                      aspectRatio: 3 / 4,
-                                      child: _ProductImage(
-                                        imageUrl: imageUrl,
-                                        productName: displayName,
-                                        iconSize: iconSize,
-                                        isNew: _isRecent(product),
-                                        isHovered: _isHovered,
-                                        width: width,
-                                        cardRadius: radius,
-                                        isAdmin: Get.find<AuthController>().isAdmin,
-                                      ),
+                                    child: _ProductImage(
+                                      imageUrl: imageUrl,
+                                      productName: displayName,
+                                      iconSize: iconSize,
+                                      isNew: _isRecent(product),
+                                      isHovered: _isHovered,
+                                      width: width,
+                                      cardRadius: radius,
+                                      isAdmin: Get.find<AuthController>().isAdmin,
                                     ),
                                   ),
                                   _ProductBottomSection(
@@ -455,9 +452,11 @@ class _ProductBottomSection extends StatelessWidget {
     final showPrice = !compact && ProductCardStateHelper.showRetailerPrice(product);
     final showCart = !compact && !isAdmin;
 
-    final hasTopRow = categoryName != null || purityLabel != null;
+    final hasTopRow = categoryName != null;
     final hasBottomInfo = showWeight || showPrice;
     final showBottomRow = hasBottomInfo || showCart;
+
+    final singleLineInfo = (fineWeight != null) != (size != null);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(0, vPad, 0, hPad),
@@ -472,8 +471,8 @@ class _ProductBottomSection extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(
                     categoryName == null ? hPad : 0,
                     0,
-                    hPad,
-                    vPad,
+                    gap2,
+                    tagNo != null ? 0 : vPad,
                   ),
                   child: Row(
                     // mainAxisSize.min ensures the row doesn't stretch unnecessarily
@@ -483,23 +482,26 @@ class _ProductBottomSection extends StatelessWidget {
                         // Flexible (without flex number) defaults to FlexFit.loose.
                         // It will take up to the maximum remaining space, and ONLY truncate 
                         // if it actually runs out of room.
-                        Flexible(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: AppColors.categoryChipBg,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(100),
-                                bottomRight: Radius.circular(100),
+                          Flexible(
+                            child: Container(
+                              constraints: BoxConstraints(
+                                maxWidth: width * 0.7,
                               ),
-                            ),
-                            padding: EdgeInsets.only(
-                              left: hPad,
-                              right: vPad,
-                              top: 1,
-                              bottom: 1,
-                            ),
-                            child: Text(
-                              categoryName!,
+                              decoration: const BoxDecoration(
+                                color: AppColors.categoryChipBg,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(100),
+                                  bottomRight: Radius.circular(100),
+                                ),
+                              ),
+                              padding: EdgeInsets.only(
+                                left: hPad,
+                                right: vPad,
+                                top: 1,
+                                bottom: 1,
+                              ),
+                              child: Text(
+                                categoryName!,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -508,20 +510,6 @@ class _ProductBottomSection extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ),
-                      if (categoryName != null && purityLabel != null)
-                        SizedBox(width: gap2),
-                      if (purityLabel != null)
-                        // NO Flexible wrapper here! 
-                        // This forces it to hug its content perfectly and yield all extra space to the Category chip.
-                        Text(
-                          purityLabel!,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: metaSize,
-                            color: AppColors.textDark.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                     ],
@@ -536,8 +524,21 @@ class _ProductBottomSection extends StatelessWidget {
                   hPad,
                   gap3,
                 ),
-                child: Text(
-                  tagNo!,
+                child: Text.rich(
+                  purityLabel != null
+                      ? TextSpan(
+                          text: tagNo,
+                          children: [
+                            TextSpan(
+                              text: '  •  ',
+                              style: TextStyle(
+                                color: AppColors.textDark.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            TextSpan(text: purityLabel),
+                          ],
+                        )
+                      : TextSpan(text: tagNo),
                   style: TextStyle(
                     fontSize: metaSize,
                     color: AppColors.textDark.withValues(alpha: 0.7),
@@ -553,13 +554,15 @@ class _ProductBottomSection extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(
                   hPad,
                   tagNo != null
-                      ? gap3
+                      ? 0
                       : (hasTopRow ? gap3 : vPad),
                   hPad,
                   0,
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: singleLineInfo && !showPrice
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
                   children: [
                     Expanded(
                       child: Column(
@@ -575,6 +578,7 @@ class _ProductBottomSection extends StatelessWidget {
                                 fineWeight: fineWeight,
                                 size: size,
                                 fontSize: metaSize,
+                                gap: gap3,
                               ),
                             ),
                           if (showPrice)
@@ -689,7 +693,7 @@ class _ProductImage extends StatelessWidget {
                     label: '$productName image',
                     child: Image(
                       image: imageProvider,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                       width: double.infinity,
                       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                         if (wasSynchronouslyLoaded || frame != null) return child;
@@ -757,11 +761,13 @@ class _WeightInfo extends StatelessWidget {
     required this.fineWeight,
     required this.fontSize,
     this.size,
+    this.gap = 2,
   });
 
   final String? fineWeight;
   final double fontSize;
   final String? size;
+  final double gap;
 
   @override
   Widget build(BuildContext context) {
@@ -787,7 +793,7 @@ class _WeightInfo extends StatelessWidget {
           ),
         if (size != null)
           Padding(
-            padding: const EdgeInsets.only(top: 2),
+            padding: EdgeInsets.only(top: gap),
             child: Text(
               size!,
               style: style,

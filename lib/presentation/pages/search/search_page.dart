@@ -227,6 +227,7 @@ class _SearchPageState extends State<SearchPage> {
                 }
               },
               filterActiveCount: controller.activeFilterCount,
+              showCart: true,
             ),
             ),
             _buildKaratRow(context),

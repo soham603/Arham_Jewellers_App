@@ -47,6 +47,15 @@ class _CartPageState extends State<CartPage> {
       backgroundColor: AppColors.pageBg,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_rounded,
+                  color: context.colorPalette.goldDeep,
+                ),
+                onPressed: () => Navigator.pop(context),
+              )
+            : null,
         elevation: 0,
         backgroundColor: AppColors.pageBg,
         titleSpacing: context.getResponsiveSize(4),
@@ -81,7 +90,9 @@ class _CartPageState extends State<CartPage> {
           context.getResponsiveSize(4),
           context.heightPercent(1),
           context.getResponsiveSize(4),
-          NavBarSpacer.heightOf(context),
+          Navigator.canPop(context)
+              ? context.getResponsiveSize(4)
+              : NavBarSpacer.heightOf(context),
         ),
         child: Column(
             children: [
@@ -696,7 +707,12 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ),
                 onPressed: () {
-                  Get.find<NavigationController>().switchTab(NavigationController.searchIndex);
+                  if (Navigator.canPop(context)) {
+                    Navigator.of(context)
+                        .popUntil((route) => route.isFirst);
+                  }
+                  Get.find<NavigationController>()
+                      .switchTab(NavigationController.searchIndex);
                 },
                 child: Text(
                   'Browse Products',
