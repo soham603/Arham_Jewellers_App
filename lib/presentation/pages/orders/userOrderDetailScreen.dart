@@ -62,10 +62,8 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
             _buildStatusBadge(context, order),
             SizedBox(height: context.heightPercent(2)),
             _buildOrderItems(context, order),
-            if (order.totalAmount != null) ...[
-              SizedBox(height: context.heightPercent(2)),
-              _buildTotalAmount(context, order),
-            ],
+            SizedBox(height: context.heightPercent(2)),
+            _buildTotalsCard(context, order),
             if (order.adminMessage != null &&
                 order.adminMessage!.isNotEmpty) ...[
               SizedBox(height: context.heightPercent(2)),
@@ -621,9 +619,31 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
     );
   }
 
-  Widget _buildTotalAmount(BuildContext context, UserOrderModel order) {
-    final total = order.totalAmount;
-    if (total == null) return const SizedBox.shrink();
+  Widget _buildTotalsCard(BuildContext context, UserOrderModel order) {
+    final isRetailer = Get.find<AuthController>().user?.isRetailer == true;
+    final goldRate = Get.find<GoldRateController>().currentRate;
+
+    final hasNet = order.items.any((i) => i.product.karigarNetWt != null);
+    final totalNetWt = order.items.fold<double>(
+      0,
+      (sum, i) => sum + ((i.product.karigarNetWt ?? 0) * i.quantity),
+    );
+
+    double? totalPrice;
+    if (isRetailer && goldRate != null) {
+      totalPrice = order.items.fold<double>(
+        0,
+        (sum, i) {
+          final price = GoldRateController.calculatePrice(
+            fineWeight: i.product.karigarNetWt ?? 0,
+            ratePer10Gram: goldRate.rate,
+          );
+          return sum + ((price ?? 0) * i.quantity);
+        },
+      );
+    }
+
+    if (!hasNet && totalPrice == null) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
@@ -633,41 +653,84 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFE7DED2)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGold.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppColors.primaryGold,
-              size: context.getResponsiveSize(5),
-            ),
-          ),
-          SizedBox(width: context.getResponsiveSize(3)),
-          Expanded(
-            child: Text(
-              "Total Amount",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: context.getResponsiveSize(4),
-                color: AppColors.textMuted,
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.scale_rounded,
+                  color: AppColors.primaryGold,
+                  size: context.getResponsiveSize(5),
+                ),
               ),
-            ),
+              SizedBox(width: context.getResponsiveSize(3)),
+              Expanded(
+                child: Text(
+                  "Totals",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: context.getResponsiveSize(4.4),
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ),
+            ],
           ),
-          Text(
-            "₹${formatCompactAmount(total)}",
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: context.getResponsiveSize(5),
-              color: AppColors.primaryGold,
+          SizedBox(height: context.heightPercent(1.5)),
+          if (hasNet)
+            _totalsRow(
+              context,
+              label: "Total Weight",
+              value: "${formatWeight(totalNetWt)}g",
             ),
-          ),
+          if (totalPrice != null) ...[
+            if (hasNet) SizedBox(height: context.heightPercent(1)),
+            _totalsRow(
+              context,
+              label: "Total Price",
+              value: "₹${formatIndianPrice(totalPrice)}",
+              emphasized: true,
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _totalsRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    bool emphasized = false,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: context.getResponsiveSize(4),
+              color: AppColors.textMuted,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+            fontSize: context.getResponsiveSize(4),
+            color: emphasized ? AppColors.primaryGold : AppColors.textDark,
+          ),
+        ),
+      ],
     );
   }
 

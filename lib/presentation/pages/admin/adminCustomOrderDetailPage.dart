@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/core/widgets/responsive_wrapper.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/craftsmanModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -41,6 +42,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     _craftsmanController = Get.isRegistered<CraftsmanController>()
         ? Get.find<CraftsmanController>()
         : Get.put(CraftsmanController(), permanent: true);
+    _controller.fetchProductDetails(widget.order.orderItems);
   }
 
   @override
@@ -254,18 +256,28 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                                     ),
                                   ),
                                   SizedBox(height: context.heightPercent(0.3)),
-                                  Wrap(
-                                    spacing: context.getResponsiveSize(2),
-                                    runSpacing: context.heightPercent(0.3),
-                                    children: [
-                                      if (item.product.tagNo != null && item.product.tagNo!.isNotEmpty)
-                                        _buildItemChip(context, label: item.product.tagNo!),
-                                      if (item.quantity > 0)
-                                        _buildItemChip(context, label: 'x${item.quantity}'),
-                                      if (item.price > 0)
-                                        _buildItemChip(context, label: '₹${item.price.toStringAsFixed(2)}'),
-                                    ],
-                                  ),
+                                  Obx(() {
+                                    final netWt = _netWtFor(item);
+                                    final goldRate = Get.find<GoldRateController>().currentRate;
+                                    final price = netWt != null && goldRate != null
+                                        ? GoldRateController.calculatePrice(
+                                            fineWeight: netWt,
+                                            ratePer10Gram: goldRate.rate,
+                                          )
+                                        : null;
+                                    return Wrap(
+                                      spacing: context.getResponsiveSize(2),
+                                      runSpacing: context.heightPercent(0.3),
+                                      children: [
+                                        if (item.product.tagNo != null && item.product.tagNo!.isNotEmpty)
+                                          _buildItemChip(context, label: item.product.tagNo!),
+                                        if (item.quantity > 0)
+                                          _buildItemChip(context, label: 'x${item.quantity}'),
+                                        if (price != null)
+                                          _buildItemChip(context, label: '₹${formatIndianPrice(price)}'),
+                                      ],
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
@@ -279,6 +291,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ),
                 SizedBox(height: context.heightPercent(2)),
               ],
+
+              _buildTotalsCard(context, order),
+              SizedBox(height: context.heightPercent(2)),
 
               if (order.referenceImages.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Reference Images'),
@@ -1019,6 +1034,62 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   }
 
   Widget _buildInfoDivider() => Divider(height: 1, color: AppColors.divider);
+
+  double? _netWtFor(AdminOrderItemModel item) {
+    final rawData = _controller.getProductRawData(item.product.id) ?? item.product.rawData;
+    final value = rawData?['KarigarNetWt'];
+    if (value == null) return null;
+    return double.tryParse(value.toString());
+  }
+
+  Widget _buildTotalsCard(BuildContext context, AdminOrderModel order) {
+    return Obx(() {
+      final items = order.orderItems;
+      final hasNet = items.any((i) => _netWtFor(i) != null);
+      final totalNetWt = items.fold<double>(
+        0,
+        (sum, i) => sum + ((_netWtFor(i) ?? 0) * i.quantity),
+      );
+
+      final goldRate = Get.find<GoldRateController>().currentRate;
+      double? totalPrice;
+      if (hasNet && goldRate != null) {
+        totalPrice = items.fold<double>(
+          0,
+          (sum, i) {
+            final netWt = _netWtFor(i);
+            final price = netWt != null
+                ? GoldRateController.calculatePrice(
+                    fineWeight: netWt,
+                    ratePer10Gram: goldRate.rate,
+                  )
+                : null;
+            return sum + ((price ?? 0) * i.quantity);
+          },
+        );
+        if (totalPrice == 0) totalPrice = null;
+      }
+
+      final total = order.totalAmount;
+      if (!hasNet && total == null) return const SizedBox.shrink();
+
+      return _buildInfoCard(
+        context,
+        children: [
+          if (hasNet)
+            _buildInfoRow(context, 'Total Weight', '${totalNetWt.toStringAsFixed(2)}g'),
+          if (totalPrice != null) ...[
+            _buildInfoDivider(),
+            _buildInfoRow(context, 'Total Price', '₹${formatIndianPrice(totalPrice)}'),
+          ],
+          if (total != null) ...[
+            _buildInfoDivider(),
+            _buildInfoRow(context, 'Total Amount', '₹${total.toStringAsFixed(2)}'),
+          ],
+        ],
+      );
+    });
+  }
 
   Widget _buildItemChip(BuildContext context, {required String label}) {
     return Container(

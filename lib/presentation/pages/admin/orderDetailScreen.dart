@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
+import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/adminOrderModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
@@ -67,7 +69,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 children: [
                   _buildOrderItems(context, order),
                   SizedBox(height: context.heightPercent(2)),
-                  _buildTotalAmount(context, order),
+                  _buildTotalsCard(context, order),
                   SizedBox(height: context.heightPercent(2)),
                   _buildUserDetails(context, order),
                   if (order.adminMessage != null &&
@@ -251,11 +253,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 context,
                                 label: "Qty: ${item.quantity}",
                               ),
-                              if (item.price > 0)
-                                _itemDetailChip(
-                                  context,
-                                  label: "₹${item.price.toStringAsFixed(2)}",
-                                ),
                               ...() {
                                 final chips = <Widget>[];
                                 final isLoading = controller.isFetchingProductDetails;
@@ -274,6 +271,19 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     context,
                                     label: "Net Wt: ${weight.toStringAsFixed(2)}g",
                                   ));
+                                  final goldRate = Get.find<GoldRateController>().currentRate;
+                                  final price = goldRate != null
+                                      ? GoldRateController.calculatePrice(
+                                          fineWeight: weight,
+                                          ratePer10Gram: goldRate.rate,
+                                        )
+                                      : null;
+                                  if (price != null) {
+                                    chips.add(_itemDetailChip(
+                                      context,
+                                      label: "₹${formatIndianPrice(price)}",
+                                    ));
+                                  }
                                 }
                                 final sizeVal = rawData?['Size1']?.toString();
                                 if (sizeVal != null && sizeVal.isNotEmpty) {
@@ -326,59 +336,153 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildTotalAmount(BuildContext context, AdminOrderModel order) {
-    final total = order.totalAmount;
-    if (total == null) return const SizedBox.shrink();
+  Widget _buildTotalsCard(BuildContext context, AdminOrderModel order) {
+    return Obx(() {
+      final hasNet = order.orderItems.any((item) {
+        final rawData = controller.getProductRawData(item.product.id);
+        final netWt = rawData != null
+            ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '')
+            : null;
+        return netWt != null;
+      });
+      final totalNetWt = order.orderItems.fold<double>(
+        0,
+        (sum, item) {
+          final rawData = controller.getProductRawData(item.product.id);
+          final netWt = rawData != null
+              ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '')
+              : null;
+          return sum + ((netWt ?? 0) * item.quantity);
+        },
+      );
+      final total = order.totalAmount;
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(context.getResponsiveSize(4)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
-            decoration: BoxDecoration(
-              color: AppColors.primaryGold.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+      final goldRate = Get.find<GoldRateController>().currentRate;
+      double? totalPrice;
+      if (hasNet && goldRate != null) {
+        totalPrice = order.orderItems.fold<double>(
+          0,
+          (sum, item) {
+            final rawData = controller.getProductRawData(item.product.id);
+            final netWt = rawData != null
+                ? double.tryParse(rawData['KarigarNetWt']?.toString() ?? '')
+                : null;
+            final price = netWt != null
+                ? GoldRateController.calculatePrice(
+                    fineWeight: netWt,
+                    ratePer10Gram: goldRate.rate,
+                  )
+                : null;
+            return sum + ((price ?? 0) * item.quantity);
+          },
+        );
+        if (totalPrice == 0) totalPrice = null;
+      }
+
+      if (!hasNet && total == null) return const SizedBox.shrink();
+
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
             ),
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: AppColors.primaryGold,
-              size: context.getResponsiveSize(5),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(context.getResponsiveSize(2.5)),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGold.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.scale_rounded,
+                    color: AppColors.primaryGold,
+                    size: context.getResponsiveSize(5),
+                  ),
+                ),
+                SizedBox(width: context.getResponsiveSize(3)),
+                Expanded(
+                  child: Text(
+                    "Totals",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w700,
+                      fontSize: context.getResponsiveSize(4.4),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          SizedBox(width: context.getResponsiveSize(3)),
-          Expanded(
-            child: Text(
-              "Total Amount",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: context.getResponsiveSize(4),
-                color: AppColors.textMuted,
+            SizedBox(height: context.heightPercent(1.5)),
+            if (hasNet)
+              _totalsRow(
+                context,
+                label: "Total Weight",
+                value: "${totalNetWt.toStringAsFixed(2)}g",
               ),
-            ),
-          ),
-          Text(
-            "₹${total.toStringAsFixed(2)}",
+            if (totalPrice != null) ...[
+              if (hasNet) SizedBox(height: context.heightPercent(1)),
+              _totalsRow(
+                context,
+                label: "Total Price",
+                value: "₹${formatIndianPrice(totalPrice)}",
+              ),
+            ],
+            if (total != null) ...[
+              if (hasNet || totalPrice != null)
+                SizedBox(height: context.heightPercent(1)),
+              _totalsRow(
+                context,
+                label: "Total Amount",
+                value: "₹${total.toStringAsFixed(2)}",
+                emphasized: true,
+              ),
+            ],
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _totalsRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    bool emphasized = false,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
             style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: context.getResponsiveSize(5),
-              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: context.getResponsiveSize(4),
+              color: AppColors.textMuted,
             ),
           ),
-        ],
-      ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+            fontSize: context.getResponsiveSize(4),
+            color: emphasized ? AppColors.primaryGold : Colors.black,
+          ),
+        ),
+      ],
     );
   }
 
