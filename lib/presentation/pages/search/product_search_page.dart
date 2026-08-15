@@ -28,6 +28,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   final FocusNode _focusNode = FocusNode();
 
   final RxBool _isCatalogLoading = false.obs;
+  bool _hasRequestedFocus = false;
   bool _catalogFlowActive = false;
 
   static const Duration _minSpinnerDisplay = Duration(milliseconds: 450);
@@ -99,6 +100,16 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _hasRequestedFocus) return;
+      _hasRequestedFocus = true;
+      _focusNode.requestFocus();
+    });
+  }
+
+  @override
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
@@ -144,7 +155,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
           SearchBarWidget(
             controller: _textController,
             focusNode: _focusNode,
-            autofocus: false,
+            autofocus: true,
             showScanner: true,
             hintText: 'Search Products',
             onBack: () {
