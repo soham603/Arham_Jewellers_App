@@ -469,7 +469,7 @@ class _CategoryListingPageState extends State<CategoryListingPage>
               builder: (_) => ProductListingPage(
                 categoryId: child.id,
                 karat: karat.displayName,
-                title: cleanCategoryName(child.name),
+                title: child.name,
               ),
             ),
           );
@@ -917,7 +917,7 @@ class _Level3Sheet extends StatelessWidget {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        cleanCategoryName(cat.name),
+                                        cat.name,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.center,
