@@ -1623,7 +1623,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final titleController = TextEditingController(
       text: widget.title ?? '${widget.karat ?? ''} Collection'.trim(),
     );
-    final compressNotifier = ValueNotifier(true);
+    final compressNotifier = ValueNotifier(false);
 
     showModalBottomSheet(
       context: context,

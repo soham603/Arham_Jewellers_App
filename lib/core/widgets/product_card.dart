@@ -1,9 +1,8 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/utils/dominant_color.dart';
 import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
@@ -650,32 +649,12 @@ class _ProductImage extends StatelessWidget {
 
     return Stack(
       children: [
-        if (imageProvider != null)
+        if (imageUrl != null)
           Padding(
             padding: EdgeInsets.all(imgPad),
             child: ClipRRect(
               borderRadius: imgBorderRadius,
-              child: ClipRect(
-                child: ImageFiltered(
-                  imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                  child: Transform.scale(
-                    scale: 1.1,
-                    child: Image(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                        if (wasSynchronouslyLoaded || frame != null) return child;
-                        return const DecoratedBox(
-                          decoration: BoxDecoration(color: AppColors.cardBgLight),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-                    ),
-                  ),
-                ),
-              ),
+              child: _DominantColorBackground(imageUrl: imageUrl!),
             ),
           ),
         if (imageProvider != null)
@@ -693,7 +672,7 @@ class _ProductImage extends StatelessWidget {
                     label: '$productName image',
                     child: Image(
                       image: imageProvider,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       width: double.infinity,
                       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
                         if (wasSynchronouslyLoaded || frame != null) return child;
@@ -752,6 +731,47 @@ class _ProductImage extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _DominantColorBackground extends StatefulWidget {
+  const _DominantColorBackground({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  State<_DominantColorBackground> createState() =>
+      _DominantColorBackgroundState();
+}
+
+class _DominantColorBackgroundState extends State<_DominantColorBackground> {
+  Color? _color;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(covariant _DominantColorBackground oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl) _load();
+  }
+
+  Future<void> _load() async {
+    final color = await DominantColor.forUrl(widget.imageUrl);
+    if (!mounted) return;
+    setState(() => _color = color);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+      color: _color ?? AppColors.cardBgLight,
     );
   }
 }
