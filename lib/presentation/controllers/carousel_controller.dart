@@ -6,6 +6,7 @@ import 'package:ratnesh_gold_app/data/repositories/carousel_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
 class CarouselsController extends GetxController {
   static CarouselsController get instance => Get.find();
@@ -77,8 +78,18 @@ class CarouselsController extends GetxController {
     super.onInit();
     if (!_isInitialized) {
       _isInitialized = true;
+      _maybeAutoFetch();
+    }
+  }
+
+  Future<void> _maybeAutoFetch() async {
+    try {
+      final token = await SessionManager().getAccessToken();
+      if (token == null || token.isEmpty) return;
+      if (await SessionManager().isAccessTokenExpired()) return;
       getAllCarousels();
       loadLatestProducts();
+    } catch (e) {
     }
   }
 

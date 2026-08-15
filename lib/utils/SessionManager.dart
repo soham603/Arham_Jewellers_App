@@ -24,6 +24,8 @@ class SessionManager {
     aOptions: AndroidOptions(resetOnError: true),
   );
 
+  DateTime? lastTokenSaveAt;
+
   Future<bool> saveTokens({
     required String accessToken,
     required String refreshToken,
@@ -47,6 +49,7 @@ class SessionManager {
       await _storage.write(
           key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, value: refreshExpiry.toString());
 
+      lastTokenSaveAt = DateTime.now();
       return true;
     } catch (e, st) {
       return false;
@@ -89,6 +92,7 @@ class SessionManager {
 
   Future<bool> clearTokens() async {
     try {
+      lastTokenSaveAt = null;
       await _storage.delete(key: DatabaseKeyConstants.ACCESS_TOKEN);
       await _storage.delete(key: DatabaseKeyConstants.REFRESH_TOKEN);
       await _storage.delete(key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);

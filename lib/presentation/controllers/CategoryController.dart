@@ -9,6 +9,7 @@ import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:ratnesh_gold_app/core/utils/dio_error_helper.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
@@ -144,17 +145,32 @@ class CategoryController extends GetxController {
     super.onInit();
     if (!_isInitialized) {
       _isInitialized = true;
-      fetchCategoryTree();
+      _maybeAutoFetchTree();
       _autoRefreshTimer = Timer.periodic(
         const Duration(hours: 1),
-        (_) => fetchCategoryTree(force: true),
+        (_) => _maybeAutoFetchTree(force: true),
       );
       if (Get.isRegistered<AuthController>()) {
         _isAdminWorker = ever(
           Get.find<AuthController>().isAdminRx,
-          (_) => fetchCategoryTree(force: true),
+          (_) => _maybeAutoFetchTree(force: true),
         );
       }
+    }
+  }
+
+  Future<void> _maybeAutoFetchTree({bool force = false}) async {
+    if (!await _hasUsableAccessToken()) return;
+    await fetchCategoryTree(force: force);
+  }
+
+  Future<bool> _hasUsableAccessToken() async {
+    try {
+      final token = await SessionManager().getAccessToken();
+      if (token == null || token.isEmpty) return false;
+      return !await SessionManager().isAccessTokenExpired();
+    } catch (e) {
+      return false;
     }
   }
 

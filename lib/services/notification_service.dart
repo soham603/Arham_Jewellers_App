@@ -95,8 +95,12 @@ class NotificationService {
   }
 
   Future<void> awaitReady({Duration? timeout}) async {
-    if (_backgroundInitDone) return;
-    if (!_isInitialized) return;
+    if (_backgroundInitDone) {
+      return;
+    }
+    if (!_isInitialized) {
+      return;
+    }
     try {
       await _readyCompleter.future.timeout(timeout ?? _readyTimeout);
     } on TimeoutException {
@@ -181,7 +185,9 @@ class NotificationService {
   }
 
   Future<void> _getFcmToken() async {
-    if (_messaging == null) return;
+    if (_messaging == null) {
+      return;
+    }
 
     try {
       final stored = await SessionManager().getFcmToken();
@@ -191,7 +197,8 @@ class NotificationService {
         _listenForTokenRefresh();
         return;
       }
-    } catch (e) {}
+    } catch (e) {
+    }
 
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
@@ -201,7 +208,8 @@ class NotificationService {
           _tokenNeedsSync = true;
           break;
         }
-      } catch (e) {}
+      } catch (e) {
+      }
       if (attempt < 2) {
         await Future.delayed(const Duration(seconds: 2));
       }
@@ -333,7 +341,9 @@ class NotificationService {
       return stored;
     }
     for (var attempt = 0; attempt < maxRetries; attempt++) {
-      if (_messaging == null) return null;
+      if (_messaging == null) {
+        return null;
+      }
       try {
         final token = await _messaging!.getToken();
         if (token != null && token.isNotEmpty) {

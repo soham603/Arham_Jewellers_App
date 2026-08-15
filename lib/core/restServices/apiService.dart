@@ -7,13 +7,15 @@ import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/services/deviceIdService.dart';
 import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 
+enum _RefreshResult { success, authFailure, otherFailure }
+
 class BaseHttpService {
   late final dio.Dio _dio;
   late final dio.Dio _refreshDio;
 
   SessionManager sessionManager = SessionManager();
 
-  Completer<bool>? _refreshCompleter;
+  Completer<_RefreshResult>? _refreshCompleter;
 
   BaseHttpService() {
     _dio = dio.Dio(
@@ -92,9 +94,9 @@ class BaseHttpService {
 
             if (requiresAuth &&
                 error.requestOptions.extra["retried"] != true) {
-              final refreshed = await _handleTokenRefresh();
+              final refreshResult = await _handleTokenRefresh();
 
-              if (refreshed) {
+              if (refreshResult == _RefreshResult.success) {
                 final newToken = await sessionManager.getAccessToken();
                 if (newToken != null) {
                   error.requestOptions.headers["Authorization"] =
@@ -124,9 +126,9 @@ class BaseHttpService {
                     ),
                   );
                 }
+              } else if (refreshResult == _RefreshResult.authFailure) {
+                await _handleTokenExpiration();
               }
-
-              await _handleTokenExpiration();
             }
           }
 
@@ -146,25 +148,25 @@ class BaseHttpService {
     );
   }
 
-  Future<bool> _handleTokenRefresh() async {
+  Future<_RefreshResult> _handleTokenRefresh() async {
     if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
       return _refreshCompleter!.future;
     }
 
-    _refreshCompleter = Completer<bool>();
+    _refreshCompleter = Completer<_RefreshResult>();
 
     try {
       final refreshToken = await sessionManager.getRefreshToken();
 
       if (refreshToken == null || refreshToken.isEmpty) {
-        _refreshCompleter!.complete(false);
-        return false;
+        _refreshCompleter!.complete(_RefreshResult.authFailure);
+        return _RefreshResult.authFailure;
       }
 
       final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
       if (isRefreshExpired) {
-        _refreshCompleter!.complete(false);
-        return false;
+        _refreshCompleter!.complete(_RefreshResult.authFailure);
+        return _RefreshResult.authFailure;
       }
 
 
@@ -178,40 +180,67 @@ class BaseHttpService {
         },
       );
 
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        final data = response.data['data'];
+      final extracted = _extractTokenSet(response.data);
+      if (extracted != null) {
+        await sessionManager.saveTokens(
+          accessToken: extracted.access,
+          refreshToken: extracted.refresh,
+          accessTokenExpiry: extracted.accessExpiry,
+          refreshTokenExpiry: extracted.refreshExpiry,
+        );
 
-        final newAccessToken = data['accessToken'] as String?;
-        final newRefreshToken = data['refreshToken'] as String?;
-        final accessExpiry = data['accessTokenValidTill'] as String?;
-        final refreshExpiry =
-            data['refreshTokenValidTill'] as String? ??
-            data['enableAccessTill'] as String?;
-
-        if (newAccessToken != null &&
-            newRefreshToken != null &&
-            accessExpiry != null &&
-            refreshExpiry != null) {
-          await sessionManager.saveTokens(
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-            accessTokenExpiry: accessExpiry,
-            refreshTokenExpiry: refreshExpiry,
-          );
-
-          _refreshCompleter!.complete(true);
-          return true;
-        }
+        _refreshCompleter!.complete(_RefreshResult.success);
+        return _RefreshResult.success;
       }
 
-      _refreshCompleter!.complete(false);
-      return false;
+      _refreshCompleter!.complete(_RefreshResult.otherFailure);
+      return _RefreshResult.otherFailure;
+    } on dio.DioException catch (e) {
+      final status = e.response?.statusCode;
+      final result = (status == 401 || status == 403)
+          ? _RefreshResult.authFailure
+          : _RefreshResult.otherFailure;
+      _refreshCompleter!.complete(result);
+      return result;
     } catch (e) {
-      _refreshCompleter!.complete(false);
-      return false;
+      _refreshCompleter!.complete(_RefreshResult.otherFailure);
+      return _RefreshResult.otherFailure;
     } finally {
       _refreshCompleter = null;
     }
+  }
+
+  ({String access, String refresh, String accessExpiry, String refreshExpiry})?
+      _extractTokenSet(dynamic body) {
+    if (body is! Map) return null;
+
+    final candidates = <Map>[];
+    final nested = body['data'];
+    if (nested is Map) {
+      candidates.add(nested);
+      final nested2 = nested['data'];
+      if (nested2 is Map) candidates.add(nested2);
+    }
+    candidates.add(body);
+
+    for (final m in candidates) {
+      final access = m['accessToken'];
+      final refresh = m['refreshToken'];
+      final accessExpiry = m['accessTokenValidTill'];
+      final refreshExpiry = m['refreshTokenValidTill'] ?? m['enableAccessTill'];
+      if (access is String && access.isNotEmpty &&
+          refresh is String && refresh.isNotEmpty &&
+          accessExpiry is String && accessExpiry.isNotEmpty &&
+          refreshExpiry is String && refreshExpiry.isNotEmpty) {
+        return (
+          access: access,
+          refresh: refresh,
+          accessExpiry: accessExpiry,
+          refreshExpiry: refreshExpiry,
+        );
+      }
+    }
+    return null;
   }
 
   String _getServerErrorMessage(int? statusCode) {
@@ -242,7 +271,22 @@ class BaseHttpService {
     return null;
   }
 
+  DateTime? _lastExpirationRedirect;
+
   Future<void> _handleTokenExpiration() async {
+    final lastSave = sessionManager.lastTokenSaveAt;
+    if (lastSave != null &&
+        DateTime.now().difference(lastSave) < const Duration(seconds: 20)) {
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastExpirationRedirect != null &&
+        now.difference(_lastExpirationRedirect!) < const Duration(seconds: 3)) {
+      return;
+    }
+    _lastExpirationRedirect = now;
+
     await sessionManager.clearTokens();
 
     Get.offAllNamed(AppRoutes.login);
@@ -252,7 +296,7 @@ class BaseHttpService {
     final isAccessExpired = await sessionManager.isAccessTokenExpired();
     if (!isAccessExpired) return true;
 
-    return _handleTokenRefresh();
+    return await _handleTokenRefresh() == _RefreshResult.success;
   }
 
   dio.Dio get client => _dio;
