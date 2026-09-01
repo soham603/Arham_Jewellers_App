@@ -277,7 +277,6 @@ class _RegisterPageState extends State<RegisterPage> {
       final fullPhoneNumber =
           '+91${phoneController.text.trim()}';
       final fcmToken = await NotificationService().getTokenWithRetry(maxRetries: 2);
-      final fcmTokenToSend = NotificationService().tokenNeedsSync ? fcmToken : null;
 
       await authController.registerUser(
         email: emailController.text.trim(),
@@ -294,7 +293,7 @@ class _RegisterPageState extends State<RegisterPage> {
         companyName: companyNameController.text.trim(),
         staffName: staffNameController.text.trim(),
         staffPhoneNumber: staffPhoneController.text.trim(),
-        fcmToken: fcmTokenToSend,
+        fcmToken: fcmToken,
         context: context,
         onSuccess: () => Get.offNamed(AppRoutes.login),
       );

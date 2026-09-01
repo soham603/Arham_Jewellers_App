@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/data/repositories/auth_repository.dart';
-import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:ratnesh_gold_app/services/Dependencies.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
@@ -17,7 +16,6 @@ import 'package:ratnesh_gold_app/presentation/controllers/notification_controlle
 
 class AuthController extends GetxController with WidgetsBindingObserver {
   final _authRepo = AuthRepository();
-  final _notificationRepo = NotificationRepository();
 
   final _userLoginState = CurrentAppState.INITIAL.obs;
   CurrentAppState get userLoginState => _userLoginState.value;
@@ -57,16 +55,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _syncFcmTokenToBackend(String? token) async {
-    if (token == null || token.isEmpty) return;
-    try {
-      await _notificationRepo
-          .updateFcmToken(data: {'fcmToken': token})
-          .timeout(const Duration(seconds: 5));
-    } catch (e) {
-    }
-  }
-
   Future<void> _safePersist(Future<void> Function() op) async {
     try {
       await op().timeout(const Duration(seconds: 5));
@@ -100,6 +88,14 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       if (isAccessExpired) {
         await baseHttpService.proactiveTokenRefresh();
       }
+      final userData = await SessionManager().getUserData();
+      if (userData != null) {
+        if (_isAdmin.value) {
+          await NotificationService().subscribeAdminTopics();
+        } else {
+          await NotificationService().subscribeUserTopics();
+        }
+      }
     } catch (e) {
     }
   }
@@ -112,11 +108,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _user.value = userData;
       _isAdmin.value = isAdminFlag;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final token = await _getFcmTokenWithRetry();
-        if (NotificationService().tokenNeedsSync) {
-          await _syncFcmTokenToBackend(token);
-          NotificationService().markTokenSynced();
-        }
         if (isAdminFlag) {
           await NotificationService().subscribeAdminTopics();
         } else {
@@ -140,13 +131,12 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _userLoginErrorMsg.value = "";
 
       final fcmToken = await _getFcmTokenWithRetry();
-      final needsSync = NotificationService().tokenNeedsSync;
 
       final response = await _authRepo.loginUser(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: needsSync ? fcmToken : null,
+        fcmToken: fcmToken,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -170,10 +160,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
 
         _userLoginState.value = CurrentAppState.SUCCESS;
         ToastUtils.showSuccess(response.data['message'] ?? "Login successful!");
-        if (needsSync) {
-          await _syncFcmTokenToBackend(fcmToken);
-          NotificationService().markTokenSynced();
-        }
         await NotificationService().subscribeUserTopics();
         onSuccess?.call();
         return true;
@@ -216,13 +202,12 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _adminLoginErrorMsg.value = "";
 
       final fcmToken = await _getFcmTokenWithRetry();
-      final needsSync = NotificationService().tokenNeedsSync;
 
       final response = await _authRepo.loginAdmin(
         phone: phoneNumber,
         password: password,
         deviceId: deviceId,
-        fcmToken: needsSync ? fcmToken : null,
+        fcmToken: fcmToken,
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
@@ -248,10 +233,6 @@ class AuthController extends GetxController with WidgetsBindingObserver {
         ToastUtils.showSuccess(
           response.data['message'] ?? "Admin login successful!",
         );
-        if (needsSync) {
-          await _syncFcmTokenToBackend(fcmToken);
-          NotificationService().markTokenSynced();
-        }
         await NotificationService().subscribeAdminTopics();
         onSuccess?.call();
         return true;

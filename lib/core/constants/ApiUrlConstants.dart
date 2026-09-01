@@ -1,12 +1,13 @@
 class ApiUrlConstants {
-  static const String BASE_URL = 'https://arham-jewellers-backend.onrender.com';
+  static const String BASE_URL = 'https://api.ratneshgold.com';
+  // static const String BASE_URL = 'https://arham-jewellers-backend.onrender.com';
+  // static const String BASE_URL = 'https://daa3-202-148-60-255.ngrok-free.app';
 
   static const String USER_LOGIN = '/api/v1/auth/user-login';
   static const String ADMIN_LOGIN = '/api/v1/auth/admin-login';
   static const String REGISTER = '/api/v1/auth/register';
   static const String REFRESH_TOKEN = '/api/v1/auth/refresh-token';
   static const String FORGOT_PASSWORD = '/api/v1/auth/forgot-password';
-  static const String UPDATE_FCM_TOKEN = '/api/v1/auth/update-fcm-token';
   static const String ADMIN_RESET_PASSWORD = '/api/v1/admin-access/admin-reset-password';
   static const String DEVICE_CHANGE_REQUEST = '/api/v1/auth/device-change-request';
   static const String DEVICE_CHANGE_REQUEST_ACTION = '/api/v1/auth/device-change-request/action';

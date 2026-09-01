@@ -157,7 +157,7 @@ class _ProductCardState extends State<ProductCard>
                                       isHovered: _isHovered,
                                       width: width,
                                       cardRadius: radius,
-                                      isAdmin: Get.find<AuthController>().isAdmin,
+                                      showInactiveBadge: _showInactiveBadge(product),
                                     ),
                                   ),
                                   _ProductBottomSection(
@@ -281,7 +281,7 @@ class _ProductCardState extends State<ProductCard>
                               ),
                             ),
                           ),
-                        if (_showAdminStatusBadge())
+                        if (_showInactiveBadge(product))
                           Positioned(
                             top: 6 * sf,
                             left: 6 * sf,
@@ -291,9 +291,7 @@ class _ProductCardState extends State<ProductCard>
                                 vertical: 3 * sf,
                               ),
                               decoration: BoxDecoration(
-                                color: product.isActive
-                                    ? Colors.green.withValues(alpha: 0.9)
-                                    : Colors.orange.withValues(alpha: 0.9),
+                                color: Colors.orange.withValues(alpha: 0.9),
                                 borderRadius: BorderRadius.circular(10 * sf),
                                 boxShadow: [
                                   BoxShadow(
@@ -315,7 +313,7 @@ class _ProductCardState extends State<ProductCard>
                                   ),
                                   SizedBox(width: 4 * sf),
                                   Text(
-                                    product.isActive ? 'Active' : 'Inactive',
+                                    'Inactive',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 10 * sf,
@@ -377,9 +375,9 @@ class _ProductCardState extends State<ProductCard>
     return DateTime.now().difference(product.createdAt!).inDays < 7;
   }
 
-  static bool _showAdminStatusBadge() {
+  static bool _showInactiveBadge(ProductModel product) {
     try {
-      return Get.find<AuthController>().isAdmin;
+      return Get.find<AuthController>().isAdmin && !product.isActive;
     } catch (_) {
       return false;
     }
@@ -617,7 +615,7 @@ class _ProductImage extends StatelessWidget {
     required this.isHovered,
     required this.width,
     required this.cardRadius,
-    this.isAdmin = false,
+    this.showInactiveBadge = false,
   });
 
   final String? imageUrl;
@@ -627,7 +625,7 @@ class _ProductImage extends StatelessWidget {
   final bool isHovered;
   final double width;
   final double cardRadius;
-  final bool isAdmin;
+  final bool showInactiveBadge;
 
   @override
   Widget build(BuildContext context) {
@@ -695,7 +693,7 @@ class _ProductImage extends StatelessWidget {
           const RatneshFallback.m(),
         if (isNew)
           Positioned(
-            top: isAdmin ? 26 * sf : badgeSize,
+            top: showInactiveBadge ? 26 * sf : badgeSize,
             left: badgeSize,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: badgeSize * 0.8, vertical: badgeSize * 0.3),

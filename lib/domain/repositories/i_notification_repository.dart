@@ -9,9 +9,6 @@ abstract class INotificationRepository {
   Future<Map<String, dynamic>> markNotificationsAsRead({
     required Map<String, dynamic> data,
   });
-  Future<void> updateFcmToken({
-    required Map<String, dynamic> data,
-  });
   Future<Map<String, dynamic>> sendNotification({
     required Map<String, dynamic> data,
   });

@@ -6,7 +6,6 @@ import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart'
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
-import 'package:ratnesh_gold_app/utils/SessionManager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationController extends GetxController {
@@ -63,7 +62,6 @@ class NotificationController extends GetxController {
   @override
   void onClose() {
     if (_listenersAttached) {
-      _notificationService.onTokenRefreshed = null;
       _notificationService.onMessageReceived = null;
       _notificationService.onMessageOpenedApp = null;
       _listenersAttached = false;
@@ -73,10 +71,6 @@ class NotificationController extends GetxController {
   }
 
   void _setupListeners() {
-    _notificationService.onTokenRefreshed = (newToken) {
-      _sendTokenToBackend(newToken);
-    };
-
     _notificationService.onMessageReceived = (message) {
       if (_isFetching) {
         _fetchDirty = true;
@@ -308,24 +302,6 @@ class NotificationController extends GetxController {
       await prefs.setString(_storageKey, jsonEncode(jsonList));
       await prefs.setStringList(_deletedIdsKey, _deletedIds.toList());
     } catch (e) {
-    }
-  }
-
-  Future<void> _sendTokenToBackend(String token) async {
-    for (var attempt = 0; attempt < 2; attempt++) {
-      try {
-        final accessToken = await SessionManager().getAccessToken();
-        if (accessToken == null || accessToken.isEmpty) {
-          return;
-        }
-        await _notificationRepo.updateFcmToken(data: {'fcmToken': token});
-        return;
-      } catch (e) {
-        if (attempt == 0) {
-          await Future.delayed(const Duration(seconds: 5));
-        } else {
-        }
-      }
     }
   }
 }

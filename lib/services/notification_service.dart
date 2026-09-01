@@ -32,9 +32,6 @@ class NotificationService {
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
 
-  bool _tokenNeedsSync = false;
-  bool get tokenNeedsSync => _tokenNeedsSync;
-
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
@@ -46,7 +43,6 @@ class NotificationService {
 
   Function(RemoteMessage)? onMessageReceived;
   Function(RemoteMessage)? onMessageOpenedApp;
-  Function(String)? onTokenRefreshed;
 
   static const Duration _criticalStepTimeout = Duration(seconds: 3);
   static const Duration _readyTimeout = Duration(seconds: 10);
@@ -95,46 +91,45 @@ class NotificationService {
   }
 
   Future<void> awaitReady({Duration? timeout}) async {
-    if (_backgroundInitDone) {
-      return;
-    }
-    if (!_isInitialized) {
-      return;
-    }
-    try {
-      await _readyCompleter.future.timeout(timeout ?? _readyTimeout);
-    } on TimeoutException {
-      _initError ??= 'NotificationService awaitReady timed out';
+    final deadline = DateTime.now().add(timeout ?? _readyTimeout);
+    while (!_backgroundInitDone && !_readyCompleter.isCompleted) {
+      if (DateTime.now().isAfter(deadline)) {
+        _initError ??= 'NotificationService awaitReady timed out';
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 50));
     }
   }
 
   Future<void> _requestPermission() async {
     if (_messaging == null) return;
-    final settings = await _messaging!.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-      provisional: false,
-      criticalAlert: false,
-    );
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final androidPlugin = _localNotifications
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-      if (androidPlugin != null) {
-        await androidPlugin.requestNotificationsPermission();
+      try {
+        final androidPlugin = _localNotifications
+            .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
+        if (androidPlugin != null) {
+          await androidPlugin.requestNotificationsPermission();
+        }
+      } catch (e) {
       }
     }
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    } else {
+    try {
+      await _messaging!.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+        criticalAlert: false,
+      );
+    } catch (e) {
     }
   }
 
   Future<void> _setupLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('ic_notification');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -189,30 +184,36 @@ class NotificationService {
       return;
     }
 
+    String? stored;
     try {
-      final stored = await SessionManager().getFcmToken();
-      if (stored != null && stored.isNotEmpty) {
-        _fcmToken = stored;
-        _tokenNeedsSync = false;
-        _listenForTokenRefresh();
-        return;
-      }
+      stored = await SessionManager().getFcmToken();
     } catch (e) {
+      stored = null;
     }
 
+    if (stored != null && stored.isNotEmpty) {
+      _fcmToken = stored;
+      _listenForTokenRefresh();
+      return;
+    }
+
+    String? fresh;
     for (var attempt = 0; attempt < 3; attempt++) {
       try {
-        _fcmToken = await _messaging!.getToken();
-        if (_fcmToken != null && _fcmToken!.isNotEmpty) {
-          await SessionManager().saveFcmToken(_fcmToken!);
-          _tokenNeedsSync = true;
-          break;
-        }
+        fresh = await _messaging!.getToken();
+        if (fresh != null && fresh.isNotEmpty) break;
       } catch (e) {
       }
       if (attempt < 2) {
         await Future.delayed(const Duration(seconds: 2));
       }
+    }
+
+    if (fresh != null && fresh.isNotEmpty) {
+      _fcmToken = fresh;
+      await SessionManager().saveFcmToken(fresh);
+    } else {
+      _fcmToken = null;
     }
 
     _listenForTokenRefresh();
@@ -223,20 +224,17 @@ class NotificationService {
     try {
       _messaging!.onTokenRefresh.listen((newToken) async {
         _fcmToken = newToken;
-        _tokenNeedsSync = true;
         await SessionManager().saveFcmToken(newToken);
-        onTokenRefreshed?.call(newToken);
       });
     } catch (e) {}
   }
 
-  void markTokenSynced() {
-    _tokenNeedsSync = false;
-  }
-
   void _setupMessageListeners() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showLocalNotification(message);
+      try {
+        _showLocalNotification(message);
+      } catch (e) {
+      }
       onMessageReceived?.call(message);
     });
 
@@ -253,10 +251,22 @@ class NotificationService {
 
   void _showLocalNotification(RemoteMessage message) {
     final notification = message.notification;
-    final title = notification?.title ?? message.data['title'] ?? message.data['notification_title'] ?? '';
-    final body = notification?.body ?? message.data['body'] ?? message.data['notification_body'] ?? '';
+    final data = message.data;
+    final title = notification?.title ??
+        data['title'] ??
+        data['notification_title'] ??
+        data['message'] ??
+        '';
+    final body = notification?.body ??
+        data['body'] ??
+        data['notification_body'] ??
+        data['text'] ??
+        data['alert'] ??
+        '';
 
-    if (title.isEmpty && body.isEmpty) return;
+    if (title.isEmpty && body.isEmpty) {
+      return;
+    }
 
     final payload = Map<String, dynamic>.from(message.data);
     if (!payload.containsKey('title')) payload['title'] = title;
@@ -282,7 +292,7 @@ class NotificationService {
       channelDescription: _channelDescription,
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
+      icon: 'ic_notification',
       color: const Color(0xFFB8860B),
     );
 
@@ -297,14 +307,17 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _localNotifications.show(
-      _notificationIdCounter++,
-      title,
-      body,
-      details,
-      payload: payload != null ? jsonEncode(payload) : null,
-    );
-    await _saveNotificationIdCounter();
+    try {
+      await _localNotifications.show(
+        _notificationIdCounter++,
+        title,
+        body,
+        details,
+        payload: payload != null ? jsonEncode(payload) : null,
+      );
+      await _saveNotificationIdCounter();
+    } catch (e) {
+    }
   }
 
   void _onNotificationTapped(NotificationResponse response) {
@@ -326,9 +339,6 @@ class NotificationService {
 
   Future<String?> getTokenWithRetry({int maxRetries = 3}) async {
     await awaitReady();
-    if (_fcmToken != null && _fcmToken!.isNotEmpty) {
-      return _fcmToken;
-    }
     String? stored;
     try {
       stored = await SessionManager().getFcmToken();
@@ -337,8 +347,10 @@ class NotificationService {
     }
     if (stored != null && stored.isNotEmpty) {
       _fcmToken = stored;
-      _tokenNeedsSync = false;
       return stored;
+    }
+    if (_fcmToken != null && _fcmToken!.isNotEmpty) {
+      return _fcmToken;
     }
     for (var attempt = 0; attempt < maxRetries; attempt++) {
       if (_messaging == null) {
@@ -348,7 +360,6 @@ class NotificationService {
         final token = await _messaging!.getToken();
         if (token != null && token.isNotEmpty) {
           _fcmToken = token;
-          _tokenNeedsSync = true;
           await SessionManager().saveFcmToken(token);
           return token;
         }
@@ -373,7 +384,6 @@ class NotificationService {
     try {
       _fcmToken = await _messaging!.getToken();
       if (_fcmToken != null && _fcmToken!.isNotEmpty) {
-        _tokenNeedsSync = true;
         await SessionManager().saveFcmToken(_fcmToken!);
       }
     } catch (e) {

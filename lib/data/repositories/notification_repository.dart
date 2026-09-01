@@ -54,16 +54,6 @@ class NotificationRepository extends BaseRepository implements INotificationRepo
   }
 
   @override
-  Future<void> updateFcmToken({
-    required Map<String, dynamic> data,
-  }) async {
-    await dio.post(
-      ApiUrlConstants.UPDATE_FCM_TOKEN,
-      data: data,
-    );
-  }
-
-  @override
   Future<Map<String, dynamic>> sendNotification({
     required Map<String, dynamic> data,
   }) async {
