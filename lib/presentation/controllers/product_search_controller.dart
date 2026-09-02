@@ -101,7 +101,15 @@ class ProductSearchController extends GetxController {
       if (hasSearch) {
         queryParameters["search"] = _query.value.trim();
         queryParameters["showAll"] = true;
-      } else if (filterState.isActive.value != null) {
+      }
+
+      if (filterState.stockFilterValue == 'ready') {
+        queryParameters["isStock"] = 1;
+      } else if (filterState.stockFilterValue == 'out') {
+        queryParameters["isStock"] = 0;
+      }
+
+      if (!hasSearch && filterState.isActive.value != null) {
         queryParameters["isActive"] = filterState.isActive.value!;
       }
 
@@ -113,16 +121,6 @@ class ProductSearchController extends GetxController {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
         allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
-      }
-
-      if (filterState.stockFilterValue == 'ready') {
-        allFetched = allFetched
-            .where((p) => p.grossWeight != null && p.grossWeight! > 0)
-            .toList();
-      } else if (filterState.stockFilterValue == 'out') {
-        allFetched = allFetched
-            .where((p) => p.grossWeight == null || p.grossWeight! <= 0)
-            .toList();
       }
 
       if (filterState.selectedKarats.isNotEmpty) {
@@ -152,7 +150,7 @@ class ProductSearchController extends GetxController {
       if (filterState.weightMin.value > 0 ||
           filterState.weightMax.value < 500) {
         allFetched = allFetched.where((p) {
-          final gw = p.grossWeight;
+          final gw = p.fineWeight;
           if (gw == null) return true;
           return gw >= filterState.weightMin.value &&
               gw <= filterState.weightMax.value;

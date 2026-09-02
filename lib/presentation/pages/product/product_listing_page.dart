@@ -202,6 +202,21 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
   }
 
+  ({String? sortByWeight, bool showReverse}) _serverSortParams(SortOption option) {
+    switch (option) {
+      case SortOption.weightAsc:
+        return (sortByWeight: 'ASC', showReverse: false);
+      case SortOption.weightDesc:
+        return (sortByWeight: 'DESC', showReverse: false);
+      case SortOption.oldest:
+        return (sortByWeight: null, showReverse: true);
+      case SortOption.newest:
+      case SortOption.priceAsc:
+      case SortOption.priceDesc:
+        return (sortByWeight: null, showReverse: false);
+    }
+  }
+
   Future<void> _loadMore() async {
     if (_isLoadingMore) return;
     if (!_hasMore || _currentStockState == CurrentAppState.LOADING) return;
@@ -210,6 +225,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
       _controller.loadMoreMultipleCategories(stockFilter: stockFilter, approvalFilter: approvalFilter);
+    } else if (_isCategoryOnly) {
+      _controller.loadMoreCategoryProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
     } else if (_isCategoryFilter) {
       _controller.loadMoreFilteredProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
     } else {
@@ -362,6 +379,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
     _controller = Get.put(SearchProductController(), tag: tag);
     _previousSortOption = _controller.sortBy;
 
+    if (Get.isRegistered<GoldRateController>()) {
+      Get.find<GoldRateController>().enableAutoFetchOnInit();
+    }
+
     if (widget.startInSelectMode && _isMultiCategory && _isAdmin) {
       _isSelectModeEnabled = true;
     }
@@ -401,14 +422,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
       setState(() {});
 
-      final oldIsServerSort = oldSort == SortOption.weightAsc ||
-          oldSort == SortOption.weightDesc ||
-          oldSort == SortOption.oldest;
-      final newIsServerSort = newSort == SortOption.weightAsc ||
-          newSort == SortOption.weightDesc ||
-          newSort == SortOption.oldest;
+      final oldParams = _serverSortParams(oldSort ?? SortOption.newest);
+      final newParams = _serverSortParams(newSort);
+      final serverParamsChanged = oldParams.sortByWeight != newParams.sortByWeight ||
+          oldParams.showReverse != newParams.showReverse;
 
-      if (oldIsServerSort != newIsServerSort) {
+      if (serverParamsChanged) {
         _onRefresh();
       }
     });
@@ -419,7 +438,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent * 0.8) {
-      if (_hasMore && !_isLoadingMore && !(_isCategoryOnly && !_isMultiCategory)) {
+      if (_hasMore && !_isLoadingMore) {
         _loadMore();
       }
     }
@@ -1211,13 +1230,34 @@ class _ProductListingPageState extends State<ProductListingPage> {
     }
   }
 
+  List<String> get _currentKaratSelection {
+    if (!_isMultiCategory || _selectedKarat.isEmpty) return const [];
+    return _selectedKarat
+        .split(',')
+        .map((k) => k.trim())
+        .where((k) => k.isNotEmpty)
+        .toList();
+  }
+
+  bool get _isCategoryFilterActive =>
+      _isMultiCategory &&
+      _filteredCategoryIds.length != (widget.categoryIds?.length ?? 0);
+
+  bool get _isKaratFilterActive =>
+      _isMultiCategory &&
+      widget.karats != null &&
+      _currentKaratSelection.isNotEmpty &&
+      _currentKaratSelection.length < widget.karats!.length;
+
   bool get _hasActiveFilter =>
       _weightMin > 0 ||
       _weightMax < _displayedWeightMax ||
       _priceMin > 0 ||
       _priceMax < 5000000 ||
       _selectedSizes.isNotEmpty ||
-      _isActiveFilter != null;
+      _isActiveFilter != null ||
+      _isCategoryFilterActive ||
+      _isKaratFilterActive;
 
   int get _activeFilterCount {
     var count = 0;
@@ -1225,6 +1265,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (_priceMin > 0 || _priceMax < 5000000) count++;
     count += _selectedSizes.length;
     if (_isActiveFilter != null) count++;
+    if (_isCategoryFilterActive) count += _filteredCategoryIds.length;
+    if (_isKaratFilterActive) count += _currentKaratSelection.length;
     return count;
   }
 
@@ -1245,7 +1287,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   List<ProductModel> _applyPriceFilter(List<ProductModel> products) {
     if (_priceMin > 0 || _priceMax < 5000000) {
-      final goldRate = Get.find<GoldRateController>().currentRate;
+      final goldRate = Get.isRegistered<GoldRateController>()
+          ? Get.find<GoldRateController>().currentRate
+          : null;
       if (goldRate != null) {
         return products.where((p) {
           final price = _calculatePrice(p, goldRate.rate);
@@ -1324,13 +1368,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
     FilterBottomSheet.show(
       context,
-      initialSelectedKarats: const [],
+      initialSelectedKarats: _isMultiCategory ? _currentKaratSelection : const [],
       initialStockFilter: _stockFilter,
       initialWeightMin: _weightMin,
       initialWeightMax: _weightMax,
       initialPriceMin: _priceMin,
       initialPriceMax: _priceMax,
-      showKaratFilter: false,
+      showKaratFilter: _isMultiCategory,
       showStockFilter: false,
       showWeightFilter: _hasWeightData,
       showPriceFilter: _isRetailer || _isAdmin,
@@ -1361,18 +1405,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
             setState(() {
               _stockFilter = stockFilter;
               _weightMin = wMin;
-              _weightMax = wMax;
+              _weightMax = wMax >= _displayedWeightMax ? double.infinity : wMax;
               _priceMin = pMin;
               _priceMax = pMax;
               _selectedSizes = sizes;
               _isActiveFilter = isActive;
-              if (_isMultiCategory && categoryIds.isNotEmpty) {
-                _filteredCategoryIds = categoryIds;
+              if (_isMultiCategory) {
+                _selectedKarat = karats.join(', ');
+                _filteredCategoryIds = categoryIds.isNotEmpty
+                    ? List<String>.from(categoryIds)
+                    : List<String>.from(widget.categoryIds ?? const []);
               }
             });
             if (_scrollController.hasClients) {
               _scrollController.jumpTo(0);
             }
+            _reloadStockFilter(_stockFilter);
           },
     );
   }

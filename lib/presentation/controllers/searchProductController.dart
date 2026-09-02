@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
-import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/search/filter_state.dart';
@@ -112,6 +111,11 @@ class SearchProductController extends GetxController {
   int _multiCategoryReadyPage = 1;
   int _multiCategoryOutPage = 1;
   int _multiCategoryAllPage = 1;
+
+  int _categoryReadyPage = 1;
+  int _categoryOutPage = 1;
+  int _categoryAllPage = 1;
+  String? _currentCategoryId;
 
   List<String> _currentMultiCategoryIds = [];
 
@@ -279,11 +283,6 @@ class SearchProductController extends GetxController {
     recentSearchesController.addToRecentSearches(query.trim());
   }
 
-  String _karatToSearchValue(String karat) {
-    final value = KaratConstants.touchValueFor(karat);
-    return value != 0 ? value.toString() : karat;
-  }
-
   Map<String, dynamic>? _stockQueryParam(String? stockFilter, {int? approvalFilter}) {
     final params = <String, dynamic>{};
     if (stockFilter == 'ready') params['isStock'] = 1;
@@ -301,6 +300,8 @@ class SearchProductController extends GetxController {
     _currentKarats = karats;
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
+
+    final limit = _pageLimit;
 
     final page = isReady ? _karatReadyPage : isOut ? _karatOutPage : _karatAllPage;
     final hasMore = isReady ? _karatReadyHasMore : isOut ? _karatOutHasMore : _karatAllHasMore;
@@ -337,11 +338,11 @@ class SearchProductController extends GetxController {
       final karatFutures = karats.map((karat) async {
         try {
           final response = await httpClient.get(
-            ApiUrlConstants.PRODUCTS_SEARCH,
+            ApiUrlConstants.PRODUCTS_GET_ALL,
             queryParameters: {
-              "search": _karatToSearchValue(karat),
+              "karat": karat,
               "page": currentPage,
-              "limit": _pageLimit,
+              "limit": limit,
               ...?stockParam,
               if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
               if (_isOldestSort) "showReverse": true,
@@ -365,17 +366,13 @@ class SearchProductController extends GetxController {
               : _karatAllProducts;
       var allFetched = _dedupe(results.expand((list) => list).toList(), existing);
 
-      if (isWeightSort) {
-        allFetched = sortProducts(allFetched, _sortBy.value);
-      }
-
       if (isPagination) {
         existing.addAll(allFetched);
       } else {
         existing.value = allFetched;
       }
 
-      final anyKaratHasMore = results.any((list) => list.length >= _pageLimit);
+      final anyKaratHasMore = results.any((list) => list.length >= limit);
       if (anyKaratHasMore) {
         currentPage++;
       } else {
@@ -408,15 +405,47 @@ class SearchProductController extends GetxController {
     loadProductsByKarats(_currentKarats, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
   }
 
-  Future<void> loadProductsByCategory(String categoryId, {String? stockFilter, int? approvalFilter}) async {
+  Future<void> loadProductsByCategory(
+    String categoryId, {
+    bool isPagination = false,
+    String? stockFilter,
+    int? approvalFilter,
+  }) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
 
     final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
     final existing = isReady ? _categoryReadyProducts : isOut ? _categoryOutProducts : _categoryAllProducts;
+    final hasMore = isReady ? _categoryReadyHasMore : isOut ? _categoryOutHasMore : _categoryAllHasMore;
+
+    final limit = _pageLimit;
+
+    int currentPage = isReady ? _categoryReadyPage : isOut ? _categoryOutPage : _categoryAllPage;
+    bool currentHasMore = hasMore;
+
+    if (!hasMore && isPagination) return;
+    if (state.value == CurrentAppState.LOADING) return;
+
+    if (!isPagination) {
+      currentPage = 1;
+      currentHasMore = true;
+      _currentCategoryId = categoryId;
+      if (isReady) {
+        _categoryReadyPage = 1;
+        _categoryReadyHasMore = true;
+        _categoryReadyProducts.clear();
+      } else if (isOut) {
+        _categoryOutPage = 1;
+        _categoryOutHasMore = true;
+        _categoryOutProducts.clear();
+      } else {
+        _categoryAllPage = 1;
+        _categoryAllHasMore = true;
+        _categoryAllProducts.clear();
+      }
+    }
 
     state.value = CurrentAppState.LOADING;
-    existing.clear();
 
     try {
       final stockParam = _stockQueryParam(stockFilter, approvalFilter: approvalFilter);
@@ -424,8 +453,8 @@ class SearchProductController extends GetxController {
         ApiUrlConstants.PRODUCTS_GET_ALL,
         queryParameters: {
           "categoryId": categoryId,
-          "page": 1,
-          "limit": _pageLimit,
+          "page": currentPage,
+          "limit": limit,
           ...?stockParam,
           if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
           if (_isOldestSort) "showReverse": true,
@@ -435,7 +464,31 @@ class SearchProductController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         final List raw = data['data'] is List ? data['data'] : [];
-        existing.value = raw.map((e) => ProductModel.fromJson(e)).toList();
+        final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
+
+        if (isPagination) {
+          existing.addAll(_dedupe(allFetched, existing));
+        } else {
+          existing.value = allFetched;
+        }
+
+        if (allFetched.length < limit) {
+          currentHasMore = false;
+        } else {
+          currentPage++;
+        }
+
+        if (isReady) {
+          _categoryReadyHasMore = currentHasMore;
+          _categoryReadyPage = currentPage;
+        } else if (isOut) {
+          _categoryOutHasMore = currentHasMore;
+          _categoryOutPage = currentPage;
+        } else {
+          _categoryAllHasMore = currentHasMore;
+          _categoryAllPage = currentPage;
+        }
+
         state.value = CurrentAppState.SUCCESS;
       } else {
         state.value = CurrentAppState.ERROR;
@@ -443,6 +496,16 @@ class SearchProductController extends GetxController {
     } catch (e, st) {
       state.value = CurrentAppState.ERROR;
     }
+  }
+
+  void loadMoreCategoryProducts({String? stockFilter, int? approvalFilter}) {
+    final isReady = stockFilter == 'ready';
+    final isOut = stockFilter == 'out';
+    final hasMore = isReady ? _categoryReadyHasMore : isOut ? _categoryOutHasMore : _categoryAllHasMore;
+    final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
+    final categoryId = _currentCategoryId;
+    if (categoryId == null || !hasMore || state.value == CurrentAppState.LOADING) return;
+    loadProductsByCategory(categoryId, isPagination: true, stockFilter: stockFilter, approvalFilter: approvalFilter);
   }
 
   Future<void> loadProductsByMultipleCategories(
@@ -453,6 +516,8 @@ class SearchProductController extends GetxController {
   }) async {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
+
+    final limit = _pageLimit;
 
     final state = isReady ? _categoryReadyState : isOut ? _categoryOutState : _categoryAllState;
     final existing = isReady ? _categoryReadyProducts : isOut ? _categoryOutProducts : _categoryAllProducts;
@@ -494,7 +559,7 @@ class SearchProductController extends GetxController {
             queryParameters: {
               "categoryId": catId,
               "page": currentPage,
-              "limit": _pageLimit,
+              "limit": limit,
               ...?stockParam,
               if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
               if (_isOldestSort) "showReverse": true,
@@ -524,7 +589,7 @@ class SearchProductController extends GetxController {
         existing.value = allFetched;
       }
 
-      final anyCategoryHasMore = results.any((list) => list.length >= _pageLimit);
+      final anyCategoryHasMore = results.any((list) => list.length >= limit);
       if (anyCategoryHasMore) {
         currentPage++;
       } else {
@@ -589,6 +654,8 @@ class SearchProductController extends GetxController {
     final isReady = stockFilter == 'ready';
     final isOut = stockFilter == 'out';
 
+    final limit = _pageLimit;
+
     final state = isReady ? _filteredReadyState : isOut ? _filteredOutState : _filteredAllState;
     final existing = isReady ? _filteredReadyProducts : isOut ? _filteredOutProducts : _filteredAllProducts;
     final hasMore = isReady ? _filteredReadyHasMore : isOut ? _filteredOutHasMore : _filteredAllHasMore;
@@ -636,7 +703,7 @@ class SearchProductController extends GetxController {
         queryParameters: {
           "categoryId": categoryId,
           "page": currentPage,
-          "limit": _pageLimit,
+          "limit": limit,
           ...?stockParam,
           if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
           if (_isOldestSort) "showReverse": true,
@@ -654,7 +721,7 @@ class SearchProductController extends GetxController {
           existing.value = allFetched;
         }
 
-        if (allFetched.length < _pageLimit) {
+        if (allFetched.length < limit) {
           currentHasMore = false;
         } else {
           currentPage++;
@@ -776,7 +843,9 @@ class SearchProductController extends GetxController {
   }
 
   double? _calculatePrice(ProductModel product) {
-    final goldRate = Get.find<GoldRateController>().currentRate;
+    final goldRate = Get.isRegistered<GoldRateController>()
+        ? Get.find<GoldRateController>().currentRate
+        : null;
     if (goldRate == null || product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
       fineWeight: product.karigarNetWt ?? 0,
