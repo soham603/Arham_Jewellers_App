@@ -27,8 +27,6 @@ class SearchBarWidget extends StatefulWidget {
   final bool showShadow;
   final bool showScanner;
   final bool showCart;
-  final bool showTagSearch;
-  final VoidCallback? onTagTap;
 
   const SearchBarWidget({
     super.key,
@@ -48,8 +46,6 @@ class SearchBarWidget extends StatefulWidget {
     this.showShadow = true,
     this.showScanner = false,
     this.showCart = false,
-    this.showTagSearch = false,
-    this.onTagTap,
   });
 
   @override
@@ -294,31 +290,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                         color: _goldDark,
                       ),
                     )
-                  else if (widget.showScanner || widget.showTagSearch)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (widget.showScanner)
-                          GestureDetector(
-                            onTap: widget.onScannerTap,
-                            child: Icon(
-                              Icons.qr_code_scanner_rounded,
-                              color: _goldDark,
-                              size: smallIconSize,
-                            ),
-                          ),
-                        if (widget.showScanner && widget.showTagSearch)
-                          SizedBox(width: spacing * 0.8),
-                        if (widget.showTagSearch)
-                          GestureDetector(
-                            onTap: widget.onTagTap,
-                            child: Icon(
-                              Icons.sell_outlined,
-                              color: _goldDark,
-                              size: smallIconSize,
-                            ),
-                          ),
-                      ],
+                  else if (widget.showScanner)
+                    GestureDetector(
+                      onTap: widget.onScannerTap,
+                      child: Icon(
+                        Icons.qr_code_scanner_rounded,
+                        color: _goldDark,
+                        size: smallIconSize,
+                      ),
                     ),
                 ],
               ),

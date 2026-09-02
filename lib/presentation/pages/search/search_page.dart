@@ -158,11 +158,6 @@ class _SearchPageState extends State<SearchPage> {
               focusNode: _focusNode,
               autofocus: false,
               showScanner: true,
-              showTagSearch: true,
-              onTagTap: () {
-                _focusNode.unfocus();
-                _showTagSearchSheet(context);
-              },
               onBack: () {
                 if (_focusNode.hasFocus) {
                   _focusNode.unfocus();
@@ -305,6 +300,11 @@ class _SearchPageState extends State<SearchPage> {
                         !controller.hasActiveFilters &&
                         controller.searchResults.isEmpty)
                       _browseCategoriesSliver(context),
+
+                    if (!isSearching &&
+                        !controller.hasActiveFilters &&
+                        controller.searchResults.isEmpty)
+                      _tagSearchSliver(context),
 
                     if (isSearching || controller.hasActiveFilters)
                       SliverToBoxAdapter(
@@ -740,6 +740,82 @@ class _SearchPageState extends State<SearchPage> {
           ],
         );
       }),
+    );
+  }
+
+  Widget _tagSearchSliver(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.getResponsiveSize(4),
+          context.heightPercent(1.5),
+          context.getResponsiveSize(4),
+          0,
+        ),
+        child: GestureDetector(
+          onTap: () {
+            _focusNode.unfocus();
+            _showTagSearchSheet(context);
+          },
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: context.getResponsiveSize(3),
+              vertical: context.heightPercent(1),
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F1EC),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFCFC7BC)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: context.colorPalette.gold.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.sell_outlined,
+                    size: context.getResponsiveSize(5),
+                    color: context.colorPalette.goldDark,
+                  ),
+                ),
+                SizedBox(width: context.getResponsiveSize(3)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Search by Tag No',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(3.8),
+                          fontWeight: FontWeight.w700,
+                          color: context.colorPalette.textColor,
+                        ),
+                      ),
+                      SizedBox(height: context.heightPercent(0.2)),
+                      Text(
+                        'Find a product using the tag number printed on it',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.8),
+                          color: context.colorPalette.subTitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: context.getResponsiveSize(5.5),
+                  color: const Color(0xFF8D847A),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
