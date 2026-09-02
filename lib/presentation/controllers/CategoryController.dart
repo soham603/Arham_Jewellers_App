@@ -338,8 +338,8 @@ class CategoryController extends GetxController {
     }
 
     allLevel3.sort((a, b) {
-      final aDate = a.createdAt ?? DateTime(0);
-      final bDate = b.createdAt ?? DateTime(0);
+      final aDate = a.updatedAt ?? a.createdAt ?? DateTime(0);
+      final bDate = b.updatedAt ?? b.createdAt ?? DateTime(0);
       return bDate.compareTo(aDate);
     });
 
