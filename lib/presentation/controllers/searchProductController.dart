@@ -806,6 +806,42 @@ class SearchProductController extends GetxController {
     _searchHasMore = true;
   }
 
+  Future<ProductModel?> searchByTagNo(String tagNo) async {
+    _searchState.value = CurrentAppState.LOADING;
+    _searchQuery.value = '';
+    _searchResults.clear();
+
+    try {
+      final response = await httpClient.get(
+        ApiUrlConstants.PRODUCTS_SEARCH,
+        queryParameters: {"tagNo": tagNo},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data['data'];
+        final inner = data['data'];
+        List raw;
+        if (inner is List) {
+          raw = inner;
+        } else if (inner is Map) {
+          raw = [inner];
+        } else {
+          raw = [];
+        }
+        _searchResults.value =
+            raw.map((e) => ProductModel.fromJson(e)).toList();
+        _searchState.value = CurrentAppState.SUCCESS;
+        return _searchResults.isNotEmpty ? _searchResults.first : null;
+      } else {
+        _searchState.value = CurrentAppState.ERROR;
+        return null;
+      }
+    } catch (e, st) {
+      _searchState.value = CurrentAppState.ERROR;
+      return null;
+    }
+  }
+
   Future<ProductModel?> searchByBarcode(String barcode) async {
     _searchState.value = CurrentAppState.LOADING;
     _searchQuery.value = '';

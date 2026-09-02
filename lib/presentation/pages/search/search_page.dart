@@ -8,6 +8,7 @@ import 'package:ratnesh_gold_app/core/widgets/filter_bottom_sheet.dart';
 import 'package:ratnesh_gold_app/core/widgets/search_bar_widget.dart';
 import 'package:ratnesh_gold_app/core/widgets/nav_bar_spacer.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/navigation_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
@@ -157,6 +158,11 @@ class _SearchPageState extends State<SearchPage> {
               focusNode: _focusNode,
               autofocus: false,
               showScanner: true,
+              showTagSearch: true,
+              onTagTap: () {
+                _focusNode.unfocus();
+                _showTagSearchSheet(context);
+              },
               onBack: () {
                 if (_focusNode.hasFocus) {
                   _focusNode.unfocus();
@@ -596,6 +602,21 @@ class _SearchPageState extends State<SearchPage> {
             const SizedBox(height: 12),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showTagSearchSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => _TagSearchSheet(
+        controller: controller,
+        onFound: (product) {
+          Navigator.pop(ctx);
+          Get.to(() => ProductDetailsPage(product: product));
+        },
       ),
     );
   }
@@ -1276,5 +1297,235 @@ class _BrowseCategoryImage extends StatelessWidget {
     }
 
     return const RatneshFallback.xs();
+  }
+}
+
+class _TagSearchSheet extends StatefulWidget {
+  const _TagSearchSheet({
+    required this.controller,
+    required this.onFound,
+  });
+
+  final SearchProductController controller;
+  final ValueChanged<ProductModel> onFound;
+
+  @override
+  State<_TagSearchSheet> createState() => _TagSearchSheetState();
+}
+
+class _TagSearchSheetState extends State<_TagSearchSheet> {
+  final TextEditingController _textController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focusNode.requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search() async {
+    final tagNo = _textController.text.trim();
+    if (tagNo.isEmpty || _isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    final product = await widget.controller.searchByTagNo(tagNo);
+    if (!mounted) return;
+
+    if (product != null) {
+      widget.onFound(product);
+    } else {
+      setState(() {
+        _isLoading = false;
+        _error = 'No product found for tag "$tagNo"';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          20 + MediaQuery.of(context).padding.bottom,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: context.colorPalette.gold.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.sell_outlined,
+                    color: context.colorPalette.gold,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Search by Tag No',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: context.colorPalette.textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Find a product using the tag number printed on it',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.colorPalette.subTitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _textController,
+              focusNode: _focusNode,
+              textCapitalization: TextCapitalization.characters,
+              autocorrect: false,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => _search(),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: context.colorPalette.textColor,
+              ),
+              decoration: InputDecoration(
+                hintText: 'e.g. AK21001',
+                hintStyle: TextStyle(
+                  color: context.colorPalette.subTitleColor,
+                ),
+                prefixIcon: Icon(
+                  Icons.tag,
+                  color: context.colorPalette.goldDark,
+                ),
+                filled: true,
+                fillColor: const Color(0xFFF4F1EC),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(
+                    color: context.colorPalette.gold,
+                    width: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.red.shade700,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      _error!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.red.shade700,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _search,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: context.colorPalette.gold,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  disabledBackgroundColor:
+                      context.colorPalette.gold.withValues(alpha: 0.6),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        'Find Product',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
