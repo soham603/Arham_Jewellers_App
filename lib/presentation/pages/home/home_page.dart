@@ -18,11 +18,13 @@ import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/core/widgets/carousel_indicator.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/category_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/chain_listing_page.dart';
 import 'package:ratnesh_gold_app/presentation/shimmers/carouselShimmer.dart';
@@ -193,6 +195,32 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => CategoryListingPage(karats: karats, title: title)),
+    );
+  }
+
+  void _openLatestProductCategory(ProductModel product) {
+    final category = product.category;
+    if (category == null || category.id.isEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ProductDetailsPage(product: product),
+        ),
+      );
+      return;
+    }
+    final karatLabel =
+        categoryController.getLevel3Karat(category.id) ??
+        (product.karatNumber != null ? '${product.karatNumber}K' : null);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductListingPage(
+          categoryId: category.id,
+          karat: karatLabel,
+          title: category.name,
+        ),
+      ),
     );
   }
 
@@ -615,17 +643,7 @@ GestureDetector(
                                     child: ProductCard(
                                       product: product,
                                       onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ProductDetailsPage(
-                                                  product: product,
-                                                  products: products,
-                                                  initialIndex: index,
-                                                ),
-                                          ),
-                                        );
+                                        _openLatestProductCategory(product);
                                       },
                                     ),
                                   );
