@@ -205,14 +205,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
   ({String? sortByWeight, bool showReverse}) _serverSortParams(SortOption option) {
     switch (option) {
       case SortOption.weightAsc:
+      case SortOption.priceAsc:
         return (sortByWeight: 'ASC', showReverse: false);
       case SortOption.weightDesc:
+      case SortOption.priceDesc:
         return (sortByWeight: 'DESC', showReverse: false);
       case SortOption.oldest:
         return (sortByWeight: null, showReverse: true);
       case SortOption.newest:
-      case SortOption.priceAsc:
-      case SortOption.priceDesc:
         return (sortByWeight: null, showReverse: false);
     }
   }

@@ -25,13 +25,17 @@ class SearchProductController extends GetxController {
 
   bool get isWeightSort =>
       _sortBy.value == SortOption.weightAsc ||
-      _sortBy.value == SortOption.weightDesc;
+      _sortBy.value == SortOption.weightDesc ||
+      _sortBy.value == SortOption.priceAsc ||
+      _sortBy.value == SortOption.priceDesc;
 
   String? get sortByWeightParam {
     switch (_sortBy.value) {
       case SortOption.weightAsc:
+      case SortOption.priceAsc:
         return 'ASC';
       case SortOption.weightDesc:
+      case SortOption.priceDesc:
         return 'DESC';
       default:
         return null;
