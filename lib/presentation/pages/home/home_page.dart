@@ -1569,9 +1569,9 @@ class _CategoryQuickAccess extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final allCategories = [
-        ...controller.k18Categories,
-        ...controller.k20Categories,
-        ...controller.k22Categories,
+        ...controller.k18Categories.where((c) => c.isActive),
+        ...controller.k20Categories.where((c) => c.isActive),
+        ...controller.k22Categories.where((c) => c.isActive),
       ];
 
       final seen = <String>{};
