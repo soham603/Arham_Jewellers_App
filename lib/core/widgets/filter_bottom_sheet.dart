@@ -6,18 +6,19 @@ import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import '../utils/string_utils.dart';
 
-typedef FilterApplyCallback = void Function({
-  required List<String> karats,
-  required List<String> categoryIds,
-  required List<String> categoryNames,
-  required String stockFilter,
-  required double wMin,
-  required double wMax,
-  required double pMin,
-  required double pMax,
-  required List<String> sizes,
-  bool? isActive,
-});
+typedef FilterApplyCallback =
+    void Function({
+      required List<String> karats,
+      required List<String> categoryIds,
+      required List<String> categoryNames,
+      required String stockFilter,
+      required double wMin,
+      required double wMax,
+      required double pMin,
+      required double pMax,
+      required List<String> sizes,
+      bool? isActive,
+    });
 
 class FilterBottomSheet extends StatefulWidget {
   final List<String> initialSelectedKarats;
@@ -133,6 +134,20 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   static const _karatOptions = KaratConstants.common;
   static const double _minWeightSliderMax = 1.0;
   static const double _minPriceSliderMax = 1.0;
+  static const _weightStepCandidates = [
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    1.0,
+    2.5,
+    5.0,
+    10.0,
+    25.0,
+    50.0,
+    100.0,
+  ];
+  static const int _maxWeightDivisions = 50;
 
   late List<String> _tempSelectedKarats;
   late String _tempStockFilter;
@@ -154,32 +169,40 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
     _tempStockFilter = widget.initialStockFilter;
 
-    _tempSelectedCategoryIds =
-        Set<String>.from(widget.initialSelectedCategoryIds);
+    _tempSelectedCategoryIds = Set<String>.from(
+      widget.initialSelectedCategoryIds,
+    );
 
     _tempSelectedSizes = List<String>.from(widget.initialSelectedSizes);
 
     _tempIsActive = widget.initialIsActive;
 
-    _effectiveWeightSliderMax =
-        widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
-    _tempWeightMin =
-        widget.initialWeightMin.clamp(0.0, _effectiveWeightSliderMax);
-    _tempWeightMax =
-        widget.initialWeightMax.clamp(0.0, _effectiveWeightSliderMax);
+    _effectiveWeightSliderMax = widget.weightSliderMax.clamp(
+      _minWeightSliderMax,
+      double.infinity,
+    );
+    _tempWeightMin = widget.initialWeightMin.clamp(
+      0.0,
+      _effectiveWeightSliderMax,
+    );
+    _tempWeightMax = widget.initialWeightMax.clamp(
+      0.0,
+      _effectiveWeightSliderMax,
+    );
     if (_tempWeightMin > _tempWeightMax) {
       _tempWeightMax = _effectiveWeightSliderMax;
     }
 
-    final effectivePriceMax =
-        widget.priceSliderMax.clamp(_minPriceSliderMax, double.infinity);
+    final effectivePriceMax = widget.priceSliderMax.clamp(
+      _minPriceSliderMax,
+      double.infinity,
+    );
     _tempPriceMin = widget.initialPriceMin.clamp(0.0, effectivePriceMax);
     _tempPriceMax = widget.initialPriceMax.clamp(0.0, effectivePriceMax);
     if (_tempPriceMin > _tempPriceMax) {
       _tempPriceMax = effectivePriceMax;
     }
   }
-
 
   Map<String, List<CategoryModel>> _getDeduplicatedCategories() {
     final Map<String, List<CategoryModel>> grouped = {};
@@ -194,8 +217,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     final products = widget.products;
     if (products.isEmpty) {
       setState(() {
-        _effectiveWeightSliderMax =
-            widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
+        _effectiveWeightSliderMax = widget.weightSliderMax.clamp(
+          _minWeightSliderMax,
+          double.infinity,
+        );
         _clampWeightValues();
       });
       return;
@@ -219,8 +244,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     setState(() {
       _effectiveWeightSliderMax = maxWeight > 0
           ? maxWeight.ceilToDouble()
-          : widget.weightSliderMax
-              .clamp(_minWeightSliderMax, double.infinity);
+          : widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
       _clampWeightValues();
     });
   }
@@ -250,7 +274,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       final grouped = _getDeduplicatedCategories();
       count += grouped.entries
           .where(
-              (e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)))
+            (e) => e.value.any((c) => _tempSelectedCategoryIds.contains(c.id)),
+          )
           .length;
     }
     if (widget.showSizeFilter) {
@@ -261,7 +286,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     }
     return count;
   }
-
 
   void _toggleKarat(String karat) {
     setState(() {
@@ -314,7 +338,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     Navigator.pop(context);
   }
 
-
   @override
   Widget build(BuildContext context) {
     final filterCount = _activeFilterCount;
@@ -326,9 +349,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       decoration: BoxDecoration(
         color: context.colorPalette.cream,
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(
-            context.responsiveWidth(14, tabletVal: 16),
-          ),
+          top: Radius.circular(context.responsiveWidth(14, tabletVal: 16)),
         ),
       ),
       child: Column(
@@ -504,7 +525,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget _buildCategorySection(BuildContext context) {
     const collapsedCount = 10;
     final grouped = _getDeduplicatedCategories();
-    final uniqueCleanNames = grouped.keys.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final uniqueCleanNames = grouped.keys.toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     final showExpand = uniqueCleanNames.length > collapsedCount;
     final visibleNames = _categoriesExpanded || !showExpand
         ? uniqueCleanNames
@@ -526,8 +548,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             ),
             if (_tempSelectedCategoryIds.isNotEmpty)
               GestureDetector(
-                onTap: () =>
-                    setState(() => _tempSelectedCategoryIds.clear()),
+                onTap: () => setState(() => _tempSelectedCategoryIds.clear()),
                 child: Text(
                   'Clear',
                   style: TextStyle(
@@ -545,13 +566,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           runSpacing: 6,
           children: visibleNames.map((cleanName) {
             final cats = grouped[cleanName]!;
-            final isSelected =
-                cats.any((c) => _tempSelectedCategoryIds.contains(c.id));
+            final isSelected = cats.any(
+              (c) => _tempSelectedCategoryIds.contains(c.id),
+            );
             return GestureDetector(
               onTap: () {
                 setState(() {
                   final allSelected = cats.every(
-                      (c) => _tempSelectedCategoryIds.contains(c.id));
+                    (c) => _tempSelectedCategoryIds.contains(c.id),
+                  );
                   for (final cat in cats) {
                     if (allSelected) {
                       _tempSelectedCategoryIds.remove(cat.id);
@@ -607,7 +630,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 color: context.colorPalette.cardBg,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                    color: context.colorPalette.border, width: 1),
+                  color: context.colorPalette.border,
+                  width: 1,
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -725,7 +750,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   Widget _buildWeightSection(BuildContext context) {
     final sliderMax = _effectiveWeightSliderMax;
-    final divisions = sliderMax.round().clamp(1, 10000);
+    final step = _pickWeightStep(sliderMax);
+    final divisions = (sliderMax / step).round().clamp(1, 10000);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,7 +768,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ),
             ),
             Text(
-              '${_tempWeightMin.round()}g – ${_tempWeightMax.round()}g',
+              '${_formatWeightLabel(_tempWeightMin)}g – ${_formatWeightLabel(_tempWeightMax)}g',
               style: TextStyle(
                 fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w500,
@@ -754,8 +780,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         const SizedBox(height: 2),
         SliderTheme(
           data: const SliderThemeData(
-            rangeThumbShape:
-                RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            rangeThumbShape: RoundRangeSliderThumbShape(enabledThumbRadius: 6),
             overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
             trackHeight: 3,
           ),
@@ -772,8 +797,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               activeColor: context.colorPalette.gold,
               inactiveColor: context.colorPalette.border,
               labels: RangeLabels(
-                '${_tempWeightMin.round()}g',
-                '${_tempWeightMax.round()}g',
+                '${_formatWeightLabel(_tempWeightMin)}g',
+                '${_formatWeightLabel(_tempWeightMax)}g',
               ),
               onChanged: (values) {
                 setState(() {
@@ -786,6 +811,17 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         ),
       ],
     );
+  }
+
+  String _formatWeightLabel(double value) {
+    return value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+  }
+
+  double _pickWeightStep(double sliderMax) {
+    for (final step in _weightStepCandidates) {
+      if ((sliderMax / step).round() <= _maxWeightDivisions) return step;
+    }
+    return _weightStepCandidates.last;
   }
 
   Widget _buildSizeSection(BuildContext context) {
@@ -954,8 +990,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   Widget _buildPriceSection(BuildContext context) {
-    final sliderMax =
-        widget.priceSliderMax.clamp(_minPriceSliderMax, double.infinity);
+    final sliderMax = widget.priceSliderMax.clamp(
+      _minPriceSliderMax,
+      double.infinity,
+    );
     final divisions = (sliderMax / 100000).round().clamp(1, 1000);
 
     return Column(
@@ -985,8 +1023,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         const SizedBox(height: 2),
         SliderTheme(
           data: const SliderThemeData(
-            rangeThumbShape:
-                RoundRangeSliderThumbShape(enabledThumbRadius: 6),
+            rangeThumbShape: RoundRangeSliderThumbShape(enabledThumbRadius: 6),
             overlayShape: RoundSliderOverlayShape(overlayRadius: 14),
             trackHeight: 3,
           ),
@@ -1093,5 +1130,3 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 }
-
-
