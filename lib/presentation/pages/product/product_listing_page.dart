@@ -64,7 +64,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   final Set<String> _selectedProductIds = {};
   bool _isSelectModeEnabled = false;
-  bool get _isSelectMode => _isSelectModeEnabled || _selectedProductIds.isNotEmpty;
+  bool get _isSelectMode =>
+      _isSelectModeEnabled || _selectedProductIds.isNotEmpty;
   bool get _isAdmin => Get.find<AuthController>().isAdmin;
   bool get _isRetailer => Get.find<AuthController>().user?.isRetailer == true;
 
@@ -97,7 +98,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   Map<String, List<ProductModel>>? _cachedPurityCategoryGroups;
   Map<String, List<ProductModel>> get _purityCategoryGroups {
-    if (_cachedPurityCategoryGroups != null) return _cachedPurityCategoryGroups!;
+    if (_cachedPurityCategoryGroups != null)
+      return _cachedPurityCategoryGroups!;
     final groups = <String, List<ProductModel>>{};
     final categoryController = Get.find<CategoryController>();
 
@@ -117,8 +119,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
           ? KaratConstants.touchValueFor('${product.karatNumber}K').toString()
           : '??';
 
-      final categoryName = cleanCategoryName(
-          product.category?.name ?? '').toUpperCase().isEmpty
+      final categoryName =
+          cleanCategoryName(product.category?.name ?? '').toUpperCase().isEmpty
           ? 'OTHER'
           : cleanCategoryName(product.category?.name ?? '').toUpperCase();
       final key = '$purity $categoryName';
@@ -129,7 +131,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   Map<String, ({int selected, int total})>? _cachedCategorySelectionBreakdown;
   Map<String, ({int selected, int total})> get _categorySelectionBreakdown {
-    if (_cachedCategorySelectionBreakdown != null) return _cachedCategorySelectionBreakdown!;
+    if (_cachedCategorySelectionBreakdown != null)
+      return _cachedCategorySelectionBreakdown!;
     final breakdown = <String, ({int selected, int total})>{};
     for (final entry in _purityCategoryGroups.entries) {
       final selected = entry.value
@@ -148,7 +151,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _toggleGroupSelection(String groupKey) {
     final products = _purityCategoryGroups[groupKey];
     if (products == null || products.isEmpty) return;
-    final allSelected = products.every((p) => _selectedProductIds.contains(p.id));
+    final allSelected = products.every(
+      (p) => _selectedProductIds.contains(p.id),
+    );
     setState(() {
       _clearCategoryCaches();
       if (allSelected) {
@@ -164,22 +169,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   bool get _isCategoryFilter => widget.categoryId != null || _isMultiCategory;
-  bool get _isMultiCategory => widget.categoryIds != null && widget.categoryIds!.isNotEmpty;
+  bool get _isMultiCategory =>
+      widget.categoryIds != null && widget.categoryIds!.isNotEmpty;
   bool get _hasKarat => widget.karat != null;
   bool get _isCategoryOnly => _isCategoryFilter && !_hasKarat;
 
   CurrentAppState get _currentStockState {
     switch (_stockFilter) {
       case 'ready':
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryReadyState;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryReadyState;
         if (_isCategoryFilter) return _controller.filteredReadyState;
         return _controller.karatReadyState;
       case 'out':
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryOutState;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryOutState;
         if (_isCategoryFilter) return _controller.filteredOutState;
         return _controller.karatOutState;
       default:
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryAllState;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryAllState;
         if (_isCategoryFilter) return _controller.filteredAllState;
         return _controller.karatAllState;
     }
@@ -188,21 +197,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
   bool get _hasMore {
     switch (_stockFilter) {
       case 'ready':
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryReadyHasMore;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryReadyHasMore;
         if (_isCategoryFilter) return _controller.filteredReadyHasMore;
         return _controller.karatReadyHasMore;
       case 'out':
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryOutHasMore;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryOutHasMore;
         if (_isCategoryFilter) return _controller.filteredOutHasMore;
         return _controller.karatOutHasMore;
       default:
-        if (_isMultiCategory || _isCategoryOnly) return _controller.categoryAllHasMore;
+        if (_isMultiCategory || _isCategoryOnly)
+          return _controller.categoryAllHasMore;
         if (_isCategoryFilter) return _controller.filteredAllHasMore;
         return _controller.karatAllHasMore;
     }
   }
 
-  ({String? sortByWeight, bool showReverse}) _serverSortParams(SortOption option) {
+  ({String? sortByWeight, bool showReverse}) _serverSortParams(
+    SortOption option,
+  ) {
     switch (option) {
       case SortOption.weightAsc:
       case SortOption.priceAsc:
@@ -224,13 +238,25 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final stockFilter = _stockFilter;
     final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
-      _controller.loadMoreMultipleCategories(stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadMoreMultipleCategories(
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryOnly) {
-      _controller.loadMoreCategoryProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadMoreCategoryProducts(
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryFilter) {
-      _controller.loadMoreFilteredProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadMoreFilteredProducts(
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else {
-      _controller.loadMoreKaratProducts(stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadMoreKaratProducts(
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     }
     await Future.delayed(const Duration(milliseconds: 100));
     if (mounted && _currentStockState == CurrentAppState.LOADING) {
@@ -254,28 +280,65 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
       await Future.wait([
-        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready', approvalFilter: approvalFilter),
-        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out'),
-        _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all'),
+        _controller.loadProductsByMultipleCategories(
+          widget.categoryIds!,
+          stockFilter: 'ready',
+          approvalFilter: approvalFilter,
+        ),
+        _controller.loadProductsByMultipleCategories(
+          widget.categoryIds!,
+          stockFilter: 'out',
+        ),
+        _controller.loadProductsByMultipleCategories(
+          widget.categoryIds!,
+          stockFilter: 'all',
+        ),
       ]);
     } else if (_isCategoryFilter && _hasKarat) {
       await Future.wait([
-        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready', approvalFilter: approvalFilter),
-        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out'),
-        _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all'),
+        _controller.loadByCategoryWithKaratFilter(
+          widget.categoryId!,
+          widget.karat!,
+          stockFilter: 'ready',
+          approvalFilter: approvalFilter,
+        ),
+        _controller.loadByCategoryWithKaratFilter(
+          widget.categoryId!,
+          widget.karat!,
+          stockFilter: 'out',
+        ),
+        _controller.loadByCategoryWithKaratFilter(
+          widget.categoryId!,
+          widget.karat!,
+          stockFilter: 'all',
+        ),
       ]);
     } else if (_isCategoryFilter) {
       await Future.wait([
-        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready', approvalFilter: approvalFilter),
-        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out'),
-        _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all'),
+        _controller.loadProductsByCategory(
+          widget.categoryId!,
+          stockFilter: 'ready',
+          approvalFilter: approvalFilter,
+        ),
+        _controller.loadProductsByCategory(
+          widget.categoryId!,
+          stockFilter: 'out',
+        ),
+        _controller.loadProductsByCategory(
+          widget.categoryId!,
+          stockFilter: 'all',
+        ),
       ]);
     } else {
       final karatsToLoad =
           widget.karats ??
           (widget.karat != null ? [widget.karat!] : <String>[]);
       await Future.wait([
-        _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready', approvalFilter: approvalFilter),
+        _controller.loadProductsByKarats(
+          karatsToLoad,
+          stockFilter: 'ready',
+          approvalFilter: approvalFilter,
+        ),
         _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out'),
         _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all'),
       ]);
@@ -337,7 +400,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
           .whereType<int>()
           .toList();
       if (targetKarats.isNotEmpty) {
-        result = result.where((p) => targetKarats.contains(p.karatNumber)).toList();
+        result = result
+            .where((p) => targetKarats.contains(p.karatNumber))
+            .toList();
       }
     }
     return result;
@@ -387,26 +452,57 @@ class _ProductListingPageState extends State<ProductListingPage> {
       _isSelectModeEnabled = true;
     }
 
-    _selectedKarat = widget.karat ??
+    _selectedKarat =
+        widget.karat ??
         (_isMultiCategory
             ? (widget.karats != null && widget.karats!.isNotEmpty
-                ? widget.karats!.join(', ')
-                : '')
+                  ? widget.karats!.join(', ')
+                  : '')
             : '22K');
 
     if (_isMultiCategory) {
       _filteredCategoryIds = List<String>.from(widget.categoryIds!);
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready');
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out');
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all');
+      _controller.loadProductsByMultipleCategories(
+        widget.categoryIds!,
+        stockFilter: 'ready',
+      );
+      _controller.loadProductsByMultipleCategories(
+        widget.categoryIds!,
+        stockFilter: 'out',
+      );
+      _controller.loadProductsByMultipleCategories(
+        widget.categoryIds!,
+        stockFilter: 'all',
+      );
     } else if (_isCategoryFilter && _hasKarat) {
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready');
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out');
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all');
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+        stockFilter: 'ready',
+      );
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+        stockFilter: 'out',
+      );
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+        stockFilter: 'all',
+      );
     } else if (_isCategoryFilter) {
-      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready');
-      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out');
-      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all');
+      _controller.loadProductsByCategory(
+        widget.categoryId!,
+        stockFilter: 'ready',
+      );
+      _controller.loadProductsByCategory(
+        widget.categoryId!,
+        stockFilter: 'out',
+      );
+      _controller.loadProductsByCategory(
+        widget.categoryId!,
+        stockFilter: 'all',
+      );
     } else {
       final karatsToLoad =
           widget.karats ??
@@ -424,7 +520,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
       final oldParams = _serverSortParams(oldSort ?? SortOption.newest);
       final newParams = _serverSortParams(newSort);
-      final serverParamsChanged = oldParams.sortByWeight != newParams.sortByWeight ||
+      final serverParamsChanged =
+          oldParams.sortByWeight != newParams.sortByWeight ||
           oldParams.showReverse != newParams.showReverse;
 
       if (serverParamsChanged) {
@@ -466,7 +563,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 style: GoogleFonts.bodoniModa(
                   fontWeight: FontWeight.w700,
                   color: context.colorPalette.goldDeep,
-                  fontSize: context.responsiveFont(18, largeTabletMultiplier: 1.8),
+                  fontSize: context.responsiveFont(
+                    18,
+                    largeTabletMultiplier: 1.8,
+                  ),
                 ),
               )
             : _buildAppBarTitleWidget(context),
@@ -515,7 +615,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 ),
                 decoration: BoxDecoration(
                   color: context.colorPalette.gold.withValues(alpha: 0.10),
-                  borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                  borderRadius: BorderRadius.circular(
+                    context.responsiveWidth(8),
+                  ),
                 ),
                 child: Text(
                   _karatPurityLabel!,
@@ -534,13 +636,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
               final state = _currentStockState;
               final hasMore = _hasMore;
 
-              if (_isLoadingMore && (state != CurrentAppState.LOADING || !hasMore)) {
+              if (_isLoadingMore &&
+                  (state != CurrentAppState.LOADING || !hasMore)) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (mounted) setState(() => _isLoadingMore = false);
                 });
               }
 
-              final filteredProducts = _applyClientSideFilters(_displayedProducts);
+              final filteredProducts = _applyClientSideFilters(
+                _displayedProducts,
+              );
               final products = _controller.isWeightSort
                   ? filteredProducts
                   : _controller.sortProducts(
@@ -552,7 +657,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
               if (state == CurrentAppState.LOADING && products.isEmpty) {
                 if (layoutType == LayoutType.list) {
                   return ListView.builder(
-                    padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.responsiveWidth(8, largeTabletVal: 16),
+                    ),
                     itemCount: _initialShimmerListCount,
                     itemBuilder: (_, index) => _shimmerListTile(context),
                   );
@@ -560,19 +667,19 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 final gridCrossCount = layoutType == LayoutType.fullScreen
                     ? 1
                     : MediaQuery.of(context).size.width >= 1000
-                        ? 3
-                        : context.gridColumns(phone: 2, tablet: 3);
+                    ? 3
+                    : context.gridColumns(phone: 2, tablet: 3);
                 final gridAspectRatio = layoutType == LayoutType.fullScreen
                     ? (MediaQuery.of(context).size.width >= 1000
-                        ? 0.7
-                        : MediaQuery.of(context).size.width >= 600
-                            ? 0.68
-                            : 0.65)
+                          ? 0.7
+                          : MediaQuery.of(context).size.width >= 600
+                          ? 0.68
+                          : 0.65)
                     : (MediaQuery.of(context).size.width >= 1000
-                        ? 0.62
-                        : MediaQuery.of(context).size.width >= 600
-                            ? 0.55
-                            : 0.488);
+                          ? 0.62
+                          : MediaQuery.of(context).size.width >= 600
+                          ? 0.55
+                          : 0.488);
                 return CustomScrollView(
                   slivers: [
                     SliverPadding(
@@ -615,28 +722,73 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          final approvalFilter = _stockFilter == 'ready' ? _approvalFilter : null;
+                          final approvalFilter = _stockFilter == 'ready'
+                              ? _approvalFilter
+                              : null;
                           if (_isMultiCategory) {
-                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'ready', approvalFilter: approvalFilter);
-                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'out');
-                            _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: 'all');
+                            _controller.loadProductsByMultipleCategories(
+                              widget.categoryIds!,
+                              stockFilter: 'ready',
+                              approvalFilter: approvalFilter,
+                            );
+                            _controller.loadProductsByMultipleCategories(
+                              widget.categoryIds!,
+                              stockFilter: 'out',
+                            );
+                            _controller.loadProductsByMultipleCategories(
+                              widget.categoryIds!,
+                              stockFilter: 'all',
+                            );
                           } else if (_isCategoryOnly) {
-                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'ready', approvalFilter: approvalFilter);
-                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'out');
-                            _controller.loadProductsByCategory(widget.categoryId!, stockFilter: 'all');
+                            _controller.loadProductsByCategory(
+                              widget.categoryId!,
+                              stockFilter: 'ready',
+                              approvalFilter: approvalFilter,
+                            );
+                            _controller.loadProductsByCategory(
+                              widget.categoryId!,
+                              stockFilter: 'out',
+                            );
+                            _controller.loadProductsByCategory(
+                              widget.categoryId!,
+                              stockFilter: 'all',
+                            );
                           } else if (_isCategoryFilter) {
-                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'ready', approvalFilter: approvalFilter);
-                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'out');
-                            _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: 'all');
+                            _controller.loadByCategoryWithKaratFilter(
+                              widget.categoryId!,
+                              widget.karat!,
+                              stockFilter: 'ready',
+                              approvalFilter: approvalFilter,
+                            );
+                            _controller.loadByCategoryWithKaratFilter(
+                              widget.categoryId!,
+                              widget.karat!,
+                              stockFilter: 'out',
+                            );
+                            _controller.loadByCategoryWithKaratFilter(
+                              widget.categoryId!,
+                              widget.karat!,
+                              stockFilter: 'all',
+                            );
                           } else {
                             final karatsToLoad =
                                 widget.karats ??
                                 (widget.karat != null
                                     ? [widget.karat!]
                                     : <String>[]);
-                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'ready', approvalFilter: approvalFilter);
-                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'out');
-                            _controller.loadProductsByKarats(karatsToLoad, stockFilter: 'all');
+                            _controller.loadProductsByKarats(
+                              karatsToLoad,
+                              stockFilter: 'ready',
+                              approvalFilter: approvalFilter,
+                            );
+                            _controller.loadProductsByKarats(
+                              karatsToLoad,
+                              stockFilter: 'out',
+                            );
+                            _controller.loadProductsByKarats(
+                              karatsToLoad,
+                              stockFilter: 'all',
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -665,8 +817,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         _stockFilter == 'ready'
                             ? 'No ready stock items available'
                             : _stockFilter == 'out'
-                                ? 'No out of stock items found'
-                                : 'No products found',
+                            ? 'No out of stock items found'
+                            : 'No products found',
                         style: TextStyle(
                           color: context.colorPalette.goldDark,
                           fontSize: 16,
@@ -684,7 +836,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   onRefresh: _onRefresh,
                   child: ListView.builder(
                     controller: _scrollController,
-                    padding: EdgeInsets.symmetric(vertical: context.responsiveWidth(8, largeTabletVal: 16)),
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.responsiveWidth(8, largeTabletVal: 16),
+                    ),
                     itemCount: products.length + shimmerCount,
                     itemBuilder: (_, index) {
                       if (_isLoadingMore && index >= products.length) {
@@ -702,18 +856,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) =>
-                                        ProductDetailsPage(
-                                          product: product,
-                                          products: products,
-                                          initialIndex: index,
-                                          controller: _controller,
-                                          listType: _isCategoryOnly
-                                              ? 'category'
-                                              : _isCategoryFilter
-                                                  ? 'filtered'
-                                                  : 'karat',
-                                        ),
+                                    builder: (_) => ProductDetailsPage(
+                                      product: product,
+                                      products: products,
+                                      initialIndex: index,
+                                      controller: _controller,
+                                      listType: _isCategoryOnly
+                                          ? 'category'
+                                          : _isCategoryFilter
+                                          ? 'filtered'
+                                          : 'karat',
+                                    ),
                                   ),
                                 );
                               },
@@ -733,26 +886,29 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   child: CustomScrollView(
                     controller: _scrollController,
                     slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                              ? 0.7
-                              : MediaQuery.of(context).size.width >= 600
-                                  ? 0.68
-                                  : 0.65,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) {
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 1,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio:
+                                    MediaQuery.of(context).size.width >= 1000
+                                    ? 0.7
+                                    : MediaQuery.of(context).size.width >= 600
+                                    ? 0.68
+                                    : 0.65,
+                              ),
+                          delegate: SliverChildBuilderDelegate((_, index) {
                             final product = products[index];
                             return ProductCard(
                               key: ValueKey(product.id),
                               product: product,
-                              isSelected: _selectedProductIds.contains(product.id),
+                              isSelected: _selectedProductIds.contains(
+                                product.id,
+                              ),
                               isSelectMode: _isSelectMode,
                               onTap: _isSelectMode
                                   ? () => _toggleSelection(product.id)
@@ -760,18 +916,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              ProductDetailsPage(
-                                                product: product,
-                                                products: products,
-                                                initialIndex: index,
-                                                controller: _controller,
-                                                listType: _isCategoryOnly
-                                                    ? 'category'
-                                                    : _isCategoryFilter
-                                                        ? 'filtered'
-                                                        : 'karat',
-                                              ),
+                                          builder: (_) => ProductDetailsPage(
+                                            product: product,
+                                            products: products,
+                                            initialIndex: index,
+                                            controller: _controller,
+                                            listType: _isCategoryOnly
+                                                ? 'category'
+                                                : _isCategoryFilter
+                                                ? 'filtered'
+                                                : 'karat',
+                                          ),
                                         ),
                                       );
                                     },
@@ -779,32 +934,32 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                   ? () => _toggleSelection(product.id)
                                   : null,
                             );
-                          },
-                          childCount: products.length,
+                          }, childCount: products.length),
                         ),
                       ),
-                    ),
-                    if (_isLoadingMore && hasMore)
-                      SliverPadding(
-                        padding: const EdgeInsets.all(16),
-                        sliver: SliverGrid(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 1,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                                ? 0.7
-                                : MediaQuery.of(context).size.width >= 600
-                                    ? 0.68
-                                    : 0.65,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (_, index) => _shimmerCard(context),
-                            childCount: 2,
+                      if (_isLoadingMore && hasMore)
+                        SliverPadding(
+                          padding: const EdgeInsets.all(16),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 1,
+                                  mainAxisSpacing: 16,
+                                  crossAxisSpacing: 16,
+                                  childAspectRatio:
+                                      MediaQuery.of(context).size.width >= 1000
+                                      ? 0.7
+                                      : MediaQuery.of(context).size.width >= 600
+                                      ? 0.68
+                                      : 0.65,
+                                ),
+                            delegate: SliverChildBuilderDelegate(
+                              (_, index) => _shimmerCard(context),
+                              childCount: 2,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
                   ),
                 );
               }
@@ -813,30 +968,33 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 color: context.colorPalette.gold,
                 onRefresh: _onRefresh,
                 child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.all(16),
-                    sliver: SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: MediaQuery.of(context).size.width >= 1000
-                            ? 3
-                            : context.gridColumns(phone: 2, tablet: 3),
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                            ? 0.62
-                            : MediaQuery.of(context).size.width >= 600
-                                ? 0.55
-                                : 0.52,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (_, index) {
+                  controller: _scrollController,
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:
+                              MediaQuery.of(context).size.width >= 1000
+                              ? 3
+                              : context.gridColumns(phone: 2, tablet: 3),
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio:
+                              MediaQuery.of(context).size.width >= 1000
+                              ? 0.62
+                              : MediaQuery.of(context).size.width >= 600
+                              ? 0.55
+                              : 0.52,
+                        ),
+                        delegate: SliverChildBuilderDelegate((_, index) {
                           final product = products[index];
                           return ProductCard(
                             key: ValueKey(product.id),
                             product: product,
-                            isSelected: _selectedProductIds.contains(product.id),
+                            isSelected: _selectedProductIds.contains(
+                              product.id,
+                            ),
                             isSelectMode: _isSelectMode,
                             onTap: _isSelectMode
                                 ? () => _toggleSelection(product.id)
@@ -844,18 +1002,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            ProductDetailsPage(
-                                              product: product,
-                                              products: products,
-                                              initialIndex: index,
-                                              controller: _controller,
-                                              listType: _isCategoryOnly
-                                                  ? 'category'
-                                                  : _isCategoryFilter
-                                                      ? 'filtered'
-                                                      : 'karat',
-                                            ),
+                                        builder: (_) => ProductDetailsPage(
+                                          product: product,
+                                          products: products,
+                                          initialIndex: index,
+                                          controller: _controller,
+                                          listType: _isCategoryOnly
+                                              ? 'category'
+                                              : _isCategoryFilter
+                                              ? 'filtered'
+                                              : 'karat',
+                                        ),
                                       ),
                                     );
                                   },
@@ -863,34 +1020,35 @@ class _ProductListingPageState extends State<ProductListingPage> {
                                 ? () => _toggleSelection(product.id)
                                 : null,
                           );
-                        },
-                        childCount: products.length,
+                        }, childCount: products.length),
                       ),
                     ),
-                  ),
-                  if (_isLoadingMore && hasMore)
-                    SliverPadding(
-                      padding: const EdgeInsets.all(16),
-                      sliver: SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: MediaQuery.of(context).size.width >= 1000
-                              ? 3
-                              : context.gridColumns(phone: 2, tablet: 3),
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: MediaQuery.of(context).size.width >= 1000
-                              ? 0.62
-                              : MediaQuery.of(context).size.width >= 600
-                                  ? 0.55
-                                  : 0.488,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (_, index) => _shimmerCard(context),
-                          childCount: _shimmerLoadMoreCount,
+                    if (_isLoadingMore && hasMore)
+                      SliverPadding(
+                        padding: const EdgeInsets.all(16),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount:
+                                    MediaQuery.of(context).size.width >= 1000
+                                    ? 3
+                                    : context.gridColumns(phone: 2, tablet: 3),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio:
+                                    MediaQuery.of(context).size.width >= 1000
+                                    ? 0.62
+                                    : MediaQuery.of(context).size.width >= 600
+                                    ? 0.55
+                                    : 0.488,
+                              ),
+                          delegate: SliverChildBuilderDelegate(
+                            (_, index) => _shimmerCard(context),
+                            childCount: _shimmerLoadMoreCount,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
                 ),
               );
             }),
@@ -915,7 +1073,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
             SizedBox(height: context.responsiveWidth(4)),
           ],
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16)),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.responsiveWidth(16),
+            ),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -947,7 +1107,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
           if (_stockFilter == 'ready') ...[
             SizedBox(height: context.responsiveWidth(6)),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16)),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.responsiveWidth(16),
+              ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -964,19 +1126,27 @@ class _ProductListingPageState extends State<ProductListingPage> {
           ],
           SizedBox(height: context.responsiveWidth(4)),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: context.responsiveWidth(16), vertical: context.responsiveWidth(8)),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.responsiveWidth(16),
+              vertical: context.responsiveWidth(8),
+            ),
             child: Row(
               children: [
                 GestureDetector(
                   onTap: () => _showSortSheet(context),
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.responsiveWidth(10, largeTabletVal: 18),
+                      horizontal: context.responsiveWidth(
+                        10,
+                        largeTabletVal: 18,
+                      ),
                       vertical: context.responsiveWidth(6, largeTabletVal: 12),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
+                      borderRadius: BorderRadius.circular(
+                        context.responsiveWidth(8, largeTabletVal: 14),
+                      ),
                       border: Border.all(color: context.colorPalette.border),
                     ),
                     child: Row(
@@ -987,11 +1157,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                           size: context.responsiveWidth(18, largeTabletVal: 28),
                           color: context.colorPalette.goldDark,
                         ),
-                        SizedBox(width: context.responsiveWidth(6, largeTabletVal: 10)),
+                        SizedBox(
+                          width: context.responsiveWidth(6, largeTabletVal: 10),
+                        ),
                         Text(
                           currentSort.label,
                           style: TextStyle(
-                            fontSize: context.responsiveFont(12, largeTabletMultiplier: 1.8),
+                            fontSize: context.responsiveFont(
+                              12,
+                              largeTabletMultiplier: 1.8,
+                            ),
                             fontWeight: FontWeight.w500,
                             color: context.colorPalette.goldDark,
                           ),
@@ -1006,14 +1181,19 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   onTap: () => _showFilterSheet(context),
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: context.responsiveWidth(10, largeTabletVal: 18),
+                      horizontal: context.responsiveWidth(
+                        10,
+                        largeTabletVal: 18,
+                      ),
                       vertical: context.responsiveWidth(6, largeTabletVal: 12),
                     ),
                     decoration: BoxDecoration(
                       color: _hasActiveFilter
                           ? context.colorPalette.gold.withValues(alpha: 0.08)
                           : Colors.white,
-                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
+                      borderRadius: BorderRadius.circular(
+                        context.responsiveWidth(8, largeTabletVal: 14),
+                      ),
                       border: Border.all(
                         color: _hasActiveFilter
                             ? context.colorPalette.gold
@@ -1030,11 +1210,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
                               ? context.colorPalette.gold
                               : context.colorPalette.goldDark,
                         ),
-                        SizedBox(width: context.responsiveWidth(6, largeTabletVal: 10)),
+                        SizedBox(
+                          width: context.responsiveWidth(6, largeTabletVal: 10),
+                        ),
                         Text(
                           'Filter',
                           style: TextStyle(
-                            fontSize: context.responsiveFont(12, largeTabletMultiplier: 1.8),
+                            fontSize: context.responsiveFont(
+                              12,
+                              largeTabletMultiplier: 1.8,
+                            ),
                             fontWeight: FontWeight.w500,
                             color: _hasActiveFilter
                                 ? context.colorPalette.gold
@@ -1050,7 +1235,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                             ),
                             decoration: BoxDecoration(
                               color: context.colorPalette.gold,
-                              borderRadius: BorderRadius.circular(context.responsiveWidth(8)),
+                              borderRadius: BorderRadius.circular(
+                                context.responsiveWidth(8),
+                              ),
                             ),
                             child: Text(
                               '$_activeFilterCount',
@@ -1070,18 +1257,22 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 GestureDetector(
                   onTap: () => _controller.toggleLayout(),
                   child: Container(
-                    padding: EdgeInsets.all(context.responsiveWidth(6, largeTabletVal: 12)),
+                    padding: EdgeInsets.all(
+                      context.responsiveWidth(6, largeTabletVal: 12),
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
+                      borderRadius: BorderRadius.circular(
+                        context.responsiveWidth(8, largeTabletVal: 14),
+                      ),
                       border: Border.all(color: context.colorPalette.border),
                     ),
                     child: Icon(
                       layoutType == LayoutType.grid
                           ? Icons.list_rounded
                           : layoutType == LayoutType.list
-                              ? Icons.view_agenda_rounded
-                              : Icons.grid_view_rounded,
+                          ? Icons.view_agenda_rounded
+                          : Icons.grid_view_rounded,
                       size: context.responsiveWidth(20, largeTabletVal: 32),
                       color: context.colorPalette.goldDark,
                     ),
@@ -1124,7 +1315,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
           color: isSelected
               ? context.colorPalette.gold.withValues(alpha: 0.08)
               : Colors.white,
-          borderRadius: BorderRadius.circular(context.responsiveWidth(8, largeTabletVal: 14)),
+          borderRadius: BorderRadius.circular(
+            context.responsiveWidth(8, largeTabletVal: 14),
+          ),
           border: Border.all(
             color: isSelected
                 ? context.colorPalette.gold
@@ -1145,7 +1338,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: context.responsiveFont(11, largeTabletMultiplier: 1.8),
+                fontSize: context.responsiveFont(
+                  11,
+                  largeTabletMultiplier: 1.8,
+                ),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
                     ? context.colorPalette.gold
@@ -1158,11 +1354,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  Widget _buildApprovalChip(
-    String label,
-    int? value,
-    BuildContext context,
-  ) {
+  Widget _buildApprovalChip(String label, int? value, BuildContext context) {
     final isSelected = _approvalFilter == value;
     return GestureDetector(
       onTap: () {
@@ -1182,7 +1374,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
           color: isSelected
               ? context.colorPalette.gold.withValues(alpha: 0.12)
               : context.colorPalette.cream,
-          borderRadius: BorderRadius.circular(context.responsiveWidth(6, largeTabletVal: 10)),
+          borderRadius: BorderRadius.circular(
+            context.responsiveWidth(6, largeTabletVal: 10),
+          ),
           border: Border.all(
             color: isSelected
                 ? context.colorPalette.gold
@@ -1205,28 +1399,66 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   void _reloadWithApprovalFilter(int? approvalFilter) {
     if (_isMultiCategory) {
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+      _controller.loadProductsByMultipleCategories(
+        widget.categoryIds!,
+        stockFilter: _stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryOnly) {
-      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+      _controller.loadProductsByCategory(
+        widget.categoryId!,
+        stockFilter: _stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryFilter) {
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+        stockFilter: _stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else {
-      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
-      _controller.loadProductsByKarats(karatsToLoad, stockFilter: _stockFilter, approvalFilter: approvalFilter);
+      final karatsToLoad =
+          widget.karats ??
+          (widget.karat != null ? [widget.karat!] : <String>[]);
+      _controller.loadProductsByKarats(
+        karatsToLoad,
+        stockFilter: _stockFilter,
+        approvalFilter: approvalFilter,
+      );
     }
   }
 
   void _reloadStockFilter(String stockFilter) {
     final approvalFilter = stockFilter == 'ready' ? _approvalFilter : null;
     if (_isMultiCategory) {
-      _controller.loadProductsByMultipleCategories(widget.categoryIds!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadProductsByMultipleCategories(
+        widget.categoryIds!,
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryOnly) {
-      _controller.loadProductsByCategory(widget.categoryId!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadProductsByCategory(
+        widget.categoryId!,
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else if (_isCategoryFilter) {
-      _controller.loadByCategoryWithKaratFilter(widget.categoryId!, widget.karat!, stockFilter: stockFilter, approvalFilter: approvalFilter);
+      _controller.loadByCategoryWithKaratFilter(
+        widget.categoryId!,
+        widget.karat!,
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     } else {
-      final karatsToLoad = widget.karats ?? (widget.karat != null ? [widget.karat!] : <String>[]);
-      _controller.loadProductsByKarats(karatsToLoad, stockFilter: stockFilter, approvalFilter: approvalFilter);
+      final karatsToLoad =
+          widget.karats ??
+          (widget.karat != null ? [widget.karat!] : <String>[]);
+      _controller.loadProductsByKarats(
+        karatsToLoad,
+        stockFilter: stockFilter,
+        approvalFilter: approvalFilter,
+      );
     }
   }
 
@@ -1271,18 +1503,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
-    return _applySizeFilter(_applyPriceFilter(_applyWeightFilter(products)));
-  }
-
-  List<ProductModel> _applyWeightFilter(List<ProductModel> products) {
-    if (_weightMin > 0 || _weightMax < _displayedWeightMax) {
-      return products.where((p) {
-        final gw = p.fineWeight;
-        if (gw == null) return true;
-        return gw >= _weightMin && gw <= _weightMax;
-      }).toList();
-    }
-    return products;
+    return _applySizeFilter(_applyPriceFilter(products));
   }
 
   List<ProductModel> _applyPriceFilter(List<ProductModel> products) {
@@ -1315,8 +1536,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   double? _calculatePrice(ProductModel product, double ratePer10Gram) {
     if (product.fineWeight == null) return null;
     return GoldRateController.calculatePrice(
-      fineWeight:
-          product.karigarNetWt ?? 0,
+      fineWeight: product.karigarNetWt ?? 0,
       ratePer10Gram: ratePer10Gram,
     );
   }
@@ -1342,11 +1562,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
     if (karatLabel == null) return null;
 
     if (karatLabel.contains(',')) {
-      final parts = karatLabel.split(',').map((k) {
-        final trimmed = k.trim();
-        final purity = KaratConstants.purityValueFor(trimmed);
-        return purity != null ? '$trimmed·$purity%' : trimmed;
-      }).join(', ');
+      final parts = karatLabel
+          .split(',')
+          .map((k) {
+            final trimmed = k.trim();
+            final purity = KaratConstants.purityValueFor(trimmed);
+            return purity != null ? '$trimmed·$purity%' : trimmed;
+          })
+          .join(', ');
       return parts;
     }
 
@@ -1357,18 +1580,24 @@ class _ProductListingPageState extends State<ProductListingPage> {
 
   void _showFilterSheet(BuildContext context) {
     final categoryModels = _isMultiCategory
-        ? (widget.categoryNames ?? {}).entries.map((e) => CategoryModel(
-              id: e.key,
-              name: e.value,
-              nameSlug: e.value.toLowerCase().replaceAll(' ', '-'),
-              imageUrl: '',
-              isDeleted: false,
-            )).toList()
+        ? (widget.categoryNames ?? {}).entries
+              .map(
+                (e) => CategoryModel(
+                  id: e.key,
+                  name: e.value,
+                  nameSlug: e.value.toLowerCase().replaceAll(' ', '-'),
+                  imageUrl: '',
+                  isDeleted: false,
+                ),
+              )
+              .toList()
         : <CategoryModel>[];
 
     FilterBottomSheet.show(
       context,
-      initialSelectedKarats: _isMultiCategory ? _currentKaratSelection : const [],
+      initialSelectedKarats: _isMultiCategory
+          ? _currentKaratSelection
+          : const [],
       initialStockFilter: _stockFilter,
       initialWeightMin: _weightMin,
       initialWeightMax: _weightMax,
@@ -1420,6 +1649,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             if (_scrollController.hasClients) {
               _scrollController.jumpTo(0);
             }
+            _controller.setWeightRange(_weightMin, _weightMax);
             _reloadStockFilter(_stockFilter);
           },
     );
@@ -1562,7 +1792,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
               GestureDetector(
                 onTap: () => _showShareOptionsDialog(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: context.colorPalette.goldDark,
                     borderRadius: BorderRadius.circular(10),
@@ -1611,20 +1844,23 @@ class _ProductListingPageState extends State<ProductListingPage> {
               onTap: () => _toggleGroupSelection(groupKey),
               child: Container(
                 margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: isGroupFullySelected
                       ? context.colorPalette.gold.withValues(alpha: 0.12)
                       : isPartiallySelected
-                          ? context.colorPalette.gold.withValues(alpha: 0.06)
-                          : context.colorPalette.cardBg,
+                      ? context.colorPalette.gold.withValues(alpha: 0.06)
+                      : context.colorPalette.cardBg,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: isGroupFullySelected
                         ? context.colorPalette.gold
                         : isPartiallySelected
-                            ? context.colorPalette.gold.withValues(alpha: 0.5)
-                            : context.colorPalette.border,
+                        ? context.colorPalette.gold.withValues(alpha: 0.5)
+                        : context.colorPalette.border,
                     width: isGroupFullySelected ? 1.5 : 1,
                   ),
                 ),
@@ -1645,13 +1881,13 @@ class _ProductListingPageState extends State<ProductListingPage> {
                         fontWeight: isGroupFullySelected
                             ? FontWeight.w700
                             : isPartiallySelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: isGroupFullySelected
                             ? context.colorPalette.gold
                             : isPartiallySelected
-                                ? context.colorPalette.gold
-                                : context.colorPalette.goldDark,
+                            ? context.colorPalette.gold
+                            : context.colorPalette.goldDark,
                       ),
                     ),
                   ],
@@ -1684,7 +1920,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
             20,
             20,
             20,
-            20 + MediaQuery.of(ctx).padding.bottom + MediaQuery.of(ctx).viewInsets.bottom,
+            20 +
+                MediaQuery.of(ctx).padding.bottom +
+                MediaQuery.of(ctx).viewInsets.bottom,
           ),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -1723,7 +1961,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   ),
                   hintText: 'e.g. New Collection 2024',
                   hintStyle: TextStyle(
-                    color: context.colorPalette.subTitleColor.withValues(alpha: 0.5),
+                    color: context.colorPalette.subTitleColor.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -1757,7 +1997,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 child: Row(
                   children: [
                     Icon(
-                      compressImages ? Icons.compress_rounded : Icons.expand_rounded,
+                      compressImages
+                          ? Icons.compress_rounded
+                          : Icons.expand_rounded,
                       size: context.getResponsiveSize(5),
                       color: context.colorPalette.goldDeep,
                     ),
@@ -1791,7 +2033,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       value: compressImages,
                       onChanged: (value) => compressNotifier.value = value,
                       activeThumbColor: context.colorPalette.gold,
-                      activeTrackColor: context.colorPalette.gold.withValues(alpha: 0.3),
+                      activeTrackColor: context.colorPalette.gold.withValues(
+                        alpha: 0.3,
+                      ),
                     ),
                   ],
                 ),
@@ -1805,7 +2049,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 subtitle: 'Send product images directly',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _shareAsImages(context, titleController.text.trim(), compressImages: compressImages);
+                  _shareAsImages(
+                    context,
+                    titleController.text.trim(),
+                    compressImages: compressImages,
+                  );
                 },
               ),
               const SizedBox(height: 10),
@@ -1817,7 +2065,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 subtitle: 'Create a branded product catalog',
                 onTap: () {
                   Navigator.pop(ctx);
-                  _showProductsPerPageDialog(context, titleController.text.trim(), compressImages: compressImages);
+                  _showProductsPerPageDialog(
+                    context,
+                    titleController.text.trim(),
+                    compressImages: compressImages,
+                  );
                 },
               ),
               const SizedBox(height: 12),
@@ -1828,7 +2080,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
     );
   }
 
-  void _showProductsPerPageDialog(BuildContext context, String title, {bool compressImages = true}) {
+  void _showProductsPerPageDialog(
+    BuildContext context,
+    String title, {
+    bool compressImages = true,
+  }) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -1836,7 +2092,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
       builder: (ctx) => ShareProductsPerPageSheet(
         onSelected: (productsPerPage) {
           Navigator.pop(ctx);
-          _shareAsPdf(context, title, productsPerPage: productsPerPage, compressImages: compressImages);
+          _shareAsPdf(
+            context,
+            title,
+            productsPerPage: productsPerPage,
+            compressImages: compressImages,
+          );
         },
       ),
     );
@@ -1914,16 +2175,25 @@ class _ProductListingPageState extends State<ProductListingPage> {
         .toList();
   }
 
-  void _shareAsImages(BuildContext context, String title, {bool compressImages = true}) {
+  void _shareAsImages(
+    BuildContext context,
+    String title, {
+    bool compressImages = true,
+  }) {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
     final cancelled = ValueNotifier(false);
     final progress = ValueNotifier(0.0);
 
-    PdfLoadingDialog.show(context, message: 'Sharing images...', progress: progress, onCancel: () {
-      cancelled.value = true;
-    });
+    PdfLoadingDialog.show(
+      context,
+      message: 'Sharing images...',
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
+    );
 
     ShareService.shareImagesDirectly(
       products: products,
@@ -1940,16 +2210,26 @@ class _ProductListingPageState extends State<ProductListingPage> {
     });
   }
 
-  void _shareAsPdf(BuildContext context, String title, {int productsPerPage = 1, bool compressImages = true}) {
+  void _shareAsPdf(
+    BuildContext context,
+    String title, {
+    int productsPerPage = 1,
+    bool compressImages = true,
+  }) {
     final products = _getSelectedProducts();
     if (products.isEmpty) return;
 
     final cancelled = ValueNotifier(false);
     final progress = ValueNotifier(0.0);
 
-    PdfLoadingDialog.show(context, message: 'Generating PDF...', progress: progress, onCancel: () {
-      cancelled.value = true;
-    });
+    PdfLoadingDialog.show(
+      context,
+      message: 'Generating PDF...',
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
+    );
 
     ShareService.shareAsPdf(
       products: products,
