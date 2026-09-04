@@ -413,6 +413,8 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   double get _displayedWeightMax {
+    final serverMax = _controller.availableMaxWeight;
+    if (serverMax != null && serverMax > 0) return serverMax.ceilToDouble();
     double max = 0;
     for (final p in _displayedProducts) {
       final gw = p.fineWeight;
@@ -422,6 +424,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   bool get _hasWeightData {
+    if ((_controller.availableMaxWeight ?? 0) > 0) return true;
     return _displayedProducts.any((p) => p.fineWeight != null);
   }
 

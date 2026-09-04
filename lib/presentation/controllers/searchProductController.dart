@@ -57,6 +57,30 @@ class SearchProductController extends GetxController {
     if (_maxWeight.isFinite) 'maxWeight': _maxWeight,
   };
 
+  double? _availableMinWeight;
+  double? _availableMaxWeight;
+
+  double? get availableMinWeight => _availableMinWeight;
+  double? get availableMaxWeight => _availableMaxWeight;
+
+  void _absorbWeightRange(dynamic envelope) {
+    if (envelope is! Map) return;
+    final min = (envelope['availableMinWeight'] as num?)?.toDouble();
+    final max = (envelope['availableMaxWeight'] as num?)?.toDouble();
+    if (max != null) {
+      _availableMaxWeight =
+          (_availableMaxWeight == null || max > _availableMaxWeight!)
+          ? max
+          : _availableMaxWeight;
+    }
+    if (min != null) {
+      _availableMinWeight =
+          (_availableMinWeight == null || min < _availableMinWeight!)
+          ? min
+          : _availableMinWeight;
+    }
+  }
+
   final _layoutType = Rx<LayoutType>(LayoutType.grid);
   LayoutType get layoutType => _layoutType.value;
   Rx<LayoutType> get layoutTypeObs => _layoutType;
@@ -392,6 +416,7 @@ class SearchProductController extends GetxController {
 
           if (response.statusCode == 200 || response.statusCode == 201) {
             final data = response.data['data'];
+            _absorbWeightRange(data);
             final List raw = data['data'] is List ? data['data'] : [];
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
@@ -539,6 +564,7 @@ class SearchProductController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
+        _absorbWeightRange(data);
         final List raw = data['data'] is List ? data['data'] : [];
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
@@ -680,6 +706,7 @@ class SearchProductController extends GetxController {
 
           if (response.statusCode == 200 || response.statusCode == 201) {
             final data = response.data['data'];
+            _absorbWeightRange(data);
             final List raw = data['data'] is List ? data['data'] : [];
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
@@ -869,6 +896,7 @@ class SearchProductController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
+        _absorbWeightRange(data);
         final List raw = data['data'] is List ? data['data'] : [];
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 

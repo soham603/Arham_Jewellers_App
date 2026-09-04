@@ -214,37 +214,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   void _recomputeWeightSliderMax() {
-    final products = widget.products;
-    if (products.isEmpty) {
-      setState(() {
-        _effectiveWeightSliderMax = widget.weightSliderMax.clamp(
-          _minWeightSliderMax,
-          double.infinity,
-        );
-        _clampWeightValues();
-      });
-      return;
-    }
-
-    var filtered = products.toList();
-
-    if (_tempSelectedKarats.isNotEmpty) {
-      filtered = filtered.where((p) {
-        final k = p.karat;
-        return k != null && _tempSelectedKarats.contains(k);
-      }).toList();
-    }
-
-    var maxWeight = 0.0;
-    for (final p in filtered) {
-      final gw = p.fineWeight;
-      if (gw != null && gw > maxWeight) maxWeight = gw;
-    }
-
     setState(() {
-      _effectiveWeightSliderMax = maxWeight > 0
-          ? maxWeight.ceilToDouble()
-          : widget.weightSliderMax.clamp(_minWeightSliderMax, double.infinity);
+      _effectiveWeightSliderMax = widget.weightSliderMax.clamp(
+        _minWeightSliderMax,
+        double.infinity,
+      );
       _clampWeightValues();
     });
   }
