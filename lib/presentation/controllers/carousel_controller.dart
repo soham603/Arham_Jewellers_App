@@ -423,6 +423,7 @@ class CarouselsController extends GetxController {
         queryParams: {
           "page": _productPage,
           "limit": _productLimit,
+          "diversifyCategories": true,
         },
       );
 
