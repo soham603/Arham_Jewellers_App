@@ -745,8 +745,8 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 80);
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 80);
     if (picked == null) return;
     if (!mounted) return;
     final result = await cropImage(context, imageFile: File(picked.path), aspectRatio: 1);
@@ -970,10 +970,10 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                           final hasPickedImage = _pickedImage != null;
                           final hasAnyImage = hasPickedImage || hasExistingImage;
 
-                          if (hasAnyImage) {
-                            showImageActionSheet(
-                              context,
-                              onEdit: () async {
+                          showImageActionSheet(
+                            context,
+                            onCamera: () => _pickImage(ImageSource.camera),
+                            onEdit: () async {
                                 if (hasPickedImage) {
                                   final meta = _imageMeta;
                                   final originalFile = meta?.originalFile ?? _pickedImage!;
@@ -1023,17 +1023,15 @@ class _CategoryFormSheetState extends State<_CategoryFormSheet> {
                                   }
                                 }
                               },
-                              onUpload: _pickImage,
+                              onUpload: () => _pickImage(ImageSource.gallery),
                               onRemove: () {
                                 setState(() {
                                   _pickedImage = null;
                                   _isDeleteImage = true;
                                 });
                               },
+                              hasImage: hasAnyImage,
                             );
-                          } else {
-                            _pickImage();
-                          }
                         },
                         child: Container(
                           clipBehavior: Clip.antiAlias,

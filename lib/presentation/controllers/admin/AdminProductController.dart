@@ -66,10 +66,11 @@ class AdminProductController extends GetxController {
     return compressedFile;
   }
 
-  Future<void> pickImage(BuildContext context) async {
+  Future<void> pickImage(BuildContext context,
+      {ImageSource source = ImageSource.gallery}) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 80,
     );
     if (picked == null) return;

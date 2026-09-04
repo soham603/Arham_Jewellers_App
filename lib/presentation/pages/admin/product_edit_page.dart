@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/core/widgets/image_action_sheet.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -116,8 +117,8 @@ class _ProductEditPageState extends State<ProductEditPage> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    await _adminCtrl.pickImage(context);
+  Future<void> _pickImage(ImageSource source) async {
+    await _adminCtrl.pickImage(context, source: source);
     if (_adminCtrl.pickedImage != null) {
       setState(() {
         _isDeleteImage = false;
@@ -129,10 +130,10 @@ class _ProductEditPageState extends State<ProductEditPage> {
     final hasPicked = _adminCtrl.pickedImage != null;
     final hasAny = hasPicked || _hasExistingImage;
 
-    if (hasAny) {
-      showImageActionSheet(
-        context,
-        onEdit: () async {
+    showImageActionSheet(
+      context,
+      onCamera: () => _pickImage(ImageSource.camera),
+      onEdit: () async {
           if (hasPicked) {
             final originalFile = _adminCtrl.imageMeta?.originalFile ?? _adminCtrl.pickedImage!;
             final initialState = _adminCtrl.imageMeta != null
@@ -179,17 +180,15 @@ class _ProductEditPageState extends State<ProductEditPage> {
             }
           }
         },
-        onUpload: _pickImage,
+        onUpload: () => _pickImage(ImageSource.gallery),
         onRemove: () {
           setState(() {
             _isDeleteImage = true;
           });
           _adminCtrl.clearPickedImage();
         },
+        hasImage: hasAny,
       );
-    } else {
-      _pickImage();
-    }
   }
 
   Future<void> _submit() async {
