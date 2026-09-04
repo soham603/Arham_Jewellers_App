@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:ratnesh_gold_app/domain/entities/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -33,31 +34,52 @@ class SessionManager {
     required String refreshTokenExpiry,
   }) async {
     try {
-      if (accessToken.isEmpty || refreshToken.isEmpty ||
-          accessTokenExpiry.isEmpty || refreshTokenExpiry.isEmpty) {
+      if (accessToken.isEmpty ||
+          refreshToken.isEmpty ||
+          accessTokenExpiry.isEmpty ||
+          refreshTokenExpiry.isEmpty) {
         return false;
       }
-      final accessExpiry =
-          DateTime.parse(accessTokenExpiry).millisecondsSinceEpoch;
-      final refreshExpiry =
-          DateTime.parse(refreshTokenExpiry).millisecondsSinceEpoch;
+      final accessExpiry = DateTime.parse(
+        accessTokenExpiry,
+      ).millisecondsSinceEpoch;
+      final refreshExpiry = DateTime.parse(
+        refreshTokenExpiry,
+      ).millisecondsSinceEpoch;
 
-      await _storage.write(key: DatabaseKeyConstants.ACCESS_TOKEN, value: accessToken);
-      await _storage.write(key: DatabaseKeyConstants.REFRESH_TOKEN, value: refreshToken);
       await _storage.write(
-          key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY, value: accessExpiry.toString());
+        key: DatabaseKeyConstants.ACCESS_TOKEN,
+        value: accessToken,
+      );
       await _storage.write(
-          key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY, value: refreshExpiry.toString());
+        key: DatabaseKeyConstants.REFRESH_TOKEN,
+        value: refreshToken,
+      );
+      await _storage.write(
+        key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY,
+        value: accessExpiry.toString(),
+      );
+      await _storage.write(
+        key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY,
+        value: refreshExpiry.toString(),
+      );
 
       lastTokenSaveAt = DateTime.now();
+      debugPrint(
+        '[SessionManager] tokens saved (accessLen=${accessToken.length})',
+      );
       return true;
     } catch (e, st) {
+      debugPrint('[SessionManager] saveTokens FAILED: $e');
       return false;
     }
   }
 
   Future<String?> getAccessToken() async {
     final token = await _storage.read(key: DatabaseKeyConstants.ACCESS_TOKEN);
+    debugPrint(
+      '[SessionManager] access token read: ${token == null ? 'null' : 'present (${token.length} chars)'}',
+    );
     return token;
   }
 
@@ -67,12 +89,16 @@ class SessionManager {
   }
 
   Future<int?> getAccessTokenExpiry() async {
-    final value = await _storage.read(key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY);
+    final value = await _storage.read(
+      key: DatabaseKeyConstants.ACCESS_TOKEN_EXPIRY,
+    );
     return value != null ? int.tryParse(value) : null;
   }
 
   Future<int?> getRefreshTokenExpiry() async {
-    final value = await _storage.read(key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY);
+    final value = await _storage.read(
+      key: DatabaseKeyConstants.REFRESH_TOKEN_EXPIRY,
+    );
     return value != null ? int.tryParse(value) : null;
   }
 

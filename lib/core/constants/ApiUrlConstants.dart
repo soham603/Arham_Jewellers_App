@@ -1,7 +1,8 @@
 class ApiUrlConstants {
-  static const String BASE_URL = 'https://api.ratneshgold.com';
-  // static const String BASE_URL = 'https://arham-jewellers-backend.onrender.com';
-  // static const String BASE_URL = 'https://daa3-202-148-60-255.ngrok-free.app';
+  static const String BASE_URL = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://api.ratneshgold.com',
+  );
 
   static const String USER_LOGIN = '/api/v1/auth/user-login';
   static const String ADMIN_LOGIN = '/api/v1/auth/admin-login';

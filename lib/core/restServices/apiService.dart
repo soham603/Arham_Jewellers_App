@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
@@ -16,6 +17,13 @@ class BaseHttpService {
   SessionManager sessionManager = SessionManager();
 
   Completer<_RefreshResult>? _refreshCompleter;
+
+  static const Duration _tokenReadTimeout = Duration(seconds: 3);
+  static const Duration _accessTokenCacheTtl = Duration(seconds: 30);
+
+  Future<String?>? _accessTokenReadFuture;
+  String? _cachedAccessToken;
+  DateTime? _accessTokenCacheExpiry;
 
   BaseHttpService() {
     _dio = dio.Dio(
@@ -48,14 +56,13 @@ class BaseHttpService {
             final requiresAuth = options.extra["requiresAuth"] ?? true;
 
             if (requiresAuth) {
-              final token = await sessionManager.getAccessToken();
+              final token = await _readAccessTokenForRequest();
 
-              if (token != null) {
+              if (token != null && token.isNotEmpty) {
                 options.headers["Authorization"] = "Bearer $token";
               }
             }
-          } catch (e) {
-          }
+          } catch (e) {}
 
           return handler.next(options);
         },
@@ -92,13 +99,12 @@ class BaseHttpService {
             final requiresAuth =
                 error.requestOptions.extra["requiresAuth"] ?? true;
 
-            if (requiresAuth &&
-                error.requestOptions.extra["retried"] != true) {
+            if (requiresAuth && error.requestOptions.extra["retried"] != true) {
               final refreshResult = await _handleTokenRefresh();
 
               if (refreshResult == _RefreshResult.success) {
-                final newToken = await sessionManager.getAccessToken();
-                if (newToken != null) {
+                final newToken = await _readAccessTokenForRequest();
+                if (newToken != null && newToken.isNotEmpty) {
                   error.requestOptions.headers["Authorization"] =
                       "Bearer $newToken";
                 }
@@ -106,8 +112,7 @@ class BaseHttpService {
                 error.requestOptions.extra["retried"] = true;
 
                 try {
-                  final retryResponse =
-                      await _dio.fetch(error.requestOptions);
+                  final retryResponse = await _dio.fetch(error.requestOptions);
                   return handler.resolve(retryResponse);
                 } on dio.DioException catch (retryError) {
                   if (retryError.response?.statusCode == 401) {
@@ -120,8 +125,7 @@ class BaseHttpService {
                     dio.DioException(
                       requestOptions: retryError.requestOptions,
                       response: retryError.response,
-                      error:
-                          errorMessage ?? "An unexpected error occurred.",
+                      error: errorMessage ?? "An unexpected error occurred.",
                       type: retryError.type,
                     ),
                   );
@@ -133,19 +137,74 @@ class BaseHttpService {
           }
 
           final errorMessage = _extractErrorMessage(error.response);
-          final isServerError = statusCode == 502 || statusCode == 503 || statusCode == 504;
+          final isServerError =
+              statusCode == 502 || statusCode == 503 || statusCode == 504;
 
           handler.reject(
             dio.DioException(
               requestOptions: error.requestOptions,
               response: error.response,
-              error: errorMessage ?? (isServerError ? _getServerErrorMessage(statusCode) : "An unexpected error occurred."),
+              error:
+                  errorMessage ??
+                  (isServerError
+                      ? _getServerErrorMessage(statusCode)
+                      : "An unexpected error occurred."),
               type: error.type,
             ),
           );
         },
       ),
     );
+  }
+
+  void _invalidateAccessTokenCache() {
+    _cachedAccessToken = null;
+    _accessTokenCacheExpiry = null;
+    _accessTokenReadFuture = null;
+  }
+
+  Future<String?> _readAccessTokenForRequest() async {
+    final cached = _cachedAccessToken;
+    if (cached != null &&
+        _accessTokenCacheExpiry != null &&
+        DateTime.now().isBefore(_accessTokenCacheExpiry!)) {
+      return cached;
+    }
+
+    if (_accessTokenReadFuture != null) return _accessTokenReadFuture;
+
+    final future = _readAccessTokenFromStorage();
+    _accessTokenReadFuture = future;
+    try {
+      return await future;
+    } finally {
+      _accessTokenReadFuture = null;
+    }
+  }
+
+  Future<String?> _readAccessTokenFromStorage() async {
+    try {
+      final token = await sessionManager.getAccessToken().timeout(
+        _tokenReadTimeout,
+      );
+
+      if (token != null && token.isNotEmpty) {
+        _cachedAccessToken = token;
+        _accessTokenCacheExpiry = DateTime.now().add(_accessTokenCacheTtl);
+      } else {
+        _invalidateAccessTokenCache();
+      }
+      return token;
+    } catch (e) {
+      if (e is TimeoutException) {
+        debugPrint(
+          'BaseHttpService: access token read timed out after '
+          '${_tokenReadTimeout.inSeconds}s',
+        );
+      }
+      _invalidateAccessTokenCache();
+      return null;
+    }
   }
 
   Future<_RefreshResult> _handleTokenRefresh() async {
@@ -156,28 +215,28 @@ class BaseHttpService {
     _refreshCompleter = Completer<_RefreshResult>();
 
     try {
-      final refreshToken = await sessionManager.getRefreshToken();
+      final refreshToken = await sessionManager.getRefreshToken().timeout(
+        _tokenReadTimeout,
+      );
 
       if (refreshToken == null || refreshToken.isEmpty) {
         _refreshCompleter!.complete(_RefreshResult.authFailure);
         return _RefreshResult.authFailure;
       }
 
-      final isRefreshExpired = await sessionManager.isRefreshTokenExpired();
+      final isRefreshExpired = await sessionManager
+          .isRefreshTokenExpired()
+          .timeout(_tokenReadTimeout);
       if (isRefreshExpired) {
         _refreshCompleter!.complete(_RefreshResult.authFailure);
         return _RefreshResult.authFailure;
       }
 
-
       final deviceId = await getDeviceId();
 
       final response = await _refreshDio.post(
         ApiUrlConstants.REFRESH_TOKEN,
-        data: {
-          "refreshToken": refreshToken,
-          "deviceId": deviceId,
-        },
+        data: {"refreshToken": refreshToken, "deviceId": deviceId},
       );
 
       final extracted = _extractTokenSet(response.data);
@@ -188,6 +247,8 @@ class BaseHttpService {
           accessTokenExpiry: extracted.accessExpiry,
           refreshTokenExpiry: extracted.refreshExpiry,
         );
+
+        _invalidateAccessTokenCache();
 
         _refreshCompleter!.complete(_RefreshResult.success);
         return _RefreshResult.success;
@@ -211,7 +272,7 @@ class BaseHttpService {
   }
 
   ({String access, String refresh, String accessExpiry, String refreshExpiry})?
-      _extractTokenSet(dynamic body) {
+  _extractTokenSet(dynamic body) {
     if (body is! Map) return null;
 
     final candidates = <Map>[];
@@ -228,10 +289,14 @@ class BaseHttpService {
       final refresh = m['refreshToken'];
       final accessExpiry = m['accessTokenValidTill'];
       final refreshExpiry = m['refreshTokenValidTill'] ?? m['enableAccessTill'];
-      if (access is String && access.isNotEmpty &&
-          refresh is String && refresh.isNotEmpty &&
-          accessExpiry is String && accessExpiry.isNotEmpty &&
-          refreshExpiry is String && refreshExpiry.isNotEmpty) {
+      if (access is String &&
+          access.isNotEmpty &&
+          refresh is String &&
+          refresh.isNotEmpty &&
+          accessExpiry is String &&
+          accessExpiry.isNotEmpty &&
+          refreshExpiry is String &&
+          refreshExpiry.isNotEmpty) {
         return (
           access: access,
           refresh: refresh,
@@ -287,14 +352,20 @@ class BaseHttpService {
     }
     _lastExpirationRedirect = now;
 
-    await sessionManager.clearTokens();
+    try {
+      await sessionManager.clearTokens().timeout(_tokenReadTimeout);
+    } catch (e) {}
 
     Get.offAllNamed(AppRoutes.login);
   }
 
   Future<bool> proactiveTokenRefresh() async {
-    final isAccessExpired = await sessionManager.isAccessTokenExpired();
-    if (!isAccessExpired) return true;
+    try {
+      final isAccessExpired = await sessionManager
+          .isAccessTokenExpired()
+          .timeout(_tokenReadTimeout);
+      if (!isAccessExpired) return true;
+    } catch (e) {}
 
     return await _handleTokenRefresh() == _RefreshResult.success;
   }
