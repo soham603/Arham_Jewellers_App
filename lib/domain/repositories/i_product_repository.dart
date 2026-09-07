@@ -14,4 +14,11 @@ abstract class IProductRepository {
     required String id,
     required dynamic data,
   });
+  Future<Map<String, dynamic>> fetchMissingImages({
+    required String startDate,
+    required String endDate,
+    int page,
+    int limit,
+  });
+  Future<Map<String, dynamic>> syncMissingImage(String id);
 }

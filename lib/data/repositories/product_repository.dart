@@ -68,4 +68,33 @@ class ProductRepository extends BaseRepository implements IProductRepository {
     );
     return response.data;
   }
+
+  @override
+  Future<Map<String, dynamic>> fetchMissingImages({
+    required String startDate,
+    required String endDate,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final response = await dio.get(
+      ApiUrlConstants.PRODUCTS_MISSING_IMAGES,
+      queryParameters: {
+        'startDate': startDate,
+        'endDate': endDate,
+        'page': page,
+        'limit': limit,
+      },
+    );
+    checkApiError(response.data);
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> syncMissingImage(String id) async {
+    final response = await dio.post(
+      ApiUrlConstants.productSyncMissingImage(id),
+    );
+    checkApiError(response.data);
+    return response.data;
+  }
 }

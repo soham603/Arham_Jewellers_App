@@ -14,6 +14,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/craftsmanManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/image_sync_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -364,6 +365,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         _ManagementItem(Icons.engineering_rounded, "Manage Karigar",
             "Import & manage craftsmen",
             () => Get.to(() => const CraftsmanManagerScreen())),
+        _ManagementItem(Icons.cloud_sync_rounded, "Image Sync",
+            "Sync missing images by date",
+            () => Get.to(() => const ImageSyncPage())),
       ];
 
   Widget _adminListTile(
