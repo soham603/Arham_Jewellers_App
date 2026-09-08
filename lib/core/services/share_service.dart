@@ -47,6 +47,10 @@ class ShareService {
     return '$_brandName\n$_brandSubtitle\n\n$filterInfo';
   }
 
+  static String buildShareCaption({String filterInfo = '', String? title}) {
+    return _buildShareText(filterInfo, title: title);
+  }
+
   static Future<Uint8List?> _downloadAndCompressImage(
     String imageUrl, {
     int? maxLongestEdge,
@@ -228,12 +232,9 @@ class ShareService {
 
       if (files.isEmpty) return;
 
-      final shareText = _buildShareText(filterInfo, title: title);
-
       await Share.shareXFiles(
         files,
         subject: _brandName,
-        text: shareText,
       );
     } finally {
       for (final file in files) {
@@ -981,6 +982,27 @@ class ShareService {
     }
   }
 
+  static String buildCustomOrderShareCaption(AdminOrderModel order) {
+    final itemName = order.itemName ?? '-';
+    final weight = order.weight ?? '-';
+    final purity = order.purity ?? '-';
+    final noOfPieces = order.noOfPieces ?? '-';
+    final marking = order.marking ?? '-';
+    final deliveryDate = order.deliveryDate ?? '-';
+
+    return 'Custom Order Details\n'
+        '━━━━━━━━━━━━━━━━━━━━\n'
+        'Item: $itemName\n'
+        'Weight: ${weight == '-' ? '-' : '${weight}g'}\n'
+        'Purity: $purity\n'
+        'Pieces: $noOfPieces\n'
+        'Hallmark/HUID: $marking\n'
+        'Delivery Date: $deliveryDate\n'
+        '━━━━━━━━━━━━━━━━━━━━\n'
+        '$_brandName\n'
+        '$_brandSubtitle';
+  }
+
   static Future<bool?> shareCustomOrderAsImages({
     required AdminOrderModel order,
     ValueNotifier<double>? progress,
@@ -1050,31 +1072,11 @@ class ShareService {
 
       progress?.value = 0.8;
 
-      final itemName = order.itemName ?? '-';
-      final weight = order.weight ?? '-';
-      final purity = order.purity ?? '-';
-      final noOfPieces = order.noOfPieces ?? '-';
-      final marking = order.marking ?? '-';
-      final deliveryDate = order.deliveryDate ?? '-';
-
-      final shareText = 'Custom Order Details\n'
-          '━━━━━━━━━━━━━━━━━━━━\n'
-          'Item: $itemName\n'
-          'Weight: ${weight == '-' ? '-' : '${weight}g'}\n'
-          'Purity: $purity\n'
-          'Pieces: $noOfPieces\n'
-          'Hallmark/HUID: $marking\n'
-          'Delivery Date: $deliveryDate\n'
-          '━━━━━━━━━━━━━━━━━━━━\n'
-          '$_brandName\n'
-          '$_brandSubtitle';
-
       progress?.value = 0.95;
 
       await Share.shareXFiles(
         files,
         subject: '$_brandName - Custom Order',
-        text: shareText,
       );
       progress?.value = 1.0;
       return true;

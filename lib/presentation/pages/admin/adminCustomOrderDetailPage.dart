@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/utils/formatters.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AdminOrderContro
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/craftsmanController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ratnesh_gold_app/core/widgets/status_border_card.dart';
 import 'package:ratnesh_gold_app/utils/whatsapp_util.dart';
@@ -518,6 +520,9 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   }
 
   void _showShareOptionsBottomSheet(BuildContext context) {
+    final captionController = TextEditingController(
+      text: ShareService.buildCustomOrderShareCaption(widget.order),
+    );
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -556,6 +561,15 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               ),
             ),
             SizedBox(height: context.heightPercent(1.5)),
+            _buildCaptionEditor(
+              ctx,
+              controller: captionController,
+              onCopy: () {
+                Clipboard.setData(ClipboardData(text: captionController.text));
+                ToastUtils.showSuccess('Caption copied');
+              },
+            ),
+            SizedBox(height: context.heightPercent(1.5)),
             _shareOptionTile(
               context,
               icon: Icons.image_outlined,
@@ -582,6 +596,109 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
             SizedBox(height: context.heightPercent(1.5)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCaptionEditor(
+    BuildContext context, {
+    required TextEditingController controller,
+    required VoidCallback onCopy,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(context.getResponsiveSize(3)),
+      decoration: BoxDecoration(
+        color: AppColors.tileBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Caption',
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.5),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+          SizedBox(height: context.heightPercent(0.4)),
+          Text(
+            'Edit the caption and copy it to paste while sending.',
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(2.8),
+              color: AppColors.textMuted,
+            ),
+          ),
+          SizedBox(height: context.heightPercent(0.8)),
+          TextField(
+            controller: controller,
+            minLines: 4,
+            maxLines: 6,
+            textAlignVertical: TextAlignVertical.top,
+            decoration: InputDecoration(
+              hintText: 'Caption to send with images',
+              hintStyle: TextStyle(
+                color: AppColors.textMuted.withValues(alpha: 0.6),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: AppColors.divider),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: AppColors.primaryGold,
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.all(12),
+            ),
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.2),
+              color: AppColors.textDark,
+            ),
+          ),
+          SizedBox(height: context.heightPercent(0.8)),
+          GestureDetector(
+            onTap: onCopy,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getResponsiveSize(3),
+                vertical: context.heightPercent(0.8),
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGold.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.primaryGold),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.copy_rounded,
+                    size: context.getResponsiveSize(4),
+                    color: AppColors.primaryGold,
+                  ),
+                  SizedBox(width: context.getResponsiveSize(1.5)),
+                  Text(
+                    'Copy caption',
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.2),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
