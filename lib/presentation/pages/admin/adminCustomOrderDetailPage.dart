@@ -582,7 +582,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                   subtitle: 'Send order images directly',
                   onTap: () {
                     Navigator.pop(ctx);
-                    _shareOrderAsImages(context);
+                    _shareOrderAsImages(context, caption: captionController.text);
                   },
                 ),
                 SizedBox(height: context.heightPercent(1)),
@@ -631,7 +631,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           ),
           SizedBox(height: context.heightPercent(0.4)),
           Text(
-            'Edit the caption and copy it to paste while sending.',
+            'Edit the caption — it is sent automatically with your images.',
             style: TextStyle(
               fontSize: context.getResponsiveSize(2.8),
               color: AppColors.textMuted,
@@ -775,7 +775,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     );
   }
 
-  void _shareOrderAsImages(BuildContext context) async {
+  void _shareOrderAsImages(BuildContext context, {String? caption}) async {
     if (_isSharing) return;
     setState(() => _isSharing = true);
 
@@ -784,6 +784,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
     final result = await ShareService.shareCustomOrderAsImages(
       order: widget.order,
+      caption: caption,
       progress: progress,
     );
 

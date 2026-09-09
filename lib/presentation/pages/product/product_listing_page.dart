@@ -1909,20 +1909,32 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final selectedProducts = _getSelectedProducts();
     if (selectedProducts.isEmpty) return;
 
+    final hasMultiCategory =
+        widget.categoryNames != null && widget.categoryNames!.isNotEmpty;
+    final filterInfo = hasMultiCategory
+        ? ''
+        : '${widget.karat ?? ''} Collection'.trim();
+
     final titleController = TextEditingController(
       text: widget.title ?? '${widget.karat ?? ''} Collection'.trim(),
     );
     final compressNotifier = ValueNotifier(false);
     final captionController = TextEditingController(
       text: ShareService.buildShareCaption(
-        filterInfo: '${widget.karat ?? ''} Collection'.trim(),
+        filterInfo: filterInfo,
         title: widget.title,
+        karats: hasMultiCategory ? widget.karats : null,
+        categories: hasMultiCategory ? widget.categoryNames!.values.toList() : null,
+        productCount: hasMultiCategory ? selectedProducts.length : null,
       ),
     );
     titleController.addListener(() {
       captionController.text = ShareService.buildShareCaption(
-        filterInfo: '${widget.karat ?? ''} Collection'.trim(),
+        filterInfo: filterInfo,
         title: titleController.text,
+        karats: hasMultiCategory ? widget.karats : null,
+        categories: hasMultiCategory ? widget.categoryNames!.values.toList() : null,
+        productCount: hasMultiCategory ? selectedProducts.length : null,
       );
     });
 
@@ -2079,6 +2091,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   _shareAsImages(
                     context,
                     titleController.text.trim(),
+                    caption: captionController.text,
                     compressImages: compressImages,
                   );
                 },
@@ -2156,7 +2169,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
           ),
           SizedBox(height: context.heightPercent(0.4)),
           Text(
-            'Edit the caption and copy it to paste while sending.',
+            'Edit the caption — it is sent automatically with your images.',
             style: TextStyle(
               fontSize: context.getResponsiveSize(2.8),
               color: context.colorPalette.subTitleColor,
@@ -2309,6 +2322,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   void _shareAsImages(
     BuildContext context,
     String title, {
+    String? caption,
     bool compressImages = true,
   }) {
     final products = _getSelectedProducts();
@@ -2330,6 +2344,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
       products: products,
       filterInfo: title.isNotEmpty ? title : 'Products',
       title: title.isNotEmpty ? title : null,
+      caption: caption,
       compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,

@@ -47,8 +47,41 @@ class ShareService {
     return '$_brandName\n$_brandSubtitle\n\n$filterInfo';
   }
 
-  static String buildShareCaption({String filterInfo = '', String? title}) {
-    return _buildShareText(filterInfo, title: title);
+  static String buildShareCaption({
+    String filterInfo = '',
+    String? title,
+    List<String>? karats,
+    List<String>? categories,
+    int? productCount,
+  }) {
+    final lines = <String>[];
+    final titleText = title != null && title.isNotEmpty && title != 'Selected Products'
+        ? title
+        : null;
+    if (titleText != null && titleText.isNotEmpty) {
+      lines.add(titleText);
+    } else if (filterInfo.isNotEmpty) {
+      lines.add(filterInfo);
+    }
+    if (karats != null && karats.isNotEmpty) {
+      lines.add('${karats.join(', ')} Collection');
+    }
+    if (categories != null && categories.isNotEmpty) {
+      final shown = categories.take(3).toList();
+      final remainder = categories.length - shown.length;
+      if (remainder > 0) {
+        lines.add('${shown.join(', ')}, +$remainder more');
+      } else {
+        lines.add(shown.join(', '));
+      }
+    }
+    if (productCount != null && productCount > 0) {
+      lines.add('$productCount items');
+    }
+    if (lines.isNotEmpty) lines.add('');
+    lines.add(_brandName);
+    lines.add(_brandSubtitle);
+    return lines.join('\n');
   }
 
   static Future<Uint8List?> _downloadAndCompressImage(
@@ -200,6 +233,7 @@ class ShareService {
     required List<ProductModel> products,
     required String filterInfo,
     String? title,
+    String? caption,
     bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
@@ -232,9 +266,12 @@ class ShareService {
 
       if (files.isEmpty) return;
 
+      final shareText = caption == null || caption.trim().isEmpty ? null : caption.trim();
+
       await Share.shareXFiles(
         files,
         subject: _brandName,
+        text: shareText,
       );
     } finally {
       for (final file in files) {
@@ -317,6 +354,7 @@ class ShareService {
     required List<String> categoryIds,
     required String filterInfo,
     String? title,
+    String? caption,
     bool compressImages = true,
     ValueNotifier<bool>? cancelled,
     ValueNotifier<double>? progress,
@@ -328,6 +366,7 @@ class ShareService {
       products: products,
       filterInfo: filterInfo,
       title: title,
+      caption: caption,
       compressImages: compressImages,
       cancelled: cancelled,
       progress: progress,
@@ -1005,6 +1044,7 @@ class ShareService {
 
   static Future<bool?> shareCustomOrderAsImages({
     required AdminOrderModel order,
+    String? caption,
     ValueNotifier<double>? progress,
   }) async {
     try {
@@ -1074,9 +1114,12 @@ class ShareService {
 
       progress?.value = 0.95;
 
+      final shareText = caption == null || caption.trim().isEmpty ? null : caption.trim();
+
       await Share.shareXFiles(
         files,
         subject: '$_brandName - Custom Order',
+        text: shareText,
       );
       progress?.value = 1.0;
       return true;
