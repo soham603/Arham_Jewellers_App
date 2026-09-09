@@ -314,6 +314,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Import & manage craftsmen",
                   onTap: () => Get.to(() => const CraftsmanManagerScreen()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.cloud_sync_rounded,
+                  title: "Image Sync",
+                  subtitle: "Sync missing images by date",
+                  onTap: () => Get.to(() => const ImageSyncPage()),
+                ),
                 _screenshotProtectionTile(context),
               ],
             )

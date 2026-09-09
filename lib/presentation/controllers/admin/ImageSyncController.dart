@@ -72,6 +72,9 @@ class ImageSyncController extends GetxController {
   final _currentIndex = 0.obs;
   int get currentIndex => _currentIndex.value;
 
+  final _syncingItemIds = <String>{}.obs;
+  bool isSyncingItem(String id) => _syncingItemIds.contains(id);
+
   final _syncedCount = 0.obs;
   int get syncedCount => _syncedCount.value;
 
@@ -152,26 +155,11 @@ class ImageSyncController extends GetxController {
     for (var i = 0; i < _items.length; i++) {
       final item = _items[i];
       _currentIndex.value = i + 1;
-
-      try {
-        final response = await _productRepo.syncMissingImage(item.id);
-        final result = SyncResultItem.fromJson(response['data'] ?? {});
-        _results[item.id] = result;
-        if (result.status == 'SUCCESS') {
-          _syncedCount.value++;
-        } else {
-          _failedCount.value++;
-        }
-      } catch (e) {
-        _results[item.id] = SyncResultItem(
-          status: 'FAILED',
-          reason: _errorMessage(e),
-        );
-        _failedCount.value++;
-      }
+      await _syncOne(item.id);
     }
 
     _isSyncing.value = false;
+    _syncingItemIds.clear();
 
     if (_failedCount.value == 0) {
       ToastUtils.showSuccess(
@@ -182,10 +170,50 @@ class ImageSyncController extends GetxController {
     }
   }
 
+  Future<void> syncSingleImage(String id) async {
+    if (_isSyncing.value) return;
+    if (_syncingItemIds.contains(id)) return;
+
+    final wasFailed = _failedCount.value;
+
+    await _syncOne(id);
+
+    if (_failedCount.value - wasFailed == 0) {
+      ToastUtils.showSuccess('Synced image successfully');
+    } else {
+      ToastUtils.showWarning('Failed to sync image');
+    }
+  }
+
+  Future<void> _syncOne(String id) async {
+    if (_syncingItemIds.contains(id)) return;
+    _syncingItemIds.add(id);
+
+    try {
+      final response = await _productRepo.syncMissingImage(id);
+      final result = SyncResultItem.fromJson(response['data'] ?? {});
+      _results[id] = result;
+      if (result.status == 'SUCCESS') {
+        _syncedCount.value++;
+      } else {
+        _failedCount.value++;
+      }
+    } catch (e) {
+      _results[id] = SyncResultItem(
+        status: 'FAILED',
+        reason: _errorMessage(e),
+      );
+      _failedCount.value++;
+    } finally {
+      _syncingItemIds.remove(id);
+    }
+  }
+
   void reset() {
     _items.clear();
     _total.value = 0;
     _results.clear();
+    _syncingItemIds.clear();
     _syncedCount.value = 0;
     _failedCount.value = 0;
     _currentIndex.value = 0;

@@ -69,26 +69,28 @@ class ImageSyncPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: context.heightPercent(2)),
-            Row(
-              children: [
-                Expanded(
-                  child: _dateField(
-                    context,
-                    label: 'Start',
-                    date: ctrl.startDate.value,
-                    onTap: () => _pickDate(context, ctrl, isStart: true),
+            Obx(
+              () => Row(
+                children: [
+                  Expanded(
+                    child: _dateField(
+                      context,
+                      label: 'Start',
+                      date: ctrl.startDate.value,
+                      onTap: () => _pickDate(context, ctrl, isStart: true),
+                    ),
                   ),
-                ),
-                SizedBox(width: context.getResponsiveSize(3)),
-                Expanded(
-                  child: _dateField(
-                    context,
-                    label: 'End',
-                    date: ctrl.endDate.value,
-                    onTap: () => _pickDate(context, ctrl, isStart: false),
+                  SizedBox(width: context.getResponsiveSize(3)),
+                  Expanded(
+                    child: _dateField(
+                      context,
+                      label: 'End',
+                      date: ctrl.endDate.value,
+                      onTap: () => _pickDate(context, ctrl, isStart: false),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             SizedBox(height: context.heightPercent(2)),
             SizedBox(
@@ -118,6 +120,34 @@ class ImageSyncPage extends StatelessWidget {
       initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      helpText: isStart ? 'SELECT START DATE' : 'SELECT END DATE',
+      builder: (ctx, child) => Theme(
+        data: Theme.of(ctx).copyWith(
+          colorScheme: ColorScheme.light(
+            primary: AppColors.primaryGold,
+            onPrimary: Colors.white,
+            surface: Colors.white,
+            onSurface: AppColors.textDark,
+          ),
+          datePickerTheme: DatePickerThemeData(
+            headerHeadlineStyle: TextStyle(
+              fontSize: ctx.responsiveFont(22),
+              fontWeight: FontWeight.w600,
+            ),
+            headerHelpStyle: TextStyle(
+              fontSize: ctx.responsiveFont(13),
+            ),
+            dayStyle: TextStyle(
+              fontSize: ctx.responsiveFont(14),
+            ),
+            weekdayStyle: TextStyle(
+              fontSize: ctx.responsiveFont(12),
+            ),
+            dayShape: WidgetStateProperty.all(const CircleBorder()),
+          ),
+        ),
+        child: child!,
+      ),
     );
     if (picked != null) {
       if (isStart) {
@@ -236,7 +266,7 @@ class ImageSyncPage extends StatelessWidget {
                                   strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.cloud_sync_rounded),
-                      label: Text(ctrl.isSyncing ? 'Syncing…' : 'Sync All (1 by 1)'),
+                      label: Text(ctrl.isSyncing ? 'Syncing…' : 'Sync All'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGold,
                         foregroundColor: Colors.white,
@@ -296,17 +326,22 @@ class ImageSyncPage extends StatelessWidget {
           );
         case CurrentAppState.INITIAL:
           return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.cloud_sync_rounded,
-                    size: context.getResponsiveSize(12), color: AppColors.textMuted),
-                SizedBox(height: context.heightPercent(1)),
-                Text(
-                  'Select a date range and tap "Find Missing Images".',
-                  style: TextStyle(color: AppColors.textMuted),
-                ),
-              ],
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.getResponsiveSize(6)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(Icons.cloud_sync_rounded,
+                      size: context.getResponsiveSize(12), color: AppColors.textMuted),
+                  SizedBox(height: context.heightPercent(1)),
+                  Text(
+                    'Select a date range and tap "Find Missing Images".',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
+                ],
+              ),
             ),
           );
         case CurrentAppState.SUCCESS:
@@ -387,10 +422,41 @@ class ImageSyncPage extends StatelessWidget {
               ],
             ),
           ),
-          _statusIcon(context, status),
+          _itemActions(context, ctrl, item, status),
         ],
       ),
     );
+  }
+
+  Widget _itemActions(BuildContext context, ImageSyncController ctrl,
+      MissingImageItem item, String? status) {
+    final isSyncingThis = ctrl.isSyncingItem(item.id);
+
+    if (status == null && !isSyncingThis) {
+      return ElevatedButton.icon(
+        onPressed: () => ctrl.syncSingleImage(item.id),
+        icon: const Icon(Icons.cloud_sync_rounded, size: 18),
+        label: const Text('Sync'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryGold,
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(3),
+            vertical: context.heightPercent(1),
+          ),
+        ),
+      );
+    }
+
+    if (isSyncingThis) {
+      return const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryGold),
+      );
+    }
+
+    return _statusIcon(context, status);
   }
 
   Widget _statusIcon(BuildContext context, String? status) {
