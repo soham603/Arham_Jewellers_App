@@ -1919,6 +1919,12 @@ class _ProductListingPageState extends State<ProductListingPage> {
         title: widget.title,
       ),
     );
+    titleController.addListener(() {
+      captionController.text = ShareService.buildShareCaption(
+        filterInfo: '${widget.karat ?? ''} Collection'.trim(),
+        title: titleController.text,
+      );
+    });
 
     showModalBottomSheet(
       context: context,
@@ -1939,10 +1945,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Center(
                 child: Container(
                   width: 40,
@@ -2094,6 +2101,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
               ),
               const SizedBox(height: 12),
             ],
+            ),
           ),
         ),
       ),

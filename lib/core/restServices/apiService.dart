@@ -32,7 +32,10 @@ class BaseHttpService {
         connectTimeout: AppTimeouts.normalSend,
         sendTimeout: AppTimeouts.normalSend,
         receiveTimeout: AppTimeouts.normalReceive,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ApiUrlConstants.API_KEY,
+        },
       ),
     );
 
@@ -41,7 +44,10 @@ class BaseHttpService {
         baseUrl: ApiUrlConstants.BASE_URL,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ApiUrlConstants.API_KEY,
+        },
       ),
     );
 

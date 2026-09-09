@@ -526,75 +526,81 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          20 + MediaQuery.of(ctx).padding.bottom,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            20 + MediaQuery.of(ctx).padding.bottom,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(height: context.heightPercent(2)),
+                Text(
+                  'Share Order Details',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4.5),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                SizedBox(height: context.heightPercent(1.5)),
+                _buildCaptionEditor(
+                  ctx,
+                  controller: captionController,
+                  onCopy: () {
+                    Clipboard.setData(ClipboardData(text: captionController.text));
+                    ToastUtils.showSuccess('Caption copied');
+                  },
+                ),
+                SizedBox(height: context.heightPercent(1.5)),
+                _shareOptionTile(
+                  context,
+                  icon: Icons.image_outlined,
+                  iconColor: const Color(0xFF25D366),
+                  title: 'Share as Images',
+                  subtitle: 'Send order images directly',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _shareOrderAsImages(context);
+                  },
+                ),
+                SizedBox(height: context.heightPercent(1)),
+                _shareOptionTile(
+                  context,
+                  icon: Icons.picture_as_pdf_outlined,
+                  iconColor: const Color(0xFFE53935),
+                  title: 'Share as PDF',
+                  subtitle: 'Create a branded order document',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _shareOrderAsPdf(context);
+                  },
+                ),
+                SizedBox(height: context.heightPercent(1.5)),
+              ],
             ),
-            SizedBox(height: context.heightPercent(2)),
-            Text(
-              'Share Order Details',
-              style: TextStyle(
-                fontSize: context.getResponsiveSize(4.5),
-                fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
-              ),
-            ),
-            SizedBox(height: context.heightPercent(1.5)),
-            _buildCaptionEditor(
-              ctx,
-              controller: captionController,
-              onCopy: () {
-                Clipboard.setData(ClipboardData(text: captionController.text));
-                ToastUtils.showSuccess('Caption copied');
-              },
-            ),
-            SizedBox(height: context.heightPercent(1.5)),
-            _shareOptionTile(
-              context,
-              icon: Icons.image_outlined,
-              iconColor: const Color(0xFF25D366),
-              title: 'Share as Images',
-              subtitle: 'Send order images directly',
-              onTap: () {
-                Navigator.pop(ctx);
-                _shareOrderAsImages(context);
-              },
-            ),
-            SizedBox(height: context.heightPercent(1)),
-            _shareOptionTile(
-              context,
-              icon: Icons.picture_as_pdf_outlined,
-              iconColor: const Color(0xFFE53935),
-              title: 'Share as PDF',
-              subtitle: 'Create a branded order document',
-              onTap: () {
-                Navigator.pop(ctx);
-                _shareOrderAsPdf(context);
-              },
-            ),
-            SizedBox(height: context.heightPercent(1.5)),
-          ],
+          ),
         ),
       ),
     );

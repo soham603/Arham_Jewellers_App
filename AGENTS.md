@@ -20,7 +20,7 @@ This repo is part of a larger system. Two sibling directories sit alongside it:
 | Directory | Stack | Notes |
 |---|---|---|
 | `../Arham_Jewellers_Web-App` | Next.js, React, TypeScript, Tailwind, shadcn/ui | Web storefront + admin. Reference for features, UI, API usage |
-| `../Arham_Jewellers_Backend` | Node.js, TypeScript, Express 5, Prisma, PostgreSQL | REST API backend |
+| `../arhamBackend` | Node.js, TypeScript, Express 5, Prisma, PostgreSQL | REST API backend |
 
 - Never modify files in sibling directories from this repo.
 - This repo is the authoritative **API endpoint reference** — the live base URL and all endpoints live in `lib/core/constants/ApiUrlConstants.dart`.

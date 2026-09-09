@@ -1,4 +1,9 @@
 class ApiUrlConstants {
+  static const String API_KEY = String.fromEnvironment(
+    'API_KEY',
+    defaultValue: 'c5d01fb4b102434d239a8ee050a2f8719586bf51a12e5205e2d52b6139309c7c',
+  );
+
   static const String BASE_URL = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'https://api.ratneshgold.com',
