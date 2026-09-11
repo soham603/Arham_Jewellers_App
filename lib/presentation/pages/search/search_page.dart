@@ -797,7 +797,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       SizedBox(height: context.heightPercent(0.2)),
                       Text(
-                        'Find a product using the tag number printed on it',
+                        'Find a product using the tag number',
                         style: TextStyle(
                           fontSize: context.getResponsiveSize(2.8),
                           color: context.colorPalette.subTitleColor,
@@ -1493,7 +1493,7 @@ class _TagSearchSheetState extends State<_TagSearchSheet> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Find a product using the tag number printed on it',
+                        'Find a product using the tag number',
                         style: TextStyle(
                           fontSize: 12,
                           color: context.colorPalette.subTitleColor,
