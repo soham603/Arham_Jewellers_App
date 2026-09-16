@@ -250,14 +250,18 @@ class ImageSyncPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: ctrl.isSyncing ? null : ctrl.findMissingImages,
+                      onPressed: (ctrl.isSyncing || ctrl.isFetchingAll)
+                          ? null
+                          : ctrl.findMissingImages,
                       child: const Text('Refresh'),
                     ),
                   ),
                   SizedBox(width: context.getResponsiveSize(3)),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: ctrl.isSyncing ? null : ctrl.syncMissingImages,
+                      onPressed: (ctrl.isSyncing || ctrl.isFetchingAll)
+                          ? null
+                          : ctrl.syncMissingImages,
                       icon: ctrl.isSyncing
                           ? const SizedBox(
                               width: 16,
@@ -319,7 +323,21 @@ class ImageSyncPage extends StatelessWidget {
     return Obx(() {
       switch (ctrl.listState) {
         case CurrentAppState.LOADING:
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                if (ctrl.isFetchingAll && ctrl.total > 0) ...[
+                  SizedBox(height: context.heightPercent(1.5)),
+                  Text(
+                    'Loading ${ctrl.items.length}/${ctrl.total}…',
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
+                ],
+              ],
+            ),
+          );
         case CurrentAppState.ERROR:
           return const Center(
             child: Text('Failed to load products. Try again.'),

@@ -69,6 +69,9 @@ class ImageSyncController extends GetxController {
   final _isSyncing = false.obs;
   bool get isSyncing => _isSyncing.value;
 
+  final _isFetchingAll = false.obs;
+  bool get isFetchingAll => _isFetchingAll.value;
+
   final _currentIndex = 0.obs;
   int get currentIndex => _currentIndex.value;
 
@@ -106,37 +109,59 @@ class ImageSyncController extends GetxController {
       ToastUtils.showWarning('Start date cannot be after end date');
       return;
     }
+    if (_isFetchingAll.value) return;
 
+    _isFetchingAll.value = true;
     _listState.value = CurrentAppState.LOADING;
     _results.clear();
     _syncedCount.value = 0;
     _failedCount.value = 0;
+    _items.clear();
+    _total.value = 0;
+
+    const pageSize = 50;
+    final collected = <MissingImageItem>[];
 
     try {
-      final response = await _productRepo.fetchMissingImages(
-        startDate: _formatDate(start),
-        endDate: _formatDate(end),
-      );
-      final data = response['data'];
-      if (data is Map<String, dynamic>) {
+      var page = 1;
+      var totalPages = 1;
+      do {
+        final response = await _productRepo.fetchMissingImages(
+          startDate: _formatDate(start),
+          endDate: _formatDate(end),
+          page: page,
+          limit: pageSize,
+        );
+        final data = response['data'];
+        if (data is! Map<String, dynamic>) break;
+
         final rawList = data['data'] is List ? data['data'] as List : [];
-        _items.value = rawList
-            .map((e) => MissingImageItem.fromJson(
-                e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e)))
-            .toList();
+        collected.addAll(rawList.map((e) => MissingImageItem.fromJson(
+            e is Map<String, dynamic> ? e : Map<String, dynamic>.from(e))));
+
         _total.value = data['total'] is int
             ? data['total'] as int
             : int.tryParse(data['total']?.toString() ?? '0') ?? 0;
-      } else {
-        _items.clear();
-        _total.value = 0;
-      }
+        _items.value = List.of(collected);
+
+        final tp = data['totalPages'] is int
+            ? data['totalPages'] as int
+            : (_total.value <= 0 ? 1 : (_total.value / pageSize).ceil());
+        totalPages = tp < 1 ? 1 : tp;
+
+        if (rawList.isEmpty) break;
+        page++;
+      } while (page <= totalPages);
+
+      _items.value = List.of(collected);
       _listState.value = CurrentAppState.SUCCESS;
     } catch (e) {
       _items.clear();
       _total.value = 0;
       _listState.value = CurrentAppState.ERROR;
       ToastUtils.showError(_errorMessage(e));
+    } finally {
+      _isFetchingAll.value = false;
     }
   }
 
@@ -220,6 +245,7 @@ class ImageSyncController extends GetxController {
     _listState.value = CurrentAppState.INITIAL;
     startDate.value = null;
     endDate.value = null;
+    _isFetchingAll.value = false;
   }
 
   String _errorMessage(Object e) {
