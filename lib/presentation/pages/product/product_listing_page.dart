@@ -431,13 +431,17 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<String> get _displayedAvailableSizes {
-    final sizes = <String>{};
-    for (final p in _displayedProducts) {
-      final s = p.size;
-      if (s != null && s.isNotEmpty) sizes.add(s);
+    final sizes = <String>{..._selectedSizes};
+    final serverSizes = _controller.availableSizes;
+    if (serverSizes.isNotEmpty) {
+      sizes.addAll(serverSizes);
+    } else {
+      for (final p in _displayedProducts) {
+        final s = p.size;
+        if (s != null && s.isNotEmpty) sizes.add(s);
+      }
     }
-    final sorted = sizes.toList()..sort();
-    return sorted;
+    return sizes.toList()..sort();
   }
 
   @override
@@ -447,6 +451,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ? 'filtered_${widget.categoryId ?? widget.categoryIds?.join("_")}_${widget.karat ?? ''}'
         : 'listing_${widget.karat ?? widget.karats?.join("_")}';
     _controller = Get.put(SearchProductController(), tag: tag);
+    _controller.setActiveQueryFilter(_isAdmin ? null : true);
     _previousSortOption = _controller.sortBy;
 
     if (Get.isRegistered<GoldRateController>()) {
@@ -1508,7 +1513,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
   }
 
   List<ProductModel> _applyClientSideFilters(List<ProductModel> products) {
-    return _applySizeFilter(_applyPriceFilter(products));
+    return _applyPriceFilter(products);
   }
 
   List<ProductModel> _applyPriceFilter(List<ProductModel> products) {
@@ -1523,17 +1528,6 @@ class _ProductListingPageState extends State<ProductListingPage> {
           return price >= _priceMin && price <= _priceMax;
         }).toList();
       }
-    }
-    return products;
-  }
-
-  List<ProductModel> _applySizeFilter(List<ProductModel> products) {
-    if (_selectedSizes.isNotEmpty) {
-      return products.where((p) {
-        final s = p.size;
-        if (s == null) return false;
-        return _selectedSizes.contains(s);
-      }).toList();
     }
     return products;
   }
@@ -1654,6 +1648,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             if (_scrollController.hasClients) {
               _scrollController.jumpTo(0);
             }
+            _controller.setSelectedSizeFilters(_selectedSizes);
             _controller.setWeightRange(_weightMin, _weightMax);
             _reloadStockFilter(_stockFilter);
           },

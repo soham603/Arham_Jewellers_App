@@ -62,17 +62,6 @@ class FilterStateController extends GetxController {
     return count;
   }
 
-  List<String> get availableSizes {
-    final source = _products;
-    final sizes = <String>{};
-    for (final p in source) {
-      final s = p.size;
-      if (s != null && s.isNotEmpty) sizes.add(s);
-    }
-    final sorted = sizes.toList()..sort();
-    return sorted;
-  }
-
   bool get hasWeightData {
     final source = _products;
     return source.any((p) => p.fineWeight != null);

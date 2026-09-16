@@ -63,6 +63,38 @@ class SearchProductController extends GetxController {
   double? get availableMinWeight => _availableMinWeight;
   double? get availableMaxWeight => _availableMaxWeight;
 
+  List<String> _selectedSizeFilters = [];
+  void setSelectedSizeFilters(List<String> sizes) {
+    _selectedSizeFilters = List<String>.from(sizes);
+  }
+
+  Map<String, dynamic> get _sizeQueryParam => {
+    if (_selectedSizeFilters.isNotEmpty) 'size': _selectedSizeFilters,
+  };
+
+  bool? _activeQueryFilter;
+  void setActiveQueryFilter(bool? value) {
+    _activeQueryFilter = value;
+  }
+
+  Map<String, dynamic> get _isActiveQueryParam => {
+    if (_activeQueryFilter != null) 'isActive': _activeQueryFilter,
+  };
+
+  final Set<String> _availableSizes = <String>{};
+  List<String> get availableSizes => _availableSizes.toList()..sort();
+
+  void _absorbAvailableSizes(dynamic envelope) {
+    if (envelope is! Map) return;
+    final raw = envelope['availableSizes'];
+    if (raw is List) {
+      for (final s in raw) {
+        final value = s?.toString();
+        if (value != null && value.isNotEmpty) _availableSizes.add(value);
+      }
+    }
+  }
+
   void _absorbWeightRange(dynamic envelope) {
     if (envelope is! Map) return;
     final min = (envelope['availableMinWeight'] as num?)?.toDouble();
@@ -222,7 +254,6 @@ class SearchProductController extends GetxController {
   double get priceMax => filterState.priceMax;
   bool get hasActiveFilters => filterState.hasActiveFilters;
   int get activeFilterCount => filterState.activeFilterCount;
-  List<String> get availableSizes => filterState.availableSizes;
   bool get hasWeightData => filterState.hasWeightData;
   double get availableWeightMax => filterState.availableWeightMax;
 
@@ -377,6 +408,7 @@ class SearchProductController extends GetxController {
     bool currentHasMore = hasMore;
 
     if (!isPagination) {
+      _availableSizes.clear();
       currentPage = 1;
       currentHasMore = true;
       if (isReady) {
@@ -411,12 +443,15 @@ class SearchProductController extends GetxController {
               if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
               if (_isOldestSort) "showReverse": true,
               ..._weightQueryParam,
+              ..._sizeQueryParam,
+              ..._isActiveQueryParam,
             },
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {
             final data = response.data['data'];
             _absorbWeightRange(data);
+            _absorbAvailableSizes(data);
             final List raw = data['data'] is List ? data['data'] : [];
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
@@ -524,6 +559,7 @@ class SearchProductController extends GetxController {
     if (state.value == CurrentAppState.LOADING) return;
 
     if (!isPagination) {
+      _availableSizes.clear();
       currentPage = 1;
       currentHasMore = true;
       _currentCategoryId = categoryId;
@@ -559,12 +595,15 @@ class SearchProductController extends GetxController {
           if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
           if (_isOldestSort) "showReverse": true,
           ..._weightQueryParam,
+          ..._sizeQueryParam,
+          ..._isActiveQueryParam,
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         _absorbWeightRange(data);
+        _absorbAvailableSizes(data);
         final List raw = data['data'] is List ? data['data'] : [];
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
@@ -664,6 +703,7 @@ class SearchProductController extends GetxController {
     bool currentHasMore = hasMore;
 
     if (!isPagination) {
+      _availableSizes.clear();
       currentPage = 1;
       currentHasMore = true;
       _currentMultiCategoryIds = List<String>.from(categoryIds);
@@ -701,12 +741,15 @@ class SearchProductController extends GetxController {
               if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
               if (_isOldestSort) "showReverse": true,
               ..._weightQueryParam,
+              ..._sizeQueryParam,
+              ..._isActiveQueryParam,
             },
           );
 
           if (response.statusCode == 200 || response.statusCode == 201) {
             final data = response.data['data'];
             _absorbWeightRange(data);
+            _absorbAvailableSizes(data);
             final List raw = data['data'] is List ? data['data'] : [];
             return raw.map((e) => ProductModel.fromJson(e)).toList();
           }
@@ -853,6 +896,7 @@ class SearchProductController extends GetxController {
     state.value = CurrentAppState.LOADING;
 
     if (!isPagination) {
+      _availableSizes.clear();
       currentPage = 1;
       currentHasMore = true;
       if (isReady) {
@@ -891,12 +935,15 @@ class SearchProductController extends GetxController {
           if (sortByWeightParam != null) "sortByWeight": sortByWeightParam,
           if (_isOldestSort) "showReverse": true,
           ..._weightQueryParam,
+          ..._sizeQueryParam,
+          ..._isActiveQueryParam,
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'];
         _absorbWeightRange(data);
+        _absorbAvailableSizes(data);
         final List raw = data['data'] is List ? data['data'] : [];
         final allFetched = raw.map((e) => ProductModel.fromJson(e)).toList();
 
