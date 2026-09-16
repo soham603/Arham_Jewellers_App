@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
@@ -385,64 +386,90 @@ class ImageSyncPage extends StatelessWidget {
 
   Widget _itemTile(BuildContext context, ImageSyncController ctrl,
       MissingImageItem item, int index) {
-    final result = ctrl.results[item.id];
-    final status = result?.status;
+    return Obx(() {
+      final result = ctrl.results[item.id];
+      final status = result?.status;
 
-    return Container(
-      padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE7DED2)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: context.getResponsiveSize(11),
-            height: context.getResponsiveSize(11),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5EFE7),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.image_outlined, color: AppColors.primaryGold),
-          ),
-          SizedBox(width: context.getResponsiveSize(3)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                    fontSize: context.getResponsiveSize(3.8),
-                  ),
-                ),
-                SizedBox(height: context.heightPercent(0.3)),
-                Text(
-                  'Tag: ${item.tagNo ?? '-'}',
-                  style: TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: context.getResponsiveSize(3.2),
-                  ),
-                ),
-                if (item.tagGenerateDate != null)
+      return Container(
+        padding: EdgeInsets.all(context.getResponsiveSize(3.5)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE7DED2)),
+        ),
+        child: Row(
+          children: [
+            _leadingImage(context, result),
+            SizedBox(width: context.getResponsiveSize(3)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'Generated: ${item.tagGenerateDate}',
+                    item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: context.getResponsiveSize(3),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                      fontSize: context.getResponsiveSize(3.8),
                     ),
                   ),
-              ],
+                  SizedBox(height: context.heightPercent(0.3)),
+                  Text(
+                    'Tag: ${item.tagNo ?? '-'}',
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: context.getResponsiveSize(3.2),
+                    ),
+                  ),
+                  if (item.tagGenerateDate != null)
+                    Text(
+                      'Generated: ${item.tagGenerateDate}',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: context.getResponsiveSize(3),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          _itemActions(context, ctrl, item, status),
-        ],
+            _itemActions(context, ctrl, item, status),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _leadingImage(BuildContext context, SyncResultItem? result) {
+    final url = result?.url;
+    final size = context.getResponsiveSize(11);
+    final hasImage = url != null && url.isNotEmpty;
+
+    return Container(
+      width: size,
+      height: size,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5EFE7),
+        borderRadius: BorderRadius.circular(10),
       ),
+      child: hasImage
+          ? CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primaryGold),
+                ),
+              ),
+              errorWidget: (context, url, error) =>
+                  const Icon(Icons.image_outlined, color: AppColors.primaryGold),
+            )
+          : const Icon(Icons.image_outlined, color: AppColors.primaryGold),
     );
   }
 
