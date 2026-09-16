@@ -105,7 +105,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
     final groups = <String, List<ProductModel>>{};
     final categoryController = Get.find<CategoryController>();
 
-    for (final product in _displayedProducts) {
+    for (final product in _applyClientSideFilters(_displayedProducts)) {
       final categoryId = product.category?.id;
       String? purity;
 
@@ -1631,6 +1631,7 @@ class _ProductListingPageState extends State<ProductListingPage> {
             bool? isActive,
           }) {
             setState(() {
+              _clearCategoryCaches();
               _stockFilter = stockFilter;
               _weightMin = wMin;
               _weightMax = wMax >= _displayedWeightMax ? double.infinity : wMax;
