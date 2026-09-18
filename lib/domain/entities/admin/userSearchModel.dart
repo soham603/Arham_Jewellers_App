@@ -50,7 +50,7 @@ class UserSearchModel {
       area: json['area'],
       companyName: json['companyName'],
       accountStatus: json['accountStatus'] ?? 'PENDING',
-      userActivationStatus: json['userActivationStatus'] ?? 'ACTIVE',
+      userActivationStatus: json['userActivationStatus'] ?? 'PENDING',
       enableAccessTill: json['enableAccessTill'] != null
           ? DateTime.parse(json['enableAccessTill'])
           : null,

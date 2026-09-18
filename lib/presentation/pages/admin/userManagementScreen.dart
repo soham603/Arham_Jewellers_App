@@ -499,6 +499,17 @@ class _UserCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isActive = user.userActivationStatus == 'ACTIVE';
+    final accountStatus = user.accountStatus.toUpperCase();
+    final isApproved = accountStatus == 'APPROVED';
+    final isRejected = accountStatus == 'REJECTED';
+    final statusLabel = isApproved
+        ? (isActive ? 'ACTIVE' : 'INACTIVE')
+        : accountStatus;
+    final statusColor = isApproved
+        ? (isActive ? Colors.green : Colors.red)
+        : (isRejected ? Colors.red : Colors.orange);
+    final accentColor =
+        isApproved && isActive ? AppColors.primaryGold : statusColor;
 
     return GestureDetector(
       onTap: () => _showUserDetailSheet(context),
@@ -508,9 +519,7 @@ class _UserCard extends StatelessWidget {
           color: context.colorPalette.boxColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isActive
-                ? AppColors.primaryGold.withValues(alpha: 0.2)
-                : Colors.red.withValues(alpha: 0.2),
+            color: accentColor.withValues(alpha: 0.2),
           ),
           boxShadow: [
             BoxShadow(
@@ -526,9 +535,7 @@ class _UserCard extends StatelessWidget {
               width: context.getResponsiveSize(11),
               height: context.getResponsiveSize(11),
               decoration: BoxDecoration(
-                color: isActive
-                    ? AppColors.primaryGold.withValues(alpha: 0.12)
-                    : Colors.red.withValues(alpha: 0.12),
+                color: accentColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -537,7 +544,7 @@ class _UserCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: context.getResponsiveSize(5),
                     fontWeight: FontWeight.w700,
-                    color: isActive ? AppColors.primaryGold : Colors.red,
+                    color: accentColor,
                   ),
                 ),
               ),
@@ -664,14 +671,13 @@ class _UserCard extends StatelessWidget {
                     vertical: context.heightPercent(0.4),
                   ),
                   decoration: BoxDecoration(
-                    color: (isActive ? Colors.green : Colors.red)
-                        .withValues(alpha: 0.12),
+                    color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    isActive ? 'ACTIVE' : 'INACTIVE',
+                    statusLabel,
                     style: TextStyle(
-                      color: isActive ? Colors.green : Colors.red,
+                      color: statusColor,
                       fontSize: context.getResponsiveSize(2.5),
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
@@ -774,7 +780,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                     context.heightPercent(3),
                   ),
                   children: [
-                    _header(context, user, isActive),
+                    _header(context, user),
                     SizedBox(height: context.heightPercent(2.5)),
                     _sectionTitle(context, 'Profile Information'),
                     _detailCard(
@@ -811,6 +817,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                           Icons.verified_user_outlined,
                           'Account Status',
                           user.accountStatus,
+                          valueColor: _accountStatusColor(user.accountStatus),
                         ),
                         _divider(context),
                         _detailRow(
@@ -901,7 +908,20 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     );
   }
 
-  Widget _header(BuildContext context, UserSearchModel user, bool isActive) {
+  Widget _header(BuildContext context, UserSearchModel user) {
+    final accountStatus = user.accountStatus.toUpperCase();
+    final isActivationActive = user.userActivationStatus == 'ACTIVE';
+    final isApproved = accountStatus == 'APPROVED';
+    final isRejected = accountStatus == 'REJECTED';
+    final statusLabel = isApproved
+        ? (isActivationActive ? 'Active' : 'Inactive')
+        : (isRejected ? 'Rejected' : 'Pending Approval');
+    final statusColor = isApproved
+        ? (isActivationActive ? Colors.green : Colors.red)
+        : (isRejected ? Colors.red : Colors.orange);
+    final accentColor =
+        isApproved && isActivationActive ? AppColors.primaryGold : statusColor;
+
     return Column(
       children: [
         _handleBar(context),
@@ -910,9 +930,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           width: context.getResponsiveSize(18),
           height: context.getResponsiveSize(18),
           decoration: BoxDecoration(
-            color: isActive
-                ? AppColors.primaryGold.withValues(alpha: 0.12)
-                : Colors.red.withValues(alpha: 0.12),
+            color: accentColor.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -921,7 +939,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               style: TextStyle(
                 fontSize: context.getResponsiveSize(8),
                 fontWeight: FontWeight.w700,
-                color: isActive ? AppColors.primaryGold : Colors.red,
+                color: accentColor,
               ),
             ),
           ),
@@ -955,8 +973,8 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             SizedBox(width: context.getResponsiveSize(2)),
             _badge(
               context,
-              label: isActive ? 'Active' : 'Inactive',
-              color: isActive ? Colors.green : Colors.red,
+              label: statusLabel,
+              color: statusColor,
             ),
             if (user.isRetailer == true) ...[
               SizedBox(width: context.getResponsiveSize(2)),
@@ -1091,6 +1109,17 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
         return AppColors.primaryGold;
       default:
         return const Color(0xFF2D9D59);
+    }
+  }
+
+  Color _accountStatusColor(String? status) {
+    switch (status?.toUpperCase()) {
+      case 'APPROVED':
+        return Colors.green;
+      case 'REJECTED':
+        return Colors.red;
+      default:
+        return Colors.orange;
     }
   }
 
