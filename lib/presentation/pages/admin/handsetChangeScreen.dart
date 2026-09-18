@@ -426,6 +426,11 @@ class _RequestCardState extends State<_RequestCard> {
     final userName = req.userName ?? 'Unknown';
     final userPhone = req.userPhoneNumber ?? '—';
 
+    final isBrowser = req.isBrowser;
+    final oldLabel = isBrowser ? 'Current Browser' : 'Old Device';
+    final newName = isBrowser ? (req.newUuid ?? '') : req.newDeviceName;
+    final newLabel = isBrowser ? 'New Browser' : 'New Device';
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
@@ -482,12 +487,42 @@ class _RequestCardState extends State<_RequestCard> {
                           ),
                         ),
                         SizedBox(height: context.heightPercent(0.3)),
-                        Text(
-                          userPhone,
-                          style: TextStyle(
-                            fontSize: context.getResponsiveSize(3.2),
-                            color: context.colorPalette.subTitleColor,
-                          ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                userPhone,
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.2),
+                                  color: context.colorPalette.subTitleColor,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: context.getResponsiveSize(2)),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.getResponsiveSize(2),
+                                vertical: context.heightPercent(0.2),
+                              ),
+                              decoration: BoxDecoration(
+                                color: (isBrowser
+                                        ? Colors.blue
+                                        : context.colorPalette.subTitleColor)
+                                    .withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                isBrowser ? 'Browser' : 'App',
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.6),
+                                  fontWeight: FontWeight.w600,
+                                  color: isBrowser
+                                      ? Colors.blue.shade700
+                                      : context.colorPalette.subTitleColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -540,7 +575,9 @@ class _RequestCardState extends State<_RequestCard> {
               padding: EdgeInsets.all(context.getResponsiveSize(4)),
               child: Column(
                 children: [
-                  if (req.oldDeviceName != null || req.oldDeviceId != null)
+                  if (isBrowser ||
+                      req.oldDeviceName != null ||
+                      req.oldDeviceId != null)
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(context.getResponsiveSize(3)),
@@ -558,7 +595,7 @@ class _RequestCardState extends State<_RequestCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Old Device',
+                                  oldLabel,
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(2.8),
                                     color: context.colorPalette.subTitleColor,
@@ -567,21 +604,25 @@ class _RequestCardState extends State<_RequestCard> {
                                 ),
                                 SizedBox(height: context.heightPercent(0.3)),
                                 Text(
-                                  req.oldDeviceName ?? '—',
+                                  isBrowser
+                                      ? (req.oldUuid ?? '—')
+                                      : (req.oldDeviceName ?? '—'),
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(3.5),
                                     fontWeight: FontWeight.w700,
                                     color: context.colorPalette.textColor,
                                   ),
                                 ),
-                                SizedBox(height: context.heightPercent(0.2)),
-                                Text(
-                                  req.oldDeviceId ?? '—',
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.6),
-                                    color: context.colorPalette.subTitleColor,
+                                if (!isBrowser) ...[
+                                  SizedBox(height: context.heightPercent(0.2)),
+                                  Text(
+                                    req.oldDeviceId ?? '—',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(2.6),
+                                      color: context.colorPalette.subTitleColor,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ],
                             ),
                           ),
@@ -600,7 +641,7 @@ class _RequestCardState extends State<_RequestCard> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  'New Device',
+                                  newLabel,
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(2.8),
                                     color: context.colorPalette.subTitleColor,
@@ -609,7 +650,7 @@ class _RequestCardState extends State<_RequestCard> {
                                 ),
                                 SizedBox(height: context.heightPercent(0.3)),
                                 Text(
-                                  req.newDeviceName,
+                                  newName.isEmpty ? '—' : newName,
                                   style: TextStyle(
                                     fontSize: context.getResponsiveSize(3.5),
                                     fontWeight: FontWeight.w700,
@@ -617,15 +658,17 @@ class _RequestCardState extends State<_RequestCard> {
                                   ),
                                   textAlign: TextAlign.end,
                                 ),
-                                SizedBox(height: context.heightPercent(0.2)),
-                                Text(
-                                  req.newDeviceId,
-                                  style: TextStyle(
-                                    fontSize: context.getResponsiveSize(2.6),
-                                    color: context.colorPalette.subTitleColor,
+                                if (!isBrowser) ...[
+                                  SizedBox(height: context.heightPercent(0.2)),
+                                  Text(
+                                    req.newDeviceId,
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(2.6),
+                                      color: context.colorPalette.subTitleColor,
+                                    ),
+                                    textAlign: TextAlign.end,
                                   ),
-                                  textAlign: TextAlign.end,
-                                ),
+                                ],
                               ],
                             ),
                           ),
@@ -782,7 +825,9 @@ class _RequestCardState extends State<_RequestCard> {
           ],
         ),
         content: Text(
-          'Allow ${req.userName ?? 'this user'} to change their handset to ${req.newDeviceName}?',
+          req.isBrowser
+              ? 'Allow ${req.userName ?? 'this user'} to link this browser to their account?'
+              : 'Allow ${req.userName ?? 'this user'} to change their handset to ${req.newDeviceName}?',
           style: TextStyle(
             fontSize: context.getResponsiveSize(3.8),
             color: context.colorPalette.textColor,
@@ -878,7 +923,7 @@ class _RequestCardState extends State<_RequestCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Reject handset change request from ${req.userName ?? 'this user'}?',
+              'Reject ${req.isBrowser ? 'browser change' : 'handset change'} request from ${req.userName ?? 'this user'}?',
               style: TextStyle(
                 fontSize: context.getResponsiveSize(3.8),
                 color: context.colorPalette.textColor,
