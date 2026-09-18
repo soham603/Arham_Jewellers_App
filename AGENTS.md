@@ -92,7 +92,7 @@ For verifying flows against `https://api.ratneshgold.com/`. Test accounts only �
 Notes:
 
 - The app normalizes 10-digit numbers to `+91XXXXXXXXXX`; the raw API requires the international format.
-- Customer accounts are device-bound on the backend. The app sends the real device id from `getDeviceId()`; for direct API logins outside the app, pass the registered device (`SP1A.210812.016`) — otherwise login fails with `Device mismatch`.
+- Customer accounts are device-bound on the backend. The app sends the real device id from `getDeviceId()`; for direct API logins outside the app (e.g. curling `+918097137041`), pass that account's registered `deviceId` (`SP1A.210812.016`) — otherwise login fails with `Device mismatch`.
 - Admin and customer use separate endpoints (`user-login` vs `admin-login`); the app chooses based on account type and stores the result in the `isAdmin` flag.
 
 ## Code Style
