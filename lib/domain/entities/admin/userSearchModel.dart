@@ -16,6 +16,7 @@ class UserSearchModel {
   final List<AccessRequestRef>? accessRequests;
   final String? deviceId;
   final String? deviceName;
+  final String? uuid;
   final bool? isRetailer;
   final String? forgotPasswordStatus;
 
@@ -35,6 +36,7 @@ class UserSearchModel {
     this.accessRequests,
     this.deviceId,
     this.deviceName,
+    this.uuid,
     this.isRetailer,
     this.forgotPasswordStatus,
   });
@@ -64,6 +66,7 @@ class UserSearchModel {
           : null,
       deviceId: json['deviceId'],
       deviceName: json['deviceName'],
+      uuid: json['uuid'],
       isRetailer: json['retailUser'] ?? false,
       forgotPasswordStatus: json['forgotPasswordStatus'],
     );
@@ -86,6 +89,7 @@ class UserSearchModel {
       'accessRequests': accessRequests?.map((e) => e.toJson()).toList(),
       'deviceId': deviceId,
       'deviceName': deviceName,
+      'uuid': uuid,
       'retailUser': isRetailer,
       'forgotPasswordStatus': forgotPasswordStatus,
     };
@@ -107,6 +111,7 @@ class UserSearchModel {
     List<AccessRequestRef>? accessRequests,
     String? deviceId,
     String? deviceName,
+    String? uuid,
     bool? isRetailer,
     String? forgotPasswordStatus,
   }) {
@@ -126,6 +131,7 @@ class UserSearchModel {
       accessRequests: accessRequests ?? this.accessRequests,
       deviceId: deviceId ?? this.deviceId,
       deviceName: deviceName ?? this.deviceName,
+      uuid: uuid ?? this.uuid,
       isRetailer: isRetailer ?? this.isRetailer,
       forgotPasswordStatus: forgotPasswordStatus ?? this.forgotPasswordStatus,
     );

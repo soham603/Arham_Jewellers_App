@@ -875,6 +875,16 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                             maxLines: 2,
                           ),
                         ],
+                        if (user.uuid != null && user.uuid!.isNotEmpty) ...[
+                          _divider(context),
+                          _detailRow(
+                            context,
+                            Icons.public_outlined,
+                            'Web UUID',
+                            user.uuid!,
+                            maxLines: 2,
+                          ),
+                        ],
                       ],
                     ),
                     SizedBox(height: context.heightPercent(2.5)),
