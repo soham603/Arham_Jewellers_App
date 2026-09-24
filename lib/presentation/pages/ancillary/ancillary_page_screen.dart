@@ -139,6 +139,57 @@ class _AncillaryPageScreenState extends State<AncillaryPageScreen> {
           );
         }
 
+        if (pageKey == 'ADMIN_CONTACT') {
+          final digits = page.content.replaceAll(RegExp(r'[^0-9+]'), '');
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.all(context.getResponsiveSize(6)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.support_agent_rounded,
+                    size: context.getResponsiveSize(16),
+                    color: AppColors.primaryGold,
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+                  Text(
+                    'Need help? Our support team is happy to assist you.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(4),
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(3)),
+                  ElevatedButton.icon(
+                    onPressed: () => launchUrl(Uri.parse('tel:$digits')),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryGold,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(6),
+                        vertical: context.heightPercent(1.6),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.call, color: Colors.white),
+                    label: Text(
+                      page.content,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: context.getResponsiveSize(4.2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: context.getResponsiveSize(4),

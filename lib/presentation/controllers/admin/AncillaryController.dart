@@ -50,10 +50,19 @@ class AncillaryController extends GetxController {
   AncillaryPageModel? getPage(String key) => _pages[key];
 
   static String _sanitizePhone(String raw) {
-    final stripped = raw.replaceAll(RegExp(r'<[^>]*>'), '').trim();
-    final cleaned = stripped.replaceAll(RegExp(r'[^0-9+]'), '');
-    final match = RegExp(r'(\+?\d{10,13})').firstMatch(cleaned);
-    return match?.group(1) ?? '';
+    final digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    String national;
+    if (digits.length == 12 && digits.startsWith('91')) {
+      national = digits.substring(2);
+    } else if (digits.length == 11 && digits.startsWith('0')) {
+      national = digits.substring(1);
+    } else if (digits.length == 10) {
+      national = digits;
+    } else {
+      return '';
+    }
+    if (!RegExp(r'^[6-9]\d{9}$').hasMatch(national)) return '';
+    return '+91$national';
   }
 
   Future<void>? _adminContactReady;
