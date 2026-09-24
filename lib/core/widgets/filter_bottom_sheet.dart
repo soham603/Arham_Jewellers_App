@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -643,7 +644,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Stock Status',
+          'Availability',
           style: TextStyle(
             fontSize: context.responsiveFont(12),
             fontWeight: FontWeight.w600,
@@ -655,14 +656,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           children: [
             _buildStockOption(
               context,
-              label: 'Ready Stock',
+              label: 'STOCK',
+              accent: AppColors.success,
               isSelected: _tempStockFilter == 'ready',
               onTap: () => setState(() => _tempStockFilter = 'ready'),
             ),
             const SizedBox(width: 5),
             _buildStockOption(
               context,
-              label: 'Out of Stock',
+              label: 'NON STOCK',
+              accent: AppColors.danger,
               isSelected: _tempStockFilter == 'out',
               onTap: () => setState(() => _tempStockFilter = 'out'),
             ),
@@ -670,6 +673,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             _buildStockOption(
               context,
               label: 'Show All',
+              accent: context.colorPalette.gold,
               isSelected: _tempStockFilter == 'all',
               onTap: () => setState(() => _tempStockFilter = 'all'),
             ),
@@ -682,6 +686,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget _buildStockOption(
     BuildContext context, {
     required String label,
+    required Color accent,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
@@ -694,15 +699,11 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             vertical: context.responsiveWidth(6, tabletVal: 8),
           ),
           decoration: BoxDecoration(
-            color: isSelected
-                ? context.colorPalette.gold
-                : context.colorPalette.cardBg,
+            color: isSelected ? accent : context.colorPalette.cardBg,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected
-                  ? context.colorPalette.gold
-                  : context.colorPalette.border,
-              width: 1,
+              color: accent.withValues(alpha: isSelected ? 1.0 : 0.6),
+              width: 1.4,
             ),
           ),
           child: Center(
@@ -711,9 +712,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               style: TextStyle(
                 fontSize: context.responsiveFont(11),
                 fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? Colors.white
-                    : context.colorPalette.goldDeep,
+                color: isSelected ? Colors.white : accent,
               ),
             ),
           ),

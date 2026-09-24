@@ -505,10 +505,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final bool inStock = isStockField != null
         ? (isStockField == 1 || isStockField == true || isStockField == '1')
         : product.isActive;
-    final String stockText = inStock ? "READY STOCK" : "OUT OF STOCK";
-    final Color stockColor = inStock
-        ? AppColors.primaryGold
-        : Colors.red.shade600;
+    final String stockText = inStock
+        ? "CATALOGUE AVAILABLE"
+        : "NOT AVAILABLE";
+    final Color stockColor = inStock ? AppColors.success : AppColors.danger;
 
     return SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -767,8 +767,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 color: stockColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: stockColor.withValues(alpha: 0.3),
-                                  width: 1,
+                                  color: stockColor,
+                                  width: 1.4,
                                 ),
                               ),
                               child: Text(

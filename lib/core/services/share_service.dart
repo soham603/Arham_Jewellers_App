@@ -2121,7 +2121,7 @@ Future<List<int>> _buildProductEnquiryPdfInIsolate(Map<String, dynamic> params) 
         pw.SizedBox(width: 12),
         pw.Expanded(
           child: pw.Text(
-            'This item is currently out of stock. Please share your interest via this enquiry.',
+            'This item is currently not available online. Please share your interest via this enquiry.',
             style: pw.TextStyle(font: regularFont, fontSize: 10, color: redColor),
           ),
         ),

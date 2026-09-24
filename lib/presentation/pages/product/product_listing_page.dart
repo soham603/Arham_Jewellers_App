@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
+import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/utils/string_utils.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/share/widgets/share_products_per_page_sheet.dart';
@@ -825,9 +826,9 @@ class _ProductListingPageState extends State<ProductListingPage> {
                       const SizedBox(height: 12),
                       Text(
                         _stockFilter == 'ready'
-                            ? 'No ready stock items available'
+                            ? 'No stock items available'
                             : _stockFilter == 'out'
-                            ? 'No out of stock items found'
+                            ? 'No non stock items found'
                             : 'No products found',
                         style: TextStyle(
                           color: context.colorPalette.goldDark,
@@ -1091,14 +1092,14 @@ class _ProductListingPageState extends State<ProductListingPage> {
               child: Row(
                 children: [
                   _buildStockChip(
-                    'Ready Stock',
+                    'STOCK',
                     'ready',
                     Icons.check_circle_outline_rounded,
                     context,
                   ),
                   SizedBox(width: context.responsiveWidth(8)),
                   _buildStockChip(
-                    'Out of Stock',
+                    'NON STOCK',
                     'out',
                     Icons.remove_circle_outline_rounded,
                     context,
@@ -1303,6 +1304,11 @@ class _ProductListingPageState extends State<ProductListingPage> {
     BuildContext context,
   ) {
     final isSelected = _stockFilter == value;
+    final Color accent = value == 'ready'
+        ? AppColors.success
+        : value == 'out'
+        ? AppColors.danger
+        : context.colorPalette.gold;
     return GestureDetector(
       onTap: () {
         if (!isSelected) {
@@ -1323,15 +1329,16 @@ class _ProductListingPageState extends State<ProductListingPage> {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? context.colorPalette.gold.withValues(alpha: 0.08)
+              ? accent.withValues(alpha: 0.08)
               : Colors.white,
           borderRadius: BorderRadius.circular(
             context.responsiveWidth(8, largeTabletVal: 14),
           ),
           border: Border.all(
-            color: isSelected
-                ? context.colorPalette.gold
-                : context.colorPalette.border,
+            color: value == 'all'
+                ? (isSelected ? accent : context.colorPalette.border)
+                : accent.withValues(alpha: isSelected ? 1.0 : 0.6),
+            width: value != 'all' ? 1.4 : 1.0,
           ),
         ),
         child: Row(
@@ -1341,8 +1348,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
               icon,
               size: context.responsiveWidth(16, largeTabletVal: 26),
               color: isSelected
-                  ? context.colorPalette.gold
-                  : context.colorPalette.goldDark,
+                  ? accent
+                  : value == 'all'
+                  ? context.colorPalette.goldDark
+                  : accent,
             ),
             SizedBox(width: context.responsiveWidth(4)),
             Text(
@@ -1354,8 +1363,10 @@ class _ProductListingPageState extends State<ProductListingPage> {
                 ),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? context.colorPalette.gold
-                    : context.colorPalette.goldDark,
+                    ? accent
+                    : value == 'all'
+                    ? context.colorPalette.goldDark
+                    : accent,
               ),
             ),
           ],
