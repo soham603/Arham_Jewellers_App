@@ -470,8 +470,8 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
             color: context.colorPalette.goldDeep,
           ),
           items: const [
-            DropdownMenuItem(value: 'ready', child: Text('STOCK')),
-            DropdownMenuItem(value: 'out', child: Text('NON STOCK')),
+            DropdownMenuItem(value: 'ready', child: Text('Stock')),
+            DropdownMenuItem(value: 'out', child: Text('Non-Stock')),
             DropdownMenuItem(value: 'all', child: Text('All Stock')),
           ],
           onChanged: (val) {

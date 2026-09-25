@@ -656,7 +656,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           children: [
             _buildStockOption(
               context,
-              label: 'STOCK',
+              label: 'Stock',
               accent: AppColors.success,
               isSelected: _tempStockFilter == 'ready',
               onTap: () => setState(() => _tempStockFilter = 'ready'),
@@ -664,7 +664,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             const SizedBox(width: 5),
             _buildStockOption(
               context,
-              label: 'NON STOCK',
+              label: 'Non-Stock',
               accent: AppColors.danger,
               isSelected: _tempStockFilter == 'out',
               onTap: () => setState(() => _tempStockFilter = 'out'),
