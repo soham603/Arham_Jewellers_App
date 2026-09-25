@@ -56,6 +56,7 @@ class ApiUrlConstants {
   static const String ADMIN_ACCESS_HANDLE = '/api/v1/admin-access/handle-access';
   static const String ADMIN_ACCESS_GET_ALL_USERS = '/api/v1/admin-access/get-all-users';
   static const String CREATE_ADMIN = '/api/v1/admin-access/create-admin';
+  static const String REMOVE_ADMIN = '/api/v1/admin-access/remove-admin';
   static const String ADMIN_ACCESS_TOGGLE_RETAILER = '/api/v1/admin-access/toggle-retailer';
   static const String ADMIN_ACCESS_UPDATE_USER_ACTIVATION = '/api/v1/admin-access/update-user-activation';
 

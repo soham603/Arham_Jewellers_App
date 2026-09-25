@@ -18,6 +18,9 @@ abstract class IAdminAccessRepository {
   Future<Map<String, dynamic>> createAdmin({
     required Map<String, dynamic> data,
   });
+  Future<Map<String, dynamic>> removeAdmin({
+    required Map<String, dynamic> data,
+  });
   Future<Map<String, dynamic>> toggleRetailer({
     required Map<String, dynamic> data,
   });

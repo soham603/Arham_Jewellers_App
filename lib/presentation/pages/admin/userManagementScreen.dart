@@ -1166,6 +1166,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             _sheetDivider(context),
           ],
 
+          if (Get.find<AuthController>().user?.role == 'SUPERADMIN' &&
+              widget.user.role.toUpperCase() == 'ADMIN') ...[
+            _actionRow(
+              context,
+              icon: Icons.no_accounts_outlined,
+              title: 'Remove Admin',
+              subtitle: 'Revoke admin privileges',
+              color: Colors.red,
+              isLoading: widget.controller.actionState == CurrentAppState.LOADING &&
+                  widget.controller.actioningId == widget.user.id,
+              onTap: () => _showRemoveAdminDialog(context),
+            ),
+            _sheetDivider(context),
+          ],
+
           _toggleRow(
             context,
             icon: Icons.store_outlined,
@@ -1661,6 +1676,165 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
                       : const Text('Create Admin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _showRemoveAdminDialog(BuildContext context) {
+    final passwordController = TextEditingController();
+    var obscurePassword = true;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final hasPassword = passwordController.text.trim().isNotEmpty;
+
+          return AlertDialog(
+            backgroundColor: context.colorPalette.backgroundColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.no_accounts_rounded, color: Colors.red, size: 20),
+                ),
+                SizedBox(width: context.getResponsiveSize(2)),
+                Text(
+                  'Remove Admin',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(4.5),
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Remove admin privileges from ${widget.user.name}? They will continue as a customer.',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.8),
+                    color: context.colorPalette.textColor,
+                  ),
+                ),
+                SizedBox(height: context.heightPercent(0.5)),
+                Text(
+                  'Phone: ${widget.user.phoneNumber}',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.5),
+                    color: context.colorPalette.subTitleColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: context.heightPercent(2)),
+                Text(
+                  'Enter your password to confirm this action',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3),
+                    color: context.colorPalette.subTitleColor,
+                  ),
+                ),
+                SizedBox(height: context.heightPercent(0.8)),
+                TextField(
+                  controller: passwordController,
+                  obscureText: obscurePassword,
+                  onChanged: (_) => setDialogState(() {}),
+                  style: TextStyle(
+                    color: AppColors.textDark,
+                    fontSize: context.getResponsiveSize(3.5),
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Your Password',
+                    hintText: 'Enter your password',
+                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    prefixIcon: Icon(
+                      Icons.lock_outline_rounded,
+                      color: context.colorPalette.subTitleColor,
+                      size: context.getResponsiveSize(4.5),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey.shade500,
+                        size: context.getResponsiveSize(4.5),
+                      ),
+                      onPressed: () {
+                        setDialogState(() {
+                          obscurePassword = !obscurePassword;
+                        });
+                      },
+                    ),
+                    filled: true,
+                    fillColor: context.colorPalette.boxColor,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.heightPercent(1.2),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: context.colorPalette.subTitleColor.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: Text('Cancel', style: TextStyle(color: context.colorPalette.subTitleColor)),
+              ),
+              Obx(
+                () => ElevatedButton(
+                  onPressed: hasPassword && widget.controller.actionState != CurrentAppState.LOADING
+                      ? () async {
+                          final password = passwordController.text.trim();
+                          Navigator.of(dialogContext).pop();
+                          await widget.controller.removeAdmin(
+                            userId: widget.user.id,
+                            adminPassword: password,
+                          );
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    disabledBackgroundColor: Colors.red.withValues(alpha: 0.35),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: widget.controller.actionState == CurrentAppState.LOADING
+                      ? const SizedBox(
+                          width: 16, height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Remove Admin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                 ),
               ),
             ],

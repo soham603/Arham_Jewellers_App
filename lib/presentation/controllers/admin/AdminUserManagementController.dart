@@ -195,6 +195,18 @@ class AdminUserManagementController extends GetxController {
     );
   }
 
+  Future<bool> removeAdmin({
+    required String userId,
+    required String adminPassword,
+  }) async {
+    return _handleAction(
+      userId: userId,
+      actionType: AdminAction.removeAdmin,
+      body: {'userId': userId, 'adminPassword': adminPassword},
+      actionLabel: 'removed from admins',
+    );
+  }
+
   Future<bool> toggleRetailer({
     required String userId,
     required bool isRetailer,
@@ -233,6 +245,9 @@ class AdminUserManagementController extends GetxController {
       switch (actionType) {
         case AdminAction.createAdmin:
           response = await _adminAccessRepo.createAdmin(data: body);
+          break;
+        case AdminAction.removeAdmin:
+          response = await _adminAccessRepo.removeAdmin(data: body);
           break;
         case AdminAction.toggleRetailer:
           response = await _adminAccessRepo.toggleRetailer(data: body);
@@ -294,6 +309,7 @@ enum UserSearchMode {
 enum AdminAction {
   toggleActivation,
   createAdmin,
+  removeAdmin,
   toggleRetailer,
   resetPassword,
 }

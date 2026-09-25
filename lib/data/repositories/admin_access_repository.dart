@@ -97,6 +97,18 @@ class AdminAccessRepository extends BaseRepository implements IAdminAccessReposi
   }
 
   @override
+  Future<Map<String, dynamic>> removeAdmin({
+    required Map<String, dynamic> data,
+  }) async {
+    final response = await dio.post(
+      ApiUrlConstants.REMOVE_ADMIN,
+      data: data,
+      options: Options(extra: {'requiresAuth': true}),
+    );
+    return response.data;
+  }
+
+  @override
   Future<Map<String, dynamic>> toggleRetailer({
     required Map<String, dynamic> data,
   }) async {
