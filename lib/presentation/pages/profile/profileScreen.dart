@@ -6,7 +6,7 @@ import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/adminPanelScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/staffPanelScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/superAdminPanelScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/ancillary/ancillary_page_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/my_orders_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/wishlist/wishlist_page.dart';
@@ -88,8 +88,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(
           isAdmin
               ? (authController.user?.role == 'SUPERADMIN'
-                  ? "Admin Panel"
-                  : "Staff Panel")
+                  ? "Super Admin Panel"
+                  : "Admin Panel")
               : "Profile",
           style: TextStyle(
             color: AppColors.textDark,
@@ -205,8 +205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       body: isAdmin
           ? (authController.user?.role == 'SUPERADMIN'
-              ? const AdminPanelScreen()
-              : const StaffPanelScreen())
+              ? const SuperAdminPanelScreen()
+              : const AdminPanelScreen())
           : Obx(() {
               if (orderController.ordersState == CurrentAppState.LOADING &&
                   orderController.userOrders.isEmpty) {

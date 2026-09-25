@@ -22,7 +22,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
-  static const _roleFilters = ['ALL', 'STAFF', 'USER', 'RETAILER'];
+  static const _roleFilters = ['ALL', 'ADMIN', 'USER', 'RETAILER'];
 
   @override
   void initState() {
@@ -277,7 +277,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Color _roleColor(String role) {
     switch (role) {
-      case 'STAFF':
+      case 'ADMIN':
         return AppColors.primaryGold;
       case 'USER':
         return const Color(0xFF2D9D59);
@@ -591,7 +591,7 @@ class _UserCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                   if (user.role.toUpperCase() != 'STAFF' && user.role.toUpperCase() != 'SUPERADMIN' && user.role.toUpperCase() != 'ADMIN') ...[
+                   if (user.role.toUpperCase() != 'SUPERADMIN' && user.role.toUpperCase() != 'ADMIN') ...[
                     SizedBox(height: context.heightPercent(0.4)),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -617,7 +617,7 @@ class _UserCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                  if ((user.role.toUpperCase() == 'STAFF' || user.role.toUpperCase() == 'SUPERADMIN' || user.role.toUpperCase() == 'ADMIN') && user.isRetailer != true) ...[
+                  if ((user.role.toUpperCase() == 'SUPERADMIN' || user.role.toUpperCase() == 'ADMIN') && user.isRetailer != true) ...[
                     SizedBox(height: context.heightPercent(0.3)),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -629,7 +629,7 @@ class _UserCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'STAFF',
+                        user.role.toUpperCase(),
                         style: TextStyle(
                           fontSize: context.getResponsiveSize(2.5),
                           fontWeight: FontWeight.w700,
@@ -1114,7 +1114,6 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     switch (role?.toUpperCase()) {
       case 'SUPERADMIN':
         return Colors.purple;
-      case 'STAFF':
       case 'ADMIN':
         return AppColors.primaryGold;
       default:
@@ -1150,7 +1149,6 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
       child: Column(
         children: [
           if (Get.find<AuthController>().user?.role == 'SUPERADMIN' &&
-              widget.user.role.toUpperCase() != 'STAFF' &&
               widget.user.role.toUpperCase() != 'SUPERADMIN' &&
               widget.user.role.toUpperCase() != 'ADMIN') ...[
             _actionRow(

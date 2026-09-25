@@ -145,10 +145,10 @@ class AdminUserManagementController extends GetxController {
 
   List<UserSearchModel> get filteredUsers {
     if (_activeFilter.value == 'ALL') return _users;
-    if (_activeFilter.value == 'STAFF') {
+    if (_activeFilter.value == 'ADMIN') {
       return _users.where((u) {
         final r = u.role.toUpperCase();
-        return r == 'STAFF' || r == 'SUPERADMIN' || r == 'ADMIN';
+        return r == 'SUPERADMIN' || r == 'ADMIN';
       }).toList();
     }
     if (_activeFilter.value == 'RETAILER') {
