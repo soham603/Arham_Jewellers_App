@@ -12,6 +12,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/AncillaryControl
 import 'package:ratnesh_gold_app/presentation/controllers/admin/GoldRateController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/cart_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/home_video_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/userOrderController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/wishlist_controller.dart';
@@ -74,4 +75,5 @@ void _registerControllers() {
   safePut(CarouselsController(), permanent: true);
   safePut(UserOrderController(), permanent: true);
   safePut(AncillaryController(), permanent: true);
+  safePut(HomeVideoController(), permanent: true);
 }

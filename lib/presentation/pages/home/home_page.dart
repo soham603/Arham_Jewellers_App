@@ -21,6 +21,7 @@ import 'package:ratnesh_gold_app/domain/entities/carousel_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/carousel_controller.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/home_video_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/notification_controller.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/searchProductController.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
@@ -48,6 +49,7 @@ import 'package:ratnesh_gold_app/presentation/pages/profile/goldRateDetailScreen
 import 'package:ratnesh_gold_app/presentation/pages/search/search_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/barcode_scanner_page.dart';
 import 'package:ratnesh_gold_app/core/constants/image_constants.dart';
+import 'package:ratnesh_gold_app/core/widgets/home_video_section.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -59,6 +61,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final CarouselsController carouselController;
   late final CategoryController categoryController;
+  late final HomeVideoController homeVideoController;
   final PageController pageController = PageController();
 
   final ScrollController scrollController = ScrollController();
@@ -78,6 +81,9 @@ class _HomePageState extends State<HomePage> {
     categoryController = Get.isRegistered<CategoryController>()
         ? Get.find<CategoryController>()
         : Get.put(CategoryController());
+    homeVideoController = Get.isRegistered<HomeVideoController>()
+        ? Get.find<HomeVideoController>()
+        : Get.put(HomeVideoController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -94,6 +100,10 @@ class _HomePageState extends State<HomePage> {
       ];
       if (allCats.isEmpty) {
         categoryController.fetchCategoryTree(force: true);
+      }
+      if (homeVideoController.video == null &&
+          homeVideoController.state != CurrentAppState.LOADING) {
+        homeVideoController.fetchVideo();
       }
     });
 
@@ -171,6 +181,7 @@ class _HomePageState extends State<HomePage> {
         carouselController.getAllCarousels(),
         categoryController.fetchCategoryTree(force: true),
         carouselController.loadLatestProducts(),
+        homeVideoController.fetchVideo(),
       ]);
     } catch (e, stackTrace) {
     }
@@ -654,6 +665,14 @@ GestureDetector(
                         }),
 
                         SizedBox(height: context.heightPercent(1.5)),
+
+                        Obx(() {
+                          final video = homeVideoController.video;
+                          final url = (video != null && video.isActive)
+                              ? video.videoUrl
+                              : '';
+                          return HomeVideoSection(videoUrl: url);
+                        }),
 
                         GestureDetector(
                           onTap: _bespokeLoading

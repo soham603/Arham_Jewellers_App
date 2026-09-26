@@ -15,6 +15,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/craftsmanManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/homeVideoManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/image_sync_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -289,6 +290,13 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                 ),
                 _adminTile(
                   context,
+                  icon: Icons.video_library_rounded,
+                  title: "Home Video",
+                  subtitle: "Storefront promo",
+                  onTap: () => Get.to(() => const HomeVideoManagerScreen()),
+                ),
+                _adminTile(
+                  context,
                   icon: Icons.text_snippet_rounded,
                   title: "Ancillary Data",
                   subtitle: "Terms, About, Policies",
@@ -370,6 +378,9 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
             "Browse & edit products", () => Get.to(() => const ProductSearchPage())),
         _ManagementItem(Icons.view_carousel_rounded, "Carousel",
             "Manage banners", () => Get.to(() => CarouselManagerScreen())),
+        _ManagementItem(Icons.video_library_rounded, "Home Video",
+            "Storefront promo",
+            () => Get.to(() => const HomeVideoManagerScreen())),
         _ManagementItem(Icons.text_snippet_rounded, "Ancillary Data",
             "Terms, About, Policies",
             () => Get.to(() => const AncillarySelectionScreen())),
