@@ -14,6 +14,7 @@ class ApiUrlConstants {
   static const String REGISTER = '/api/v1/auth/register';
   static const String REFRESH_TOKEN = '/api/v1/auth/refresh-token';
   static const String FORGOT_PASSWORD = '/api/v1/auth/forgot-password';
+  static const String CHANGE_PASSWORD = '/api/v1/auth/change-password';
   static const String ADMIN_RESET_PASSWORD = '/api/v1/admin-access/admin-reset-password';
   static const String DEVICE_CHANGE_REQUEST = '/api/v1/auth/device-change-request';
   static const String DEVICE_CHANGE_REQUEST_ACTION = '/api/v1/auth/device-change-request/action';

@@ -95,6 +95,13 @@ Notes:
 - Customer accounts are device-bound on the backend. The app sends the real device id from `getDeviceId()`; for direct API logins outside the app (e.g. curling `+918097137041`), pass that account's registered `deviceId` (`SP1A.210812.016`) — otherwise login fails with `Device mismatch`.
 - Admin and customer use separate endpoints (`user-login` vs `admin-login`); the app chooses based on account type and stores the result in the `isAdmin` flag.
 
+## Roles & Admin management
+
+- Roles are `USER`, `ADMIN`, `SUPERADMIN`; `AuthController.isAdmin` only distinguishes admin vs customer. The Super Admin panel is `SuperAdminPanelScreen`; `profileScreen.dart` picks it over `AdminPanelScreen` when `user.role == 'SUPERADMIN'`.
+- **Self password change:** Super Admin panel → "Change Password" → `ChangePasswordScreen` (`lib/presentation/pages/admin/change_password_screen.dart`) calling `AuthController.changePassword` → `PUT /api/v1/auth/change-password`. Requires the current password; no admin can reset a super admin.
+- **Admins list:** `UserManagementScreen` filter `ADMIN` shows both `SUPERADMIN` and `ADMIN`. The backend `get-all-users` returns super admins to a super admin, so they are visible here.
+- **No UI can create a `SUPERADMIN`.** `create/remove-admin` are gated to `role == 'SUPERADMIN'` and operate on `ADMIN` only.
+
 ## Code Style
 
 - Match existing style in the repo; use idiomatic Flutter/Dart conventions.

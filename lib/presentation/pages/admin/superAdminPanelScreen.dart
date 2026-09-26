@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeCon
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/change_password_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/craftsmanManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
@@ -321,6 +322,13 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                   subtitle: "Sync missing images by date",
                   onTap: () => Get.to(() => const ImageSyncPage()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.lock_reset_rounded,
+                  title: "Change Password",
+                  subtitle: "Update your password",
+                  onTap: () => Get.to(() => const ChangePasswordScreen()),
+                ),
                 _screenshotProtectionTile(context),
               ],
             )
@@ -375,6 +383,9 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
         _ManagementItem(Icons.cloud_sync_rounded, "Image Sync",
             "Sync missing images by date",
             () => Get.to(() => const ImageSyncPage())),
+        _ManagementItem(Icons.lock_reset_rounded, "Change Password",
+            "Update your password",
+            () => Get.to(() => const ChangePasswordScreen())),
       ];
 
   Widget _adminListTile(

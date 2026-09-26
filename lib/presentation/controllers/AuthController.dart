@@ -38,6 +38,9 @@ class AuthController extends GetxController with WidgetsBindingObserver {
   final _forgotPasswordState = CurrentAppState.INITIAL.obs;
   CurrentAppState get forgotPasswordState => _forgotPasswordState.value;
 
+  final _changePasswordState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get changePasswordState => _changePasswordState.value;
+
   final Rxn<UserModel> _user = Rxn<UserModel>();
   UserModel? get user => _user.value;
 
@@ -412,6 +415,42 @@ class AuthController extends GetxController with WidgetsBindingObserver {
       _userRegisterErrorMsg.value = "An unexpected error occurred";
       _userRegisterState.value = CurrentAppState.ERROR;
       ToastUtils.showError(_userRegisterErrorMsg.value);
+    }
+    return false;
+  }
+
+  Future<bool> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    if (_changePasswordState.value == CurrentAppState.LOADING) return false;
+
+    try {
+      _changePasswordState.value = CurrentAppState.LOADING;
+
+      final response = await _authRepo.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        _changePasswordState.value = CurrentAppState.SUCCESS;
+        ToastUtils.showSuccess(
+          response.data['message'] ?? "Password changed successfully!",
+        );
+        return true;
+      }
+
+      _changePasswordState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(
+        response.data['message'] ?? "Failed to change password",
+      );
+    } on DioException catch (e) {
+      _changePasswordState.value = CurrentAppState.ERROR;
+      ToastUtils.showError(DioErrorHelper.getMessage(e));
+    } catch (e) {
+      _changePasswordState.value = CurrentAppState.ERROR;
+      ToastUtils.showError("An unexpected error occurred");
     }
     return false;
   }

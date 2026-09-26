@@ -71,6 +71,22 @@ class AuthRepository extends BaseRepository implements IAuthRepository {
   }
 
   @override
+  Future<({int statusCode, Map<String, dynamic> data})> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    final response = await dio.put(
+      ApiUrlConstants.CHANGE_PASSWORD,
+      options: Options(extra: {"requiresAuth": true}),
+      data: {
+        "oldPassword": oldPassword,
+        "newPassword": newPassword,
+      },
+    );
+    return (statusCode: response.statusCode ?? 0, data: response.data as Map<String, dynamic>);
+  }
+
+  @override
   Future<PaginatedResult<HandsetChangeRequestModel>> fetchHandsetRequests({
     Map<String, dynamic>? queryParams,
   }) async {

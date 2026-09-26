@@ -20,6 +20,10 @@ abstract class IAuthRepository {
   Future<({int statusCode, Map<String, dynamic> data})> forgotPassword({
     required String phone,
   });
+  Future<({int statusCode, Map<String, dynamic> data})> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  });
   Future<PaginatedResult<HandsetChangeRequestModel>> fetchHandsetRequests({
     Map<String, dynamic>? queryParams,
   });
