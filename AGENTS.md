@@ -98,7 +98,7 @@ Notes:
 ## Roles & Admin management
 
 - Roles are `USER`, `ADMIN`, `SUPERADMIN`; `AuthController.isAdmin` only distinguishes admin vs customer. The Super Admin panel is `SuperAdminPanelScreen`; `profileScreen.dart` picks it over `AdminPanelScreen` when `user.role == 'SUPERADMIN'`.
-- **Self password change:** Super Admin panel → "Change Password" → `ChangePasswordScreen` (`lib/presentation/pages/admin/change_password_screen.dart`) calling `AuthController.changePassword` → `PUT /api/v1/auth/change-password`. Requires the current password; no admin can reset a super admin.
+- **Self password change (all roles):** shared `ChangePasswordPage` (`lib/presentation/pages/auth/change_password_page.dart`) calling `AuthController.changePassword` → `PUT /api/v1/auth/change-password`. Reachable for customers via Profile → Security, and for admins via the Super Admin panel. Requires the current password; no admin can reset a super admin. Backend does not invalidate sessions, so the user stays signed in after changing.
 - **Admins list:** `UserManagementScreen` filter `ADMIN` shows both `SUPERADMIN` and `ADMIN`. The backend `get-all-users` returns super admins to a super admin, so they are visible here.
 - **No UI can create a `SUPERADMIN`.** `create/remove-admin` are gated to `role == 'SUPERADMIN'` and operate on `ADMIN` only.
 

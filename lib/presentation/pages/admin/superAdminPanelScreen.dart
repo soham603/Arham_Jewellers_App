@@ -10,7 +10,7 @@ import 'package:ratnesh_gold_app/presentation/controllers/admin/HandsetChangeCon
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/approveUsers.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
-import 'package:ratnesh_gold_app/presentation/pages/admin/change_password_screen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/auth/change_password_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/craftsmanManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
@@ -335,7 +335,7 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                   icon: Icons.lock_reset_rounded,
                   title: "Change Password",
                   subtitle: "Update your password",
-                  onTap: () => Get.to(() => const ChangePasswordScreen()),
+                  onTap: () => Get.to(() => const ChangePasswordPage()),
                 ),
                 _screenshotProtectionTile(context),
               ],
@@ -396,7 +396,7 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
             () => Get.to(() => const ImageSyncPage())),
         _ManagementItem(Icons.lock_reset_rounded, "Change Password",
             "Update your password",
-            () => Get.to(() => const ChangePasswordScreen())),
+            () => Get.to(() => const ChangePasswordPage())),
       ];
 
   Widget _adminListTile(

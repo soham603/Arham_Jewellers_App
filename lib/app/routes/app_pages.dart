@@ -9,6 +9,7 @@ import '../../presentation/pages/admin/orderDetailScreen.dart';
 import '../../presentation/pages/admin/adminCustomOrderDetailPage.dart';
 import '../../presentation/pages/admin/approveOrders.dart';
 import '../../presentation/pages/auth/change_handset_page.dart';
+import '../../presentation/pages/auth/change_password_page.dart';
 import '../../presentation/pages/auth/forgot_password_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/auth/register_page.dart';
@@ -55,6 +56,7 @@ abstract class AppPages {
     GetPage(name: AppRoutes.notifications, page: NotificationsPage.new),
     GetPage(name: AppRoutes.changeHandset, page: ChangeHandsetPage.new),
     GetPage(name: AppRoutes.forgotPassword, page: ForgotPasswordPage.new),
+    GetPage(name: AppRoutes.changePassword, page: ChangePasswordPage.new),
     GetPage(name: AppRoutes.handsetRequests, page: HandsetChangeScreen.new),
     GetPage(name: AppRoutes.share, page: SharePage.new),
     GetPage(name: AppRoutes.ancillary, page: AncillaryPageScreen.new),

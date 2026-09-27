@@ -484,6 +484,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: context.heightPercent(2)),
 
                     Text(
+                      "Security",
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(6),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+
+                    SizedBox(height: context.heightPercent(2)),
+
+                    _changePasswordLink(context),
+
+                    SizedBox(height: context.heightPercent(2)),
+
+                    Divider(color: Colors.grey.shade300),
+
+                    SizedBox(height: context.heightPercent(2)),
+
+                    Text(
                       "Help & Info",
                       style: TextStyle(
                         fontSize: context.getResponsiveSize(6),
@@ -596,6 +615,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: AppColors.textMuted,
                           fontSize: context.getResponsiveSize(3),
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textMuted,
+                size: context.getResponsiveSize(5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _changePasswordLink(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.heightPercent(1)),
+      child: GestureDetector(
+        onTap: () => Get.toNamed(AppRoutes.changePassword),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(4),
+            vertical: context.heightPercent(1.5),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.lock_outline_rounded,
+                  color: AppColors.primaryGold,
+                  size: context.getResponsiveSize(5),
+                ),
+              ),
+              SizedBox(width: context.getResponsiveSize(3)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Change Password',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: context.getResponsiveSize(4),
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: context.heightPercent(0.3)),
+                    Text(
+                      'Keep your account secure',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: context.getResponsiveSize(3),
                       ),
                     ),
                   ],
