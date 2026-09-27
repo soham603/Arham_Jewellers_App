@@ -23,10 +23,15 @@ class SentNotification {
     return SentNotification(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
-      body: json['body'] ?? '',
+      body: json['body'] ?? json['message'] ?? '',
       targetType: json['targetType'] ?? json['target_type'] ?? 'all',
       targetValue: json['targetValue'] ?? json['target_value'],
-      sentAt: DateTime.tryParse(json['sentAt'] ?? json['sent_at'] ?? json['timestamp'] ?? '') ?? DateTime.now(),
+      sentAt: DateTime.tryParse(json['sentAt'] ??
+              json['sent_at'] ??
+              json['timestamp'] ??
+              json['createdAt'] ??
+              '') ??
+          DateTime.now(),
       sentBy: json['sentBy'] ?? json['sent_by'],
       recipientCount: json['recipientCount'] ?? json['recipient_count'],
     );

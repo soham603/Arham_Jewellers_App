@@ -10,6 +10,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/approveOrders.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/notificationManagerScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 
@@ -318,6 +319,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Terms, About, Policies",
                   onTap: () => Get.to(() => const AncillarySelectionScreen()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.notifications_active_rounded,
+                  title: "Notifications",
+                  subtitle: "Send push alerts",
+                  onTap: () => Get.to(() => const NotificationManagerScreen()),
+                ),
               ],
             )
           else
@@ -362,6 +370,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         _ManagementItem(Icons.text_snippet_rounded, "Ancillary Data",
             "Terms, About, Policies",
             () => Get.to(() => const AncillarySelectionScreen())),
+        _ManagementItem(Icons.notifications_active_rounded, "Notifications",
+            "Send push alerts",
+            () => Get.to(() => const NotificationManagerScreen())),
       ];
 
   Widget _buildStatsRow(BuildContext context) {

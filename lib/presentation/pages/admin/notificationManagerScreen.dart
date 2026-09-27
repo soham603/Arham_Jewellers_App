@@ -22,7 +22,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _bodyController = TextEditingController();
-  final TextEditingController _targetValueController = TextEditingController();
+  final TextEditingController _userSearchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -42,7 +42,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
   void dispose() {
     _titleController.dispose();
     _bodyController.dispose();
-    _targetValueController.dispose();
+    _userSearchController.dispose();
     _scrollController.dispose();
     if (Get.isRegistered<NotificationManagerController>()) {
       Get.delete<NotificationManagerController>();
@@ -146,28 +146,10 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
           _buildTargetSelector(context),
           SizedBox(height: context.heightPercent(2)),
           Obx(() {
-            final showTargetField = controller.targetType != 'all';
-
-            if (showTargetField) {
-              return Column(
-                children: [
-                  _buildTextField(
-                    context,
-                    controller: _targetValueController,
-                    label: controller.targetType == 'topic'
-                        ? 'Topic Name'
-                        : 'User ID',
-                    hint: controller.targetType == 'topic'
-                        ? 'e.g. promotions'
-                        : 'Enter user ID',
-                    maxLines: 1,
-                    onChanged: controller.setTargetValue,
-                  ),
-                  SizedBox(height: context.heightPercent(2)),
-                ],
-              );
+            if (controller.targetType != 'users') {
+              return const SizedBox.shrink();
             }
-            return const SizedBox.shrink();
+            return _buildUserPicker(context);
           }),
           Obx(() {
             final isLoading = controller.sendState == CurrentAppState.LOADING;
@@ -180,7 +162,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                       if (success) {
                         _titleController.clear();
                         _bodyController.clear();
-                        _targetValueController.clear();
+                        _userSearchController.clear();
                       }
                     },
               child: Container(
@@ -236,8 +218,11 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
   Widget _buildTargetSelector(BuildContext context) {
     final options = [
       {'value': 'all', 'label': 'All Users', 'icon': Icons.people_rounded},
-      {'value': 'topic', 'label': 'Topic', 'icon': Icons.tag_rounded},
-      {'value': 'user', 'label': 'Specific User', 'icon': Icons.person_rounded},
+      {
+        'value': 'users',
+        'label': 'Specific Users',
+        'icon': Icons.person_add_alt_1_rounded,
+      },
     ];
 
     return Column(
@@ -310,6 +295,192 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             }).toList(),
           );
         }),
+      ],
+    );
+  }
+
+  Widget _buildUserPicker(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTextField(
+          context,
+          controller: _userSearchController,
+          label: 'Users',
+          hint: 'Search by name or phone number',
+          maxLines: 1,
+          onChanged: controller.onSearchChanged,
+        ),
+        SizedBox(height: context.heightPercent(1)),
+        Obx(() {
+          final selected = controller.selectedUsers;
+          if (selected.isEmpty) return const SizedBox.shrink();
+          return Wrap(
+            spacing: context.getResponsiveSize(1.5),
+            runSpacing: context.getResponsiveSize(1),
+            children: selected.map((user) {
+              final label = user.name.isNotEmpty
+                  ? user.name
+                  : (user.phoneNumber.isNotEmpty
+                      ? user.phoneNumber
+                      : user.email);
+              return Chip(
+                label: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3),
+                    color: AppColors.textDark,
+                  ),
+                ),
+                backgroundColor:
+                    AppColors.primaryGold.withValues(alpha: 0.1),
+                side: BorderSide(
+                  color: AppColors.primaryGold.withValues(alpha: 0.4),
+                ),
+                onDeleted: () => controller.removeUser(user.id),
+                deleteIconColor: AppColors.primaryGold,
+              );
+            }).toList(),
+          );
+        }),
+        SizedBox(height: context.heightPercent(1)),
+        Obx(() {
+          final searchState = controller.searchState;
+
+          if (searchState == CurrentAppState.LOADING) {
+            return Padding(
+              padding:
+                  EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
+              child: const Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primaryGold,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          if (searchState == CurrentAppState.ERROR) {
+            return Text(
+              controller.searchError.isNotEmpty
+                  ? controller.searchError
+                  : 'Could not search users',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                color: Colors.redAccent,
+              ),
+            );
+          }
+
+          if (searchState != CurrentAppState.SUCCESS) {
+            return const SizedBox.shrink();
+          }
+
+          final results = controller.searchResults;
+          if (results.isEmpty) {
+            return Text(
+              'No users found',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                color: context.colorPalette.subTitleColor,
+              ),
+            );
+          }
+
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: context.heightPercent(28),
+            ),
+            decoration: BoxDecoration(
+              color: context.colorPalette.boxColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primaryGold.withValues(alpha: 0.25),
+              ),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(
+                vertical: context.heightPercent(0.8),
+              ),
+              itemCount: results.length,
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                color:
+                    context.colorPalette.subTitleColor.withValues(alpha: 0.12),
+              ),
+              itemBuilder: (context, index) {
+                final user = results[index];
+                final isSelected = controller.isUserSelected(user.id);
+                final label = user.name.isNotEmpty
+                    ? user.name
+                    : (user.phoneNumber.isNotEmpty
+                        ? user.phoneNumber
+                        : user.email);
+                final subtitle = [
+                  if (user.phoneNumber.isNotEmpty) user.phoneNumber,
+                  if (user.email.isNotEmpty) user.email,
+                ].join(' · ');
+
+                return InkWell(
+                  onTap: () => controller.toggleUser(user),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.getResponsiveSize(3),
+                      vertical: context.heightPercent(1),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isSelected
+                              ? Icons.check_circle_rounded
+                              : Icons.radio_button_unchecked_rounded,
+                          size: context.getResponsiveSize(5),
+                          color: isSelected
+                              ? AppColors.primaryGold
+                              : AppColors.textMuted,
+                        ),
+                        SizedBox(width: context.getResponsiveSize(2.5)),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(3.5),
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                              if (subtitle.isNotEmpty)
+                                Text(
+                                  subtitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: context.getResponsiveSize(3),
+                                    color: context.colorPalette.subTitleColor,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        }),
+        SizedBox(height: context.heightPercent(2)),
       ],
     );
   }
@@ -568,10 +739,11 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
   Color _targetBadgeColor(String targetType) {
     switch (targetType) {
-      case 'topic':
-        return const Color(0xFF3B82F6);
+      case 'users':
       case 'user':
         return const Color(0xFF8B5CF6);
+      case 'topic':
+        return const Color(0xFF3B82F6);
       default:
         return const Color(0xFF2E7D32);
     }
@@ -579,10 +751,12 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
   String _targetLabel(String targetType) {
     switch (targetType) {
-      case 'topic':
-        return 'Topic';
+      case 'users':
+        return 'Users';
       case 'user':
         return 'User';
+      case 'topic':
+        return 'Topic';
       default:
         return 'All';
     }
