@@ -24,6 +24,7 @@ import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 import 'package:ratnesh_gold_app/app/app.dart';
 
 import 'ancillary_selection_screen.dart';
+import 'notificationManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/search/product_search_page.dart';
 
 class SuperAdminPanelScreen extends StatefulWidget {
@@ -318,6 +319,13 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                 ),
                 _adminTile(
                   context,
+                  icon: Icons.notifications_active_rounded,
+                  title: "Notifications",
+                  subtitle: "Send push alerts",
+                  onTap: () => Get.to(() => const NotificationManagerScreen()),
+                ),
+                _adminTile(
+                  context,
                   icon: Icons.engineering_rounded,
                   title: "Manage Karigar",
                   subtitle: "Import & manage craftsmen",
@@ -388,6 +396,9 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
             "Change requests", () => Get.to(() => const HandsetChangeScreen())),
         _ManagementItem(Icons.monetization_on_rounded, "Gold Rate",
             "Set daily rate", () => Get.to(() => const GoldRateScreen())),
+        _ManagementItem(Icons.notifications_active_rounded, "Notifications",
+            "Send push alerts",
+            () => Get.to(() => const NotificationManagerScreen())),
         _ManagementItem(Icons.engineering_rounded, "Manage Karigar",
             "Import & manage craftsmen",
             () => Get.to(() => const CraftsmanManagerScreen())),
