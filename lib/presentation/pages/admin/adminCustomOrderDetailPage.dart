@@ -1031,6 +1031,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
               TextField(
                 controller: reasonCtrl,
                 maxLines: 3,
+                style: TextStyle(
+                  color: AppColors.textDark,
+                  fontSize: context.getResponsiveSize(3.5),
+                ),
                 decoration: InputDecoration(
                   hintText: 'Reason...',
                   hintStyle: TextStyle(color: AppColors.textMuted, fontSize: context.getResponsiveSize(3.3)),

@@ -131,7 +131,10 @@ class _RawDataPageState extends State<RawDataPage> {
                         vertical: context.heightPercent(1.2),
                       ),
                       hintText: 'Search fields...',
-                      hintStyle: TextStyle(color: Colors.grey.shade400),
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: context.getResponsiveSize(3.3),
+                      ),
                       prefixIcon: Icon(
                         Icons.search,
                         size: context.getResponsiveSize(4.5),

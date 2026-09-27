@@ -348,8 +348,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: searchController,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.5),
+                      color: AppColors.textDark,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Search...',
+                      hintStyle: TextStyle(
+                        fontSize: context.getResponsiveSize(3.3),
+                        color: Colors.grey,
+                      ),
                       prefixIcon: const Icon(
                         Icons.search_rounded,
                         color: Colors.grey,

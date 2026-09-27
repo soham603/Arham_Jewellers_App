@@ -69,6 +69,16 @@ abstract class AppTheme {
         borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.2),
       ),
       hintStyle: GoogleFonts.inter(fontSize: 14, color: Color(0xFFA39A8F)),
+      labelStyle: GoogleFonts.inter(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: AppColors.textMuted,
+      ),
+      floatingLabelStyle: GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: AppColors.primaryGold,
+      ),
     ),
     dialogTheme: DialogThemeData(
       titleTextStyle: GoogleFonts.inter(

@@ -236,7 +236,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
-                              fontSize: context.getResponsiveSize(3.8),
+                              fontSize: context.getResponsiveSize(3.5),
                             ),
                           ),
                   ),
@@ -287,12 +287,34 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       autofillHints: autofillHint == null ? null : [autofillHint],
       textInputAction: textInputAction,
       onSubmitted: onSubmitted,
+      style: TextStyle(
+        fontSize: context.getResponsiveSize(3.5).clamp(14.0, 28.0),
+        color: AppColors.textDark,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         errorText: errorText,
         filled: true,
         fillColor: AppColors.inputFill,
+        labelStyle: TextStyle(
+          fontSize: context.getResponsiveSize(3.4).clamp(13.0, 18.0),
+          color: AppColors.textMuted,
+          fontWeight: FontWeight.w500,
+        ),
+        floatingLabelStyle: TextStyle(
+          fontSize: context.getResponsiveSize(3.2).clamp(13.0, 18.0),
+          color: AppColors.primaryGold,
+          fontWeight: FontWeight.w600,
+        ),
+        hintStyle: TextStyle(
+          fontSize: context.getResponsiveSize(3.4).clamp(13.0, 18.0),
+          color: AppColors.hint,
+        ),
+        errorStyle: TextStyle(
+          fontSize: context.getResponsiveSize(3.0).clamp(12.0, 16.0),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.divider),

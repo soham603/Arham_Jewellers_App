@@ -1596,8 +1596,20 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                   decoration: InputDecoration(
                     labelText: 'Your Password',
+                    labelStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(3.4),
+                    ),
+                    floatingLabelStyle: TextStyle(
+                      color: AppColors.primaryGold,
+                      fontSize: context.getResponsiveSize(3.2),
+                      fontWeight: FontWeight.w600,
+                    ),
                     hintText: 'Enter your password',
-                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    hintStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(3.3),
+                    ),
                     prefixIcon: Icon(
                       Icons.lock_outline_rounded,
                       color: context.colorPalette.subTitleColor,
@@ -1756,8 +1768,20 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                   decoration: InputDecoration(
                     labelText: 'Your Password',
+                    labelStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(3.4),
+                    ),
+                    floatingLabelStyle: TextStyle(
+                      color: AppColors.primaryGold,
+                      fontSize: context.getResponsiveSize(3.2),
+                      fontWeight: FontWeight.w600,
+                    ),
                     hintText: 'Enter your password',
-                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    hintStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(3.3),
+                    ),
                     prefixIcon: Icon(
                       Icons.lock_outline_rounded,
                       color: context.colorPalette.subTitleColor,
@@ -1993,7 +2017,10 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                   decoration: InputDecoration(
                     hintText: 'New Password',
-                    hintStyle: TextStyle(color: context.colorPalette.subTitleColor),
+                    hintStyle: TextStyle(
+                      color: context.colorPalette.subTitleColor,
+                      fontSize: context.getResponsiveSize(3.3),
+                    ),
                     prefixIcon: Icon(
                       Icons.lock_outline_rounded,
                       color: context.colorPalette.subTitleColor,

@@ -208,7 +208,16 @@ class _AncillaryEditorScreenState extends State<AncillaryEditorScreen> {
             style: TextStyle(fontSize: context.getResponsiveSize(4)),
             decoration: InputDecoration(
               labelText: 'Support mobile number',
+              labelStyle: TextStyle(
+                fontSize: context.getResponsiveSize(3.4),
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w500,
+              ),
               hintText: '98765 43210',
+              hintStyle: TextStyle(
+                fontSize: context.getResponsiveSize(3.3),
+                color: AppColors.hint,
+              ),
               prefixText: '+91 ',
               errorText: _phoneError,
               border: OutlineInputBorder(
