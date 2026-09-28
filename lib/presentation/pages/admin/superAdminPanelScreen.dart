@@ -17,6 +17,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/homeVideoManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/image_sync_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/pdf_catalog_manager_screen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -333,6 +334,13 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                 ),
                 _adminTile(
                   context,
+                  icon: Icons.picture_as_pdf_rounded,
+                  title: "PDF Catalog",
+                  subtitle: "Manage design PDFs",
+                  onTap: () => Get.to(() => const PdfCatalogManagerScreen()),
+                ),
+                _adminTile(
+                  context,
                   icon: Icons.cloud_sync_rounded,
                   title: "Image Sync",
                   subtitle: "Sync missing images by date",
@@ -402,6 +410,9 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
         _ManagementItem(Icons.engineering_rounded, "Manage Karigar",
             "Import & manage craftsmen",
             () => Get.to(() => const CraftsmanManagerScreen())),
+        _ManagementItem(Icons.picture_as_pdf_rounded, "PDF Catalog",
+            "Manage design PDFs",
+            () => Get.to(() => const PdfCatalogManagerScreen())),
         _ManagementItem(Icons.cloud_sync_rounded, "Image Sync",
             "Sync missing images by date",
             () => Get.to(() => const ImageSyncPage())),
