@@ -26,6 +26,9 @@ class HomeVideoController extends GetxController {
   final _deleteState = CurrentAppState.INITIAL.obs;
   CurrentAppState get deleteState => _deleteState.value;
 
+  final _linkState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get linkState => _linkState.value;
+
   final _error = ''.obs;
   String get error => _error.value;
 
@@ -74,6 +77,22 @@ class HomeVideoController extends GetxController {
     } catch (e) {
       _error.value = _messageFrom(e, 'Failed to update home video');
       _toggleState.value = CurrentAppState.ERROR;
+      return false;
+    }
+  }
+
+  Future<bool> setLink({required String linkType, String? linkId}) async {
+    try {
+      _linkState.value = CurrentAppState.LOADING;
+      _error.value = '';
+
+      _video.value = await _repo.upsertVideo(linkType: linkType, linkId: linkId);
+
+      _linkState.value = CurrentAppState.SUCCESS;
+      return true;
+    } catch (e) {
+      _error.value = _messageFrom(e, 'Failed to update the video link');
+      _linkState.value = CurrentAppState.ERROR;
       return false;
     }
   }

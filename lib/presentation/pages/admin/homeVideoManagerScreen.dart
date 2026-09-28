@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:image_picker/image_picker.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/core/widgets/link_target_picker.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/home_video_controller.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -111,6 +112,24 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
     }
   }
 
+  Future<void> _onLinkChanged(LinkTargetSelection selection) async {
+    final ok = await controller.setLink(
+      linkType: selection.linkType,
+      linkId: selection.linkId,
+    );
+    if (!mounted) return;
+
+    if (ok) {
+      ToastUtils.showSuccess(
+        selection.linkType == 'none'
+            ? 'Video link cleared'
+            : 'Video link updated',
+      );
+    } else {
+      ToastUtils.showError(controller.error);
+    }
+  }
+
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -202,6 +221,7 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
         controller.uploadState == CurrentAppState.LOADING ||
         controller.toggleState == CurrentAppState.LOADING ||
         controller.deleteState == CurrentAppState.LOADING ||
+        controller.linkState == CurrentAppState.LOADING ||
         _isPicking;
 
     return RefreshIndicator(
@@ -393,6 +413,17 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
                       ),
                     ],
                   ),
+                ),
+                SizedBox(height: context.heightPercent(2)),
+                LinkTargetPicker(
+                  key: ValueKey(
+                    'video-link-${video.linkType}-${video.linkId}-${video.linkName}',
+                  ),
+                  initialLinkType: video.linkType,
+                  initialLinkId: video.linkId,
+                  initialLinkName: video.linkName,
+                  enabled: !isBusy,
+                  onChanged: _onLinkChanged,
                 ),
                 SizedBox(height: context.heightPercent(1.5)),
                 SizedBox(

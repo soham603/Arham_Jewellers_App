@@ -668,10 +668,9 @@ GestureDetector(
 
                         Obx(() {
                           final video = homeVideoController.video;
-                          final url = (video != null && video.isActive)
-                              ? video.videoUrl
-                              : '';
-                          return HomeVideoSection(videoUrl: url);
+                          final activeVideo =
+                              (video != null && video.isActive) ? video : null;
+                          return HomeVideoSection(video: activeVideo);
                         }),
 
                         GestureDetector(

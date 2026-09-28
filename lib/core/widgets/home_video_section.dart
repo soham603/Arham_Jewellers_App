@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:ratnesh_gold_app/core/constants/social_links.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/domain/entities/home_video_model.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
+import 'package:ratnesh_gold_app/utils/link_navigation_util.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 class HomeVideoSection extends StatefulWidget {
-  final String videoUrl;
+  final HomeVideoModel? video;
 
-  const HomeVideoSection({super.key, required this.videoUrl});
+  const HomeVideoSection({super.key, this.video});
 
   @override
   State<HomeVideoSection> createState() => _HomeVideoSectionState();
@@ -19,10 +24,12 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
   bool _failed = false;
   int _initToken = 0;
 
+  String get _videoUrl => widget.video?.videoUrl.trim() ?? '';
+
   @override
   void initState() {
     super.initState();
-    if (widget.videoUrl.trim().isNotEmpty) {
+    if (_videoUrl.isNotEmpty) {
       _initVideo();
     }
   }
@@ -30,13 +37,13 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
   @override
   void didUpdateWidget(covariant HomeVideoSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.videoUrl.trim() != widget.videoUrl.trim()) {
+    if ((oldWidget.video?.videoUrl.trim() ?? '') != _videoUrl) {
       _initToken++;
       _controller?.dispose();
       _controller = null;
       _initialized = false;
       _failed = false;
-      if (widget.videoUrl.trim().isNotEmpty) {
+      if (_videoUrl.isNotEmpty) {
         _initVideo();
       } else if (mounted) {
         setState(() {});
@@ -47,7 +54,7 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
   Future<void> _initVideo() async {
     final token = ++_initToken;
     final ctrl = VideoPlayerController.networkUrl(
-      Uri.parse(widget.videoUrl.trim()),
+      Uri.parse(_videoUrl),
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
     _controller = ctrl;
@@ -69,16 +76,96 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
     }
   }
 
-  void _togglePlayback() {
-    final ctrl = _controller;
-    if (ctrl == null || !ctrl.value.isInitialized) return;
-
-    if (ctrl.value.isPlaying) {
-      ctrl.pause();
-    } else {
-      ctrl.play();
+  Future<void> _openInstagram() async {
+    final uri = Uri.parse(SocialLinks.instagramUrl);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      ToastUtils.showError('Unable to open Instagram');
     }
-    setState(() {});
+  }
+
+  void _showOptions() {
+    final video = widget.video;
+    if (video == null) return;
+
+    final linkType = video.linkType?.toLowerCase();
+    final isProduct = linkType == 'product';
+    final isCategory = linkType == 'category';
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (isProduct || isCategory)
+                ListTile(
+                  leading: Icon(
+                    isProduct
+                        ? Icons.shopping_bag_rounded
+                        : Icons.category_rounded,
+                    color: AppColors.primaryGold,
+                  ),
+                  title: Text(
+                    isProduct ? 'View Product' : 'View Collection',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  subtitle: (video.linkName != null &&
+                          video.linkName!.isNotEmpty)
+                      ? Text(video.linkName!)
+                      : null,
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    LinkNavigationUtil.open(
+                      linkType: video.linkType,
+                      linkId: video.linkId,
+                      linkRef: video.linkRef,
+                      linkName: video.linkName,
+                    );
+                  },
+                ),
+              ListTile(
+                leading: const Icon(
+                  Icons.camera_alt_rounded,
+                  color: AppColors.primaryGold,
+                ),
+                title: const Text(
+                  'View Instagram',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _openInstagram();
+                },
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -89,7 +176,7 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.videoUrl.trim().isEmpty || _failed) {
+    if (_videoUrl.isEmpty || _failed) {
       return const SizedBox.shrink();
     }
 
@@ -132,33 +219,48 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
 
   Widget _buildVideo(BuildContext context) {
     final ctrl = _controller!;
-    final isPlaying = ctrl.value.isPlaying;
 
     return GestureDetector(
-      onTap: _togglePlayback,
+      onTap: _showOptions,
       child: AspectRatio(
         aspectRatio: ctrl.value.aspectRatio,
         child: Stack(
           fit: StackFit.expand,
           children: [
             VideoPlayer(ctrl),
-            if (!isPlaying) ...[
-              Container(color: Colors.black.withValues(alpha: 0.25)),
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: Colors.black54,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow_rounded,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+            Positioned(
+              right: 10,
+              bottom: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.touch_app_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'Explore',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ],
         ),
       ),

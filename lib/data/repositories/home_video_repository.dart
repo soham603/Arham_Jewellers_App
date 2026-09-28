@@ -37,9 +37,16 @@ class HomeVideoRepository extends BaseRepository
   }
 
   @override
-  Future<HomeVideoModel> upsertVideo({File? file, bool? isActive}) async {
+  Future<HomeVideoModel> upsertVideo({
+    File? file,
+    bool? isActive,
+    String? linkType,
+    String? linkId,
+  }) async {
     final map = <String, dynamic>{
       if (isActive != null) 'isActive': isActive.toString(),
+      if (linkType != null) 'linkType': linkType,
+      if (linkId != null && linkId.isNotEmpty) 'linkId': linkId,
       if (file != null)
         'video': await MultipartFile.fromFile(
           file.path,
