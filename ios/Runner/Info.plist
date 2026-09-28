@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera to scan barcodes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photos to attach images to notifications and other content.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

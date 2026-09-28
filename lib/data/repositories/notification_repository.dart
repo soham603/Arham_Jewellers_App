@@ -67,6 +67,31 @@ class NotificationRepository extends BaseRepository implements INotificationRepo
   }
 
   @override
+  Future<String?> uploadNotificationImage({
+    required String filePath,
+  }) async {
+    final form = FormData.fromMap({
+      'image': await MultipartFile.fromFile(filePath),
+    });
+    final response = await dio.post(
+      ApiUrlConstants.NOTIFICATION_UPLOAD_IMAGE,
+      data: form,
+      options: Options(
+        headers: {'Content-Type': 'multipart/form-data'},
+        extra: {'requiresAuth': true},
+      ),
+    );
+    final responseData = response.data;
+    checkApiError(responseData);
+    requireData(responseData);
+    final data = responseData['data'];
+    if (data is Map && data['url'] is String) {
+      return data['url'] as String;
+    }
+    return null;
+  }
+
+  @override
   Future<PaginatedResult<SentNotification>> getNotificationHistory({
     Map<String, dynamic>? queryParams,
   }) async {

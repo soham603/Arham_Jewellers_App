@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
+import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/sent_notification_model.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/admin/NotificationManagerController.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
@@ -11,18 +16,21 @@ class NotificationManagerScreen extends StatefulWidget {
   const NotificationManagerScreen({super.key});
 
   @override
-  State<NotificationManagerScreen> createState() => _NotificationManagerScreenState();
+  State<NotificationManagerScreen> createState() =>
+      _NotificationManagerScreenState();
 }
 
 class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
   final NotificationManagerController controller =
       Get.isRegistered<NotificationManagerController>()
-          ? Get.find<NotificationManagerController>()
-          : Get.put(NotificationManagerController());
+      ? Get.find<NotificationManagerController>()
+      : Get.put(NotificationManagerController());
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _bodyController = TextEditingController();
   final TextEditingController _userSearchController = TextEditingController();
+  final TextEditingController _productSearchController =
+      TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -43,6 +51,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
     _titleController.dispose();
     _bodyController.dispose();
     _userSearchController.dispose();
+    _productSearchController.dispose();
     _scrollController.dispose();
     if (Get.isRegistered<NotificationManagerController>()) {
       Get.delete<NotificationManagerController>();
@@ -143,6 +152,10 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             onChanged: controller.setBody,
           ),
           SizedBox(height: context.heightPercent(1.5)),
+          _buildImagePicker(context),
+          SizedBox(height: context.heightPercent(1.5)),
+          _buildLinkSelector(context),
+          SizedBox(height: context.heightPercent(1.5)),
           _buildTargetSelector(context),
           SizedBox(height: context.heightPercent(2)),
           Obx(() {
@@ -163,12 +176,14 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                         _titleController.clear();
                         _bodyController.clear();
                         _userSearchController.clear();
+                        _productSearchController.clear();
                       }
                     },
               child: Container(
                 width: double.infinity,
-                padding:
-                    EdgeInsets.symmetric(vertical: context.heightPercent(1.8)),
+                padding: EdgeInsets.symmetric(
+                  vertical: context.heightPercent(1.8),
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
                   borderRadius: BorderRadius.circular(16),
@@ -194,8 +209,11 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.send_rounded,
-                              color: Colors.white, size: 20),
+                          const Icon(
+                            Icons.send_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                           SizedBox(width: context.getResponsiveSize(2)),
                           Text(
                             'Send Notification',
@@ -213,6 +231,481 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildImagePicker(BuildContext context) {
+    return Obx(() {
+      final path = controller.imagePath;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Image (optional)',
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.5),
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
+          ),
+          SizedBox(height: context.heightPercent(0.5)),
+          if (path == null)
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  vertical: context.heightPercent(2),
+                ),
+                decoration: BoxDecoration(
+                  color: context.colorPalette.boxColor,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.primaryGold.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      color: AppColors.primaryGold,
+                      size: context.getResponsiveSize(6),
+                    ),
+                    SizedBox(height: context.heightPercent(0.5)),
+                    Text(
+                      'Tap to attach an image',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.2),
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.file(
+                    File(path),
+                    width: double.infinity,
+                    height: context.heightPercent(18),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: controller.clearImage,
+                    child: Container(
+                      padding: EdgeInsets.all(context.getResponsiveSize(1)),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.getResponsiveSize(2.5),
+                        vertical: context.heightPercent(0.5),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Change',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.8),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      );
+    });
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 1600,
+      );
+      if (picked != null) {
+        controller.setImage(picked.path);
+      }
+    } catch (_) {}
+  }
+
+  Widget _buildLinkSelector(BuildContext context) {
+    final options = [
+      {'value': 'none', 'label': 'None', 'icon': Icons.block_rounded},
+      {
+        'value': 'product',
+        'label': 'Product',
+        'icon': Icons.shopping_bag_rounded,
+      },
+      {
+        'value': 'category',
+        'label': 'Category',
+        'icon': Icons.category_rounded,
+      },
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Link to (optional)',
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(3.5),
+            fontWeight: FontWeight.w600,
+            color: AppColors.textDark,
+          ),
+        ),
+        SizedBox(height: context.heightPercent(0.3)),
+        Text(
+          'Tapping the notification opens the linked product or category.',
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(2.8),
+            color: AppColors.textMuted,
+          ),
+        ),
+        SizedBox(height: context.heightPercent(0.8)),
+        Obx(() {
+          return Row(
+            children: options.map((opt) {
+              final isSelected = controller.linkType == opt['value'];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => controller.setLinkType(opt['value'] as String),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      right: opt != options.last
+                          ? context.getResponsiveSize(2)
+                          : 0,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.heightPercent(1),
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primaryGold.withValues(alpha: 0.1)
+                          : context.colorPalette.boxColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primaryGold
+                            : context.colorPalette.subTitleColor.withValues(
+                                alpha: 0.15,
+                              ),
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          opt['icon'] as IconData,
+                          color: isSelected
+                              ? AppColors.primaryGold
+                              : AppColors.textMuted,
+                          size: context.getResponsiveSize(5),
+                        ),
+                        SizedBox(height: context.heightPercent(0.3)),
+                        Text(
+                          opt['label'] as String,
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(2.8),
+                            fontWeight: FontWeight.w600,
+                            color: isSelected
+                                ? AppColors.primaryGold
+                                : AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          );
+        }),
+        Obx(() {
+          if (controller.linkType == 'product') {
+            return Padding(
+              padding: EdgeInsets.only(top: context.heightPercent(1)),
+              child: _buildProductLinkPicker(context),
+            );
+          }
+          if (controller.linkType == 'category') {
+            return Padding(
+              padding: EdgeInsets.only(top: context.heightPercent(1)),
+              child: _buildCategoryLinkPicker(context),
+            );
+          }
+          return const SizedBox.shrink();
+        }),
+      ],
+    );
+  }
+
+  Widget _buildProductLinkPicker(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Obx(() {
+          final product = controller.linkProduct;
+          if (product == null) return const SizedBox.shrink();
+          return Padding(
+            padding: EdgeInsets.only(bottom: context.heightPercent(1)),
+            child: Chip(
+              label: Text(
+                product.name,
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3),
+                  color: AppColors.textDark,
+                ),
+              ),
+              backgroundColor: AppColors.primaryGold.withValues(alpha: 0.1),
+              onDeleted: controller.clearLinkProduct,
+              deleteIcon: const Icon(Icons.close_rounded, size: 16),
+            ),
+          );
+        }),
+        _buildTextField(
+          context,
+          controller: _productSearchController,
+          label: 'Product',
+          hint: 'Search by product name or tag number',
+          maxLines: 1,
+          onChanged: controller.onProductSearchChanged,
+        ),
+        Obx(() {
+          if (controller.linkProduct != null) return const SizedBox.shrink();
+
+          final state = controller.productSearchState;
+          final results = controller.productResults;
+
+          if (state == CurrentAppState.LOADING && results.isEmpty) {
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: context.heightPercent(1.5),
+              ),
+              child: const Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            );
+          }
+
+          if (results.isEmpty) return const SizedBox.shrink();
+
+          return Container(
+            margin: EdgeInsets.only(top: context.heightPercent(0.8)),
+            constraints: BoxConstraints(maxHeight: context.heightPercent(28)),
+            decoration: BoxDecoration(
+              color: context.colorPalette.boxColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: context.colorPalette.subTitleColor.withValues(
+                  alpha: 0.15,
+                ),
+              ),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: results.length,
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                color: context.colorPalette.subTitleColor.withValues(
+                  alpha: 0.1,
+                ),
+              ),
+              itemBuilder: (context, index) {
+                final product = results[index];
+                final isSelected = controller.isLinkProductSelected(product.id);
+                return ListTile(
+                  dense: true,
+                  leading: Icon(
+                    isSelected
+                        ? Icons.check_circle_rounded
+                        : Icons.circle_outlined,
+                    color: isSelected
+                        ? AppColors.primaryGold
+                        : AppColors.textMuted,
+                    size: context.getResponsiveSize(4.5),
+                  ),
+                  title: Text(
+                    product.name,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.4),
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  subtitle: (product.tagNo != null && product.tagNo!.isNotEmpty)
+                      ? Text(
+                          'Tag ${product.tagNo}',
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(2.8),
+                            color: AppColors.textMuted,
+                          ),
+                        )
+                      : null,
+                  onTap: () => controller.selectLinkProduct(product),
+                );
+              },
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildCategoryLinkPicker(BuildContext context) {
+    return Obx(() {
+      final category = controller.linkCategory;
+      return GestureDetector(
+        onTap: () => _openCategoryPicker(context),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: context.getResponsiveSize(4),
+            vertical: context.heightPercent(1.4),
+          ),
+          decoration: BoxDecoration(
+            color: context.colorPalette.boxColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: context.colorPalette.subTitleColor.withValues(alpha: 0.15),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  category?.name ?? 'Select a level-3 category',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.5),
+                    color: category == null
+                        ? context.colorPalette.subTitleColor.withValues(
+                            alpha: 0.6,
+                          )
+                        : AppColors.textDark,
+                  ),
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textMuted,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Future<void> _openCategoryPicker(BuildContext context) async {
+    final selected = await showModalBottomSheet<CategoryModel>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SizedBox(
+          height: MediaQuery.of(sheetContext).size.height * 0.6,
+          child: FutureBuilder<List<CategoryModel>>(
+            future: controller.loadLevel3Categories(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final categories = snapshot.data ?? const <CategoryModel>[];
+              if (categories.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No categories available',
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.6),
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(context.getResponsiveSize(4)),
+                    child: Text(
+                      'Select a category',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(4.2),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                  ),
+                  Divider(height: 1, color: AppColors.divider),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: categories.length,
+                      separatorBuilder: (_, _) =>
+                          Divider(height: 1, color: AppColors.divider),
+                      itemBuilder: (itemContext, index) {
+                        final category = categories[index];
+                        return ListTile(
+                          title: Text(
+                            category.name,
+                            style: TextStyle(
+                              fontSize: itemContext.getResponsiveSize(3.6),
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          onTap: () => Navigator.of(sheetContext).pop(category),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    if (selected != null) {
+      controller.selectLinkCategory(selected);
+    }
   }
 
   Widget _buildTargetSelector(BuildContext context) {
@@ -243,8 +736,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               final isSelected = controller.targetType == opt['value'];
               return Expanded(
                 child: GestureDetector(
-                  onTap: () =>
-                      controller.setTargetType(opt['value'] as String),
+                  onTap: () => controller.setTargetType(opt['value'] as String),
                   child: Container(
                     margin: EdgeInsets.only(
                       right: opt != options.last
@@ -262,8 +754,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                       border: Border.all(
                         color: isSelected
                             ? AppColors.primaryGold
-                            : context.colorPalette.subTitleColor
-                                .withValues(alpha: 0.15),
+                            : context.colorPalette.subTitleColor.withValues(
+                                alpha: 0.15,
+                              ),
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -322,8 +815,8 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               final label = user.name.isNotEmpty
                   ? user.name
                   : (user.phoneNumber.isNotEmpty
-                      ? user.phoneNumber
-                      : user.email);
+                        ? user.phoneNumber
+                        : user.email);
               return Chip(
                 label: Text(
                   label,
@@ -332,8 +825,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                     color: AppColors.textDark,
                   ),
                 ),
-                backgroundColor:
-                    AppColors.primaryGold.withValues(alpha: 0.1),
+                backgroundColor: AppColors.primaryGold.withValues(alpha: 0.1),
                 side: BorderSide(
                   color: AppColors.primaryGold.withValues(alpha: 0.4),
                 ),
@@ -349,8 +841,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
           if (searchState == CurrentAppState.LOADING) {
             return Padding(
-              padding:
-                  EdgeInsets.symmetric(vertical: context.heightPercent(1.5)),
+              padding: EdgeInsets.symmetric(
+                vertical: context.heightPercent(1.5),
+              ),
               child: const Center(
                 child: SizedBox(
                   width: 20,
@@ -396,9 +889,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
           }
 
           return Container(
-            constraints: BoxConstraints(
-              maxHeight: context.heightPercent(28),
-            ),
+            constraints: BoxConstraints(maxHeight: context.heightPercent(28)),
             decoration: BoxDecoration(
               color: context.colorPalette.boxColor,
               borderRadius: BorderRadius.circular(14),
@@ -414,8 +905,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               itemCount: results.length,
               separatorBuilder: (_, _) => Divider(
                 height: 1,
-                color:
-                    context.colorPalette.subTitleColor.withValues(alpha: 0.12),
+                color: context.colorPalette.subTitleColor.withValues(
+                  alpha: 0.12,
+                ),
               ),
               itemBuilder: (context, index) {
                 final user = results[index];
@@ -423,8 +915,8 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                 final label = user.name.isNotEmpty
                     ? user.name
                     : (user.phoneNumber.isNotEmpty
-                        ? user.phoneNumber
-                        : user.email);
+                          ? user.phoneNumber
+                          : user.email);
                 final subtitle = [
                   if (user.phoneNumber.isNotEmpty) user.phoneNumber,
                   if (user.email.isNotEmpty) user.email,
@@ -530,10 +1022,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: AppColors.primaryGold,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: AppColors.primaryGold, width: 1.5),
             ),
             contentPadding: EdgeInsets.symmetric(
               horizontal: context.getResponsiveSize(4),
@@ -585,8 +1074,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                 Icon(
                   Icons.notifications_off_rounded,
                   size: context.getResponsiveSize(12),
-                  color: context.colorPalette.subTitleColor
-                      .withValues(alpha: 0.4),
+                  color: context.colorPalette.subTitleColor.withValues(
+                    alpha: 0.4,
+                  ),
                 ),
                 SizedBox(height: context.heightPercent(1)),
                 Text(
@@ -679,8 +1169,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                     vertical: context.heightPercent(0.3),
                   ),
                   decoration: BoxDecoration(
-                    color: _targetBadgeColor(notification.targetType)
-                        .withValues(alpha: 0.1),
+                    color: _targetBadgeColor(
+                      notification.targetType,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -817,21 +1308,56 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                       color: AppColors.textMuted,
                     ),
                   ),
+                  if (notification.imageUrl != null &&
+                      notification.imageUrl!.isNotEmpty) ...[
+                    SizedBox(height: context.heightPercent(1.5)),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        context.getResponsiveSize(3),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: notification.imageUrl!,
+                        width: double.infinity,
+                        height: context.heightPercent(24),
+                        fit: BoxFit.cover,
+                        errorWidget: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                   SizedBox(height: context.heightPercent(2)),
-                  _detailRow(context, 'Audience',
-                      '${_targetLabel(notification.targetType)}${notification.targetValue != null ? ' (${notification.targetValue})' : ''}'),
-                  _detailRow(context, 'Recipients',
-                      '${notification.recipientCount ?? '—'}'),
-                  _detailRow(context, 'Sent by',
-                      notification.sentBy ?? '—'),
-                  _detailRow(context, 'Sent at',
-                      DateFormat('dd MMM yyyy, hh:mm a').format(notification.sentAt)),
-                  _detailRow(context, 'Push mode',
-                      notification.pushMode ?? '—'),
-                  _detailRow(context, 'Delivered',
-                      '${notification.pushSuccessCount ?? '—'}'),
-                  _detailRow(context, 'Failed',
-                      '${notification.pushFailureCount ?? '—'}'),
+                  _detailRow(
+                    context,
+                    'Audience',
+                    '${_targetLabel(notification.targetType)}${notification.targetValue != null ? ' (${notification.targetValue})' : ''}',
+                  ),
+                  _detailRow(
+                    context,
+                    'Recipients',
+                    '${notification.recipientCount ?? '—'}',
+                  ),
+                  _detailRow(context, 'Sent by', notification.sentBy ?? '—'),
+                  _detailRow(
+                    context,
+                    'Sent at',
+                    DateFormat(
+                      'dd MMM yyyy, hh:mm a',
+                    ).format(notification.sentAt),
+                  ),
+                  _detailRow(
+                    context,
+                    'Push mode',
+                    notification.pushMode ?? '—',
+                  ),
+                  _detailRow(
+                    context,
+                    'Delivered',
+                    '${notification.pushSuccessCount ?? '—'}',
+                  ),
+                  _detailRow(
+                    context,
+                    'Failed',
+                    '${notification.pushFailureCount ?? '—'}',
+                  ),
                   if ((notification.noTokenCount ?? 0) > 0)
                     Padding(
                       padding: EdgeInsets.only(top: context.heightPercent(1)),
@@ -879,7 +1405,9 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                     SizedBox(height: context.heightPercent(1)),
                     ...notification.failures.map(
                       (failure) => Padding(
-                        padding: EdgeInsets.only(bottom: context.heightPercent(0.8)),
+                        padding: EdgeInsets.only(
+                          bottom: context.heightPercent(0.8),
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -940,11 +1468,13 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
                                   color: AppColors.textDark,
                                 ),
                               ),
-                              backgroundColor:
-                                  AppColors.primaryGold.withValues(alpha: 0.1),
+                              backgroundColor: AppColors.primaryGold.withValues(
+                                alpha: 0.1,
+                              ),
                               side: BorderSide(
-                                color: AppColors.primaryGold
-                                    .withValues(alpha: 0.4),
+                                color: AppColors.primaryGold.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
                             ),
                           )

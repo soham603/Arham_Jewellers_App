@@ -13,6 +13,9 @@ abstract class INotificationRepository {
   Future<Map<String, dynamic>> sendNotification({
     required Map<String, dynamic> data,
   });
+  Future<String?> uploadNotificationImage({
+    required String filePath,
+  });
   Future<PaginatedResult<SentNotification>> getNotificationHistory({
     Map<String, dynamic>? queryParams,
   });

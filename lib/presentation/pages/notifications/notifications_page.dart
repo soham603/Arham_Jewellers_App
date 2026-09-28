@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -145,10 +146,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textMuted),
-            ),
+            child: Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
@@ -174,28 +172,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textMuted),
-            ),
+            child: Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
           ),
           TextButton(
             onPressed: () {
               _controller.clearAll();
               Navigator.pop(context);
             },
-            child: Text(
-              'Clear All',
-              style: TextStyle(color: AppColors.danger),
-            ),
+            child: Text('Clear All', style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
     );
   }
 }
-
-
 
 class _LoadingShimmer extends StatelessWidget {
   @override
@@ -226,7 +216,9 @@ class _LoadingShimmer extends StatelessWidget {
                   height: context.getResponsiveSize(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                    borderRadius: BorderRadius.circular(
+                      context.getResponsiveSize(2),
+                    ),
                   ),
                 ),
                 SizedBox(width: context.getResponsiveSize(3)),
@@ -239,7 +231,9 @@ class _LoadingShimmer extends StatelessWidget {
                         height: context.getResponsiveSize(3.5),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                          borderRadius: BorderRadius.circular(
+                            context.getResponsiveSize(1),
+                          ),
                         ),
                       ),
                       SizedBox(height: context.heightPercent(1)),
@@ -248,7 +242,9 @@ class _LoadingShimmer extends StatelessWidget {
                         height: context.getResponsiveSize(3),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                          borderRadius: BorderRadius.circular(
+                            context.getResponsiveSize(1),
+                          ),
                         ),
                       ),
                       SizedBox(height: context.heightPercent(0.8)),
@@ -257,7 +253,9 @@ class _LoadingShimmer extends StatelessWidget {
                         height: context.getResponsiveSize(2.5),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(context.getResponsiveSize(1)),
+                          borderRadius: BorderRadius.circular(
+                            context.getResponsiveSize(1),
+                          ),
                         ),
                       ),
                     ],
@@ -317,7 +315,9 @@ class _ErrorState extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primaryGold,
-                  borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                  borderRadius: BorderRadius.circular(
+                    context.getResponsiveSize(2),
+                  ),
                 ),
                 child: Text(
                   'Retry',
@@ -385,11 +385,7 @@ class _NotificationList extends StatelessWidget {
 
   void _handleTap(NotificationModel notification) {
     controller.markAsRead(notification.id);
-
-    final route = notification.data?['route']?.toString();
-    if (route != null && NotificationController.allowedRoutes.contains(route)) {
-      Get.toNamed(route, arguments: notification.data);
-    }
+    controller.openNotification(notification);
   }
 
   @override
@@ -411,7 +407,9 @@ class _NotificationList extends StatelessWidget {
               return GestureDetector(
                 onTap: () => controller.loadMore(),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: context.heightPercent(2)),
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.heightPercent(2),
+                  ),
                   child: Center(
                     child: Text(
                       'Tap to retry',
@@ -476,7 +474,9 @@ class _NotificationList extends StatelessWidget {
               padding: EdgeInsets.all(context.getResponsiveSize(4)),
               decoration: BoxDecoration(
                 color: AppColors.danger,
-                borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
+                borderRadius: BorderRadius.circular(
+                  context.getResponsiveSize(3),
+                ),
               ),
               alignment: Alignment.centerRight,
               child: Icon(
@@ -500,10 +500,7 @@ class _NotificationCard extends StatefulWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
 
-  const _NotificationCard({
-    required this.notification,
-    required this.onTap,
-  });
+  const _NotificationCard({required this.notification, required this.onTap});
 
   @override
   State<_NotificationCard> createState() => _NotificationCardState();
@@ -513,6 +510,10 @@ class _NotificationCardState extends State<_NotificationCard> {
   bool _expanded = false;
 
   IconData _getNotificationIcon() {
+    final linkType = widget.notification.linkType?.toLowerCase();
+    if (linkType == 'product') return Icons.shopping_bag_rounded;
+    if (linkType == 'category') return Icons.category_rounded;
+
     final route = widget.notification.data?['route']?.toString();
     if (route == null) return Icons.notifications_none_rounded;
 
@@ -541,7 +542,9 @@ class _NotificationCardState extends State<_NotificationCard> {
         margin: EdgeInsets.only(bottom: context.heightPercent(1.2)),
         padding: EdgeInsets.all(context.getResponsiveSize(4)),
         decoration: BoxDecoration(
-          color: widget.notification.isRead ? Colors.white : AppColors.primaryGold.withValues(alpha: 0.05),
+          color: widget.notification.isRead
+              ? Colors.white
+              : AppColors.primaryGold.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(context.getResponsiveSize(3)),
           border: Border.all(
             color: widget.notification.isRead
@@ -559,12 +562,16 @@ class _NotificationCardState extends State<_NotificationCard> {
                 color: widget.notification.isRead
                     ? AppColors.textMuted.withValues(alpha: 0.1)
                     : AppColors.primaryGold.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(context.getResponsiveSize(2)),
+                borderRadius: BorderRadius.circular(
+                  context.getResponsiveSize(2),
+                ),
               ),
               child: Icon(
                 icon,
                 size: context.getResponsiveSize(5),
-                color: widget.notification.isRead ? AppColors.textMuted : AppColors.primaryGold,
+                color: widget.notification.isRead
+                    ? AppColors.textMuted
+                    : AppColors.primaryGold,
               ),
             ),
             SizedBox(width: context.getResponsiveSize(3)),
@@ -580,7 +587,9 @@ class _NotificationCardState extends State<_NotificationCard> {
                           widget.notification.title,
                           style: TextStyle(
                             fontSize: context.getResponsiveSize(3.8),
-                            fontWeight: widget.notification.isRead ? FontWeight.w500 : FontWeight.w700,
+                            fontWeight: widget.notification.isRead
+                                ? FontWeight.w500
+                                : FontWeight.w700,
                             color: AppColors.textDark,
                           ),
                           maxLines: 1,
@@ -591,7 +600,9 @@ class _NotificationCardState extends State<_NotificationCard> {
                         Container(
                           width: context.getResponsiveSize(2),
                           height: context.getResponsiveSize(2),
-                          margin: EdgeInsets.only(left: context.getResponsiveSize(2)),
+                          margin: EdgeInsets.only(
+                            left: context.getResponsiveSize(2),
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryGold,
                             shape: BoxShape.circle,
@@ -609,6 +620,26 @@ class _NotificationCardState extends State<_NotificationCard> {
                     maxLines: _expanded ? null : 2,
                     overflow: _expanded ? null : TextOverflow.ellipsis,
                   ),
+                  if (widget.notification.imageUrl != null &&
+                      widget.notification.imageUrl!.isNotEmpty) ...[
+                    SizedBox(height: context.heightPercent(0.8)),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        context.getResponsiveSize(2),
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.notification.imageUrl!,
+                        width: double.infinity,
+                        height: context.heightPercent(16),
+                        fit: BoxFit.cover,
+                        placeholder: (_, _) => Container(
+                          height: context.heightPercent(16),
+                          color: AppColors.divider.withValues(alpha: 0.3),
+                        ),
+                        errorWidget: (_, _, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                   SizedBox(height: context.heightPercent(0.8)),
                   Row(
                     children: [

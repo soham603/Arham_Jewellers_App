@@ -4,8 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
+import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
+import 'package:ratnesh_gold_app/domain/entities/category_model.dart';
+import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/sent_notification_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 
@@ -13,6 +17,7 @@ class NotificationManagerController extends GetxController {
   static NotificationManagerController get instance => Get.find();
 
   final _notificationRepo = NotificationRepository();
+  final _productRepo = ProductRepository();
 
   final _title = ''.obs;
   String get title => _title.value;
@@ -20,8 +25,28 @@ class NotificationManagerController extends GetxController {
   final _body = ''.obs;
   String get body => _body.value;
 
+  final _imagePath = RxnString();
+  String? get imagePath => _imagePath.value;
+
+  bool get hasImage => _imagePath.value != null;
+
   final _targetType = 'all'.obs;
   String get targetType => _targetType.value;
+
+  final _linkType = 'none'.obs;
+  String get linkType => _linkType.value;
+
+  final _linkProduct = Rxn<ProductModel>();
+  ProductModel? get linkProduct => _linkProduct.value;
+
+  final _linkCategory = Rxn<CategoryModel>();
+  CategoryModel? get linkCategory => _linkCategory.value;
+
+  final _productResults = <ProductModel>[].obs;
+  List<ProductModel> get productResults => _productResults;
+
+  final _productSearchState = CurrentAppState.INITIAL.obs;
+  CurrentAppState get productSearchState => _productSearchState.value;
 
   final _selectedUsers = <UserSearchModel>[].obs;
   List<UserSearchModel> get selectedUsers => _selectedUsers;
@@ -58,6 +83,7 @@ class NotificationManagerController extends GetxController {
   static const int _pageLimit = 20;
 
   Timer? _debounce;
+  Timer? _productDebounce;
 
   @override
   void onInit() {
@@ -68,11 +94,15 @@ class NotificationManagerController extends GetxController {
   @override
   void onClose() {
     _debounce?.cancel();
+    _productDebounce?.cancel();
     super.onClose();
   }
 
   void setTitle(String value) => _title.value = value;
   void setBody(String value) => _body.value = value;
+
+  void setImage(String? path) => _imagePath.value = path;
+  void clearImage() => _imagePath.value = null;
 
   void setTargetType(String value) {
     if (_targetType.value == value) return;
@@ -83,6 +113,82 @@ class NotificationManagerController extends GetxController {
     _searchQuery.value = '';
     _searchResults.clear();
     _searchState.value = CurrentAppState.INITIAL;
+  }
+
+  void setLinkType(String value) {
+    if (_linkType.value == value) return;
+    _linkType.value = value;
+
+    if (value != 'product') {
+      _productResults.clear();
+      _productSearchState.value = CurrentAppState.INITIAL;
+      _linkProduct.value = null;
+    }
+    if (value != 'category') {
+      _linkCategory.value = null;
+    }
+  }
+
+  void selectLinkProduct(ProductModel product) {
+    _linkProduct.value = product;
+    _linkCategory.value = null;
+  }
+
+  bool isLinkProductSelected(String productId) =>
+      _linkProduct.value?.id == productId;
+
+  void selectLinkCategory(CategoryModel category) {
+    _linkCategory.value = category;
+    _linkProduct.value = null;
+  }
+
+  void clearLinkProduct() => _linkProduct.value = null;
+  void clearLinkCategory() => _linkCategory.value = null;
+
+  void onProductSearchChanged(String query) {
+    _productDebounce?.cancel();
+
+    if (query.trim().isEmpty) {
+      _productResults.clear();
+      _productSearchState.value = CurrentAppState.INITIAL;
+      return;
+    }
+
+    _productDebounce = Timer(const Duration(milliseconds: 350), () {
+      searchLinkProducts(query.trim());
+    });
+  }
+
+  Future<void> searchLinkProducts(String query) async {
+    _productSearchState.value = CurrentAppState.LOADING;
+    try {
+      final result = await _productRepo.searchProducts(query: query);
+      if (_linkType.value != 'product') return;
+      _productResults.value = result.items;
+      _productSearchState.value = CurrentAppState.SUCCESS;
+    } catch (e) {
+      if (_linkType.value != 'product') return;
+      _productResults.clear();
+      _productSearchState.value = CurrentAppState.ERROR;
+    }
+  }
+
+  Future<List<CategoryModel>> loadLevel3Categories() async {
+    if (!Get.isRegistered<CategoryController>()) return const [];
+    final categoryController = Get.find<CategoryController>();
+    if (categoryController.allLevel3Categories.isNotEmpty) {
+      return categoryController.allLevel3Categories;
+    }
+    try {
+      await categoryController.fetchCategoryTree();
+    } catch (_) {}
+    return categoryController.allLevel3Categories;
+  }
+
+  String? get selectedLinkId {
+    if (_linkType.value == 'product') return _linkProduct.value?.id;
+    if (_linkType.value == 'category') return _linkCategory.value?.id;
+    return null;
   }
 
   bool isUserSelected(String userId) =>
@@ -158,18 +264,45 @@ class NotificationManagerController extends GetxController {
       ToastUtils.showWarning('Please select at least one user');
       return false;
     }
+    if (_linkType.value != 'none' &&
+        (selectedLinkId == null || selectedLinkId!.isEmpty)) {
+      ToastUtils.showWarning(
+        _linkType.value == 'product'
+            ? 'Please select a product to link'
+            : 'Please select a category to link',
+      );
+      return false;
+    }
 
     _sendState.value = CurrentAppState.LOADING;
 
     try {
+      String? imageUrl;
+      if (_imagePath.value != null) {
+        imageUrl = await _notificationRepo.uploadNotificationImage(
+          filePath: _imagePath.value!,
+        );
+        if (imageUrl == null || imageUrl.isEmpty) {
+          _sendState.value = CurrentAppState.ERROR;
+          ToastUtils.showError('Failed to upload image');
+          return false;
+        }
+      }
+
       final data = <String, dynamic>{
         'title': _title.value.trim(),
         'message': _body.value.trim(),
         'targetType': _targetType.value,
+        if (imageUrl != null && imageUrl.isNotEmpty) 'imageUrl': imageUrl,
       };
 
       if (_targetType.value == 'users') {
         data['userIds'] = selectedUserIds;
+      }
+
+      if (_linkType.value != 'none' && selectedLinkId != null) {
+        data['linkType'] = _linkType.value;
+        data['linkId'] = selectedLinkId;
       }
 
       final response = await _notificationRepo.sendNotification(data: data);
@@ -296,10 +429,16 @@ class NotificationManagerController extends GetxController {
   void _clearForm() {
     _title.value = '';
     _body.value = '';
+    _imagePath.value = null;
     _targetType.value = 'all';
     _selectedUsers.clear();
     _searchQuery.value = '';
     _searchResults.clear();
     _searchState.value = CurrentAppState.INITIAL;
+    _linkType.value = 'none';
+    _linkProduct.value = null;
+    _linkCategory.value = null;
+    _productResults.clear();
+    _productSearchState.value = CurrentAppState.INITIAL;
   }
 }

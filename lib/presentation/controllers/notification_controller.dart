@@ -3,9 +3,14 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:ratnesh_gold_app/app/routes/app_routes.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
+import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/CategoryController.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/product_listing_page.dart';
 import 'package:ratnesh_gold_app/services/notification_service.dart';
 import 'package:ratnesh_gold_app/utils/Enums.dart';
+import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationController extends GetxController {
@@ -15,6 +20,7 @@ class NotificationController extends GetxController {
   static const int _pageSize = 20;
 
   final _notificationRepo = NotificationRepository();
+  final _productRepo = ProductRepository();
 
   static const Set<String> _allowedRoutes = {
     AppRoutes.userOrderDetail,
@@ -122,15 +128,13 @@ class NotificationController extends GetxController {
         notifications.addAll(fetched);
       } else {
         final existingIds = notifications.map((n) => n.id).toSet();
-        final newOnes =
-            fetched.where((n) => !existingIds.contains(n.id)).toList();
+        final newOnes = fetched
+            .where((n) => !existingIds.contains(n.id))
+            .toList();
         if (newOnes.isNotEmpty) {
           notifications.insertAll(0, newOnes);
           if (notifications.length > _maxNotifications) {
-            notifications.removeRange(
-              _maxNotifications,
-              notifications.length,
-            );
+            notifications.removeRange(_maxNotifications, notifications.length);
           }
         }
       }
@@ -177,6 +181,7 @@ class NotificationController extends GetxController {
       id: old.id,
       title: old.title,
       body: old.body,
+      imageUrl: old.imageUrl,
       timestamp: old.timestamp,
       isRead: true,
       data: old.data,
@@ -184,13 +189,15 @@ class NotificationController extends GetxController {
     _updateUnreadCount();
     _saveNotifications();
 
-    _notificationRepo.markNotificationsAsRead(
-      data: {
-        'notificationIds': [id],
-      },
-    ).catchError((e) {
-      return <String, dynamic>{};
-    });
+    _notificationRepo
+        .markNotificationsAsRead(
+          data: {
+            'notificationIds': [id],
+          },
+        )
+        .catchError((e) {
+          return <String, dynamic>{};
+        });
   }
 
   Future<void> markAllAsRead() async {
@@ -207,6 +214,7 @@ class NotificationController extends GetxController {
           id: n.id,
           title: n.title,
           body: n.body,
+          imageUrl: n.imageUrl,
           timestamp: n.timestamp,
           isRead: true,
           data: n.data,
@@ -219,11 +227,11 @@ class NotificationController extends GetxController {
     _updateUnreadCount();
     _saveNotifications();
 
-    _notificationRepo.markNotificationsAsRead(
-      data: {'notificationIds': unreadIds},
-    ).catchError((e) {
-      return <String, dynamic>{};
-    });
+    _notificationRepo
+        .markNotificationsAsRead(data: {'notificationIds': unreadIds})
+        .catchError((e) {
+          return <String, dynamic>{};
+        });
   }
 
   void addLocalNotification({
@@ -266,13 +274,84 @@ class NotificationController extends GetxController {
   }
 
   void _handleNotificationTap(Map<String, dynamic> data) {
+    final linkType = (data['linkType'] ?? data['link_type'])?.toString();
+    if (linkType != null &&
+        linkType.isNotEmpty &&
+        linkType.toLowerCase() != 'none') {
+      openDeepLink(
+        linkType: linkType,
+        linkId: (data['linkId'] ?? data['link_id'])?.toString(),
+        linkRef: (data['linkRef'] ?? data['link_ref'])?.toString(),
+        linkName: (data['linkName'] ?? data['link_name'])?.toString(),
+      );
+      return;
+    }
+
     final route = data['route'];
 
     if (route != null && route is String && _allowedRoutes.contains(route)) {
       try {
         Get.toNamed(route, arguments: data);
-      } catch (e) {
+      } catch (e) {}
+    }
+  }
+
+  Future<void> openDeepLink({
+    String? linkType,
+    String? linkId,
+    String? linkRef,
+    String? linkName,
+  }) async {
+    final type = linkType?.toLowerCase();
+
+    try {
+      if (type == 'product') {
+        if (linkRef == null || linkRef.isEmpty) return;
+
+        final product = await _productRepo.fetchProductByTagNo(linkRef);
+        if (product != null) {
+          Get.to(() => ProductDetailsPage(product: product));
+        } else {
+          ToastUtils.showError('This product is no longer available');
+        }
+        return;
       }
+
+      if (type == 'category') {
+        if (linkId == null || linkId.isEmpty) return;
+
+        String? karat;
+        if (Get.isRegistered<CategoryController>()) {
+          karat = Get.find<CategoryController>().getLevel3Karat(linkId);
+        }
+
+        Get.to(
+          () => ProductListingPage(
+            categoryId: linkId,
+            karat: karat,
+            title: linkName,
+          ),
+        );
+      }
+    } catch (e) {
+      ToastUtils.showError('Unable to open the linked item');
+    }
+  }
+
+  void openNotification(NotificationModel notification) {
+    if (notification.hasDeepLink) {
+      openDeepLink(
+        linkType: notification.linkType,
+        linkId: notification.linkId,
+        linkRef: notification.linkRef,
+        linkName: notification.linkName,
+      );
+      return;
+    }
+
+    final route = notification.data?['route']?.toString();
+    if (route != null && _allowedRoutes.contains(route)) {
+      Get.toNamed(route, arguments: notification.data);
     }
   }
 
@@ -291,8 +370,7 @@ class NotificationController extends GetxController {
       if (deletedJson != null) {
         _deletedIds.addAll(deletedJson);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _saveNotifications() async {
@@ -301,7 +379,6 @@ class NotificationController extends GetxController {
       final jsonList = notifications.map((n) => n.toJson()).toList();
       await prefs.setString(_storageKey, jsonEncode(jsonList));
       await prefs.setStringList(_deletedIdsKey, _deletedIds.toList());
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 }

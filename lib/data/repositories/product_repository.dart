@@ -50,9 +50,17 @@ class ProductRepository extends BaseRepository implements IProductRepository {
     );
     checkApiError(response.data);
     requireData(response.data);
-    final data = response.data['data'];
-    if (data is Map<String, dynamic>) {
-      return ProductModel.fromJson(data);
+
+    // Tag/barcode searches return a non-paginated envelope:
+    // { data: { paginated: false, data: { ...product } } }.
+    final envelope = response.data['data'];
+    dynamic product;
+    if (envelope is Map) {
+      product = envelope['data'] ?? envelope;
+    }
+
+    if (product is Map) {
+      return ProductModel.fromJson(Map<String, dynamic>.from(product));
     }
     return null;
   }

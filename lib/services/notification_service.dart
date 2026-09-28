@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -18,14 +19,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class NotificationService {
   static const String _channelId = 'arham_jewellers_high_importance';
   static const String _channelName = 'Arham Jewellers Notifications';
-  static const String _channelDescription = 'High importance notifications from Arham Jewellers';
+  static const String _channelDescription =
+      'High importance notifications from Arham Jewellers';
 
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
   FirebaseMessaging? _messaging;
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
   static const String _counterKey = 'notification_id_counter';
   int _notificationIdCounter = 0;
 
@@ -42,17 +45,41 @@ class NotificationService {
   bool _backgroundInitDone = false;
 
   Function(RemoteMessage)? onMessageReceived;
-  Function(RemoteMessage)? onMessageOpenedApp;
+
+  Function(RemoteMessage)? _onMessageOpenedApp;
+  Function(RemoteMessage)? get onMessageOpenedApp => _onMessageOpenedApp;
+
+  set onMessageOpenedApp(Function(RemoteMessage)? handler) {
+    _onMessageOpenedApp = handler;
+
+    final pending = _pendingOpenedMessage;
+    if (handler != null && pending != null) {
+      _pendingOpenedMessage = null;
+      handler(pending);
+    }
+  }
+
+  // A tap on a notification that launched the app (getInitialMessage) or that
+  // arrived before NotificationController attached its listener is replayed
+  // once a handler is registered, so cold-start deep links are not lost.
+  RemoteMessage? _pendingOpenedMessage;
+
+  void _emitOpened(RemoteMessage message) {
+    final handler = _onMessageOpenedApp;
+    if (handler != null) {
+      handler(message);
+    } else {
+      _pendingOpenedMessage = message;
+    }
+  }
 
   static const Duration _criticalStepTimeout = Duration(seconds: 3);
   static const Duration _readyTimeout = Duration(seconds: 10);
 
   Future<void> init() async {
     try {
-      await _setupLocalNotifications()
-          .timeout(_criticalStepTimeout);
-      await _loadNotificationIdCounter()
-          .timeout(_criticalStepTimeout);
+      await _setupLocalNotifications().timeout(_criticalStepTimeout);
+      await _loadNotificationIdCounter().timeout(_criticalStepTimeout);
     } catch (e) {
       _initError = e.toString();
     }
@@ -76,7 +103,9 @@ class NotificationService {
         if (!_readyCompleter.isCompleted) _readyCompleter.complete();
         return;
       }
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+        _firebaseMessagingBackgroundHandler,
+      );
       await _getFcmToken();
       _setupMessageListeners();
       _backgroundInitDone = true;
@@ -108,12 +137,12 @@ class NotificationService {
       try {
         final androidPlugin = _localNotifications
             .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>();
+              AndroidFlutterLocalNotificationsPlugin
+            >();
         if (androidPlugin != null) {
           await androidPlugin.requestNotificationsPermission();
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     }
 
     try {
@@ -124,8 +153,7 @@ class NotificationService {
         provisional: false,
         criticalAlert: false,
       );
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _setupLocalNotifications() async {
@@ -146,8 +174,10 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
-    final androidPlugin = _localNotifications.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _localNotifications
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
@@ -175,8 +205,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_counterKey, _notificationIdCounter);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> _getFcmToken() async {
@@ -202,8 +231,7 @@ class NotificationService {
       try {
         fresh = await _messaging!.getToken();
         if (fresh != null && fresh.isNotEmpty) break;
-      } catch (e) {
-      }
+      } catch (e) {}
       if (attempt < 2) {
         await Future.delayed(const Duration(seconds: 2));
       }
@@ -233,18 +261,17 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       try {
         _showLocalNotification(message);
-      } catch (e) {
-      }
+      } catch (e) {}
       onMessageReceived?.call(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      onMessageOpenedApp?.call(message);
+      _emitOpened(message);
     });
 
     _messaging?.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        onMessageOpenedApp?.call(message);
+        _emitOpened(message);
       }
     });
   }
@@ -252,12 +279,14 @@ class NotificationService {
   void _showLocalNotification(RemoteMessage message) {
     final notification = message.notification;
     final data = message.data;
-    final title = notification?.title ??
+    final title =
+        notification?.title ??
         data['title'] ??
         data['notification_title'] ??
         data['message'] ??
         '';
-    final body = notification?.body ??
+    final body =
+        notification?.body ??
         data['body'] ??
         data['notification_body'] ??
         data['text'] ??
@@ -272,9 +301,18 @@ class NotificationService {
     if (!payload.containsKey('title')) payload['title'] = title;
     if (!payload.containsKey('body')) payload['body'] = body;
 
+    final imageUrl =
+        notification?.android?.imageUrl ??
+        data['imageUrl'] ??
+        data['image_url'];
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      payload['imageUrl'] = imageUrl;
+    }
+
     showSystemNotification(
       title: title,
       body: body,
+      imageUrl: imageUrl,
       payload: payload,
     );
   }
@@ -282,9 +320,14 @@ class NotificationService {
   Future<void> showSystemNotification({
     required String title,
     required String body,
+    String? imageUrl,
     Map<String, dynamic>? payload,
   }) async {
     if (title.isEmpty && body.isEmpty) return;
+
+    final imageBytes = (imageUrl != null && imageUrl.isNotEmpty)
+        ? await _downloadImageBytes(imageUrl)
+        : null;
 
     final androidDetails = AndroidNotificationDetails(
       _channelId,
@@ -294,6 +337,13 @@ class NotificationService {
       priority: Priority.high,
       icon: 'ic_notification',
       color: const Color(0xFFB8860B),
+      styleInformation: imageBytes != null
+          ? BigPictureStyleInformation(
+              ByteArrayAndroidBitmap(imageBytes),
+              contentTitle: title,
+              summaryText: body,
+            )
+          : null,
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -316,7 +366,32 @@ class NotificationService {
         payload: payload != null ? jsonEncode(payload) : null,
       );
       await _saveNotificationIdCounter();
-    } catch (e) {
+    } catch (e) {}
+  }
+
+  Future<Uint8List?> _downloadImageBytes(String url) async {
+    try {
+      final uri = Uri.tryParse(url);
+      if (uri == null || !uri.hasScheme) return null;
+
+      final client = HttpClient()
+        ..connectionTimeout = const Duration(seconds: 5);
+      try {
+        final request = await client.getUrl(uri);
+        final response = await request.close().timeout(
+          const Duration(seconds: 8),
+        );
+        if (response.statusCode != 200) return null;
+        final bytes = await response.fold<List<int>>(
+          <int>[],
+          (previous, chunk) => previous..addAll(chunk),
+        );
+        return Uint8List.fromList(bytes);
+      } finally {
+        client.close();
+      }
+    } catch (_) {
+      return null;
     }
   }
 
@@ -325,15 +400,16 @@ class NotificationService {
       try {
         final data = jsonDecode(response.payload!) as Map<String, dynamic>;
         final notification = NotificationModel.fromFcmPayload(data);
-        onMessageOpenedApp?.call(RemoteMessage(
-          data: data,
-          notification: RemoteNotification(
-            title: notification.title,
-            body: notification.body,
+        _emitOpened(
+          RemoteMessage(
+            data: data,
+            notification: RemoteNotification(
+              title: notification.title,
+              body: notification.body,
+            ),
           ),
-        ));
-      } catch (e) {
-      }
+        );
+      } catch (e) {}
     }
   }
 
@@ -363,8 +439,7 @@ class NotificationService {
           await SessionManager().saveFcmToken(token);
           return token;
         }
-      } catch (e) {
-      }
+      } catch (e) {}
       if (attempt < maxRetries - 1) {
         await Future.delayed(const Duration(seconds: 2));
       }
@@ -386,8 +461,7 @@ class NotificationService {
       if (_fcmToken != null && _fcmToken!.isNotEmpty) {
         await SessionManager().saveFcmToken(_fcmToken!);
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     return _fcmToken;
   }
@@ -399,8 +473,7 @@ class NotificationService {
     if (_messaging == null) return;
     try {
       await _messaging!.subscribeToTopic(topic);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> unsubscribeFromTopic(String topic) async {
@@ -410,8 +483,7 @@ class NotificationService {
     if (_messaging == null) return;
     try {
       await _messaging!.unsubscribeFromTopic(topic);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> subscribeUserTopics() async {

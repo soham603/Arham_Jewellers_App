@@ -54,6 +54,7 @@ class SentNotification {
   final String id;
   final String title;
   final String body;
+  final String? imageUrl;
   final String targetType;
   final String? targetValue;
   final DateTime sentAt;
@@ -71,6 +72,7 @@ class SentNotification {
     required this.id,
     required this.title,
     required this.body,
+    this.imageUrl,
     required this.targetType,
     this.targetValue,
     required this.sentAt,
@@ -101,6 +103,7 @@ class SentNotification {
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       body: json['body'] ?? json['message'] ?? '',
+      imageUrl: json['imageUrl'] ?? json['image_url'],
       targetType: json['targetType'] ?? json['target_type'] ?? 'all',
       targetValue: json['targetValue'] ?? json['target_value'],
       sentAt: DateTime.tryParse(json['sentAt'] ??

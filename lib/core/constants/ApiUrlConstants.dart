@@ -75,6 +75,8 @@ class ApiUrlConstants {
   static const String NOTIFICATION_HISTORY = '/api/v1/notifications/history';
   static const String NOTIFICATION_ELIGIBLE_USERS =
       '/api/v1/notifications/eligible-users';
+  static const String NOTIFICATION_UPLOAD_IMAGE =
+      '/api/v1/notifications/upload-image';
 
   static const String HOME_VIDEO = '/api/v1/home-video';
 }
