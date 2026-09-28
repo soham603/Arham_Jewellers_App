@@ -73,6 +73,8 @@ class ApiUrlConstants {
   static const String NOTIFICATION_ACTION = '/api/v1/notifications/action';
   static const String NOTIFICATION_SEND = '/api/v1/notifications/send';
   static const String NOTIFICATION_HISTORY = '/api/v1/notifications/history';
+  static const String NOTIFICATION_ELIGIBLE_USERS =
+      '/api/v1/notifications/eligible-users';
 
   static const String HOME_VIDEO = '/api/v1/home-video';
 }

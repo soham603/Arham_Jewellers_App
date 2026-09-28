@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' hide Response;
-import 'package:ratnesh_gold_app/data/repositories/admin_access_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/data/repositories/notification_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
@@ -14,7 +13,6 @@ class NotificationManagerController extends GetxController {
   static NotificationManagerController get instance => Get.find();
 
   final _notificationRepo = NotificationRepository();
-  final _adminAccessRepo = AdminAccessRepository();
 
   final _title = ''.obs;
   String get title => _title.value;
@@ -130,7 +128,7 @@ class NotificationManagerController extends GetxController {
         'limit': 20,
       };
 
-      final result = await _adminAccessRepo.fetchUsers(
+      final result = await _notificationRepo.searchEligibleUsers(
         queryParams: queryParams,
       );
 

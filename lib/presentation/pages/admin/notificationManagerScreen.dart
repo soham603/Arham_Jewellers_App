@@ -381,6 +381,10 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
           }
 
           final results = controller.searchResults;
+          // Read the selection inside the Obx builder: itemBuilder runs lazily
+          // during layout, outside GetX's dependency-tracking window, so
+          // isUserSelected() called there would never rebuild the list.
+          final selectedIds = controller.selectedUserIds.toSet();
           if (results.isEmpty) {
             return Text(
               'No users found',
@@ -415,7 +419,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
               ),
               itemBuilder: (context, index) {
                 final user = results[index];
-                final isSelected = controller.isUserSelected(user.id);
+                final isSelected = selectedIds.contains(user.id);
                 final label = user.name.isNotEmpty
                     ? user.name
                     : (user.phoneNumber.isNotEmpty
@@ -627,110 +631,360 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
   }
 
   Widget _historyTile(BuildContext context, SentNotification notification) {
-    return Container(
-      padding: EdgeInsets.all(context.getResponsiveSize(4)),
-      decoration: BoxDecoration(
-        color: context.colorPalette.boxColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
+    return GestureDetector(
+      onTap: () => _showHistoryDetail(context, notification),
+      child: Container(
+        padding: EdgeInsets.all(context.getResponsiveSize(4)),
+        decoration: BoxDecoration(
+          color: context.colorPalette.boxColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: context.colorPalette.subTitleColor.withValues(alpha: 0.1),
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: context.getResponsiveSize(8),
-                height: context.getResponsiveSize(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGold.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: context.getResponsiveSize(8),
+                  height: context.getResponsiveSize(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGold.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.send_rounded,
+                    size: context.getResponsiveSize(3.5),
+                    color: AppColors.primaryGold,
+                  ),
                 ),
-                child: Icon(
-                  Icons.send_rounded,
-                  size: context.getResponsiveSize(3.5),
-                  color: AppColors.primaryGold,
+                SizedBox(width: context.getResponsiveSize(2)),
+                Expanded(
+                  child: Text(
+                    notification.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.8),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                    ),
+                  ),
                 ),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.getResponsiveSize(2),
+                    vertical: context.heightPercent(0.3),
+                  ),
+                  decoration: BoxDecoration(
+                    color: _targetBadgeColor(notification.targetType)
+                        .withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _targetLabel(notification.targetType),
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(2.5),
+                      fontWeight: FontWeight.w600,
+                      color: _targetBadgeColor(notification.targetType),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: context.heightPercent(0.8)),
+            Text(
+              notification.body,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                color: context.colorPalette.subTitleColor,
               ),
-              SizedBox(width: context.getResponsiveSize(2)),
-              Expanded(
+            ),
+            SizedBox(height: context.heightPercent(0.8)),
+            if (notification.sentBy != null &&
+                notification.sentBy!.trim().isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(bottom: context.heightPercent(0.6)),
                 child: Text(
-                  notification.title,
+                  'Sent by ${notification.sentBy}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.8),
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
+                    fontSize: context.getResponsiveSize(2.6),
+                    color: AppColors.textMuted,
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.getResponsiveSize(2),
-                  vertical: context.heightPercent(0.3),
-                ),
-                decoration: BoxDecoration(
-                  color: _targetBadgeColor(notification.targetType)
-                      .withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  _targetLabel(notification.targetType),
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(2.5),
-                    fontWeight: FontWeight.w600,
-                    color: _targetBadgeColor(notification.targetType),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: context.heightPercent(0.8)),
-          Text(
-            notification.body,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: context.getResponsiveSize(3.2),
-              color: context.colorPalette.subTitleColor,
-            ),
-          ),
-          SizedBox(height: context.heightPercent(0.8)),
-          Row(
-            children: [
-              Icon(
-                Icons.access_time_rounded,
-                size: context.getResponsiveSize(2.8),
-                color: AppColors.textMuted,
-              ),
-              SizedBox(width: context.getResponsiveSize(1)),
-              Text(
-                _formatTime(notification.sentAt),
-                style: TextStyle(
-                  fontSize: context.getResponsiveSize(2.5),
-                  color: AppColors.textMuted,
-                ),
-              ),
-              if (notification.recipientCount != null) ...[
-                SizedBox(width: context.getResponsiveSize(3)),
+            Row(
+              children: [
                 Icon(
-                  Icons.people_rounded,
+                  Icons.access_time_rounded,
                   size: context.getResponsiveSize(2.8),
                   color: AppColors.textMuted,
                 ),
                 SizedBox(width: context.getResponsiveSize(1)),
                 Text(
-                  '${notification.recipientCount} recipients',
+                  _formatTime(notification.sentAt),
                   style: TextStyle(
                     fontSize: context.getResponsiveSize(2.5),
                     color: AppColors.textMuted,
                   ),
                 ),
+                if (notification.recipientCount != null) ...[
+                  SizedBox(width: context.getResponsiveSize(3)),
+                  Icon(
+                    Icons.people_rounded,
+                    size: context.getResponsiveSize(2.8),
+                    color: AppColors.textMuted,
+                  ),
+                  SizedBox(width: context.getResponsiveSize(1)),
+                  Text(
+                    '${notification.recipientCount} recipients',
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(2.5),
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: context.getResponsiveSize(4),
+                  color: AppColors.textMuted,
+                ),
               ],
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showHistoryDetail(BuildContext context, SentNotification notification) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.75,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: ListView(
+                controller: scrollController,
+                padding: EdgeInsets.fromLTRB(
+                  context.getResponsiveSize(5),
+                  context.heightPercent(1.5),
+                  context.getResponsiveSize(5),
+                  context.heightPercent(3),
+                ),
+                children: [
+                  Center(
+                    child: Container(
+                      width: context.getResponsiveSize(10),
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.divider,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+                  Text(
+                    notification.title,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(5),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark,
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(0.8)),
+                  Text(
+                    notification.body,
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(3.5),
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                  SizedBox(height: context.heightPercent(2)),
+                  _detailRow(context, 'Audience',
+                      '${_targetLabel(notification.targetType)}${notification.targetValue != null ? ' (${notification.targetValue})' : ''}'),
+                  _detailRow(context, 'Recipients',
+                      '${notification.recipientCount ?? '—'}'),
+                  _detailRow(context, 'Sent by',
+                      notification.sentBy ?? '—'),
+                  _detailRow(context, 'Sent at',
+                      DateFormat('dd MMM yyyy, hh:mm a').format(notification.sentAt)),
+                  _detailRow(context, 'Push mode',
+                      notification.pushMode ?? '—'),
+                  _detailRow(context, 'Delivered',
+                      '${notification.pushSuccessCount ?? '—'}'),
+                  _detailRow(context, 'Failed',
+                      '${notification.pushFailureCount ?? '—'}'),
+                  if ((notification.noTokenCount ?? 0) > 0)
+                    Padding(
+                      padding: EdgeInsets.only(top: context.heightPercent(1)),
+                      child: Text(
+                        '${notification.noTokenCount} recipient(s) had no registered device — saved in-app only.',
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.8),
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ),
+                  if (notification.pushError != null &&
+                      notification.pushError!.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.only(top: context.heightPercent(1.5)),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(context.getResponsiveSize(3)),
+                        decoration: BoxDecoration(
+                          color: AppColors.danger.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.danger.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          notification.pushError!,
+                          style: TextStyle(
+                            fontSize: context.getResponsiveSize(3),
+                            color: AppColors.danger,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (notification.failures.isNotEmpty) ...[
+                    SizedBox(height: context.heightPercent(2)),
+                    Text(
+                      'Failed deliveries (${notification.failures.length})',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.8),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: context.heightPercent(1)),
+                    ...notification.failures.map(
+                      (failure) => Padding(
+                        padding: EdgeInsets.only(bottom: context.heightPercent(0.8)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.error_outline_rounded,
+                              size: context.getResponsiveSize(3.5),
+                              color: AppColors.danger,
+                            ),
+                            SizedBox(width: context.getResponsiveSize(2)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    failure.label,
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(3.2),
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textDark,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${failure.code ?? 'error'}${failure.message != null ? ' — ${failure.message}' : ''}',
+                                    style: TextStyle(
+                                      fontSize: context.getResponsiveSize(2.8),
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (notification.recipients.isNotEmpty) ...[
+                    SizedBox(height: context.heightPercent(2)),
+                    Text(
+                      'Sent to (${notification.recipients.length})',
+                      style: TextStyle(
+                        fontSize: context.getResponsiveSize(3.8),
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    SizedBox(height: context.heightPercent(1)),
+                    Wrap(
+                      spacing: context.getResponsiveSize(1.5),
+                      runSpacing: context.getResponsiveSize(1),
+                      children: notification.recipients
+                          .map(
+                            (recipient) => Chip(
+                              label: Text(
+                                recipient.label,
+                                style: TextStyle(
+                                  fontSize: context.getResponsiveSize(2.8),
+                                  color: AppColors.textDark,
+                                ),
+                              ),
+                              backgroundColor:
+                                  AppColors.primaryGold.withValues(alpha: 0.1),
+                              side: BorderSide(
+                                color: AppColors.primaryGold
+                                    .withValues(alpha: 0.4),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.heightPercent(0.8)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: context.getResponsiveSize(28),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                color: AppColors.textMuted,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+            ),
           ),
         ],
       ),

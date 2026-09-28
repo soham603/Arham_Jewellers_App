@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
+import 'package:ratnesh_gold_app/domain/entities/admin/userSearchModel.dart';
 import 'package:ratnesh_gold_app/domain/entities/notification_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/paginated_result.dart';
 import 'package:ratnesh_gold_app/domain/entities/sent_notification_model.dart';
@@ -97,6 +98,26 @@ class NotificationRepository extends BaseRepository implements INotificationRepo
       total: pagination.total,
       totalPages: pagination.totalPages,
       currentPage: pagination.currentPage,
+    );
+  }
+
+  @override
+  Future<PaginatedResult<UserSearchModel>> searchEligibleUsers({
+    Map<String, dynamic>? queryParams,
+  }) async {
+    final response = await dio.get(
+      ApiUrlConstants.NOTIFICATION_ELIGIBLE_USERS,
+      queryParameters: queryParams,
+      options: Options(extra: {'requiresAuth': true}),
+    );
+    final responseData = response.data;
+    checkApiError(responseData);
+    requireData(responseData);
+
+    return parsePaginatedList<UserSearchModel>(
+      responseData,
+      listKey: 'users',
+      fromJson: (e) => UserSearchModel.fromJson(e as Map<String, dynamic>),
     );
   }
 }
