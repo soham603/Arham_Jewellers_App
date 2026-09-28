@@ -20,6 +20,7 @@ import 'package:ratnesh_gold_app/core/utils/image_zoom_dialog.dart';
 import 'package:ratnesh_gold_app/utils/product_navigation_util.dart';
 import 'package:ratnesh_gold_app/core/services/share_service.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/widgets/complete_order_dialog.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/widgets/pdf_page_tick_viewer.dart';
 
 class AdminCustomOrderDetailPage extends StatefulWidget {
   final AdminOrderModel order;
@@ -34,6 +35,7 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
   late final AdminOrderController _controller;
   late final CraftsmanController _craftsmanController;
   bool _isSharing = false;
+  bool _showDesignTick = true;
 
   @override
   void initState() {
@@ -296,6 +298,10 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
 
               _buildTotalsCard(context, order),
               SizedBox(height: context.heightPercent(2)),
+
+              _buildSelectedDesignSection(context, order),
+              if (order.selectedDesign != null)
+                SizedBox(height: context.heightPercent(2)),
 
               if (order.referenceImages.isNotEmpty) ...[
                 _buildSectionTitle(context, 'Reference Images'),
@@ -1114,6 +1120,83 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSelectedDesignSection(BuildContext context, AdminOrderModel order) {
+    final design = order.selectedDesign;
+    if (design == null) return const SizedBox.shrink();
+
+    final aspect = (design.width > 0 && design.height > 0)
+        ? design.width / design.height
+        : 0.707;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle(context, 'Selected Catalog Design'),
+            Row(
+              children: [
+                Text(
+                  'Show tick-mark',
+                  style: TextStyle(
+                    fontSize: context.getResponsiveSize(3.2),
+                    color: AppColors.textMuted,
+                  ),
+                ),
+                Switch(
+                  value: _showDesignTick,
+                  onChanged: (value) => setState(() => _showDesignTick = value),
+                ),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: context.heightPercent(1)),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(context.getResponsiveSize(3)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE7DED2)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${design.catalogTitle} · Page ${design.pageNumber}',
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3.4),
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
+              ),
+              SizedBox(height: context.heightPercent(1)),
+              AspectRatio(
+                aspectRatio: aspect,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: ColoredBox(
+                    color: Colors.black,
+                    child: PdfPageTickViewer(
+                      imageUrl: design.imageUrl,
+                      imageWidth: design.width,
+                      imageHeight: design.height,
+                      initialTick: Offset(design.x, design.y),
+                      interactive: false,
+                      showTick: _showDesignTick,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -45,6 +45,10 @@ class CustomOrderController extends GetxController {
     required String style,
     required String marking,
     List<File>? images,
+    String? designCatalogId,
+    int? designPageNumber,
+    double? designX,
+    double? designY,
   }) async {
     if (_isCreating.value) return false;
 
@@ -67,6 +71,14 @@ class CustomOrderController extends GetxController {
         'purity': purity,
         'style': style,
         'marking': marking,
+        if (designCatalogId != null &&
+            designCatalogId.isNotEmpty &&
+            designPageNumber != null) ...{
+          'designCatalogId': designCatalogId,
+          'designPageNumber': designPageNumber,
+          'designX': designX,
+          'designY': designY,
+        },
           if (images != null && images.isNotEmpty)
           'referenceImages': [
             for (final img in images)
@@ -128,6 +140,10 @@ class CustomOrderController extends GetxController {
     String? marking,
     List<File>? newImages,
     bool removeOldImages = false,
+    String? designCatalogId,
+    int? designPageNumber,
+    double? designX,
+    double? designY,
   }) async {
     if (_isModifying.value) return false;
 
@@ -150,6 +166,10 @@ class CustomOrderController extends GetxController {
         'style': ?style,
         'marking': ?marking,
         'removeOldImages': removeOldImages,
+        'designCatalogId': ?designCatalogId,
+        'designPageNumber': ?designPageNumber,
+        'designX': ?designX,
+        'designY': ?designY,
       };
 
       if (newImages != null && newImages.isNotEmpty) {

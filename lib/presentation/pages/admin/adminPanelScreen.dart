@@ -11,6 +11,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/carouselManagerScreen.
 import 'package:ratnesh_gold_app/presentation/pages/admin/categoryManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/goldRateScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/notificationManagerScreen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/pdf_catalog_manager_screen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/core/widgets/stat_card.dart';
 
@@ -326,6 +327,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   subtitle: "Send push alerts",
                   onTap: () => Get.to(() => const NotificationManagerScreen()),
                 ),
+                _adminTile(
+                  context,
+                  icon: Icons.picture_as_pdf_rounded,
+                  title: "PDF Catalog",
+                  subtitle: "Manage design PDFs",
+                  onTap: () => Get.to(() => const PdfCatalogManagerScreen()),
+                ),
               ],
             )
           else
@@ -373,6 +381,9 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
         _ManagementItem(Icons.notifications_active_rounded, "Notifications",
             "Send push alerts",
             () => Get.to(() => const NotificationManagerScreen())),
+        _ManagementItem(Icons.picture_as_pdf_rounded, "PDF Catalog",
+            "Manage design PDFs",
+            () => Get.to(() => const PdfCatalogManagerScreen())),
       ];
 
   Widget _buildStatsRow(BuildContext context) {

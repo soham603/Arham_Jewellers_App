@@ -1,3 +1,5 @@
+import 'package:ratnesh_gold_app/domain/entities/pdf_catalog_model.dart';
+
 class AdminOrderModel {
   final String id;
   final String status;
@@ -31,6 +33,7 @@ class AdminOrderModel {
   final String? completeAdminNotes;
   final String? deliveryDate;
   final bool isCustomOrder;
+  final CatalogDesignSelection? selectedDesign;
 
   AdminOrderModel({
     required this.id,
@@ -63,6 +66,7 @@ class AdminOrderModel {
     this.completeAdminNotes,
     this.deliveryDate,
     this.isCustomOrder = false,
+    this.selectedDesign,
   });
 
   factory AdminOrderModel.fromJson(
@@ -133,6 +137,10 @@ class AdminOrderModel {
       completeAdminNotes: json["completeAdminNotes"]?.toString(),
       deliveryDate: json["deliveryDate"]?.toString(),
       isCustomOrder: json["isCustomOrder"] ?? false,
+      selectedDesign: json["selectedDesign"] is Map
+          ? CatalogDesignSelection.fromJson(
+              Map<String, dynamic>.from(json["selectedDesign"] as Map))
+          : null,
     );
   }
 }

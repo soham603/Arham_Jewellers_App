@@ -1,3 +1,5 @@
+import 'package:ratnesh_gold_app/domain/entities/pdf_catalog_model.dart';
+
 class CustomOrderModel {
   final String id;
   final String? productId;
@@ -26,6 +28,7 @@ class CustomOrderModel {
   final bool isCustomOrder;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final CatalogDesignSelection? selectedDesign;
 
   CustomOrderModel({
     required this.id,
@@ -55,6 +58,7 @@ class CustomOrderModel {
     this.isCustomOrder = true,
     required this.createdAt,
     required this.updatedAt,
+    this.selectedDesign,
   });
 
   factory CustomOrderModel.fromJson(Map<String, dynamic> json) {
@@ -91,6 +95,10 @@ class CustomOrderModel {
           DateTime.now(),
       updatedAt: DateTime.tryParse(json['updatedAt']?.toString() ?? '') ??
           DateTime.now(),
+      selectedDesign: json['selectedDesign'] is Map
+          ? CatalogDesignSelection.fromJson(
+              Map<String, dynamic>.from(json['selectedDesign'] as Map))
+          : null,
     );
   }
 }

@@ -49,6 +49,12 @@ class ApiUrlConstants {
   static String customOrderModify(String orderId) => '/api/v1/orders/custom-order/$orderId';
   static String customOrderDelete(String orderId) => '/api/v1/orders/custom-order/$orderId';
 
+  static const String PDF_CATALOG_ACTIVE = '/api/v1/pdf-catalog/active';
+  static const String PDF_CATALOG_GET_ALL = '/api/v1/pdf-catalog/get-All';
+  static const String PDF_CATALOG_CREATE = '/api/v1/pdf-catalog/create';
+  static String pdfCatalogDelete(String id) => '/api/v1/pdf-catalog/delete/$id';
+  static String pdfCatalogTogglePage(String pageId) => '/api/v1/pdf-catalog/page/$pageId';
+
   static const String ADMIN_ORDER_GET_ALL = '/api/v1/admin-order/get-AllOrders';
   static const String ADMIN_ORDER_ACTION = '/api/v1/admin-order/order-action';
   static const String ADMIN_CUSTOM_ORDER_ACTION = '/api/v1/admin-order/custom-order/action';

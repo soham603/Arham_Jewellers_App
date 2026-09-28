@@ -8,9 +8,12 @@ import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/core/theme/app_colors.dart';
 import 'package:ratnesh_gold_app/core/widgets/ratnesh_fallback.dart';
 import 'package:ratnesh_gold_app/domain/entities/customOrderModel.dart';
+import 'package:ratnesh_gold_app/domain/entities/pdf_catalog_model.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/AuthController.dart';
 import 'package:ratnesh_gold_app/presentation/controllers/customOrderController.dart';
+import 'package:ratnesh_gold_app/presentation/controllers/pdf_catalog_controller.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/pdf_catalog_picker_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/orders/customOrderSuccessPage.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/image_crop_helper.dart';
@@ -59,6 +62,9 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
   final List<bool> _isMigratingImages = [false, false, false, false];
 
   late final CustomOrderController _customOrderController;
+  late final PdfCatalogController _pdfCatalogController;
+
+  CatalogDesignSelection? _designSelection;
 
   final TextEditingController partyNameCtrl = TextEditingController();
   final TextEditingController partyCodeCtrl = TextEditingController();
@@ -110,10 +116,27 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         ? Get.find<CustomOrderController>()
         : Get.put(CustomOrderController());
 
+    _pdfCatalogController = Get.isRegistered<PdfCatalogController>()
+        ? Get.find<PdfCatalogController>()
+        : Get.put(PdfCatalogController());
+
     if (_isEditMode) {
       _initEditMode();
     } else {
       _initCreateMode();
+      _designSelection = _pdfCatalogController.selection;
+      _pdfCatalogController.loadSavedSelection().then((_) async {
+        if (_pdfCatalogController.selection != null) {
+          final stillAvailable =
+              await _pdfCatalogController.isSelectionStillAvailable();
+          if (!stillAvailable) {
+            await _pdfCatalogController.clearSelection();
+          }
+        }
+        if (mounted && !_isEditMode) {
+          setState(() => _designSelection = _pdfCatalogController.selection);
+        }
+      });
     }
   }
 
@@ -149,6 +172,7 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
     if (order.marking.isNotEmpty) selectedMarking = order.marking;
 
     _existingImageUrls = List<String>.from(order.referenceImages);
+    _designSelection = order.selectedDesign;
   }
 
   void _initCreateMode() {
@@ -246,6 +270,10 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         marking: selectedMarking,
         newImages: newImages.isNotEmpty ? newImages : null,
         removeOldImages: _removeOldImages,
+        designCatalogId: _designSelection?.catalogId ?? '',
+        designPageNumber: _designSelection?.pageNumber,
+        designX: _designSelection?.x,
+        designY: _designSelection?.y,
       );
 
       if (success && mounted) Get.back();
@@ -263,10 +291,36 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
         style: selectedStyle,
         marking: selectedMarking,
         images: newImages.isNotEmpty ? newImages : null,
+        designCatalogId: _designSelection?.catalogId,
+        designPageNumber: _designSelection?.pageNumber,
+        designX: _designSelection?.x,
+        designY: _designSelection?.y,
       );
 
-      if (success && mounted) Get.off(() => const CustomOrderSuccessPage());
+      if (success && mounted) {
+        await _pdfCatalogController.clearSelection();
+        Get.off(() => const CustomOrderSuccessPage());
+      }
     }
+  }
+
+
+  Future<void> _openCatalogPicker() async {
+    final result = await Get.to<CatalogDesignSelection>(
+      () => PdfCatalogPickerPage(
+        initialSelection: _designSelection,
+        persistSelection: !_isEditMode,
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() => _designSelection = result);
+    }
+  }
+
+  Future<void> _clearDesignSelection() async {
+    await _pdfCatalogController.clearSelection();
+    if (mounted) setState(() => _designSelection = null);
   }
 
 
@@ -634,6 +688,11 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
 
               SizedBox(height: context.heightPercent(0.5)),
 
+              _buildSectionHeader("Select Design from Catalog"),
+              _buildCard(child: _buildCatalogSelectionSection()),
+
+              SizedBox(height: context.heightPercent(0.5)),
+
               _buildSectionHeader("Customization Options"),
               _buildCard(
                 child: Column(
@@ -783,6 +842,124 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
           return const SizedBox.shrink();
         },
       ),
+    );
+  }
+
+  Widget _buildCatalogSelectionSection() {
+    final selection = _designSelection;
+
+    if (selection == null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Pick a design from our PDF catalog (optional). You can also upload reference images below.',
+            style: TextStyle(
+              fontSize: context.getResponsiveSize(3.2),
+              color: AppColors.textMuted,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: _openCatalogPicker,
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: const Text('Select from PDF Catalog'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primaryGold,
+                side: BorderSide(
+                  color: AppColors.primaryGold.withValues(alpha: 0.5),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+            width: 84,
+            height: 112,
+            child: CachedNetworkImage(
+              imageUrl: selection.imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (_, _) => Container(
+                color: AppColors.pageBg,
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+              errorWidget: (_, _, _) => Container(
+                color: AppColors.pageBg,
+                alignment: Alignment.center,
+                child: const Icon(Icons.broken_image_outlined),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                selection.catalogTitle,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: context.getResponsiveSize(3.6),
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Page ${selection.pageNumber}',
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3.2),
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _openCatalogPicker,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryGold,
+                        side: BorderSide(
+                          color: AppColors.primaryGold.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: const Text('Change'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _clearDesignSelection,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.redAccent,
+                        side: const BorderSide(color: Colors.redAccent),
+                      ),
+                      child: const Text('Delete'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
