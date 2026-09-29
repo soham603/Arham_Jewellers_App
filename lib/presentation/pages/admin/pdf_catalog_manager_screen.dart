@@ -37,86 +37,92 @@ class _PdfCatalogManagerScreenState extends State<PdfCatalogManagerScreen> {
 
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          title: const Text('Upload PDF catalog'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: titleCtrl,
-                decoration: const InputDecoration(labelText: 'Title'),
+        builder: (ctx, setLocal) => Obx(() {
+          final uploading = _controller.isUploading;
+
+          return PopScope(
+            canPop: !uploading,
+            child: AlertDialog(
+              title: Text(
+                uploading ? 'Uploading PDF catalog' : 'Upload PDF catalog',
               ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      pickedFile == null
-                          ? 'No file selected'
-                          : pickedFile!.path.split('/').last,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12),
+              content: uploading
+                  ? const _UploadProgressIndicator()
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: titleCtrl,
+                          decoration:
+                              const InputDecoration(labelText: 'Title'),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                pickedFile == null
+                                    ? 'No file selected'
+                                    : pickedFile!.path.split('/').last,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final result =
+                                    await FilePicker.platform.pickFiles(
+                                  type: FileType.custom,
+                                  allowedExtensions: ['pdf'],
+                                  allowMultiple: false,
+                                );
+                                final path = result?.files.single.path;
+                                if (path != null && path.isNotEmpty) {
+                                  setLocal(() => pickedFile = File(path));
+                                }
+                              },
+                              child: const Text('Choose PDF'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      final result = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['pdf'],
-                        allowMultiple: false,
-                      );
-                      final path = result?.files.single.path;
-                      if (path != null && path.isNotEmpty) {
-                        setLocal(() => pickedFile = File(path));
-                      }
-                    },
-                    child: const Text('Choose PDF'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              child: const Text('Cancel'),
-            ),
-            Obx(
-              () => ElevatedButton(
-                onPressed: _controller.isUploading
-                    ? null
-                    : () async {
-                        final title = titleCtrl.text.trim();
-                        if (title.isEmpty) {
-                          ToastUtils.showWarning('Enter a title');
-                          return;
-                        }
-                        if (pickedFile == null) {
-                          ToastUtils.showWarning('Choose a PDF file');
-                          return;
-                        }
+              actions: uploading
+                  ? const []
+                  : [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final title = titleCtrl.text.trim();
+                          if (title.isEmpty) {
+                            ToastUtils.showWarning('Enter a title');
+                            return;
+                          }
+                          if (pickedFile == null) {
+                            ToastUtils.showWarning('Choose a PDF file');
+                            return;
+                          }
 
-                        final ok = await _controller.uploadCatalog(
-                          file: pickedFile!,
-                          title: title,
-                        );
+                          final ok = await _controller.uploadCatalog(
+                            file: pickedFile!,
+                            title: title,
+                          );
 
-                        if (ok && ctx.mounted) Get.back();
-                      },
-                child: _controller.isUploading
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Upload'),
-              ),
+                          if (ok && ctx.mounted) Get.back();
+                        },
+                        child: const Text('Upload'),
+                      ),
+                    ],
             ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
@@ -374,6 +380,40 @@ class _PageTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _UploadProgressIndicator extends StatelessWidget {
+  const _UploadProgressIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 8),
+        const CircularProgressIndicator(),
+        const SizedBox(height: 20),
+        Text(
+          'Uploading and rendering the PDF…',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: context.getResponsiveSize(3.6),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'This can take a few minutes for large catalogs. Please keep this screen open.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppColors.textMuted,
+            fontSize: context.getResponsiveSize(3),
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
     );
   }
 }
