@@ -8,14 +8,12 @@ class ToastConfig {
   final Color backgroundColor;
   final IconData icon;
   final String? title;
-  final Duration duration;
   final SnackPosition position;
 
   const ToastConfig({
     required this.backgroundColor,
     required this.icon,
     this.title,
-    this.duration = const Duration(seconds: 3),
     this.position = SnackPosition.TOP,
   });
 }
@@ -114,6 +112,14 @@ class ToastUtils {
     }
   }
 
+  static const Duration _minToastDuration = Duration(seconds: 4);
+  static const int _charsPerExtraSecond = 40;
+
+  static Duration _lengthBasedDuration(String message) {
+    final extraSeconds = message.trim().length ~/ _charsPerExtraSecond;
+    return _minToastDuration + Duration(seconds: extraSeconds);
+  }
+
 
   static void _show({
     required ToastType type,
@@ -136,7 +142,7 @@ class ToastUtils {
     if (ctx == null) return;
     final config = _defaultConfigs[type]!;
     final resolvedTitle = title ?? config.title;
-    final resolvedDuration = duration ?? config.duration;
+    final resolvedDuration = duration ?? _lengthBasedDuration(message);
     final resolvedPosition = position ?? config.position;
 
     final margin = ctx.responsiveWidth(16, tabletVal: 32);

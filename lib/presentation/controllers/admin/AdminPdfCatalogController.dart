@@ -65,8 +65,17 @@ class AdminPdfCatalogController extends GetxController {
     } catch (e) {
       String message = 'Failed to upload PDF catalog';
       if (e is DioException) {
-        message =
-            e.response?.data?['message']?.toString() ?? e.message ?? message;
+        final data = e.response?.data;
+        if (data is Map) {
+          final nested = data['error'];
+          message =
+              (nested is Map ? nested['message'] : null)?.toString() ??
+              data['message']?.toString() ??
+              e.message ??
+              message;
+        } else {
+          message = e.message ?? message;
+        }
       }
       ToastUtils.showError(message);
       return false;

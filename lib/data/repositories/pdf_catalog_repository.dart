@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/pdf_catalog_model.dart';
 import 'package:ratnesh_gold_app/domain/repositories/i_pdf_catalog_repository.dart';
@@ -22,6 +24,11 @@ class PdfCatalogRepository extends BaseRepository
     final response = await dio.post(
       ApiUrlConstants.PDF_CATALOG_CREATE,
       data: data,
+      options: Options(
+        extra: {'requiresAuth': true},
+        sendTimeout: AppTimeouts.uploadSend,
+        receiveTimeout: AppTimeouts.uploadReceive,
+      ),
     );
     return Map<String, dynamic>.from(response.data);
   }
