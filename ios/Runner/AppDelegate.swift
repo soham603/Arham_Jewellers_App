@@ -1,4 +1,5 @@
 import Flutter
+import Photos
 import UIKit
 import UserNotifications
 
@@ -21,9 +22,14 @@ import UserNotifications
       return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
-    // 3. Set up the Method Channel
+    // 3. Set up the Method Channel.
+    // Gotcha: this name must match the Dart side exactly
+    // (`MethodChannel('com.shreearhamgold.ratneshgold/file_saver')` in
+    // share_service.dart). It previously read `com.arhamjewellers/file_saver`,
+    // so every call from Dart — including saveToDownloads — silently hit
+    // FlutterMethodNotImplemented on iOS. Keep the two in sync.
     let fileSaverChannel = FlutterMethodChannel(
-      name: "com.arhamjewellers/file_saver",
+      name: "com.shreearhamgold.ratneshgold/file_saver",
       binaryMessenger: registrar.messenger()
     )
     
@@ -32,11 +38,6 @@ import UserNotifications
       
       guard let self = self else { return }
       
-      guard call.method == "saveToDownloads" else {
-        result(FlutterMethodNotImplemented)
-        return
-      }
-
       guard let args = call.arguments as? [String: Any],
             let bytes = args["bytes"] as? FlutterStandardTypedData,
             let fileName = args["fileName"] as? String else {
@@ -44,13 +45,18 @@ import UserNotifications
         return
       }
 
-      let data = bytes.data
-      let path = self.saveToDocuments(data: data, fileName: fileName)
-
-      if let path = path {
-        result(path)
-      } else {
-        result(FlutterError(code: "SAVE_FAILED", message: "Could not save file", details: nil))
+      switch call.method {
+      case "saveToDownloads":
+        let path = self.saveToDocuments(data: bytes.data, fileName: fileName)
+        if let path = path {
+          result(path)
+        } else {
+          result(FlutterError(code: "SAVE_FAILED", message: "Could not save file", details: nil))
+        }
+      case "saveImageToGallery":
+        self.saveImageToPhotoLibrary(data: bytes.data, result: result)
+      default:
+        result(FlutterMethodNotImplemented)
       }
     })
 
@@ -112,6 +118,54 @@ import UserNotifications
     } catch {
       print("Failed to save PDF: \(error)")
       return nil
+    }
+  }
+
+  private func requestPhotoLibraryAddPermission(completion: @escaping (Bool) -> Void) {
+    if #available(iOS 14, *) {
+      PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+        completion(status == .authorized || status == .limited)
+      }
+    } else {
+      PHPhotoLibrary.requestAuthorization { status in
+        completion(status == .authorized)
+      }
+    }
+  }
+
+  private func saveImageToPhotoLibrary(data: Data, result: @escaping FlutterResult) {
+    guard let image = UIImage(data: data) else {
+      result(FlutterError(code: "INVALID_IMAGE", message: "Could not decode image data", details: nil))
+      return
+    }
+
+    requestPhotoLibraryAddPermission { granted in
+      guard granted else {
+        DispatchQueue.main.async {
+          result(FlutterError(
+            code: "PERMISSION_DENIED",
+            message: "Photo library permission is required to save images",
+            details: nil
+          ))
+        }
+        return
+      }
+
+      PHPhotoLibrary.shared().performChanges({
+        PHAssetChangeRequest.creationRequestForAsset(from: image)
+      }) { success, error in
+        DispatchQueue.main.async {
+          if success {
+            result("saved")
+          } else {
+            result(FlutterError(
+              code: "SAVE_FAILED",
+              message: error?.localizedDescription ?? "Could not save image to gallery",
+              details: nil
+            ))
+          }
+        }
+      }
     }
   }
 }

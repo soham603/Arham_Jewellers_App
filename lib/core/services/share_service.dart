@@ -26,6 +26,15 @@ class ShareToWhatsAppResult {
   });
 }
 
+class ProductDownloadResult {
+  final int saved;
+  final int failed;
+
+  const ProductDownloadResult({required this.saved, required this.failed});
+
+  bool get hasFailures => failed > 0;
+}
+
 class ShareService {
   static const String _brandName = 'SHREE ARHAM GOLD & RATNESH GOLD';
   static const String _brandSubtitle = 'Purity - Quality - Trust';
@@ -280,6 +289,70 @@ class ShareService {
         } catch (_) {}
       }
     }
+  }
+
+  static Future<ProductDownloadResult> saveImagesToGallery({
+    required List<ProductModel> products,
+    ValueNotifier<double>? progress,
+    ValueNotifier<bool>? cancelled,
+  }) async {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
+      return ProductDownloadResult(saved: 0, failed: products.length);
+    }
+
+    const batchSize = 6;
+    int saved = 0;
+    int failed = 0;
+    final total = products.length;
+
+    if (total == 0) return const ProductDownloadResult(saved: 0, failed: 0);
+
+    for (int i = 0; i < total; i += batchSize) {
+      if (cancelled?.value == true) break;
+
+      final batch = products.skip(i).take(batchSize).toList();
+
+      final rawBytesList = await Future.wait(
+        batch.map((product) async {
+          final imageUrl = product.displayImageUrl;
+          if (imageUrl == null || imageUrl.isEmpty) return null;
+          try {
+            final response = await _dio.get<List<int>>(
+              imageUrl,
+              options: Options(responseType: ResponseType.bytes),
+            );
+            if (response.statusCode == 200 && response.data != null) {
+              return Uint8List.fromList(response.data!);
+            }
+          } catch (e) {
+          }
+          return null;
+        }),
+      );
+
+      for (int j = 0; j < batch.length; j++) {
+        if (cancelled?.value == true) break;
+        final bytes = rawBytesList[j];
+        if (bytes == null) {
+          failed++;
+          continue;
+        }
+        try {
+          await _channel.invokeMethod<String>('saveImageToGallery', {
+            'bytes': bytes,
+            'fileName': 'product_${i + j + 1}_${batch[j].id}.jpg',
+            'mimeType': 'image/jpeg',
+          });
+          saved++;
+        } catch (e) {
+          failed++;
+        }
+      }
+
+      progress?.value = ((i + batch.length) / total).clamp(0.0, 1.0);
+    }
+
+    return ProductDownloadResult(saved: saved, failed: failed);
   }
 
   static Future<void> shareAsPdf({

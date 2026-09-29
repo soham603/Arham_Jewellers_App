@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -2108,6 +2109,20 @@ class _ProductListingPageState extends State<ProductListingPage> {
                   );
                 },
               ),
+              if (_isAdmin && !kIsWeb) ...[
+                const SizedBox(height: 10),
+                _shareOptionTile(
+                  ctx,
+                  icon: Icons.download_rounded,
+                  iconColor: const Color(0xFF1E88E5),
+                  title: 'Download to Gallery',
+                  subtitle: 'Save selected product images to your gallery',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _downloadToGallery(context);
+                  },
+                ),
+              ],
               const SizedBox(height: 12),
             ],
             ),
@@ -2347,6 +2362,47 @@ class _ProductListingPageState extends State<ProductListingPage> {
     ).whenComplete(() {
       if (mounted && !cancelled.value) Navigator.of(context).pop();
       if (!cancelled.value) _clearSelection();
+      cancelled.dispose();
+      progress.dispose();
+    });
+  }
+
+  void _downloadToGallery(BuildContext context) {
+    final products = _getSelectedProducts();
+    if (products.isEmpty) return;
+
+    final cancelled = ValueNotifier(false);
+    final progress = ValueNotifier(0.0);
+
+    PdfLoadingDialog.show(
+      context,
+      message: 'Saving images to gallery...',
+      progress: progress,
+      onCancel: () {
+        cancelled.value = true;
+      },
+    );
+
+    ShareService.saveImagesToGallery(
+      products: products,
+      cancelled: cancelled,
+      progress: progress,
+    ).then((result) {
+      if (mounted && !cancelled.value) Navigator.of(context).pop();
+      if (cancelled.value) return;
+      if (result.saved == 0) {
+        ToastUtils.showError('Could not save images to gallery');
+      } else if (result.hasFailures) {
+        ToastUtils.showSuccess(
+          '${result.saved} saved, ${result.failed} skipped',
+        );
+      } else {
+        ToastUtils.showSuccess(
+          '${result.saved} image${result.saved == 1 ? '' : 's'} saved to Gallery',
+        );
+      }
+      _clearSelection();
+    }).whenComplete(() {
       cancelled.dispose();
       progress.dispose();
     });
