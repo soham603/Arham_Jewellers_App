@@ -22,6 +22,7 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
   VideoPlayerController? _controller;
   bool _initialized = false;
   bool _failed = false;
+  bool _isMuted = true;
   int _initToken = 0;
 
   String get _videoUrl => widget.video?.videoUrl.trim() ?? '';
@@ -58,6 +59,7 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
       videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
     _controller = ctrl;
+    _isMuted = true;
 
     try {
       await ctrl.initialize();
@@ -74,6 +76,14 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
       _controller = null;
       setState(() => _failed = true);
     }
+  }
+
+  void _toggleMute() {
+    final ctrl = _controller;
+    if (ctrl == null || !ctrl.value.isInitialized) return;
+    final next = !_isMuted;
+    ctrl.setVolume(next ? 0 : 1);
+    setState(() => _isMuted = next);
   }
 
   Future<void> _openInstagram() async {
@@ -228,6 +238,31 @@ class _HomeVideoSectionState extends State<HomeVideoSection> {
           fit: StackFit.expand,
           children: [
             VideoPlayer(ctrl),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: GestureDetector(
+                onTap: _toggleMute,
+                behavior: HitTestBehavior.opaque,
+                child: Opacity(
+                  opacity: 0.55,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.45),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _isMuted
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_up_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               right: 10,
               bottom: 10,

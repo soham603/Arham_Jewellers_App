@@ -8,6 +8,9 @@ class AppTimeouts {
   static const downloadSend = Duration(seconds: 15);
   static const downloadReceive = Duration(seconds: 60);
 
+  static const uploadSend = Duration(minutes: 5);
+  static const uploadReceive = Duration(minutes: 5);
+
   static Options get quick => Options(
     sendTimeout: quickSend,
     receiveTimeout: quickReceive,

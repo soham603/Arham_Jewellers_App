@@ -49,12 +49,22 @@ class HomeVideoController extends GetxController {
     }
   }
 
-  Future<bool> uploadVideo(File file, {bool? isActive}) async {
+  Future<bool> uploadVideo(
+    File file, {
+    bool? isActive,
+    String? linkType,
+    String? linkId,
+  }) async {
     try {
       _uploadState.value = CurrentAppState.LOADING;
       _error.value = '';
 
-      _video.value = await _repo.upsertVideo(file: file, isActive: isActive);
+      _video.value = await _repo.upsertVideo(
+        file: file,
+        isActive: isActive,
+        linkType: linkType,
+        linkId: linkId,
+      );
 
       _uploadState.value = CurrentAppState.SUCCESS;
       return true;

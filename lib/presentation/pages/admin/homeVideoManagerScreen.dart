@@ -25,6 +25,7 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
 
   File? _pickedFile;
   bool _isPicking = false;
+  LinkTargetSelection? _linkSelection;
 
   bool get _isSuperAdmin =>
       Get.find<AuthController>().user?.role == 'SUPERADMIN';
@@ -92,13 +93,18 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
     final ok = await controller.uploadVideo(
       file,
       isActive: controller.video?.isActive ?? true,
+      linkType: _linkSelection?.linkType,
+      linkId: _linkSelection?.linkId,
     );
 
     if (!mounted) return;
 
     if (ok) {
       ToastUtils.showSuccess('Home video updated');
-      setState(() => _pickedFile = null);
+      setState(() {
+        _pickedFile = null;
+        _linkSelection = null;
+      });
     } else {
       ToastUtils.showError(controller.error);
     }
@@ -261,13 +267,26 @@ class _HomeVideoManagerScreenState extends State<HomeVideoManagerScreen> {
               SizedBox(height: context.heightPercent(1)),
               _VideoPreview(file: _pickedFile),
               SizedBox(height: context.heightPercent(1.5)),
+              LinkTargetPicker(
+                key: const ValueKey('draft-video-link'),
+                initialLinkType: _linkSelection?.linkType,
+                initialLinkId: _linkSelection?.linkId,
+                initialLinkName: _linkSelection?.linkName,
+                enabled: !isBusy,
+                onChanged: (selection) =>
+                    setState(() => _linkSelection = selection),
+              ),
+              SizedBox(height: context.heightPercent(1.5)),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: isBusy
                           ? null
-                          : () => setState(() => _pickedFile = null),
+                          : () => setState(() {
+                              _pickedFile = null;
+                              _linkSelection = null;
+                            }),
                       style: OutlinedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                           vertical: context.heightPercent(1.4),
@@ -527,6 +546,7 @@ class _VideoPreview extends StatefulWidget {
 class _VideoPreviewState extends State<_VideoPreview> {
   VideoPlayerController? _controller;
   bool _initialized = false;
+  bool _isMuted = true;
 
   String? get _source => widget.file?.path ?? widget.networkUrl;
 
@@ -565,6 +585,7 @@ class _VideoPreviewState extends State<_VideoPreview> {
 
     if (ctrl == null) return;
     _controller = ctrl;
+    _isMuted = true;
 
     try {
       await ctrl.initialize();
@@ -590,6 +611,14 @@ class _VideoPreviewState extends State<_VideoPreview> {
       ctrl.play();
     }
     setState(() {});
+  }
+
+  void _toggleMute() {
+    final ctrl = _controller;
+    if (ctrl == null || !ctrl.value.isInitialized) return;
+    final next = !_isMuted;
+    ctrl.setVolume(next ? 0 : 1);
+    setState(() => _isMuted = next);
   }
 
   @override
@@ -649,6 +678,31 @@ class _VideoPreviewState extends State<_VideoPreview> {
                   ),
                 ),
               ],
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: _toggleMute,
+                  behavior: HitTestBehavior.opaque,
+                  child: Opacity(
+                    opacity: 0.55,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _isMuted
+                            ? Icons.volume_off_rounded
+                            : Icons.volume_up_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

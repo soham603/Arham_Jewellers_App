@@ -23,7 +23,7 @@ class HomeVideoRepository extends BaseRepository
     final responseData = response.data;
     if (responseData['success'] == false) {
       throw ApiException(
-        responseData['message'] ?? 'Failed to load home video',
+        _messageFrom(responseData, 'Failed to load home video'),
         code: responseData['error']?['code'],
         response: responseData,
       );
@@ -43,9 +43,12 @@ class HomeVideoRepository extends BaseRepository
     String? linkType,
     String? linkId,
   }) async {
+    final hasValidLink =
+        linkType == 'none' || (linkId != null && linkId.isNotEmpty);
+
     final map = <String, dynamic>{
       if (isActive != null) 'isActive': isActive.toString(),
-      if (linkType != null) 'linkType': linkType,
+      if (linkType != null && hasValidLink) 'linkType': linkType,
       if (linkId != null && linkId.isNotEmpty) 'linkId': linkId,
       if (file != null)
         'video': await MultipartFile.fromFile(
@@ -59,15 +62,15 @@ class HomeVideoRepository extends BaseRepository
       data: FormData.fromMap(map),
       options: Options(
         extra: {'requiresAuth': true},
-        sendTimeout: const Duration(minutes: 2),
-        receiveTimeout: const Duration(minutes: 2),
+        sendTimeout: AppTimeouts.uploadSend,
+        receiveTimeout: AppTimeouts.uploadReceive,
       ),
     );
 
     final responseData = response.data;
     if (responseData['success'] == false) {
       throw ApiException(
-        responseData['message'] ?? 'Failed to save home video',
+        _messageFrom(responseData, 'Failed to save home video'),
         code: responseData['error']?['code'],
         response: responseData,
       );
@@ -97,10 +100,24 @@ class HomeVideoRepository extends BaseRepository
     final responseData = response.data;
     if (responseData is Map && responseData['success'] == false) {
       throw ApiException(
-        responseData['message'] ?? 'Failed to delete home video',
+        _messageFrom(responseData, 'Failed to delete home video'),
         code: responseData['error']?['code'],
         response: Map<String, dynamic>.from(responseData),
       );
     }
+  }
+
+  String _messageFrom(dynamic responseData, String fallback) {
+    if (responseData is Map) {
+      final topLevel = responseData['message'];
+      if (topLevel is String && topLevel.isNotEmpty) return topLevel;
+
+      final error = responseData['error'];
+      if (error is Map) {
+        final nested = error['message'];
+        if (nested is String && nested.isNotEmpty) return nested;
+      }
+    }
+    return fallback;
   }
 }
