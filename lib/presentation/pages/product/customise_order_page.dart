@@ -939,8 +939,17 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                         side: BorderSide(
                           color: AppColors.primaryGold.withValues(alpha: 0.5),
                         ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 10,
+                        ),
+                        minimumSize: const Size(0, 40),
                       ),
-                      child: const Text('Change'),
+                      child: const Text(
+                        'Change',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -950,8 +959,17 @@ class _CustomiseOrderPageState extends State<CustomiseOrderPage> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.redAccent,
                         side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 10,
+                        ),
+                        minimumSize: const Size(0, 40),
                       ),
-                      child: const Text('Delete'),
+                      child: const Text(
+                        'Delete',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                 ],

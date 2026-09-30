@@ -37,6 +37,12 @@ class _PdfPageSelectionPageState extends State<PdfPageSelectionPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white, size: 24),
         title: Text('${widget.catalogTitle} · Page ${widget.page.pageNumber}'),
       ),
       body: Column(
