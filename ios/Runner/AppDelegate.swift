@@ -4,7 +4,7 @@ import UIKit
 import UserNotifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, UNUserNotificationCenterDelegate {
+@objc class AppDelegate: FlutterAppDelegate {
   
   override func application(
     _ application: UIApplication,
@@ -84,7 +84,7 @@ import UserNotifications
   // MARK: - UNUserNotificationCenterDelegate
   
   // Handle notifications when app is in foreground
-  func userNotificationCenter(
+  override func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification,
     withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
@@ -94,7 +94,7 @@ import UserNotifications
   }
   
   // Handle notification tap when app is in background or terminated
-  func userNotificationCenter(
+  override func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
