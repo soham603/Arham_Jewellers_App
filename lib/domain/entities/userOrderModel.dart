@@ -1,4 +1,6 @@
 
+import 'package:ratnesh_gold_app/domain/entities/pdf_catalog_model.dart';
+
 class UserOrderModel {
   final String id;
   final int? orderToken;
@@ -28,6 +30,7 @@ class UserOrderModel {
   final String? assignAdminNotes;
   final String? completeAdminNotes;
   final DateTime? deliveryDate;
+  final CatalogDesignSelection? selectedDesign;
 
   UserOrderModel({
     required this.id,
@@ -58,6 +61,7 @@ class UserOrderModel {
     this.assignAdminNotes,
     this.completeAdminNotes,
     this.deliveryDate,
+    this.selectedDesign,
   });
 
   factory UserOrderModel.fromJson(Map<String, dynamic> json) {
@@ -105,6 +109,10 @@ class UserOrderModel {
       completeAdminNotes: json["completeAdminNotes"]?.toString(),
       deliveryDate: json["deliveryDate"] != null
           ? DateTime.tryParse(json["deliveryDate"].toString())
+          : null,
+      selectedDesign: json["selectedDesign"] is Map
+          ? CatalogDesignSelection.fromJson(
+              Map<String, dynamic>.from(json["selectedDesign"] as Map))
           : null,
     );
   }

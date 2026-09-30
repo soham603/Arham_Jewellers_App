@@ -803,15 +803,23 @@ class _OrderImagesStack extends StatelessWidget {
         .toList();
 
     if (images.isEmpty) {
-      if (order.isCustomOrder && order.referenceImages.isNotEmpty) {
-        final refImages = order.referenceImages.take(3).toList();
+      final designUrl = order.selectedDesign?.imageUrl;
+      final customPreviewUrl = order.isCustomOrder
+          ? ((designUrl != null && designUrl.isNotEmpty)
+              ? designUrl
+              : (order.referenceImages.isNotEmpty
+                  ? order.referenceImages.first
+                  : null))
+          : null;
+
+      if (customPreviewUrl != null && customPreviewUrl.isNotEmpty) {
         return SizedBox(
           width: size,
           height: size,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: CachedNetworkImage(
-              imageUrl: refImages.first,
+              imageUrl: customPreviewUrl,
               fit: BoxFit.cover,
               placeholder: (_, _) => RatneshFallback.s(width: size, height: size),
               errorWidget: (_, _, _) => RatneshFallback.s(width: size, height: size),

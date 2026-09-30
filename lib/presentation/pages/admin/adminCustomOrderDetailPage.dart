@@ -1135,23 +1135,39 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildSectionTitle(context, 'Selected Catalog Design'),
-            Row(
-              children: [
-                Text(
-                  'Show tick-mark',
-                  style: TextStyle(
-                    fontSize: context.getResponsiveSize(3.2),
-                    color: AppColors.textMuted,
-                  ),
+            Container(
+              width: 4,
+              height: 16,
+              decoration: BoxDecoration(
+                color: AppColors.primaryGold,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Selected Catalog Design',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(4.2),
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textDark,
                 ),
-                Switch(
-                  value: _showDesignTick,
-                  onChanged: (value) => setState(() => _showDesignTick = value),
-                ),
-              ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Show tick-mark',
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.2),
+                color: AppColors.textMuted,
+              ),
+            ),
+            Switch(
+              value: _showDesignTick,
+              onChanged: (value) => setState(() => _showDesignTick = value),
             ),
           ],
         ),

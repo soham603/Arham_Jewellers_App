@@ -20,6 +20,7 @@ import 'package:ratnesh_gold_app/utils/ToastUtil.dart' show ToastUtils;
 import 'package:ratnesh_gold_app/core/constants/karat_constants.dart';
 import 'package:ratnesh_gold_app/data/repositories/product_repository.dart';
 import 'package:ratnesh_gold_app/presentation/pages/product/product_details_page.dart';
+import 'package:ratnesh_gold_app/presentation/pages/product/widgets/pdf_page_tick_viewer.dart';
 
 class UserOrderDetailScreen extends StatefulWidget {
   const UserOrderDetailScreen({super.key, required this.order});
@@ -31,6 +32,8 @@ class UserOrderDetailScreen extends StatefulWidget {
 }
 
 class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
+
+  bool _showDesignTick = true;
 
   @override
   Widget build(BuildContext context) {
@@ -356,6 +359,11 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
               formatOrderDate(order.deliveryDate!.toLocal()),
             ),
 
+          if (order.selectedDesign != null) ...[
+            SizedBox(height: context.heightPercent(1.5)),
+            _buildSelectedDesignSection(context, order),
+          ],
+
           if (order.items.isNotEmpty) ...[
             SizedBox(height: context.heightPercent(1.5)),
             Text(
@@ -491,6 +499,93 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildSelectedDesignSection(BuildContext context, UserOrderModel order) {
+    final design = order.selectedDesign!;
+
+    final aspect = (design.width > 0 && design.height > 0)
+        ? design.width / design.height
+        : 0.707;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                "Selected Catalog Design",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: context.getResponsiveSize(3.8),
+                  color: AppColors.textDark,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              "Show tick-mark",
+              style: TextStyle(
+                fontSize: context.getResponsiveSize(3.0),
+                color: AppColors.textMuted,
+              ),
+            ),
+            Transform.scale(
+              scale: 0.8,
+              child: Switch(
+                value: _showDesignTick,
+                activeThumbColor: AppColors.primaryGold,
+                onChanged: (value) => setState(() => _showDesignTick = value),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: context.heightPercent(0.5)),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(context.getResponsiveSize(3)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE7DED2)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${design.catalogTitle} · Page ${design.pageNumber}",
+                style: TextStyle(
+                  fontSize: context.getResponsiveSize(3.4),
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
+              ),
+              SizedBox(height: context.heightPercent(1)),
+              AspectRatio(
+                aspectRatio: aspect,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: ColoredBox(
+                    color: Colors.black,
+                    child: PdfPageTickViewer(
+                      imageUrl: design.imageUrl,
+                      imageWidth: design.width,
+                      imageHeight: design.height,
+                      initialTick: Offset(design.x, design.y),
+                      interactive: false,
+                      showTick: _showDesignTick,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
