@@ -231,6 +231,18 @@ class _CatalogCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final activeCount = catalog.pages.where((p) => p.isActive).length;
 
+    final total = catalog.totalPages;
+    final String subtitle;
+    if (catalog.isProcessing) {
+      subtitle = (total != null && total > 0)
+          ? 'Processing ${catalog.processedPages}/$total pages…'
+          : 'Processing…';
+    } else if (catalog.hasFailed) {
+      subtitle = 'Processing failed';
+    } else {
+      subtitle = '$activeCount of ${catalog.pages.length} pages shown';
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -257,12 +269,25 @@ class _CatalogCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$activeCount of ${catalog.pages.length} pages shown',
+                      subtitle,
                       style: TextStyle(
                         fontSize: context.getResponsiveSize(3),
-                        color: AppColors.textMuted,
+                        color: catalog.hasFailed
+                            ? Colors.redAccent
+                            : AppColors.textMuted,
                       ),
                     ),
+                    if (catalog.hasFailed &&
+                        (catalog.errorMessage ?? '').trim().isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        catalog.errorMessage!,
+                        style: TextStyle(
+                          fontSize: context.getResponsiveSize(2.8),
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -283,26 +308,87 @@ class _CatalogCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: catalog.pages.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.68,
+          if (catalog.isProcessing)
+            _ProcessingPanel(processed: catalog.processedPages, total: total)
+          else if (catalog.hasFailed)
+            Row(
+              children: [
+                const Icon(Icons.error_outline,
+                    color: Colors.redAccent, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'This catalog could not be processed. Delete it and upload again.',
+                    style: TextStyle(
+                      fontSize: context.getResponsiveSize(2.8),
+                      color: Colors.redAccent,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: catalog.pages.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.68,
+              ),
+              itemBuilder: (context, index) {
+                final page = catalog.pages[index];
+                return _PageTile(
+                  page: page,
+                  onToggle: (value) => onTogglePage(page, value),
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              final page = catalog.pages[index];
-              return _PageTile(
-                page: page,
-                onToggle: (value) => onTogglePage(page, value),
-              );
-            },
-          ),
         ],
       ),
+    );
+  }
+}
+
+class _ProcessingPanel extends StatelessWidget {
+  final int processed;
+  final int? total;
+
+  const _ProcessingPanel({required this.processed, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = this.total;
+    final double? value =
+        (total != null && total > 0)
+            ? (processed / total).clamp(0.0, 1.0).toDouble()
+            : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: value,
+            minHeight: 8,
+            backgroundColor: const Color(0xFFEDE6DB),
+            valueColor:
+                const AlwaysStoppedAnimation<Color>(AppColors.primaryGold),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Rendering pages in the background. This can take a few minutes '
+          'for large catalogs.',
+          style: TextStyle(
+            fontSize: context.getResponsiveSize(2.8),
+            color: AppColors.textMuted,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -396,7 +482,7 @@ class _UploadProgressIndicator extends StatelessWidget {
         const CircularProgressIndicator(),
         const SizedBox(height: 20),
         Text(
-          'Uploading and rendering the PDF…',
+          'Uploading the PDF…',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
@@ -405,7 +491,7 @@ class _UploadProgressIndicator extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'This can take a few minutes for large catalogs. Please keep this screen open.',
+          'Pages will render in the background after the upload. Please keep this screen open until the upload finishes.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.textMuted,

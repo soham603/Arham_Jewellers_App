@@ -43,6 +43,10 @@ class PdfCatalogModel {
   final String title;
   final int pageCount;
   final bool isActive;
+  final String status;
+  final int? totalPages;
+  final int processedPages;
+  final String? errorMessage;
   final List<PdfCatalogPageModel> pages;
 
   PdfCatalogModel({
@@ -50,8 +54,16 @@ class PdfCatalogModel {
     required this.title,
     required this.pageCount,
     this.isActive = true,
+    this.status = 'READY',
+    this.totalPages,
+    this.processedPages = 0,
+    this.errorMessage,
     required this.pages,
   });
+
+  bool get isProcessing => status == 'PENDING' || status == 'PROCESSING';
+
+  bool get hasFailed => status == 'FAILED';
 
   factory PdfCatalogModel.fromJson(Map<String, dynamic> json) {
     final rawPages = json['pages'];
@@ -61,6 +73,11 @@ class PdfCatalogModel {
       pageCount: int.tryParse(json['pageCount']?.toString() ?? '') ??
           (rawPages is List ? rawPages.length : 0),
       isActive: json['isActive'] ?? true,
+      status: json['status']?.toString().toUpperCase() ?? 'READY',
+      totalPages: int.tryParse(json['totalPages']?.toString() ?? ''),
+      processedPages:
+          int.tryParse(json['processedPages']?.toString() ?? '') ?? 0,
+      errorMessage: json['errorMessage']?.toString(),
       pages: rawPages is List
           ? rawPages
               .map((e) =>
@@ -76,6 +93,10 @@ class PdfCatalogModel {
       title: title,
       pageCount: pageCount,
       isActive: isActive,
+      status: status,
+      totalPages: totalPages,
+      processedPages: processedPages,
+      errorMessage: errorMessage,
       pages: pages ?? this.pages,
     );
   }

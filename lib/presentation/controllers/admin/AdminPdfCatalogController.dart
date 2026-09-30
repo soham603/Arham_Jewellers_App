@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -23,18 +24,49 @@ class AdminPdfCatalogController extends GetxController {
   final _deletingIds = <String>{}.obs;
   bool isDeleting(String id) => _deletingIds.contains(id);
 
-  Future<void> fetchCatalogs() async {
+  Timer? _pollTimer;
+
+  @override
+  void onClose() {
+    _stopPolling();
+    super.onClose();
+  }
+
+  Future<void> fetchCatalogs({bool silent = false}) async {
     if (_isLoading.value) return;
 
     try {
       _isLoading.value = true;
       final result = await _repo.fetchAdminCatalogs();
       _catalogs.assignAll(result);
+      _syncPolling();
     } catch (_) {
-      ToastUtils.showError('Failed to load PDF catalogs');
+      if (!silent) {
+        ToastUtils.showError('Failed to load PDF catalogs');
+      }
     } finally {
       _isLoading.value = false;
     }
+  }
+
+  void _syncPolling() {
+    if (_catalogs.any((c) => c.isProcessing)) {
+      _startPolling();
+    } else {
+      _stopPolling();
+    }
+  }
+
+  void _startPolling() {
+    _pollTimer ??= Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => fetchCatalogs(silent: true),
+    );
+  }
+
+  void _stopPolling() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
   }
 
   Future<bool> uploadCatalog({
@@ -57,31 +89,63 @@ class AdminPdfCatalogController extends GetxController {
       final response = await _repo.createCatalog(data: formData);
 
       ToastUtils.showSuccess(
-        response['message']?.toString() ?? 'PDF catalog uploaded',
+        response['message']?.toString() ??
+            'Upload received — processing in background',
       );
 
       await fetchCatalogs();
       return true;
     } catch (e) {
-      String message = 'Failed to upload PDF catalog';
-      if (e is DioException) {
-        final data = e.response?.data;
-        if (data is Map) {
-          final nested = data['error'];
-          message =
-              (nested is Map ? nested['message'] : null)?.toString() ??
-              data['message']?.toString() ??
-              e.message ??
-              message;
-        } else {
-          message = e.message ?? message;
-        }
-      }
-      ToastUtils.showError(message);
+      ToastUtils.showError(_describeUploadError(e));
       return false;
     } finally {
       _isUploading.value = false;
     }
+  }
+
+  String _describeUploadError(Object e) {
+    const fallback = 'Failed to upload PDF catalog';
+
+    if (e is! DioException) return fallback;
+
+    final data = e.response?.data;
+    if (data is Map) {
+      final nested = data['error'];
+      final candidates = <dynamic>[
+        nested is Map ? nested['message'] : null,
+        data['message'],
+      ];
+
+      for (final candidate in candidates) {
+        final text = candidate?.toString().trim();
+        if (text != null && text.isNotEmpty) return text;
+      }
+    }
+
+    switch (e.response?.statusCode) {
+      case 408:
+        return 'Upload timed out. Please check your connection and try again.';
+      case 413:
+        return 'The PDF is too large to upload.';
+      case 401:
+        return 'Your session expired. Please log in again.';
+      case 403:
+        return 'You do not have permission to upload catalogs.';
+      case 502:
+      case 503:
+      case 504:
+        return 'Server is temporarily unavailable. Please try again.';
+    }
+
+    final error = e.error;
+    if (error is String && error.trim().isNotEmpty) {
+      return error.trim();
+    }
+
+    final message = e.message?.trim();
+    if (message != null && message.isNotEmpty) return message;
+
+    return fallback;
   }
 
   Future<void> deleteCatalog(String id) async {
@@ -91,6 +155,7 @@ class AdminPdfCatalogController extends GetxController {
       _deletingIds.add(id);
       await _repo.deleteCatalog(id: id);
       _catalogs.removeWhere((c) => c.id == id);
+      _syncPolling();
       ToastUtils.showSuccess('PDF catalog deleted');
     } catch (_) {
       ToastUtils.showError('Failed to delete PDF catalog');
