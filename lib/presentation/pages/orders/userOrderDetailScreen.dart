@@ -526,16 +526,22 @@ class _UserOrderDetailScreenState extends State<UserOrderDetailScreen> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+          ],
+        ),
+        SizedBox(height: context.heightPercent(0.5)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
             Text(
               "Show tick-mark",
               style: TextStyle(
-                fontSize: context.getResponsiveSize(3.0),
+                fontSize: context.getResponsiveSize(3.5),
+                fontWeight: FontWeight.w600,
                 color: AppColors.textMuted,
               ),
             ),
             Transform.scale(
-              scale: 0.8,
+              scale: 0.85,
               child: Switch(
                 value: _showDesignTick,
                 activeThumbColor: AppColors.primaryGold,

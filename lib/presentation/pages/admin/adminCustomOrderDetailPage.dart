@@ -1157,17 +1157,27 @@ class _AdminCustomOrderDetailPageState extends State<AdminCustomOrderDetailPage>
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+          ],
+        ),
+        SizedBox(height: context.heightPercent(0.5)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
             Text(
               'Show tick-mark',
               style: TextStyle(
-                fontSize: context.getResponsiveSize(3.2),
+                fontSize: context.getResponsiveSize(3.5),
+                fontWeight: FontWeight.w600,
                 color: AppColors.textMuted,
               ),
             ),
-            Switch(
-              value: _showDesignTick,
-              onChanged: (value) => setState(() => _showDesignTick = value),
+            Transform.scale(
+              scale: 0.85,
+              child: Switch(
+                value: _showDesignTick,
+                activeThumbColor: AppColors.primaryGold,
+                onChanged: (value) => setState(() => _showDesignTick = value),
+              ),
             ),
           ],
         ),
