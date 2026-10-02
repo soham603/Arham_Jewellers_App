@@ -22,6 +22,7 @@ class PdfCatalogPickerPage extends StatefulWidget {
 
 class _PdfCatalogPickerPageState extends State<PdfCatalogPickerPage> {
   late final PdfCatalogController _controller;
+  PdfCatalogModel? _selectedCatalog;
 
   @override
   void initState() {
@@ -74,68 +75,189 @@ class _PdfCatalogPickerPageState extends State<PdfCatalogPickerPage> {
     if (mounted) Get.back(result: selection);
   }
 
+  PdfCatalogModel? _resolveSelected(List<PdfCatalogModel> catalogs) {
+    final selected = _selectedCatalog;
+    if (selected == null) return null;
+    for (final catalog in catalogs) {
+      if (catalog.id == selected.id) return catalog;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Select from catalog')),
-      body: Obx(
-        () {
-          if (_controller.isLoading && _controller.catalogs.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return Obx(
+      () {
+        final catalogs = _controller.catalogs;
+        final selected = _resolveSelected(catalogs);
+        final multi = catalogs.length > 1;
+        final showCatalogList = multi && selected == null;
 
-          if (_controller.error.isNotEmpty && _controller.catalogs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_controller.error),
-                  const SizedBox(height: 12),
-                  OutlinedButton(
-                    onPressed: _controller.fetchCatalogs,
-                    child: const Text('Retry'),
-                  ),
-                ],
+        return PopScope(
+          canPop: !(multi && selected != null),
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop) {
+              setState(() => _selectedCatalog = null);
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(
+                !multi
+                    ? 'Select from catalog'
+                    : showCatalogList
+                        ? 'Choose a catalog'
+                        : selected?.title ?? 'Select from catalog',
               ),
-            );
-          }
+            ),
+            body: _buildBody(catalogs, selected, showCatalogList),
+          ),
+        );
+      },
+    );
+  }
 
-          if (_controller.catalogs.isEmpty) {
-            return const Center(
-              child: Text('No design catalogs available right now.'),
-            );
-          }
+  Widget _buildBody(
+    List<PdfCatalogModel> catalogs,
+    PdfCatalogModel? selected,
+    bool showCatalogList,
+  ) {
+    if (_controller.isLoading && catalogs.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-          return RefreshIndicator(
-            onRefresh: _controller.fetchCatalogs,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const Text(
-                  'Tap a page, then tap the design you want. Only one design can be selected.',
-                  style: TextStyle(fontSize: 13, color: Colors.black54),
-                ),
-                const SizedBox(height: 16),
-                for (final catalog in _controller.catalogs) ...[
-                  Text(
-                    catalog.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+    if (_controller.error.isNotEmpty && catalogs.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_controller.error),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: _controller.fetchCatalogs,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (catalogs.isEmpty) {
+      return const Center(
+        child: Text('No design catalogs available right now.'),
+      );
+    }
+
+    if (showCatalogList) {
+      return RefreshIndicator(
+        onRefresh: _controller.fetchCatalogs,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: Text(
+                'Choose a catalog to browse its pages.',
+                style: TextStyle(fontSize: 13, color: Colors.black54),
+              ),
+            ),
+            for (final catalog in catalogs)
+              _CatalogListTile(
+                catalog: catalog,
+                onTap: () => setState(() => _selectedCatalog = catalog),
+              ),
+          ],
+        ),
+      );
+    }
+
+    final active = selected ?? catalogs.first;
+    return RefreshIndicator(
+      onRefresh: _controller.fetchCatalogs,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (active.pages.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Center(
+                child: Text('No pages available in this catalog.'),
+              ),
+            )
+          else ...[
+            const Text(
+              'Tap a page, then tap the design you want. Only one design can be selected.',
+              style: TextStyle(fontSize: 13, color: Colors.black54),
+            ),
+            const SizedBox(height: 16),
+            _CatalogPagesGrid(
+              catalog: active,
+              onPageTap: (page) => _openPage(active, page),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CatalogListTile extends StatelessWidget {
+  final PdfCatalogModel catalog;
+  final VoidCallback onTap;
+
+  const _CatalogListTile({
+    required this.catalog,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final coverUrl = catalog.pages.isNotEmpty ? catalog.pages.first.imageUrl : '';
+    final pageCount = catalog.pages.length;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      onTap: onTap,
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: 56,
+          height: 72,
+          child: coverUrl.isEmpty
+              ? Container(
+                  color: Colors.grey.shade200,
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.menu_book_outlined),
+                )
+              : CachedNetworkImage(
+                  imageUrl: coverUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (_, _) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  _CatalogPagesGrid(
-                    catalog: catalog,
-                    onPageTap: (page) => _openPage(catalog, page),
+                  errorWidget: (_, _, _) => Container(
+                    color: Colors.grey.shade200,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image_outlined),
                   ),
-                  const SizedBox(height: 24),
-                ],
-              ],
-            ),
-          );
-        },
+                ),
+        ),
       ),
+      title: Text(
+        catalog.title,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(
+        '$pageCount ${pageCount == 1 ? 'page' : 'pages'}',
+        style: const TextStyle(fontSize: 13, color: Colors.black54),
+      ),
+      trailing: const Icon(Icons.chevron_right),
     );
   }
 }
