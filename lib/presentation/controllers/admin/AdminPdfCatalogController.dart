@@ -164,6 +164,31 @@ class AdminPdfCatalogController extends GetxController {
     }
   }
 
+  Future<bool> renameCatalog({
+    required String id,
+    required String title,
+  }) async {
+    final index = _catalogs.indexWhere((c) => c.id == id);
+    if (index == -1) return false;
+
+    final previous = _catalogs[index];
+    _catalogs[index] = previous.copyWith(title: title);
+
+    try {
+      await _repo.editCatalog(id: id, title: title);
+      ToastUtils.showSuccess('Catalog renamed');
+      return true;
+    } catch (_) {
+      final rollbackIndex = _catalogs.indexWhere((c) => c.id == id);
+      if (rollbackIndex != -1) {
+        _catalogs[rollbackIndex] =
+            _catalogs[rollbackIndex].copyWith(title: previous.title);
+      }
+      ToastUtils.showError('Failed to rename catalog');
+      return false;
+    }
+  }
+
   Future<void> togglePage({
     required String catalogId,
     required PdfCatalogPageModel page,
@@ -182,8 +207,17 @@ class AdminPdfCatalogController extends GetxController {
     try {
       await _repo.toggleCatalogPage(pageId: page.id, isActive: isActive);
     } catch (_) {
-      pages[pageIndex] = pages[pageIndex].copyWith(isActive: !isActive);
-      _catalogs[catalogIndex] = _catalogs[catalogIndex].copyWith(pages: pages);
+      final rollbackIndex = _catalogs.indexWhere((c) => c.id == catalogId);
+      if (rollbackIndex == -1) return;
+      final rollbackPages =
+          List<PdfCatalogPageModel>.from(_catalogs[rollbackIndex].pages);
+      final rollbackPageIndex =
+          rollbackPages.indexWhere((p) => p.id == page.id);
+      if (rollbackPageIndex == -1) return;
+      rollbackPages[rollbackPageIndex] =
+          rollbackPages[rollbackPageIndex].copyWith(isActive: !isActive);
+      _catalogs[rollbackIndex] =
+          _catalogs[rollbackIndex].copyWith(pages: rollbackPages);
       ToastUtils.showError('Failed to update page');
     }
   }

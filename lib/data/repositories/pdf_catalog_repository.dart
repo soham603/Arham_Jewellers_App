@@ -40,6 +40,18 @@ class PdfCatalogRepository extends BaseRepository
   }
 
   @override
+  Future<Map<String, dynamic>> editCatalog({
+    required String id,
+    required String title,
+  }) async {
+    final response = await dio.put(
+      ApiUrlConstants.pdfCatalogEdit(id),
+      data: {'title': title},
+    );
+    return Map<String, dynamic>.from(response.data);
+  }
+
+  @override
   Future<Map<String, dynamic>> toggleCatalogPage({
     required String pageId,
     required bool isActive,

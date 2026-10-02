@@ -127,6 +127,49 @@ class _PdfCatalogManagerScreenState extends State<PdfCatalogManagerScreen> {
     );
   }
 
+  Future<void> _showRenameDialog(PdfCatalogModel catalog) async {
+    final titleCtrl = TextEditingController(text: catalog.title);
+
+    void submit() {
+      if (titleCtrl.text.trim().isEmpty) {
+        ToastUtils.showWarning('Enter a title');
+        return;
+      }
+      Get.back(result: true);
+    }
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename catalog'),
+        content: TextField(
+          controller: titleCtrl,
+          autofocus: true,
+          decoration: const InputDecoration(labelText: 'Title'),
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => submit(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: submit,
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (saved != true) return;
+
+    final newTitle = titleCtrl.text.trim();
+    if (newTitle == catalog.title) return;
+
+    await _controller.renameCatalog(id: catalog.id, title: newTitle);
+  }
+
   Future<void> _confirmDelete(PdfCatalogModel catalog) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -199,6 +242,7 @@ class _PdfCatalogManagerScreenState extends State<PdfCatalogManagerScreen> {
               return _CatalogCard(
                 catalog: catalog,
                 isDeleting: _controller.isDeleting(catalog.id),
+                onRename: () => _showRenameDialog(catalog),
                 onDelete: () => _confirmDelete(catalog),
                 onTogglePage: (page, isActive) => _controller.togglePage(
                   catalogId: catalog.id,
@@ -217,12 +261,14 @@ class _PdfCatalogManagerScreenState extends State<PdfCatalogManagerScreen> {
 class _CatalogCard extends StatelessWidget {
   final PdfCatalogModel catalog;
   final bool isDeleting;
+  final VoidCallback onRename;
   final VoidCallback onDelete;
   final void Function(PdfCatalogPageModel page, bool isActive) onTogglePage;
 
   const _CatalogCard({
     required this.catalog,
     required this.isDeleting,
+    required this.onRename,
     required this.onDelete,
     required this.onTogglePage,
   });
@@ -301,9 +347,20 @@ class _CatalogCard extends StatelessWidget {
                   ),
                 )
               else
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: onRename,
+                      icon: const Icon(Icons.edit_outlined,
+                          color: AppColors.textDark),
+                    ),
+                    IconButton(
+                      onPressed: onDelete,
+                      icon: const Icon(Icons.delete_outline,
+                          color: Colors.redAccent),
+                    ),
+                  ],
                 ),
             ],
           ),

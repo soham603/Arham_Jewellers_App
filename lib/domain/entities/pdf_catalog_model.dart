@@ -87,10 +87,10 @@ class PdfCatalogModel {
     );
   }
 
-  PdfCatalogModel copyWith({List<PdfCatalogPageModel>? pages}) {
+  PdfCatalogModel copyWith({String? title, List<PdfCatalogPageModel>? pages}) {
     return PdfCatalogModel(
       id: id,
-      title: title,
+      title: title ?? this.title,
       pageCount: pageCount,
       isActive: isActive,
       status: status,

@@ -53,6 +53,7 @@ class ApiUrlConstants {
   static const String PDF_CATALOG_GET_ALL = '/api/v1/pdf-catalog/get-All';
   static const String PDF_CATALOG_CREATE = '/api/v1/pdf-catalog/create';
   static String pdfCatalogDelete(String id) => '/api/v1/pdf-catalog/delete/$id';
+  static String pdfCatalogEdit(String id) => '/api/v1/pdf-catalog/edit/$id';
   static String pdfCatalogTogglePage(String pageId) => '/api/v1/pdf-catalog/page/$pageId';
 
   static const String ADMIN_ORDER_GET_ALL = '/api/v1/admin-order/get-AllOrders';

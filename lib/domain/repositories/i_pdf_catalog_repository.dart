@@ -9,6 +9,11 @@ abstract class IPdfCatalogRepository {
 
   Future<Map<String, dynamic>> deleteCatalog({required String id});
 
+  Future<Map<String, dynamic>> editCatalog({
+    required String id,
+    required String title,
+  });
+
   Future<Map<String, dynamic>> toggleCatalogPage({
     required String pageId,
     required bool isActive,
