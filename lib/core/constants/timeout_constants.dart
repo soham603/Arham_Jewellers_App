@@ -11,6 +11,9 @@ class AppTimeouts {
   static const uploadSend = Duration(minutes: 5);
   static const uploadReceive = Duration(minutes: 5);
 
+  static const syncSend = Duration(seconds: 30);
+  static const syncReceive = Duration(minutes: 20);
+
   static Options get quick => Options(
     sendTimeout: quickSend,
     receiveTimeout: quickReceive,
@@ -25,5 +28,10 @@ class AppTimeouts {
     sendTimeout: downloadSend,
     receiveTimeout: downloadReceive,
     extra: {'requiresAuth': false},
+  );
+
+  static Options get sync => Options(
+    sendTimeout: syncSend,
+    receiveTimeout: syncReceive,
   );
 }

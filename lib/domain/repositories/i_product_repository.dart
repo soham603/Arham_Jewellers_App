@@ -21,4 +21,8 @@ abstract class IProductRepository {
     int limit,
   });
   Future<Map<String, dynamic>> syncMissingImage(String id);
+  Future<Map<String, dynamic>> triggerFullStockSync();
+  Future<Map<String, dynamic>> triggerStockSync({
+    required String overrideLastSyncDate,
+  });
 }

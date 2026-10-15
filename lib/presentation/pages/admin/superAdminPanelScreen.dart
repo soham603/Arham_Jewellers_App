@@ -18,6 +18,7 @@ import 'package:ratnesh_gold_app/presentation/pages/admin/handsetChangeScreen.da
 import 'package:ratnesh_gold_app/presentation/pages/admin/homeVideoManagerScreen.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/image_sync_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/pdf_catalog_manager_screen.dart';
+import 'package:ratnesh_gold_app/presentation/pages/admin/stock_sync_page.dart';
 import 'package:ratnesh_gold_app/presentation/pages/admin/userManagementScreen.dart';
 import 'package:ratnesh_gold_app/utils/ContextExtensions.dart';
 import 'package:ratnesh_gold_app/utils/ToastUtil.dart';
@@ -348,6 +349,13 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
                 ),
                 _adminTile(
                   context,
+                  icon: Icons.sync_rounded,
+                  title: "Stock Sync",
+                  subtitle: "Full sync & backfill",
+                  onTap: () => Get.to(() => const StockSyncPage()),
+                ),
+                _adminTile(
+                  context,
                   icon: Icons.lock_reset_rounded,
                   title: "Change Password",
                   subtitle: "Update your password",
@@ -416,6 +424,9 @@ class _SuperAdminPanelScreenState extends State<SuperAdminPanelScreen> {
         _ManagementItem(Icons.cloud_sync_rounded, "Image Sync",
             "Sync missing images by date",
             () => Get.to(() => const ImageSyncPage())),
+        _ManagementItem(Icons.sync_rounded, "Stock Sync",
+            "Full sync & backfill",
+            () => Get.to(() => const StockSyncPage())),
         _ManagementItem(Icons.lock_reset_rounded, "Change Password",
             "Update your password",
             () => Get.to(() => const ChangePasswordPage())),

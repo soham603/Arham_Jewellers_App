@@ -1,4 +1,5 @@
 import 'package:ratnesh_gold_app/core/constants/ApiUrlConstants.dart';
+import 'package:ratnesh_gold_app/core/constants/timeout_constants.dart';
 import 'package:ratnesh_gold_app/data/repositories/base_repository.dart';
 import 'package:ratnesh_gold_app/domain/entities/paginated_result.dart';
 import 'package:ratnesh_gold_app/domain/entities/productModel.dart';
@@ -101,6 +102,30 @@ class ProductRepository extends BaseRepository implements IProductRepository {
   Future<Map<String, dynamic>> syncMissingImage(String id) async {
     final response = await dio.post(
       ApiUrlConstants.productSyncMissingImage(id),
+    );
+    checkApiError(response.data);
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> triggerFullStockSync() async {
+    final response = await dio.post(
+      ApiUrlConstants.PRODUCTS_ALPHA_FULL_SYNC,
+      data: const <String, dynamic>{},
+      options: AppTimeouts.sync,
+    );
+    checkApiError(response.data);
+    return response.data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> triggerStockSync({
+    required String overrideLastSyncDate,
+  }) async {
+    final response = await dio.post(
+      ApiUrlConstants.PRODUCTS_ALPHA_SYNC,
+      data: <String, dynamic>{'overrideLastSyncDate': overrideLastSyncDate},
+      options: AppTimeouts.sync,
     );
     checkApiError(response.data);
     return response.data;

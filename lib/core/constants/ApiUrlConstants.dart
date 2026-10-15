@@ -28,6 +28,9 @@ class ApiUrlConstants {
   static const String PRODUCTS_MISSING_IMAGES = '/api/v1/products/missing-images';
   static String productSyncMissingImage(String id) => '/api/v1/products/sync-missing-image/$id';
 
+  static const String PRODUCTS_ALPHA_SYNC = '/api/v1/products/alpha-sync-products';
+  static const String PRODUCTS_ALPHA_FULL_SYNC = '/api/v1/products/alpha-full-sync';
+
   static const String CATEGORY_GET_ALL = '/api/v1/category/get-All';
   static const String CATEGORY_CREATE = '/api/v1/category/create';
   static String categoryEdit(String id) => '/api/v1/category/edit/$id';
