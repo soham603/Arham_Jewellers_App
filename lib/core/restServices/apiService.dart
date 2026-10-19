@@ -245,7 +245,19 @@ class BaseHttpService {
         data: {"refreshToken": refreshToken, "deviceId": deviceId},
       );
 
-      final extracted = _extractTokenSet(response.data);
+      final storedRefreshExpiry = await sessionManager
+          .getRefreshTokenExpiry()
+          .timeout(_tokenReadTimeout);
+      final extracted = _extractTokenSet(
+        response.data,
+        fallbackRefreshToken: refreshToken,
+        fallbackRefreshExpiry: storedRefreshExpiry == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(
+                storedRefreshExpiry,
+                isUtc: true,
+              ).toIso8601String(),
+      );
       if (extracted != null) {
         await sessionManager.saveTokens(
           accessToken: extracted.access,
@@ -278,7 +290,11 @@ class BaseHttpService {
   }
 
   ({String access, String refresh, String accessExpiry, String refreshExpiry})?
-  _extractTokenSet(dynamic body) {
+  _extractTokenSet(
+    dynamic body, {
+    String? fallbackRefreshToken,
+    String? fallbackRefreshExpiry,
+  }) {
     if (body is! Map) return null;
 
     final candidates = <Map>[];
@@ -292,9 +308,17 @@ class BaseHttpService {
 
     for (final m in candidates) {
       final access = m['accessToken'];
-      final refresh = m['refreshToken'];
+      final rawRefresh = m['refreshToken'];
+      final refresh = rawRefresh is String && rawRefresh.isNotEmpty
+          ? rawRefresh
+          : fallbackRefreshToken;
       final accessExpiry = m['accessTokenValidTill'];
-      final refreshExpiry = m['refreshTokenValidTill'] ?? m['enableAccessTill'];
+      final rawRefreshExpiry =
+          m['refreshTokenValidTill'] ?? m['enableAccessTill'];
+      final refreshExpiry =
+          rawRefreshExpiry is String && rawRefreshExpiry.isNotEmpty
+          ? rawRefreshExpiry
+          : fallbackRefreshExpiry;
       if (access is String &&
           access.isNotEmpty &&
           refresh is String &&
@@ -371,9 +395,15 @@ class BaseHttpService {
           .isAccessTokenExpired()
           .timeout(_tokenReadTimeout);
       if (!isAccessExpired) return true;
+
+      final isRefreshExpired = await sessionManager
+          .isRefreshTokenExpired()
+          .timeout(_tokenReadTimeout);
+      if (isRefreshExpired) return false;
     } catch (e) {}
 
-    return await _handleTokenRefresh() == _RefreshResult.success;
+    final result = await _handleTokenRefresh();
+    return result != _RefreshResult.authFailure;
   }
 
   dio.Dio get client => _dio;
